@@ -42,6 +42,7 @@
 | `adr/ADR-TEMPLATE.md` | 治理 | `template` | ADR 模板 |
 | `adr/0001-separate-grammar-from-governance.md` | 治理 | `accepted` | 规范层与执行层分离决策 |
 | `adr/0002-compilation-meta-vs-methods.md` | 治理 | `accepted` | 编译元框架与方法分离决策 |
+| `adr/0003-version-and-state-governance.md` | 治理 | `accepted` | 版本与状态治理决策 |
 | `scripts/README.md` | 辅助 | `active` | 辅助脚本目录说明 |
 | `scripts/check_glossary_sync.md` | 辅助 | `active` | GLOSSARY/JSONL 同步检查规格 |
 | `validation/CHECKLIST.md` | 验证 | `active` | 检查项规格投影 |
