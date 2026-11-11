@@ -101,6 +101,15 @@
 - **波及文件**：`spec/CONTEXT_ASSEMBLY.md`。
 - **状态**：`closed`（2026-11-11）
 
+#### E-011 — 文件版本载体与“产物版本 = 源文件版本函数”的口径变更
+
+- **原表述**：`CONSTITUTION.md` 第 9 条、第 11.7 条要求规范层与术语表的版本号在文件头声明；`spec/COMPILATION_META.md` 第 3.6、7.5 条与第 10 条、`spec/methods/deterministic-checker.md` 第 9 节以文件版本为输入定义“产物版本 = f(`GRAMMAR.md` 版本, `SOURCE_LEDGER.md` 版本, 方法版本)”，并在装配时比对版本是否对齐。
+- **问题**：文件层去版本（ADR-0003）后该链没有输入；且版本号比较无法发现“源文件已改但未递增版本号”，会给出假通过——这使“防过期产物”在版本号机制下本身就不可靠。
+- **发现方式**：落地 ADR-0003 时逐条核对现存条文。
+- **修正**：按 ADR-0003 改为包层 tag 声明版本、文件不承载版本；按 ADR-0004 改为产物记录生成基线的 `source_commit`，装配时比对当前源提交，源文件有未提交改动时直接判定过期。
+- **波及文件**：`CONSTITUTION.md`、`spec/COMPILATION_META.md`、`spec/methods/deterministic-checker.md`、`AGENTS.md`、`README.md`、`manifest.json`。
+- **状态**：`closed`（2026-11-11）
+
 ### 3. 待核验的存疑表述
 
 以下表述已进入技能包，但尚未经外部来源核验。**它们不构成阻断，但在核验完成前不得作为“已接地”的依据**（`spec/GROUNDING_CRITERIA.md` G1 的 `assumption` 接受机制已覆盖）：

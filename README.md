@@ -23,6 +23,7 @@
 | 文件 | 层 | 作用 |
 |---|---|---|
 | `README.md` | 入口 | 本文件：定位、导航、阅读路径 |
+| `manifest.json` | 入口 | 包版本与契约 schema 版本（供外部技能引用） |
 | **`QUICKSTART.md`** | **入口** | **快速开始：最小走查样例 + LLM 接合示例** |
 | `AGENTS.md` | 执行 | 执行约定：资料获取（本地优先）、schedule 纪律、目录结构权威、检查机械化 |
 | `CHANGELOG.md` | 调度 | 变更历史的唯一登记处（规则见 `AGENTS.md` 第 3.1 条） |
@@ -43,7 +44,7 @@
 | `spec/INTERFACE_CONTRACT_SPEC.md` | 执行 | 槽位定义；**技能间信息流**；v1 单层解析；PACT 不可映射项声明（方法无关） |
 | `contracts/` | 执行 | 契约 schema、解析规则、两个领域样例（建筑施工、软件工程） |
 | `knowledge/` | 知识 | 本体条目与方法注册表（可确定性查询，不供通读） |
-| `adr/` | 治理 | 治理决策记录模板与 ADR-0001、ADR-0002 |
+| `adr/` | 治理 | 治理决策记录模板与 ADR-0001–ADR-0004 |
 | **`scripts/`** | **辅助** | **辅助检查脚本规格（GLOSSARY/JSONL 同步检查）** |
 | `validation/CHECKLIST.md` | 执行 | 由 `COMPILATION_META.md` + `spec/methods/deterministic-checker.md` 生成的检查清单 |
 | **`validation/test-cases/`** | **执行** | **反例检验用例库（当前 3 个已落盘）** |
@@ -52,10 +53,18 @@
 
 **关于编译方法的地位**：编译方法本身是可选插件，不构成技能完备性的前提（`CONSTITUTION.md` 第 10.3 条）。当前启用 `CM-DET-CHECKER`；其他方法（技能卡片、人类检查单、PACT 规则）登记为候选，启用走 ADR。
 
+## 版本与发布
+
+- 包版本只有一个，以 annotated git tag 声明发布点（ADR-0003）；tag 说明即发布说明。当前发布点：`v0.4.0`。
+- 文件不承载版本号，也不承载文件级状态；当前状态查 `STATE.md`，变更历史查 `CHANGELOG.md`。
+- 外部技能引用本包时读根目录 `manifest.json`；`pm_contract_version` 是契约文件的数据字段，不随包版本走。
+- 版本递增：规范条文或契约 schema 不兼容 → major；新增规范或文件 → minor；纯澄清与 errata → patch。
+- 编译产物的过期判定以生成基线的 `source_commit` 为准（ADR-0004），不以版本号比较。
+
 ## 三条阅读路径
 
 **首次接触（想知道这是什么）**：本文件 → `QUICKSTART.md` → `CHARTER.md` 的“可检验的设计承诺”一节 → `GRAMMAR.md` 的规则组 A → 遇到不熟悉的术语时查 `GLOSSARY.md`。
 
 **日常使用（要把技能接进一个项目）**：`AGENTS.md` 第 6、6bis 条 → `spec/CONTEXT_ASSEMBLY.md` → `spec/INTERFACE_CONTRACT_SPEC.md` 的槽位定义 → `contracts/examples/` 里最接近的样例 → 在自己的领域技能目录放置契约文件 → `validation/CHECKLIST.md` → 部署前按 `spec/GROUNDING_CRITERIA.md` 判定。
 
-**治理修改（要改动成文法、来源或编译）**：`CONSTITUTION.md` 全文 → `adr/0001-*.md`、`adr/0002-*.md` → `adr/ADR-TEMPLATE.md` → `SOURCE_LEDGER.md` 的登记规则 → 若涉及术语，读 `GLOSSARY.md` 第 4、5 节与 `CONSTITUTION.md` 第 11 条 → 若涉及编译，读 `spec/COMPILATION_META.md` 与 `spec/COMPILATION_METHODS.md` → 变更完成后追加 `CHANGELOG.md` 批次、更新 `TODO.md` 状态；发现错误登记 `ERRATA.md`。
+**治理修改（要改动成文法、来源或编译）**：`CONSTITUTION.md` 全文 → `adr/0001-*.md`、`adr/0002-*.md`、`adr/0003-*.md`、`adr/0004-*.md` → `adr/ADR-TEMPLATE.md` → `SOURCE_LEDGER.md` 的登记规则 → 若涉及术语，读 `GLOSSARY.md` 第 4、5 节与 `CONSTITUTION.md` 第 11 条 → 若涉及编译，读 `spec/COMPILATION_META.md` 与 `spec/COMPILATION_METHODS.md` → 变更完成后追加 `CHANGELOG.md` 批次、更新 `TODO.md` 状态；发现错误登记 `ERRATA.md`。

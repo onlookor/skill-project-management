@@ -39,6 +39,7 @@
 - **不登记**：错别字修正、排版调整、`README.md` 与 `AGENTS.md` 自身的措辞微调（除非改变其约束范围）。
 - **格式**：按批次追加。每批包含：`{批次号, 日期, 涉及文件, 变更摘要, 关联 ADR 编号（若有）}`。
 - **纪律**：**禁止改写已登记批次**。发现登记错误时，追加一条更正条目并引用原批次，不改原批次。批次号一经发布永不复用。
+- **版本载体**：文件不写版本号、不携带版本头；包版本只有一个，以 annotated tag 声明发布点（ADR-0003）。外部引用读根目录 `manifest.json`。
 - **与 ADR 的分工**：ADR 记录的是“为什么这样治理”；CHANGELOG 记录的是“什么时候、哪些文件、以什么批次被修改了”。一条实质性变更通常同时产生一条 ADR 和一个 CHANGELOG 批次；CHANGELOG 批次引用 ADR 编号，ADR 不引用 CHANGELOG 批次号（避免双向维护）。
 
 #### 3.2 TODO.md —— 后续工作的唯一登记处
@@ -68,6 +69,7 @@ project-management-grounding/
 ├── TODO.md                         # 后续工作唯一登记处（第 3.2 条）
 ├── ERRATA.md                       # 幻觉更正台账
 ├── STATE.md                        # 逐文件当前状态台账
+├── manifest.json                   # 包版本与契约 schema 版本（供外部技能引用）
 ├── .gitignore                      # Git 忽略规则
 │
 ├── CHARTER.md                      # 意图层：可检验设计承诺 C1–C6、与领域技能的关系
@@ -102,7 +104,9 @@ project-management-grounding/
 ├── adr/
 │   ├── ADR-TEMPLATE.md             # 治理决策模板（Nygard 五要素 + 扩展字段）
 │   ├── 0001-separate-grammar-from-governance.md
-│   └── 0002-compilation-meta-vs-methods.md
+│   ├── 0002-compilation-meta-vs-methods.md
+│   ├── 0003-version-and-state-governance.md
+│   └── 0004-artifact-baseline-by-commit.md
 │
 ├── scripts/
 │   ├── README.md                   # 辅助脚本目录说明
@@ -122,6 +126,7 @@ project-management-grounding/
 | 文件/目录 | 维护责任 | 更新触发 | 变更权限 |
 |---|---|---|---|
 | `README.md` | 交付方 | 文件地图变化、定位变化 | 随交付更新，不需 ADR |
+| `manifest.json` | 交付方 | 包版本或契约 schema 版本变化 | 随发布更新；版本以 tag 为准（ADR-0003） |
 | `AGENTS.md` | 交付方 | 执行约定变化、目录结构变化 | 随工作流调整，不需 ADR |
 | `CHANGELOG.md` | 任何执行者 | 实质性变更发生时（第 3.1 条） | 追加即生效；需 ADR 的变更标 `pending-adr` |
 | `TODO.md` | 任何执行者 | 工作项开始/完成/放弃时（第 3.2 条） | 登记即生效；关闭需完成证据 |

@@ -143,8 +143,11 @@ ADR 的状态取值：`proposed` / `accepted` / `deprecated` / `superseded`。�
 
 ### 第 9 条 状态与版本
 
-- **规范层**（`CHARTER.md`、`CONSTITUTION.md`、`GRAMMAR.md`、`SOURCE_LEDGER.md`）的版本号在各自文件头部声明；任何实质性变更必须递增版本号并附 ADR。
-- **执行层**（`spec/`、`contracts/`、`validation/`）的版本号与规范层解耦；其变更不需要 ADR，但若变更改变了已有规则的编译结果，则升级为结构性变更（第 4 条）。
+- **包层版本**：本包只保留一个版本，以 annotated git tag 声明发布点（ADR-0003）；tag 说明即发布说明。
+- **文件层**：任何文件不声明版本号、不携带版本头，也不承载文件级状态；文件历史由 git 承担，文件当前状态查 `STATE.md`。
+- **外部引用**：包被外部技能引用时，根目录 `manifest.json` 记录包版本与契约 schema 版本。`pm_contract_version` 一类**接口版本是数据字段**，随契约文件存在，不受本条约束。
+- **版本递增规则**：规范条文或契约 schema 的不兼容变更递增 major；新增规范或文件递增 minor；纯澄清与 errata 递增 patch。
+- **执行层**（`spec/`、`contracts/`、`validation/`）的变更不需要 ADR，但若变更改变了已有规则的编译结果，则升级为结构性变更（第 4 条）。编译产物的基线由生成时的 git 提交标识，见第 10 条与 ADR-0004。
 - **知识层**（`knowledge/`）的条目可独立增删；条目的来源锚定与准入条件受第 2 条、第 3 条约束。
 - **状态标记**：`pending_reanchor`（来源待重新锚定，不编译为阻断检查）、`unusable_at_small_scale`（小模型不可用的知识条目，触发 ADR）、`provisional`（接地失效期或批准不可达临时通道下的临时有效态）是三个具有强制语义的状态标记，不得被静默忽略。
 
@@ -233,9 +236,9 @@ ADR 的状态取值：`proposed` / `accepted` / `deprecated` / `superseded`。�
 - 术语表本身不扩展来源封闭枚举；它只引用已登记的来源。
 - 无外部来源的术语（如框架自创机制术语）的 `grounding_ref` 为 `null`，但必须在 `provenance_note` 中说明其来源是“技能自身的形式化贡献”。
 
-**11.7 术语表自身的版本纪律**
+**11.7 术语表自身的修订纪律**
 
-- 术语表的版本号在文件头声明。变更递增版本号。
+- 术语表不声明文件版本号，也不携带版本头；其变更历史记入 `CHANGELOG.md` 批次，包版本以 annotated tag 声明（第 9 条、ADR-0003）。
 - 术语表的变更若改变已有规则的理解（如某机制术语的定义调整），升级为结构性变更，需 ADR。
 - 术语表的变更若仅新增条目或修正描述，走 CHANGELOG。
 

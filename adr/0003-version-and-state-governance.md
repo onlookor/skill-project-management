@@ -65,5 +65,5 @@
 ### 需要跟进的事项
 
 - **T-108**（关闭）：`CONSTITUTION.md` 第 9 条、第 11.7 条的修订。
-- **T-109**（新增）：`spec/COMPILATION_META.md` 第 10 条与 `spec/methods/deterministic-checker.md` 第 9 节以“文件头版本”为输入定义产物版本与对齐检查；文件层去版本后该链失效，需裁定替代口径（候选：产物记录生成基线的 git 提交，装配时比对源提交）。
+- **T-109**（新增，已由 ADR-0004 裁定）：`spec/COMPILATION_META.md` 第 10 条与 `spec/methods/deterministic-checker.md` 第 9 节以“文件头版本”为输入定义产物版本与对齐检查；文件层去版本后该链失效。替代口径见 **ADR-0004**：产物记录生成基线的 `source_commit`，装配时比对源提交，脏工作区直接判定过期。
 - **T-110**（新增）：`manifest.json` 的包版本与最新 annotated tag 的一致性检查。

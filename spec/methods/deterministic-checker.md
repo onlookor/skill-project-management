@@ -212,12 +212,14 @@
 | F-C4（执行失败） | 第 8.2 节 |
 | F-C5（假设未闭合） | 本方法不承担；由 `ASSUMPTION_PROTOCOL.md` 第 6 节处置 |
 
-## 9. 版本纪律
+## 9. 基线纪律
 
-- **方法版本**：本文件头声明的版本号。变更递增版本号；若变更改变已有 `check_id` 的判定逻辑，升级为结构性变更，需 ADR。
-- **产物版本**：`validation/CHECKLIST.md` 与检查项规格的版本 = f(`GRAMMAR.md` 版本, `SOURCE_LEDGER.md` 版本, 方法版本)。三者任一变化触发重编译。
-- **对齐检查**：宿主装配时校验产物版本与源版本一致；不一致 → 拒绝运行过期产物（META 第 7.5 条）。
-- **重编译触发**：`GRAMMAR.md` 规则增删改、`SOURCE_LEDGER.md` 条目状态变更、本方法版本变更、`knowledge/` 谓词定义变更，均触发重编译。
+- **方法版本**：本方法不声明文件版本号；其变更历史记入 `CHANGELOG.md`，包版本以 annotated tag 声明（ADR-0003）。若变更改变已有 `check_id` 的判定逻辑，升级为结构性变更，需 ADR。
+- **产物基线**：`validation/CHECKLIST.md` 与检查项规格必须记录生成时的 `source_commit`，即 `GRAMMAR.md`、`SOURCE_LEDGER.md`、本方法声明、`knowledge/` 谓词定义所在的那次 git 提交（ADR-0004）。
+- **对齐检查**：宿主装配时比对产物的 `source_commit` 与当前源提交；不一致 → 拒绝运行过期产物（META 第 7.5 条）。
+- **脏工作区**：若任一源文件相对 `source_commit` 存在未提交改动（`git status --porcelain` 中涉及该源文件），产物**直接判定过期**，不得以“提交号相同”放行。
+- **无 git 环境**：无法取得提交标识时，不得假定产物有效；按过期处理并报告部署缺陷。
+- **重编译触发**：`GRAMMAR.md` 规则增删改、`SOURCE_LEDGER.md` 条目状态变更、本方法声明变更、`knowledge/` 谓词定义变更，均触发重编译；重编译后产物记录新的 `source_commit`。
 
 ## 10. 无插件完备性
 
