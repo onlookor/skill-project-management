@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-management-grounding/contracts/schema/pm-slot-contract.schema.json",
+  "title": "Project Management Slot Contract",
+  "description": "领域技能向项目管理接地编译技能填充槽位的契约文件 schema。契约文件只声明槽位填充，不声明上游/下游关系。",
+  "type": "object",
+  "required": ["skill_id", "pm_contract_version", "slots"],
+  "additionalProperties": false,
+  "properties": {
+    "skill_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "领域技能的稳定标识"
+    },
+    "pm_contract_version": {
+      "type": "string",
+      "pattern": "^0\\.[0-9]+$",
+      "description": "契约所遵循的 PM 接口契约规范版本"
+    },
+    "slots": {
+      "type": "object",
+      "required": ["subject_type", "deliverable_forms", "constraint_domains", "assertion_vocabulary"],
+      "additionalProperties": false,
+      "properties": {
+        "subject_type": {
+          "type": "string",
+          "minLength": 1,
+          "description": "领域 Subject 类型名"
+        },
+        "deliverable_forms": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 1 },
+          "description": "领域交付物形态名列表"
+        },
+        "constraint_domains": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["name", "relation_to_generic"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "relation_to_generic": {
+                "enum": ["specializes", "cross_cuts", "orthogonal_to"]
+              },
+              "generic_class": {
+                "enum": ["goal", "environment", "solution"],
+                "description": "relation_to_generic 为 specializes 时必填"
+              },
+              "grounding_ref": {
+                "type": ["string", "null"],
+                "description": "该约束域的外部来源依据（若有）"
+              }
+            },
+            "allOf": [
+              {
+                "if": { "properties": { "relation_to_generic": { "const": "specializes" } } },
+                "then": { "required": ["generic_class"] }
+              }
+            ]
+          }
+        },
+        "assertion_vocabulary": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["name", "maps_to"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "maps_to": {
+                "enum": ["what_is", "what_state", "what_condition"]
+              }
+            }
+          }
+        },
+        "actor_roles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "can_be_accountable"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "can_be_accountable": { "type": "boolean" }
+            }
+          },
+          "description": "缺省时不扩展；本技能使用通用角色"
+        },
+        "subject_group_extension": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "relation_to_base"],
+            "additionalProperties": false,
+            "properties": {
+              "name": { "type": "string", "minLength": 1 },
+              "relation_to_base": {
+                "enum": ["specializes", "cross_cuts", "orthogonal_to"]
+              },
+              "base_subject_group": {
+                "type": "string",
+                "description": "relation_to_base 非 orthogonal_to 时必填"
+              }
+            },
+            "allOf": [
+              {
+                "if": { "properties": { "relation_to_base": { "enum": ["specializes", "cross_cuts"] } } },
+                "then": { "required": ["base_subject_group"] }
+              }
+            ]
+          },
+          "description": "缺省时不扩展基础主题组枚举（G-B2）"
+        }
+      }
+    },
+    "grounding_ref": {
+      "type": "null",
+      "description": "契约文件本身不携带 grounding_ref；它是领域技能的自我描述。槽位级来源依据在各槽位内声明。"
+    },
+    "assumption_refs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "statement", "verification"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "type": "string", "pattern": "^A-CONTRACT-[A-Za-z0-9-]+$" },
+          "statement": { "type": "string", "minLength": 1 },
+          "verification": {
+            "type": "object",
+            "required": ["type", "target_document", "alignment_criterion"],
+            "additionalProperties": false,
+            "properties": {
+              "type": { "enum": ["alignment_check"] },
+              "target_document": { "type": "string", "minLength": 1 },
+              "target_section": { "type": "string" },
+              "alignment_criterion": { "type": "string", "minLength": 1 },
+              "on_mismatch": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,82 @@
+# 建筑施工领域技能的 PM 槽位契约（示例，非规范）
+# 本文件只声明槽位填充；不声明与任何其他技能的上下游关系。
+skill_id: construction-engineering
+pm_contract_version: "0.1"
+
+slots:
+  subject_type: "ConstructionElement"
+
+  deliverable_forms:
+    - "AsBuiltDrawing"          # 竣工图
+    - "InspectionReport"        # 检验报告
+    - "StructuralCalculation"   # 结构计算书
+    - "MaterialCertificate"     # 材料合格证
+    - "HandoverPackage"         # 移交包
+
+  constraint_domains:
+    - name: "structural_load"
+      relation_to_generic: "specializes"
+      generic_class: "environment"     # 既有结构条件对方案的约束
+      grounding_ref: null
+    - name: "fire_safety"
+      relation_to_generic: "specializes"
+      generic_class: "goal"            # 消防安全是目标类约束
+      grounding_ref: null
+    - name: "building_code_compliance"
+      relation_to_generic: "specializes"
+      generic_class: "goal"
+      grounding_ref: null
+    - name: "site_access"
+      relation_to_generic: "specializes"
+      generic_class: "environment"
+      grounding_ref: null
+    - name: "construction_sequence"
+      relation_to_generic: "specializes"
+      generic_class: "solution"
+      grounding_ref: null
+
+  assertion_vocabulary:
+    - name: "compliant"
+      maps_to: "what_condition"        # 满足合规条件
+    - name: "non_compliant"
+      maps_to: "what_condition"
+    - name: "conditional"
+      maps_to: "what_condition"        # 附条件合规
+    - name: "inspected"
+      maps_to: "what_state"
+    - name: "handed_over"
+      maps_to: "what_state"
+    - name: "as_built"
+      maps_to: "what_is"
+
+  actor_roles:
+    - name: "site_manager"
+      can_be_accountable: true
+    - name: "structural_engineer"
+      can_be_accountable: true
+    - name: "safety_officer"
+      can_be_accountable: true
+    - name: "inspection_ai_agent"
+      can_be_accountable: false        # AI 角色不承担 Accountable（G-E1）
+
+  subject_group_extension: []          # 不扩展基础主题组
+
+grounding_ref: null
+
+assumption_refs:
+  - id: "A-CONTRACT-CE-01"
+    statement: "construction-engineering 技能的 subject_type 与 deliverable_forms 在其领域技能文档中有定义"
+    verification:
+      type: "alignment_check"
+      target_document: "construction-engineering/SKILL.md"
+      target_section: "术语与交付物章节"
+      alignment_criterion: "类型名与形态名在该文档中存在"
+      on_mismatch: "修订本契约文件的对应槽位值"
+  - id: "A-CONTRACT-CE-02"
+    statement: "constraint_domains 的 generic_class 归类（structural_load→environment、fire_safety→goal 等）与该领域技能的三空间或通用分类声明一致"
+    verification:
+      type: "alignment_check"
+      target_document: "construction-engineering/SKILL.md"
+      target_section: "约束分类章节"
+      alignment_criterion: "语义等价"
+      on_mismatch: "修订 generic_class 值，或在该领域技能中补充分类声明"

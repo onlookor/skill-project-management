@@ -1,0 +1,75 @@
+# 软件工程领域技能的 PM 槽位契约（示例，非规范）
+# 本文件只声明槽位填充；不声明与任何其他技能的上下游关系。
+skill_id: software-engineering
+pm_contract_version: "0.1"
+
+slots:
+  subject_type: "SoftwareComponent"
+
+  deliverable_forms:
+    - "CodeModule"
+    - "DeploymentPackage"
+    - "TestReport"
+    - "ArchitectureDecisionRecord"
+    - "InterfaceContract"
+
+  constraint_domains:
+    - name: "quality_attribute"
+      relation_to_generic: "specializes"
+      generic_class: "goal"
+      grounding_ref: null
+    - name: "existing_system_state"
+      relation_to_generic: "specializes"
+      generic_class: "environment"
+      grounding_ref: null
+    - name: "solution_constraint"
+      relation_to_generic: "specializes"
+      generic_class: "solution"
+      grounding_ref: null
+    - name: "regulatory_compliance"
+      relation_to_generic: "cross_cuts"
+      grounding_ref: null
+
+  assertion_vocabulary:
+    - name: "implemented"
+      maps_to: "what_state"
+    - name: "tested"
+      maps_to: "what_condition"
+    - name: "documented"
+      maps_to: "what_is"
+    - name: "deployed"
+      maps_to: "what_state"
+    - name: "contract_published"
+      maps_to: "what_state"
+
+  actor_roles:
+    - name: "tech_lead"
+      can_be_accountable: true
+    - name: "product_owner"
+      can_be_accountable: true
+    - name: "ai_coding_agent"
+      can_be_accountable: false
+    - name: "ai_reviewer"
+      can_be_accountable: false
+
+  subject_group_extension: []
+
+grounding_ref: null
+
+assumption_refs:
+  - id: "A-CONTRACT-SE-01"
+    statement: "software-engineering 技能的 subject_type 与 deliverable_forms 在其 SKILL.md 中有定义"
+    verification:
+      type: "alignment_check"
+      target_document: "software-engineering/SKILL.md"
+      target_section: "术语与交付物章节"
+      alignment_criterion: "类型名与形态名在该文档中存在"
+      on_mismatch: "修订本契约文件的对应槽位值"
+  - id: "A-CONTRACT-SE-02"
+    statement: "quality_attribute 归类为 goal 类约束、existing_system_state 归类为 environment 类约束、solution_constraint 归类为 solution 类约束，与该技能的三空间本体论一致"
+    verification:
+      type: "alignment_check"
+      target_document: "软件工程元框架成文法"
+      target_section: "三空间本体论相关章节"
+      alignment_criterion: "语义等价：三空间的输入成分分类与本契约的 generic_class 归类一致"
+      on_mismatch: "修订 generic_class 值，或放弃三空间映射（退回通用分类）"
