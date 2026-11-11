@@ -1,0 +1,120 @@
+## 幻觉更正台账
+
+**权威关系**：本文件是执行层的自我审查台账。它不修改任何规范，只记录“本技能编制过程中发现并修正的错误”“外部评审指出的问题及处置”“待核验的存疑表述”。与 `SOURCE_LEDGER.md` 的关系：来源的核验状态变更走 ADR；本文件记录的是**技能自身表述**的更正，不改变来源登记。
+
+### 1. 登记规则
+
+- **登记范围**：(i) 本技能编制过程中发现并修正的错误（编造引用、版本臆断、字段虚构、语义张冠李戴）；(ii) 外部评审指出的问题及处置；(iii) 待核验的存疑表述。
+- **不登记**：错别字、排版、措辞微调（走 CHANGELOG）。
+- **格式**：按编号追加，禁止改写已登记条目；更正时追加新条目并引用原条目编号。
+- **与 CHANGELOG 的分工**：CHANGELOG 记录“什么文件在什么时候被改成了什么”；ERRATA 记录“我们曾经犯过什么错、如何发现、如何修正”。一条更正通常同时产生一个 ERRATA 条目和一个 CHANGELOG 批次。
+
+### 2. 已登记条目
+
+#### E-001 — Jarke 三世界 = 本技能三空间的未确认等同
+
+- **原表述**：在早期讨论中，将 Jarke 三世界（subject world / system world / usage world）等同于本技能的三空间（问题/事实/解），并试图将其登记入 `SOURCE_LEDGER.md`。
+- **问题**：未经原文核验的等同；三世界与三空间的语义是否等价、结构是否同构，均未确认。
+- **发现方式**：外部评审指出。
+- **修正**：`SOURCE_LEDGER.md` 的候选来源清单中排除 Jarke；`spec/INTERFACE_CONTRACT_SPEC.md` 第 7 节的三空间映射以 `assumption`（用途 B）形式存在，验证条件为“与软件工程技能原文对齐”，不以 Jarke 为锚。
+- **波及文件**：`SOURCE_LEDGER.md`、`spec/INTERFACE_CONTRACT_SPEC.md`、`GLOSSARY.md`（B 类术语“三值逻辑”的引用不涉及 Jarke）。
+- **状态**：`closed`（2026-11-11）
+
+#### E-002 — Szwed 的 PMBOK OWL 本体“reasoner 验证”表述张冠李戴
+
+- **原表述**：早期讨论中将“reasoner 自动验证一致性”的表述归于 Szwed 的 PMBOK OWL 本体（340 类）。
+- **问题**：该表述实际出自 Silega 等 2024 年论文（Springer, CIIP 2023），与 Szwed 的工作是两回事；“340 类”无可核验出处。
+- **发现方式**：外部评审指出。
+- **修正**：`SOURCE_LEDGER.md` 的候选来源清单中排除 Szwed 与 Silega 两条，标注“待核验原文后走 ADR 再决定是否引入”；`GLOSSARY.md` 不登记相关术语。
+- **波及文件**：`SOURCE_LEDGER.md`。
+- **状态**：`closed`（2026-11-11）
+
+#### E-003 — PMBOK 版本漂移未在登记表中显式声明
+
+- **原表述**：`SOURCE_LEDGER.md` 的 `PMBOK7-2021` 条目在初版中未记录“PMBOK 已出至第 8 版（2025-11）”这一事实。
+- **问题**：版本漂移未显式声明，可能使读者误以为 7th edition 是当前版本。
+- **发现方式**：外部评审指出。
+- **修正**：`PMBOK7-2021` 条目备注中加入“PMBOK 已出至第 8 版（2025-11）；本表暂不引入，理由：本技能规则尚未依赖第 8 版的结构；引入需 ADR”；`GLOSSARY.md` 的 `T-E-001 PMBOK` 条目同步说明。
+- **波及文件**：`SOURCE_LEDGER.md`、`GLOSSARY.md`。
+- **状态**：`closed`（2026-11-11）
+
+#### E-004 — `ROLE_MINIMAL_COMPLETENESS` 的 warn/block 混合逻辑未明确
+
+- **原表述**：`spec/methods/deterministic-checker.md` 附录 A 中，`ROLE_MINIMAL_COMPLETENESS` 的判定为“每个决策类 Commitment 有唯一 accountable_by 指向 HumanActor/LegalEntity，且至少一个 responsible_by；重合时有 role_merge_declaration”，severity 为 `block`。
+- **问题**：当 Accountable 与 Responsible 重合但缺少 `role_merge_declaration` 时，应整体判 `fail`（block）还是判 `warn`？原判定未区分两种情形：问责结构根本性缺失（如 Accountable 为 AIActor）应 block；角色合并声明缺失应 warn。原判定将二者混为一谈。
+- **发现方式**：QUICKSTART 最小走查样例（第 2.3 节 C-002 的检查）暴露。
+- **修正**：登记为待修正项（见 `TODO.md` T-100）；在修正前，QUICKSTART 中的输出按“role_merge_declaration 缺失触发 warn”处理，并在 `spec/methods/deterministic-checker.md` 附录 A 的判定摘要中加注。
+- **波及文件**：`spec/methods/deterministic-checker.md`、`QUICKSTART.md`。
+- **状态**：`open`（待修正）
+
+#### E-005 — `GLOSSARY.md` 与 `anchored-entries.jsonl` 的同步无机制保障
+
+- **原表述**：`CONSTITUTION.md` 第 11.5 条规定“冲突时以 JSONL 为准”，但未规定如何发现冲突。
+- **问题**：同步靠人工，术语一多就会漂移。
+- **发现方式**：本轮自我审查。
+- **修正**：新增 `scripts/check_glossary_sync.md`（同步检查规格）与 `spec/GROUNDING_CRITERIA.md` G4（接地判据要求同步检查通过）。
+- **波及文件**：`scripts/check_glossary_sync.md`、`spec/GROUNDING_CRITERIA.md`、`CONSTITUTION.md` 第 11.5 条（补充“同步检查的执行方式见 `scripts/check_glossary_sync.md`”）。
+- **状态**：`closed`（2026-11-11）
+
+#### E-006 — 反幻觉技能缺少自我审查台账
+
+- **原表述**：本技能包在 v0.3 之前无 `ERRATA.md`。
+- **问题**：一个反幻觉的技能，自己缺少反幻觉的自我审查机制，是结构性不对称。软件工程技能有幻觉更正表，本技能没有。
+- **发现方式**：本轮自我审查。
+- **修正**：新增 `ERRATA.md`（本文件）。
+- **波及文件**：`ERRATA.md`、`CONSTITUTION.md`（无需新增条款，但 `README.md` 文件地图加入）。
+- **状态**：`closed`（2026-11-11）
+
+#### E-007 — “接地完成”判据缺失
+
+- **原表述**：`README.md` 说“设计上完备，运行上待接地”，但未定义接地判据。
+- **问题**：无法判断技能何时可用。
+- **发现方式**：本轮自我审查。
+- **修正**：新增 `spec/GROUNDING_CRITERIA.md`；`CONSTITUTION.md` 新增第 12 条（接地治理）。
+- **波及文件**：`spec/GROUNDING_CRITERIA.md`、`CONSTITUTION.md`、`README.md`。
+- **状态**：`closed`（2026-11-11）
+
+#### E-008 — `GROUNDING_CRITERIA` 的 G2/G3 依赖产物版本头
+
+- **原表述**：G2 要求“产物版本与源版本对齐”，可查方式包含“`validation/` 产物的版本头”与 `COMPILATION_META.md` 第 7.5 条版本对齐检查；G3 的可查方式未明确以 `STATE.md` 与部署配置为准。
+- **问题**：现行仓库已移除文件版本头，版本对齐不再有可查对象；继续按原文执行会使 G2/G3 无法判定。
+- **发现方式**：落地分享内容时与现行版本口径冲突。
+- **修正**：G2 改为以 `STATE.md` 中产物状态为 `active` 且部署配置存在产物清单为准；G3 改为以 `STATE.md` 中检查器与用例状态、部署配置中的执行入口为准。删除版本头/版本对齐依赖。
+- **波及文件**：`spec/GROUNDING_CRITERIA.md`。
+- **状态**：`closed`（2026-11-11）
+
+#### E-009 — `QUICKSTART` 中 `A-001` 重复用作 HumanActor 与 assumption
+
+- **原表述**：最小样例的 `actors` 中 HumanActor 使用 `A-001`，`assumptions` 中也使用 `A-001`。
+- **问题**：两个不同类型实体共享同一 ID，破坏引用唯一性，可能使校验器或读者混淆。
+- **发现方式**：落地分享内容时进行样例审查。
+- **修正**：assumption 改用独立前缀 `AS-001`，输入与输出中的引用同步更新。
+- **波及文件**：`QUICKSTART.md`。
+- **状态**：`closed`（2026-11-11）
+
+#### E-010 — `CONTEXT_ASSEMBLY` 残留“本文件的版本”表述
+
+- **原表述**：第 9 节标题为“版本纪律”，末条为“本文件的版本与 `README.md` 的‘阅读路径’保持语义一致”；第 6 节有“编译产物版本变化时……”。
+- **问题**：现行仓库不保留文件版本头，“本文件的版本”没有可查对象；该表述与 E-008 同源，属同一口径冲突的残留。
+- **发现方式**：落地分享内容后进行版本口径一致性检查。
+- **修正**：第 9 节标题改为“修订纪律”，末条改为“本文件的内容与 `README.md` 的‘阅读路径’保持语义一致”；第 6 节“编译产物版本变化时”改为“编译产物更新时”。未改变任何约束语义。
+- **波及文件**：`spec/CONTEXT_ASSEMBLY.md`。
+- **状态**：`closed`（2026-11-11）
+
+### 3. 待核验的存疑表述
+
+以下表述已进入技能包，但尚未经外部来源核验。**它们不构成阻断，但在核验完成前不得作为“已接地”的依据**（`spec/GROUNDING_CRITERIA.md` G1 的 `assumption` 接受机制已覆盖）：
+
+| 编号 | 表述 | 位置 | 核验方式 | 状态 |
+|---|---|---|---|---|
+| V-001 | ISO 21502:2020 是否保留“五过程组 × 十主题组”矩阵结构 | `GRAMMAR.md` G-B1/G-B2、`SOURCE_LEDGER.md` | 获取全文核对 | `open`（T-001） |
+| V-002 | PRINCE2-2023 的具体条款措辞 | `GRAMMAR.md` G-F1/G-F2/G-G1–G3、`SOURCE_LEDGER.md` | 获取全文核对 | `open`（T-005） |
+| V-003 | ProjectCO-2024 的论文内部细节 | `SOURCE_LEDGER.md` | 获取全文核对 | `open`（T-006） |
+| V-004 | 方法条目 `M-EST-01`、`M-DEC-01`、`M-RISK-01`、`M-EV-01` 的更精确来源 | `knowledge/methods/registry-skeleton.md` | 获取对应章节核对 | `open`（T-004） |
+
+### 4. 不做的事
+
+- 不把 ERRATA 当作第二套规范——它记录更正历史，不承载规则。
+- 不改写已登记条目；更正时追加新条目并引用原编号。
+- 不把“待核验”表述包装成“已核验”。
+- 不因为某条更正是“自己发现的”就降低登记标准——自我审查与外部评审同样登记。

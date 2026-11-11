@@ -83,15 +83,29 @@
 
 | 编号 | 性质 | 工作项 | 治理路径 | 前置依赖 | 状态 |
 |---|---|---|---|---|---|
-| T-080 | 验证套件 | 为 `CM-DET-CHECKER` 的 P1c（不扭曲）设计反例检验用例：每条规则至少一个“应通过”与一个“应失败”用例，含量词边界（空集/单元素/多元素）与例外触发用例 | 结果登记 | 无 | `open` |
+| T-080 | 验证套件 | 为 `CM-DET-CHECKER` 的 P1c（不扭曲）设计反例检验用例：每条规则至少一个“应通过”与一个“应失败”用例，含量词边界（空集/单元素/多元素）与例外触发用例 | 结果登记 | 无 | `in-progress`（`validation/test-cases/` 已落 3 个用例，其余见 T-101） |
 | T-081 | 验证套件 | 验证 `CM-DET-CHECKER` 的退化路径（`runtime: deterministic-checker/human-fallback`）下 P1–P6 仍被满足 | 结果登记 | 无 | `open` |
 
 ### 新增：术语表
 
 | 编号 | 性质 | 工作项 | 治理路径 | 前置依赖 | 状态 |
 |---|---|---|---|---|---|
-| T-090 | 一致性检查 | 建立 `GLOSSARY.md` 的 A 类条目与 `knowledge/anchored-entries.jsonl` 的同步检查项（定义一致、`anchored_entry` 指针有效） | 执行层补丁 | 无 | `open` |
+| T-090 | 一致性检查 | 建立 `GLOSSARY.md` 的 A 类条目与 `knowledge/anchored-entries.jsonl` 的同步检查项（定义一致、`anchored_entry` 指针有效） | 执行层补丁 | 无 | `in-progress`（`scripts/check_glossary_sync.md` 已给出检查规格，检查执行记录待补） |
 | T-091 | 术语补充 | 补充 `GLOSSARY.md` 第 6 节列出的待补充术语（编译域执行失败分类、ADR 状态、`merge: append`、`immutable`、`SLA`、`SLO`、`RPO`、`RTO`、`CI/CD`、`API`、`IDL`） | E/F 类走 CHANGELOG；B/C/D 类走 ADR | 无 | `open` |
 | T-092 | 术语补充 | 为 `GLOSSARY.md` A 类的 `HumanActor`、`LegalEntity`、`AIActor`、`Contract`、`ProjectCharter`、`TailoringRecord` 补充 `anchored-entries.jsonl` 的独立条目（与 T-028、T-029 合并执行） | ADR + JSONL 同步 | T-028、T-029 | `open` |
 | T-093 | 术语补充 | 为 `GLOSSARY.md` B 类的机制术语补充“首次使用处”的内联定义检查（验证 `GRAMMAR.md`、`spec/` 中各术语首次出现时是否有内联定义或指向 `GLOSSARY.md`） | 执行层补丁 | 无 | `open` |
 | T-094 | 术语补充 | 为 `GLOSSARY.md` E 类条目补充更精确的 `grounding_ref`（当前 `WBS`、`PERT`、`EVM` 的 `grounding_ref` 仅为 PMBOK 原则层交叉验证；与 T-004 合并执行） | ADR + `SOURCE_LEDGER.md` 更新 | T-004 | `open` |
+
+### 新增：反例、接地与可运行性缺口
+
+| 编号 | 性质 | 工作项 | 治理路径 | 前置依赖 | 状态 |
+|---|---|---|---|---|---|
+| T-100 | 检查器判定修正 | 修正 `ROLE_MINIMAL_COMPLETENESS` 的 warn/block 混合判定：区分“问责结构根本性缺失（block）”与“角色合并声明缺失（warn）”两种情形（见 `ERRATA.md` E-004） | 结构性变更需 ADR（改变已有规则的编译结果） | 无 | `open` |
+| T-101 | 反例用例补齐 | 补齐未落盘的 10 个反例检验用例正文：`TC-A1-01`、`TC-A1-03`、`TC-C1-01`、`TC-C1-02`、`TC-D1-01`、`TC-D1-02`、`TC-D1-03`、`TC-E1-01`、`TC-E1-02`、`TC-E1-03`；并补齐未覆盖规则（G-A2、G-C2、G-D2、G-E2、G-B1、G-B2、G-F1–F4、G-G1–G3）的用例 | 结果登记 | T-080 | `open` |
+| T-102 | ADR 治理补强 | 补充“被拒绝方案”的 ADR 记录（考虑过、论证不可行、拒绝理由），并给出 ADR 合格性评审清单；当前 ADR-0001、ADR-0002 均只记录“决定这样做” | ADR（新增记录）；评审清单本身属执行层补丁 | 无 | `open` |
+| T-103 | 检查回放机制 | 定义检查执行记录的回放机制：检查失败后如何以同一输入快照重放、如何比对两次结论、回放记录保存在哪里 | 执行层补丁 | 无 | `open` |
+| T-104 | 跨技能端到端走查 | 设计一条“领域技能产物 → 项目管理槽位/baseline”的端到端走查样例（如需求工程产物进入本项目），验证 `spec/INTERFACE_CONTRACT_SPEC.md` 的槽位定义在真实流动中可用 | 随样例更新 | T-031 | `open` |
+| T-105 | 方法注册表可用性 | 补充方法的规模/领域筛选机制与方法组合说明（如挣值与风险的配合、WBS 与估算的配合）；当前注册表只有检索键，没有组合与筛选规则 | 来源治理 | T-004、T-020–T-027 | `open` |
+| T-106 | 外部依赖失效处置 | 规定“外部来源长期不可得”时的处置规则（T-001–T-003 均依赖获取 ISO 21502:2020 全文；当前未定义永远取不到时如何收口） | ADR | 无 | `open` |
+| T-107 | 可执行原型 | 提供一个最小可执行的确定性校验器原型（哪怕只覆盖 3–5 个 `check_id`），以验证 `spec/methods/deterministic-checker.md` 的判定逻辑可被程序实现；`QUICKSTART.md` 的走查为手工推演，不构成可执行证据 | 执行层补丁 | T-011 | `open` |
+| T-108 | 版本条文的遗留冲突 | `CONSTITUTION.md` 第 9 条与第 11.7 条仍要求“版本号在文件头声明”，与现行口径（不保留文件版本头，状态登记于 `STATE.md`）冲突；待确认后按规范层程序修订，未确认前不改条文 | ADR | 用户确认 | `open` |

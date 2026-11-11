@@ -225,6 +225,8 @@ ADR 的状态取值：`proposed` / `accepted` / `deprecated` / `superseded`。�
 - 冲突本身按以下处置：若冲突源于 `GLOSSARY.md` 的表述滞后，走 CHANGELOG 修正；若冲突源于 JSONL 的语义变更，走 ADR。
 - 同步检查登记为 `TODO.md` 工作项。
 
+**同步检查的执行方式**：`GLOSSARY.md` 的 A 类条目与 `anchored-entries.jsonl` 的同步检查，由 `scripts/check_glossary_sync.md` 规定的检查项执行。检查结果为 `fail` 时，按本条第 11.5 款处置；`needs_review` 时，由人工评审判定。
+
 **11.6 与 `SOURCE_LEDGER.md` 的关系**
 
 - 术语的 `grounding_ref` 必须指向 `SOURCE_LEDGER.md` 的 `active` 条目，且该条目的 `claim_mapping` 必须包含本术语。
@@ -236,3 +238,28 @@ ADR 的状态取值：`proposed` / `accepted` / `deprecated` / `superseded`。�
 - 术语表的版本号在文件头声明。变更递增版本号。
 - 术语表的变更若改变已有规则的理解（如某机制术语的定义调整），升级为结构性变更，需 ADR。
 - 术语表的变更若仅新增条目或修正描述，走 CHANGELOG。
+
+### 第 12 条 接地治理
+
+**12.1 接地的定义**
+
+“本技能在某部署中已接地”的判据由 `spec/GROUNDING_CRITERIA.md` 定义。该文件是执行层规范，但其判据的**状态声明**受本条约束。
+
+**12.2 接地判定的执行**
+
+接地判定由宿主运行时执行，输出 `spec/GROUNDING_CRITERIA.md` 第 5 节定义的接地判定记录。判定记录是证据工件，保存期限见该文件第 5 节。
+
+**12.3 未接地时的行为**
+
+- `ungrounded`（G2 或 G3 未满足）：**阻断**技能执行。无执行路径或检查结果不可信时，不得产出任何决策。
+- `partially_grounded`（G2/G3 满足，其余有未满足项）：产出决策标 `provisional`。`provisional` 决策的消费限制按 `spec/ASSUMPTION_PROTOCOL.md` 与 `COMPILATION_META.md` P6 执行；接地后批量补批准。
+- `grounded`：正常执行。
+
+**12.4 与 `COMPILATION_META.md` 的关系**
+
+接地判据中的 G2、G3 是 `COMPILATION_META.md` 第 2 条（P1–P6）与第 3 条（准入条件）的运行时验证。接地判据不修改编译元框架，只验证其是否被履行。
+
+**12.5 接地判据的修改**
+
+新增判据需 ADR。调整判据的可查方式或状态语义走 CHANGELOG。本条的修改需 `CONSTITUTION.md` 第 5 条的特殊程序（因为接地治理属于基础治理结构）。
+

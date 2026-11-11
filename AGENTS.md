@@ -62,14 +62,16 @@
 project-management-grounding/
 │
 ├── README.md                       # 入口导航：定位、文件地图（指针）、阅读路径
+├── QUICKSTART.md                   # 快速开始：最小走查样例 + LLM 接合示例
 ├── AGENTS.md                       # 本文件：执行约定、目录结构权威、schedule 纪律
 ├── CHANGELOG.md                    # 变更历史唯一登记处（第 3.1 条）
 ├── TODO.md                         # 后续工作唯一登记处（第 3.2 条）
+├── ERRATA.md                       # 幻觉更正台账
 ├── STATE.md                        # 逐文件当前状态台账
 ├── .gitignore                      # Git 忽略规则
 │
 ├── CHARTER.md                      # 意图层：可检验设计承诺 C1–C6、与领域技能的关系
-├── CONSTITUTION.md                 # 治理层：三权分立、来源封闭性、自包含三级、可选插件、编译治理总纲（第 10 条）、术语治理（第 11 条）
+├── CONSTITUTION.md                 # 治理层：三权分立、来源封闭性、自包含三级、可选插件、编译治理总纲（第 10 条）、术语治理（第 11 条）、接地治理（第 12 条）
 ├── GRAMMAR.md                      # 立法层：成文法规则组 A–G
 ├── SOURCE_LEDGER.md                # 立法层：封闭来源登记表（含论断级映射）
 ├── GLOSSARY.md                     # 立法层（支撑）：术语表与术语治理
@@ -77,6 +79,8 @@ project-management-grounding/
 ├── spec/
 │   ├── COMPILATION_META.md         # 编译元框架（方法无关）：P1–P6、准入条件、选择/共存/替换
 │   ├── COMPILATION_METHODS.md      # 编译方法注册表：方法列表、启用状态、替换历史
+│   ├── CONTEXT_ASSEMBLY.md         # 上下文装配规范：四场景加载集、token 预算、装配清单
+│   ├── GROUNDING_CRITERIA.md       # 接地完成判据：六条判据、状态语义、判据记录
 │   ├── methods/
 │   │   └── deterministic-checker.md  # CM-DET-CHECKER 方法声明（含 check_id 注册表、翻译规范）
 │   ├── ASSUMPTION_PROTOCOL.md      # assumption 协议（方法无关）
@@ -100,8 +104,17 @@ project-management-grounding/
 │   ├── 0001-separate-grammar-from-governance.md
 │   └── 0002-compilation-meta-vs-methods.md
 │
+├── scripts/
+│   ├── README.md                   # 辅助脚本目录说明
+│   └── check_glossary_sync.md      # GLOSSARY/JSONL 同步检查规格
+│
 └── validation/
-    └── CHECKLIST.md                # CM-DET-CHECKER 的产物：检查清单（生成依据见文件头）
+    ├── CHECKLIST.md                # CM-DET-CHECKER 的产物：检查清单（生成依据见正文）
+    └── test-cases/
+        ├── README.md               # 反例检验用例库说明
+        ├── TC-A1-02.md
+        ├── TC-C1-03.md
+        └── TC-E1-04.md
 ```
 
 **维护责任与更新频率**：
@@ -113,6 +126,8 @@ project-management-grounding/
 | `CHANGELOG.md` | 任何执行者 | 实质性变更发生时（第 3.1 条） | 追加即生效；需 ADR 的变更标 `pending-adr` |
 | `TODO.md` | 任何执行者 | 工作项开始/完成/放弃时（第 3.2 条） | 登记即生效；关闭需完成证据 |
 | `STATE.md` | 任何执行者 | 文件新增、删除或状态变化时 | 随文件状态更新，不需 ADR |
+| `QUICKSTART.md` | 交付方 | 走查样例更新、接合示例更新 | 随交付更新 |
+| `ERRATA.md` | 任何执行者 | 发现错误、外部评审、待核验表述登记 | 追加即生效；标记 `closed` 需附修正证据 |
 | `CHARTER.md` | 人类责任方 | 承诺调整（需 ADR，见 `CHARTER.md` 第 6 条） | ADR `accepted` |
 | `CONSTITUTION.md` | 人类责任方 | 治理规则调整（需 ADR，见第 5 条） | ADR `accepted` |
 | `GRAMMAR.md` | 人类责任方 | 规则增删改（需 ADR + `SOURCE_LEDGER.md` 支撑） | ADR `accepted` |
@@ -123,10 +138,14 @@ project-management-grounding/
 | **`spec/methods/{method-id}.md`** | **交付方** | **方法声明调整** | **CHANGELOG；改变已有规则编译结果时升级为结构性变更（需 ADR）** |
 | `spec/ASSUMPTION_PROTOCOL.md` | 交付方 | 协议调整 | 随协议调整；改变已有 assumption 处理结果时需 ADR |
 | `spec/INTERFACE_CONTRACT_SPEC.md` | 交付方 | 槽位定义变化、连接实例格式变化 | 结构性变更需 ADR |
+| `spec/CONTEXT_ASSEMBLY.md` | 交付方 | 装配场景变化、切片规则变化 | 结构性变更需 ADR；切片调整需 CHANGELOG |
+| `spec/GROUNDING_CRITERIA.md` | 人类责任方 | 判据新增需 ADR；可查方式调整需 CHANGELOG | ADR（新增判据）；CHANGELOG（可查方式） |
 | `contracts/` | 交付方 | 槽位定义变化、样例更新 | 结构性变更需 ADR |
 | `knowledge/` | 任何执行者 | 条目新增/变更（受 `CONSTITUTION.md` 第 2、3 条约束） | 随来源治理 |
 | `adr/` | 任何执行者 | 治理决策发生 | 状态 `proposed` 即时登记，`accepted` 需人类责任方 |
 | `validation/` | 交付方 | 规则变化时由 `spec/COMPILATION_META.md` + 启用的方法声明重建 | 随规则演进 |
+| `validation/test-cases/` | 交付方 | 用例新增/修正 | 随用例更新 |
+| `scripts/` | 交付方 | 脚本规格变化 | 随规格更新 |
 
 **为什么目录结构的权威放在本文件而非 README**：目录结构不是“给新读者的介绍”，而是“对执行者的约束”——它规定了哪些文件可以被修改、由谁修改、更新频率如何。这些属于执行约定，与第 1 条的资料获取纪律、第 2 条的检查机械化同层。`README.md` 的职责是**让读者尽快找到入口**，它保留一份导航表即可；两份文档的职责边界因此清晰：**README 回答“我该读什么”，AGENTS 回答“这个仓库怎么运转”**。
 
@@ -161,6 +180,14 @@ project-management-grounding/
 6. **产出留痕**：`grounded` / `assumption` 分离；未通过检查项按 `severity` 处理（`block` 阻断、`warn` 记录、`advisory` 提示）。
 7. **批准路由**：高影响产出交给批准角色；生成模型不写入批准状态。
 8. **调度登记**：实质性变更追加 CHANGELOG 批次；识别出的未完成项登记 TODO。
+
+### 6bis. 与 QUICKSTART、装配、接地的衔接
+
+- **首次使用**：读 `QUICKSTART.md`，按第 2 节走一遍最小样例。
+- **每次运行前**：宿主运行时按 `spec/CONTEXT_ASSEMBLY.md` 执行装配，产出装配清单。
+- **每次运行后**：检查装配清单的 `degradations` 与 `blocked` 字段；若有降级或阻断，记录并报告。
+- **部署前**：按 `spec/GROUNDING_CRITERIA.md` 执行接地判定；未接地时按 `CONSTITUTION.md` 第 12.3 条处理。
+- **发现错误时**：登记 `ERRATA.md`（若属于本技能自身的表述错误）或 `CHANGELOG.md`（若属于文件变更）。
 
 ### 7. 与宿主运行时的分工
 
