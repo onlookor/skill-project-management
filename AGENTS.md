@@ -110,7 +110,8 @@ project-management-grounding/
 │
 ├── scripts/
 │   ├── README.md                   # 辅助脚本目录说明
-│   └── check_glossary_sync.md      # GLOSSARY/JSONL 同步检查规格
+│   ├── check_glossary_sync.md      # GLOSSARY/JSONL 同步检查规格
+│   └── check_state.py              # STATE 与 git 跟踪文件的对账脚本（可运行）
 │
 └── validation/
     ├── CHECKLIST.md                # CM-DET-CHECKER 的产物：检查清单（生成依据见正文）
