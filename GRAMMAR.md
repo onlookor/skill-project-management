@@ -1,5 +1,7 @@
 ## 成文法
 
+规则组 B 的 `pending_reanchor` 条目在重新锚定完成前不编译为阻断性检查。
+
 **权威关系**：本文件是立法文件。其修改须遵循 `CONSTITUTION.md` 第 4 条（ADR）与第 3 条（准入条件）。本文件不包含执行细节；执行细节见 `spec/COMPILATION_SPEC.md`。
 
 ### 使用说明
