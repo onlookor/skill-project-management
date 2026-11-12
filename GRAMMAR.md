@@ -1,6 +1,6 @@
 ## 成文法
 
-规则组 B 的 `pending_reanchor` 条目在重新锚定完成前不编译为阻断性检查。
+规则组 B 已于 2026-11-12 按 ISO 21502:2020 重新锚定（ADR-0008），由 `pending_reanchor` 转为 `active`，暂以 `advisory` 运行。
 
 **权威关系**：本文件是立法文件。其修改须遵循 `CONSTITUTION.md` 第 4 条（ADR）与第 3 条（准入条件）。本文件不包含执行细节；执行细节见 `spec/COMPILATION_META.md` 与 `spec/methods/deterministic-checker.md`。
 
@@ -45,28 +45,28 @@
 
 ---
 
-### 规则组 B：过程组与主题组的正交标注
+### 规则组 B：生命周期位置与管理实践的双维标注
 
-> **规则组 B 的整体状态：`pending_reanchor`。** 原锚点已撤回，现行锚点为 ISO 21502:2020（指南）。规则组 B 的“五过程组 × 十主题组”矩阵结构在 ISO 21502:2020 中是否保留、以何种形态保留，尚待核验（见 `SOURCE_LEDGER.md` 的 `ISO21502-2020` 条目，以及 `TODO.md` T-113）。**在重新锚定完成前，本组规则不编译为阻断性检查，仅输出 `advisory`。**
+> **规则组 B 的状态：`active`（`advisory`）。** 原锚点 ISO 21500:2012 已撤回，现行锚点为 ISO 21502:2020。2026-11-12 逐页核对确认：ISO 21502:2020 **不含**“五过程组 × 十主题组”矩阵，其正文由第 6 章集成实践与第 7 章管理实践两套实践构成，附录 A 对 ISO 21500:2012 过程组的映射仅为资料性。本组规则据此改写并重新锚定（ADR-0008）。因双标签要求与维度收敛属技能自身形式化贡献，本组暂为 `advisory`，升级条件见 `TODO.md` T-118。
 
 **G-B1（双维度标注）**
 
-> 任何生成的管理项必须同时携带一个 `process_group` 标签和一个 `subject_group` 标签。缺少任一维度即判定为元框架违规。
+> 任何生成的管理项必须同时携带一个 `process_group` 标签和一个 `subject_group` 标签。`process_group` 取自 ISO 21502:2020 第 6 章集成实践的生命周期位置（`pre-project`、`overseeing`、`directing`、`initiating`、`controlling`、`managing-delivery`、`closing`、`post-project` 八项），`subject_group` 取自第 7 章的管理实践（`planning` 至 `lessons-learned` 共十七项）。缺少任一维度即判定为元框架违规。
 
-- `grounding_ref`：`ISO21502-2020`（状态：`pending_reanchor`）
-- `provenance_note`：本规则的形式化前提是“项目管理过程可被划分为若干过程组与主题组两个正交维度”。该结构在 ISO 21502:2020 中的具体形态尚待核对（T-113）。本规则将“正交性”收紧为强制性标注要求，为技能自身贡献。
+- `grounding_ref`：`ISO21502-2020`
+- `provenance_note`：ISO 21502:2020 以第 6 章“Integrated project management practices”（6.2–6.9，印刷页 18–26）与第 7 章“Management practices for a project”（7.2–7.18，印刷页 26–45）两套实践组织内容；附录 A 表 A.2 仅以 ISO 21500:2012 的五个过程组为列首做资料性映射（印刷页 49–51），本文档自身不采用该矩阵。因此本规则的维度取自 ISO 21502:2020 自身的两套实践，而非 ISO 21500:2012 的“五过程组 × 十主题组”。将两套实践强制为双标签、并把生命周期维度收敛为八个位置，是技能自身的形式化贡献。
 - `check`：`DUAL_DIMENSION_ANNOTATION`
-- `severity`：`block`（`pending_reanchor` 期间降级为 `advisory`）
-- `applicability`：任何生成管理项的活动。重新锚定后复评。
+- `severity`：`advisory`
+- `applicability`：任何生成管理项的活动。升为 `block` 前须有使用证据（T-118）。
 
 **G-B2（标签值集的封闭性）**
 
-> `process_group` 和 `subject_group` 的合法值**只能**来自 G-B1 所锚定标准中的枚举。不允许引入自定义值来“扩充”分类。如果领域技能需要表达该标准未覆盖的管理关注点，它应当通过接口契约新增 `subject_group_extension` 槽位，并在该槽位中显式声明其与基础主题组的关系（`specializes` / `cross_cuts` / `orthogonal_to`），而不是污染基础枚举。
+> `process_group` 和 `subject_group` 的合法值**只能**来自 G-B1 所列的两套枚举（ISO 21502:2020 第 6 章的八个生命周期位置与第 7 章的十七个管理实践）。不允许引入自定义值来“扩充”分类。如果领域技能需要表达该标准未覆盖的管理关注点，它应当通过接口契约新增 `subject_group_extension` 槽位，并在该槽位中显式声明其与基础值的关系（`specializes` / `cross_cuts` / `orthogonal_to`），而不是污染基础枚举。
 
-- `grounding_ref`：`ISO21502-2020`（状态：`pending_reanchor`）
-- `provenance_note`：值集取自所锚定标准的主题组分类；扩展机制的形式为技能自身贡献，目的是在保持基础分类封闭的同时允许领域特化。
+- `grounding_ref`：`ISO21502-2020`
+- `provenance_note`：值集取自 ISO 21502:2020 第 6、7 章的实践标题（印刷页 18–45）；扩展机制为技能自身贡献。原文只提供两套实践的对照关系（附录 A），不宣称两维独立或正交，因此本规则只要求双标签，不引入“正交”语义。
 - `check`：`DIMENSION_VALUE_CLOSED`
-- `severity`：`block`（`pending_reanchor` 期间降级为 `advisory`）
+- `severity`：`advisory`
 - `applicability`：同 G-B1。
 
 ---
@@ -160,7 +160,7 @@
 - `check`：`PROJECT_CHARTER_EXISTENCE`
 - `severity`：`advisory`（`assumption` 期间；核验后复评）
 - `applicability`：任何进入执行阶段的 `Project`。
-- `assumption_verification`：ISO 21502:2020 与 PRINCE2 7 对“项目授权”的最小要素集是否与本规则一致；核验后升级或修订。
+- `assumption_verification`：已于 2026-11-12 核对 PRINCE2 7（印刷页 58、61）：项目授权链为 project mandate → project brief → 项目委员会 authorizing initiation → 完整业务论证 → authorizing the project，与“进入执行阶段前须有授权”相容；PRINCE2 未规定本规则的最小关联字段集，故维持 `advisory`。
 
 **G-F2（收尾验收的闭合）**
 
@@ -171,29 +171,29 @@
 - `check`：`CLOSURE_ACCEPTANCE_LINK`
 - `severity`：`advisory`（`assumption` 期间）
 - `applicability`：任何进入收尾阶段的 `Project`。
-- `assumption_verification`：与 ISO 21502:2020 的收尾过程要素核验一致后升级。
+- `assumption_verification`：已于 2026-11-12 核对 PRINCE2 7：质量实践包含“accepting products”（印刷页 135、138），第 19 章为“Closing a project”（印刷页 277 起）；“验收断言须关联 Accountable 确认记录”仍为技能自身形式化，维持 `advisory`。
 
 **G-F3（外部采购的合同锚定）**
 
 > 任何涉及外部采购的 `Commitment`，必须关联一个 `Contract` 节点，该节点至少声明：交付物形态、验收判据、约束锚定（该合同缓解或引入哪些 `Constraint`）、以及 `Accountable` 的合同签署确认。缺少 `Contract` 锚定的外部采购承诺，判定为采购治理缺失。
 
-- `grounding_ref`：`ISO21502-2020`（采购主题组的领域无关表述）
-- `provenance_note`：ISO 21502:2020 将采购作为项目管理的主题之一；本规则将其形式化为 `Contract` 节点的最小声明集。**最小声明集的具体字段为技能自身贡献**。待核验后决定是否升级为 `block`。
+- `grounding_ref`：`ISO21502-2020`（7.17 Procurement 实践）
+- `provenance_note`：ISO 21502:2020 第 7.17 节“Procurement”（规划采购、评估与选择供应商、合同管理、合同收尾，印刷页 43–44）是十七项管理实践之一；本规则将其形式化为 `Contract` 节点的最小声明集。**最小声明集的具体字段为技能自身贡献**。
 - `check`：`PROCUREMENT_CONTRACT_ANCHOR`
 - `severity`：`advisory`（`assumption` 期间）
 - `applicability`：任何涉及外部采购的 `Commitment`。
-- `assumption_verification`：与 ISO 21502:2020 采购主题组的过程要素核验一致后升级。
+- `assumption_verification`：已于 2026-11-12 核对 ISO 21502:2020 第 7.17 节（印刷页 43–44）：采购实践覆盖合同管理与合同收尾；与本规则的合同锚定相容。具体字段集仍为自身贡献，维持 `advisory`。
 
 **G-F4（时间与进度证据的存在性）**
 
 > 任何声明了 `deadline` 或 `milestone` 的 `Commitment`，必须关联至少一条 `Assertion`，说明该时间承诺的依据（估算方法、历史数据、或外部强加的日期及其出处）。无依据的时间承诺不得作为进度基线的组成部分。
 
-- `grounding_ref`：`ISO21502-2020`（时间主题组）
-- `provenance_note`：ISO 21502:2020 将时间作为项目管理主题之一；本规则将“时间承诺必须有依据”形式化为 `Assertion` 关联要求。**“依据”的具体形态（估算方法 / 历史数据 / 外部强加出处）为技能自身贡献**。待核验后决定是否升级为 `block`。
+- `grounding_ref`：`ISO21502-2020`（7.6 Schedule management 实践）
+- `provenance_note`：ISO 21502:2020 第 7.6 节“Schedule management”（估算活动持续时间、制定进度、控制进度，印刷页 32–33）是十七项管理实践之一；本规则将“时间承诺必须有依据”形式化为 `Assertion` 关联要求。**“依据”的具体形态（估算方法 / 历史数据 / 外部强加出处）为技能自身贡献**。
 - `check`：`SCHEDULE_EVIDENCE_LINK`
 - `severity`：`advisory`（`assumption` 期间）
 - `applicability`：任何声明了时间承诺的 `Commitment`。
-- `assumption_verification`：与 ISO 21502:2020 时间主题组的过程要素核验一致后升级。
+- `assumption_verification`：已于 2026-11-12 核对 ISO 21502:2020 第 7.6 节（印刷页 32–33）：进度实践包含持续时间估算与进度制定；与本规则的“时间依据”相容。具体形态仍为自身贡献，维持 `advisory`。
 
 ---
 
@@ -210,7 +210,7 @@
 - `check`：`TAILORING_RECORD_EXISTENCE`
 - `severity`：`advisory`（`assumption` 期间）
 - `applicability`：任何裁剪规则集的活动。
-- `assumption_verification`：与 PRINCE2 裁剪原则的实践指南核验一致后升级。
+- `assumption_verification`：已于 2026-11-12 核对 PRINCE2 7 第 2.7 节（印刷页 29）：裁剪由项目委员会与项目经理作主动决策，目的为使方法与控制适配项目规模、复杂度、重要性与风险；PRINCE2 未规定裁剪记录的最小字段集，维持 `advisory`。
 
 **G-G2（裁剪不得降低不可裁剪集）**
 
@@ -223,7 +223,7 @@
 - `check`：`TAILORING_NON_TRIMMABLE_SET`
 - `severity`：`advisory`（`assumption` 期间）
 - `applicability`：任何裁剪记录。
-- `assumption_verification`：与 PRINCE2 裁剪原则的边界说明核验一致后升级。
+- `assumption_verification`：已于 2026-11-12 核对 PRINCE2 7（印刷页 20）：七项原则须全部应用，“unless all of them are applied, it is not a PRINCE2 project”，支持“存在不可裁剪核心”的概念；但不可裁剪集具体为本技能哪五条规则，仍为自身贡献，维持 `advisory`。
 
 **G-G3（裁剪记录的可追溯性）**
 
@@ -234,7 +234,7 @@
 - `check`：`TAILORING_REASSESSMENT_CONDITION`
 - `severity`：`advisory`（`assumption` 期间）
 - `applicability`：任何裁剪记录。
-- `assumption_verification`：同 G-G1。
+- `assumption_verification`：PRINCE2 7 未规定裁剪须附带重新评估条件（第 2.7 节与第 19 章核对）；该要求无来源支持，为技能自身贡献，维持 `advisory`。
 
 ---
 
@@ -243,7 +243,7 @@
 | 组 | 规则数 | 状态 | 阻断级规则 | 说明 |
 |---|---|---|---|---|
 | A | 2 | `active` | 2 | 项目存在的最小条件 |
-| B | 2 | `pending_reanchor` | 0（降级 `advisory`） | 原锚点已撤回，待按 ISO 21502:2020 重新锚定（T-113） |
+| B | 2 | `active`（`advisory`） | 0 | 已按 ISO 21502:2020 第 6/7 章重新锚定（ADR-0008）；升级为阻断待使用证据（T-118） |
 | C | 2 | `active` | 1（C1）+ 1 `warn`（C2） | 交付物可断言性 |
 | D | 2 | `active` | 1（D1）+ 1 `warn`（D2） | 变更追溯 |
 | E | 2 | `active` | 1（E1）+ 1 `warn`（E2） | 角色最小完备性 |

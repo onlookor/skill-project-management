@@ -15,12 +15,12 @@
     "rule:G-B1": {
       "path": "GRAMMAR.md",
       "heading": "G-B1",
-      "sha256": "988c5e87cdcfa2aae1041db6dd66bd04bc182f6cb3f3bf167a25cdeb84bdda49"
+      "sha256": "96f3842339f94c1234a5d84087b8918abda37697f3a4233c77c9361c22093030"
     },
     "rule:G-B2": {
       "path": "GRAMMAR.md",
       "heading": "G-B2",
-      "sha256": "650dd4f329fcc2573287c1129a89f1a5ffbee9fd0c61d691d05a65cc51dbf0ab"
+      "sha256": "c4c8c616ea969698681c226e8539f851e16a412d575f76e250a959401d6fef96"
     },
     "rule:G-C1": {
       "path": "GRAMMAR.md",
@@ -55,37 +55,37 @@
     "rule:G-F1": {
       "path": "GRAMMAR.md",
       "heading": "G-F1",
-      "sha256": "3208e5bdcd524fa8d1782289b1e74f0ec435577bdea5b1b6cb3964949d25b421"
+      "sha256": "fa852c37cf0081e943f9277d16fdc202b0326824dc64df3065e5504a1b35d41c"
     },
     "rule:G-F2": {
       "path": "GRAMMAR.md",
       "heading": "G-F2",
-      "sha256": "2583c1f20f539f84cb876a6fa23486334026ce5341971d474f6702c0eb95e4f6"
+      "sha256": "78b88a0f486576eae7961ff4d0755d6439a44428ac6ed6013181b09b14d6f1ce"
     },
     "rule:G-F3": {
       "path": "GRAMMAR.md",
       "heading": "G-F3",
-      "sha256": "42531efd5078e6d6527cb9ee7d34d836392dacb972cc4254c6ea625bbacffd7a"
+      "sha256": "05eef0c3a75d4e8e86787e80c4eec39c0668987d028ce51dbf4ef6f828684c5f"
     },
     "rule:G-F4": {
       "path": "GRAMMAR.md",
       "heading": "G-F4",
-      "sha256": "ed91b4860590a372a82b5869d36ff445227137d0638f89ba15a94aec04535271"
+      "sha256": "3b203baefd8b5cf9fb0c27dc568cd646016825af220c4e1fe64db21d69de468f"
     },
     "rule:G-G1": {
       "path": "GRAMMAR.md",
       "heading": "G-G1",
-      "sha256": "6eb9cb693670364cf96f7665587990472f1838ddd68181e27515023832fbad87"
+      "sha256": "25fc50bcf968c0735717a1d283fb592830ef47f8afb7b573b4dd8e4405446d68"
     },
     "rule:G-G2": {
       "path": "GRAMMAR.md",
       "heading": "G-G2",
-      "sha256": "ccfe7e805d0786b022134f16f74607eaeaa1ddf874c8084f8786c7b7a828b018"
+      "sha256": "967ce22d3ee019880687f9ff009b83c8d3252f786961f8d68a8938fd10bc2c39"
     },
     "rule:G-G3": {
       "path": "GRAMMAR.md",
       "heading": "G-G3",
-      "sha256": "4aec4a678880981256d2645c3be9eb2acc649ce589ba7aaa190a1048c121c87f"
+      "sha256": "4efefc4be4ea7c55c97f35edb2dbee1c34b16a9443b4ab150bae1b8bfe0f26ab"
     },
     "source:GB-T-37507-2025": {
       "path": "SOURCE_LEDGER.md",
@@ -95,32 +95,32 @@
     "source:ISO21502-2020": {
       "path": "SOURCE_LEDGER.md",
       "heading": "ISO21502-2020",
-      "sha256": "7bd79fa5a6b6318a31d7adabf269feee8daf1df2e966d44158f8722299f26243"
+      "sha256": "a06d8b9ac085443e042336ab74e6a2fc5a982a93d530dd0f62d1308f7807e866"
     },
     "source:PMBOK8-2025": {
       "path": "SOURCE_LEDGER.md",
       "heading": "PMBOK8-2025",
-      "sha256": "200a2bd4eb984b5d61aa3c67b65b14928f50636e1a45b9855a7b3f45b05364d0"
+      "sha256": "6501fc6ccb7eb8280ed998857e7aada1d6eaa82833adde91c50412cf81f8ffd0"
     },
     "source:PRINCE2-2023": {
       "path": "SOURCE_LEDGER.md",
       "heading": "PRINCE2-2023",
-      "sha256": "1b751be279d170343ead1e24cf69855b76223aacb9a980ae6cad6f61f57d305d"
+      "sha256": "91eacd165d269df9cfb8d5a47201fb628bb92753775f1d312cbfd69b56c2be42"
     },
     "source:ProjectCO-2024": {
       "path": "SOURCE_LEDGER.md",
       "heading": "ProjectCO-2024",
-      "sha256": "3d208e4dc5ba62c9f72a0e9fbc8f9c70381716782cdec3ef99b37b060631b70b"
+      "sha256": "0952d74e93ec6ea19e7e9ae806af3ce72291ef9015890da58a25a6d62ef6140b"
     },
     "source:SPRINGER-PMBOK-2024": {
       "path": "SOURCE_LEDGER.md",
       "heading": "SPRINGER-PMBOK-2024",
-      "sha256": "17337ffef0e610b07eb1b2ddb8cda043fced45f49649dc98d4480d2b8b35c32b"
+      "sha256": "a8485bbe680ebdc035104618c121356c9837ddfb160c39ab864399dcb6da638a"
     },
     "source:ThingFO-2021": {
       "path": "SOURCE_LEDGER.md",
       "heading": "ThingFO-2021",
-      "sha256": "522e388e2b9da4d5e3b5ce5de053973be277472eaa32a3530feccadcd042a4e2"
+      "sha256": "eca0ec180df6c7226500521b1f4bb5536d3095f4d3a6c60de559e0ea5a217a72"
     }
   }
 }

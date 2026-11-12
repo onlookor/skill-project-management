@@ -170,3 +170,16 @@
 - **负例验证**：在副本中插入一行——块外插入 0 错误 0 警告；在 G-A1 块内插入仅 `rule:G-A1` 一条漂移警告，其余 16 条规则与 7 个来源不受影响。
 - **关联 ADR**：ADR-0007（accepted）
 - **状态**：生效
+
+---
+
+### 批次 0015 — 2026-11-12 — 按本地 PDF 核对来源；规则组 B 重新锚定
+
+- **涉及文件**：
+  - 修改：`GRAMMAR.md`（第 1 条说明、规则组 B 引言与 G-B1/G-B2、G-F1–G-F4 与 G-G1–G-G3 的核验注、规则组状态汇总表 B 行）、`SOURCE_LEDGER.md`（`ISO21502-2020`、`PRINCE2-2023`、`ProjectCO-2024`、`ThingFO-2021`、`PMBOK8-2025`、`SPRINGER-PMBOK-2024` 的核验状态、`claim_mapping`、`allowed_uses`；废止记录；状态汇总）、`ERRATA.md`（新增 E-013–E-016，更新 V-001–V-003）、`TODO.md`（T-113 关闭，T-112 补注，新增 T-118、T-119）、`spec/ANCHOR_SPEC.md`（外部资料页码定位的澄清）
+  - 新建：`adr/0008-reanchor-dimension-rules.md`
+- **变更摘要**：安装并验证 poppler（`pdftotext`/`pdfinfo`/`pdftoppm`）与 Tesseract（eng/chi_sim/chi_tra），对 `resources/pm/` 六份 PDF 逐份判定载体形态：全部具备文本层，无整本扫描件；ProjectCO 的插图页另做 300 dpi 转图 OCR 复核。核对结论：ISO 21502:2020 不含“五过程组 × 十主题组”矩阵，正文为第 6 章集成实践（八个生命周期位置）与第 7 章管理实践（十七项）；附录 A 对 ISO 21500:2012 的映射为资料性。G-B1、G-B2 据此改写并解除 `pending_reanchor`，`severity` 保持 `advisory`（ADR-0008）。PRINCE2 第 7 版七项原则名称、授权链、产品验收与收尾、问责委派已逐页核对并记入。勘误另记：SPRINGER 请求信实际未发出（SMTP 535）、ProjectCO 本地副本未见 `Actor`/`Commitment`/`Constraint` 三个术语（原文用 `Agent`）。
+- **取舍说明**：未改动 `knowledge/` 条目与 G-A1/G-D1/G-E1 的规则文本——术语归属需先取得论文外部附录（T-119），规则改写需另走 ADR。中间产物（全文文本、渲染图、OCR 输出）全部落在 `/tmp/pm-extract/`，未进入仓库；`SOURCE_LEDGER.md` 只登记页码定位与自述结论，不复制原文段落。
+- **验证**：`scripts/check_state.py`、`scripts/check_ledger_landings.py`、`scripts/check_anchors.py` 全部通过；锚点指纹基线已按规则文本变更重新冻结。
+- **关联 ADR**：ADR-0008（accepted）
+- **状态**：生效

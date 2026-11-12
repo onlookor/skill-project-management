@@ -110,15 +110,51 @@
 - **波及文件**：`SOURCE_LEDGER.md`。
 - **状态**：`closed`（2026-11-12）
 
+#### E-013 — 误以为 ISO 21502:2020 保留“五过程组 × 十主题组”矩阵
+
+- **原表述**：`GRAMMAR.md` 规则组 B 的前提写作“项目管理过程可被划分为若干过程组与主题组两个正交维度”，并把 ISO 21502:2020 当作该矩阵的现行锚点；`SOURCE_LEDGER.md` 记为“矩阵结构待核对”。
+- **问题**：该矩阵是 ISO 21500:2012 的结构。ISO 21502:2020 正文改用第 6 章集成实践（6.2–6.9）与第 7 章管理实践（7.2–7.18）两套实践；附录 A 表 A.2 仅以 ISO 21500:2012 的五个过程组为列首做资料性反向对照（印刷页 47–51）。按原表述锚定，等于把已撤回标准的矩阵伪装成现行标准的内容。
+- **发现方式**：2026-11-12 用 `pdftotext` 逐页提取本地 62 页副本并定位附录 A。
+- **修正**：G-B1、G-B2 改写为“第 6 章生命周期位置 × 第 7 章管理实践”双维标注，`severity` 保持 `advisory`；`SOURCE_LEDGER.md` 的 `ISO21502-2020` 条目更新核验状态与落点；决策见 ADR-0008。
+- **波及文件**：`GRAMMAR.md`、`SOURCE_LEDGER.md`、`adr/0008-reanchor-dimension-rules.md`。
+- **状态**：`closed`（2026-11-12）
+
+#### E-014 — PRINCE2 第 7 版原则名称沿用旧版措辞
+
+- **原表述**：`SOURCE_LEDGER.md` 用“持续业务验证”“定义角色与职责”“根据环境裁剪”指称 PRINCE2 的七项原则。
+- **问题**：第 7 版原文为 “ensure continued business justification”、“define roles, responsibilities, and relationships”、“tailor to suit the project”（印刷页 21、24、29）。省略 “relationships” 会丢掉该原则对角色关系的要求；把 “tailor to suit the project” 写成“根据环境裁剪”扩大了原文范围。
+- **发现方式**：2026-11-12 逐页核对官方水印版第 2 章。
+- **修正**：`SOURCE_LEDGER.md` 的 `allowed_uses` 与核验状态改用原文名称并附页码；`GRAMMAR.md` 中 G-F1、G-F2、G-G1–G3 的 `assumption_verification` 记录核对结论。
+- **波及文件**：`SOURCE_LEDGER.md`、`GRAMMAR.md`。
+- **状态**：`closed`（2026-11-12）
+
+#### E-015 — 声称已向 Springer 通讯作者请求全文，实际邮件未发出
+
+- **原表述**：`SOURCE_LEDGER.md` 的 `SPRINGER-PMBOK-2024` 条目写“已于 2026-11-12 向通讯作者请求全文”。`TODO.md` T-112 的前置依赖也按“等待作者回复”理解。
+- **问题**：实际发信尝试在 SMTP 认证阶段被拒绝（`535 5.7.139 Authentication unsuccessful, basic authentication is disabled`），邮件未发出。“已请求”的表述不实，会让后续工作等待一封不存在的回信。
+- **发现方式**：按用户要求实际发送邮件并记录服务器响应。
+- **修正**：`SOURCE_LEDGER.md` 的 `verification_method` 与候选表改为“尝试致信、认证失败、邮件未发出”；`TODO.md` T-112 注明需改用其他渠道。`AGENTS.md` 第 1 条的资源获取留痕纪律不受影响。
+- **波及文件**：`SOURCE_LEDGER.md`、`TODO.md`。
+- **状态**：`closed`（2026-11-12）
+
+#### E-016 — 把 `Actor`、`Commitment`、`Constraint` 登记为 ProjectCO 原文术语
+
+- **原表述**：`SOURCE_LEDGER.md` 的 `ProjectCO-2024` 条目把 `Actor`、`Commitment`、`Constraint` 列为该论文的核心层概念，`knowledge/anchored-entries.jsonl` 中这三个条目的 `provenance_note` 写作“来自 ProjectCO”。
+- **问题**：本地 15 页副本的全文检索与第 7 页插图 OCR 均未出现这三个术语；论文以 `Agent` 指称参与实体（表 1：“internal and external involved Agents … Stakeholders and Project Agents”），`Outcome` 明确定为 ProcessCO 术语。把自设词汇写成原文术语，属于“来源存在但来源不蕴含该表述”。
+- **发现方式**：2026-11-12 文本层提取 + 插图 OCR 后逐词检索。
+- **修正**：`SOURCE_LEDGER.md` 的 `claim_mapping` 与核验状态改为“`Project`、`Deliverable`、`Outcome` 有文本依据；`Actor` 对应原文 `Agent`；`Commitment`、`Constraint` 为自设词汇”；登记 T-119 以取得论文外部附录与本体文件后复核。未删除 `knowledge/` 条目，未改动规则文本。
+- **波及文件**：`SOURCE_LEDGER.md`、`TODO.md`。
+- **状态**：`open`（待 T-119 复核；登记状态已如实降级）
+
 ### 3. 待核验的存疑表述
 
 以下表述已进入技能包，但尚未经外部来源核验。**它们不构成阻断，但在核验完成前不得作为“已接地”的依据**（`spec/GROUNDING_CRITERIA.md` G1 的 `assumption` 接受机制已覆盖）：
 
 | 编号 | 表述 | 位置 | 核验方式 | 状态 |
 |---|---|---|---|---|
-| V-001 | ISO 21502:2020 是否保留“五过程组 × 十主题组”矩阵结构 | `GRAMMAR.md` G-B1/G-B2、`SOURCE_LEDGER.md` | 获取全文核对 | `open`（T-001） |
-| V-002 | PRINCE2-2023 的具体条款措辞 | `GRAMMAR.md` G-F1/G-F2/G-G1–G3、`SOURCE_LEDGER.md` | 获取全文核对 | `open`（T-005） |
-| V-003 | ProjectCO-2024 的论文内部细节 | `SOURCE_LEDGER.md` | 获取全文核对 | `open`（T-006） |
+| V-001 | ISO 21502:2020 是否保留“五过程组 × 十主题组”矩阵结构 | `GRAMMAR.md` G-B1/G-B2、`SOURCE_LEDGER.md` | 获取全文核对 | `closed`（2026-11-12：不保留，见 E-013 与 ADR-0008） |
+| V-002 | PRINCE2-2023 的具体条款措辞 | `GRAMMAR.md` G-F1/G-F2/G-G1–G3、`SOURCE_LEDGER.md` | 获取全文核对 | `closed`（2026-11-12：七项原则、授权链、产品验收与收尾已核对，见 E-014；角色模型与产品描述模板未逐条核对） |
+| V-003 | ProjectCO-2024 的论文内部细节 | `SOURCE_LEDGER.md` | 获取全文核对 | `open`（2026-11-12：`Project`/`Deliverable`/`Outcome`/`Agent` 已核实；`Actor`/`Commitment`/`Constraint` 未见，见 E-016，T-119） |
 | V-004 | 方法条目 `M-EST-01`、`M-DEC-01`、`M-RISK-01`、`M-EV-01` 的更精确来源 | `knowledge/methods/registry-skeleton.md` | 获取对应章节核对 | `open`（T-004） |
 
 ### 4. 不做的事
