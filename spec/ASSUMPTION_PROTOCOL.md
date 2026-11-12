@@ -132,7 +132,7 @@ verification = {
 | 槽位填充（某槽位值未知） | **阻断**，报告缺失项 | 槽位缺失时不做推断；推断即幻觉 |
 | 检查项输入缺失 | **`cannot_evaluate`**，不当作 `pass` | 缺失输入当作通过是治理漏洞 |
 
-**登记**：以上四条是 `ASSUMPTION_PROTOCOL.md` 的统一纪律；`GRAMMAR.md` 与 `COMPILATION_SPEC.md` 中涉及 `unknown` 的条款均引用本节。
+**登记**：以上四条是 `ASSUMPTION_PROTOCOL.md` 的统一纪律；`GRAMMAR.md` 与 `spec/methods/deterministic-checker.md` 中涉及 `unknown` 的条款均引用本节。
 
 ### 6. 到期条件
 
@@ -173,7 +173,7 @@ verification = {
 
 ### 8. 在编译产物中的表示
 
-`COMPILATION_SPEC.md` 第 4 节规定：规则状态为 `assumption` 的检查项，编译产物中必须携带 `assumption_basis` 字段，指向 `GRAMMAR.md` 中对应规则的 `assumption_verification`。该字段的语义是：
+本文件第 8 节规定：规则状态为 `assumption` 的检查项，编译产物中必须携带 `assumption_basis` 字段，指向 `GRAMMAR.md` 中对应规则的 `assumption_verification`。该字段的语义是：
 
 - 该检查项的形式化依据尚待核验；
 - 校验器输出必须携带 `rule_status: assumption`；

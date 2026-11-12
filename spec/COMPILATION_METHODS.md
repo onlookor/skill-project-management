@@ -25,7 +25,7 @@
 | `method_id` | `CM-DET-CHECKER` |
 | `name` | 确定性校验器方法 |
 | `status` | `enabled` |
-| `spec` | `spec/methods/deterministic-checker.md`（下一轮交付；当前暂以原 `COMPILATION_SPEC.md` 的方法有关部分为内容来源） |
+| `spec` | `spec/methods/deterministic-checker.md`（下一轮交付；当前暂以 `spec/COMPILATION_META.md` 的元框架与该文件已移植的方法内容为来源） |
 | `scope` | 规则组 A、C、D、E（`active`）；规则组 B（`pending_reanchor`，产物携带状态）；规则组 F、G（`assumption`，产物携带状态）；**不可映射**：无（全部规则组可被本方法编译，但 B/F/G 组的产物按规则状态降级） |
 | `runtime_target` | 宿主提供的确定性校验器（Datalog / JSON 条件清单 / SQL / 其他可执行形态） |
 | `unmappable` | 无（本方法覆盖全部规则组；规则状态导致的降级不是不可映射，是 P6 的合规执行） |

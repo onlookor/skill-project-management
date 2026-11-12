@@ -42,13 +42,14 @@
 | **`spec/COMPILATION_METHODS.md`** | **Compilation method registry** | **Which compilation methods exist, which one is currently enabled, why, and replacement history** |
 | **`spec/CONTEXT_ASSEMBLY.md`** | **Execution** | **Context assembly specification: four-scenario load sets, token budget, assembly manifest** |
 | **`spec/GROUNDING_CRITERIA.md`** | **Execution** | **Grounding completion criteria: six criteria, status semantics, criteria record** |
+| **`spec/ANCHOR_SPEC.md`** | **Specification** | **Anchor and reference specification: stable IDs, heading paths, fingerprint baseline, explicit failure on broken anchors** |
 | **`spec/methods/deterministic-checker.md`** | **Concrete compilation method** | **Declaration of the deterministic-checker method: coverage, P1–P6 argument, check_id registry, translation specification** |
 | `spec/ASSUMPTION_PROTOCOL.md` | Execution | Specification of the format and verification conditions of the `assumption` block (method-independent) |
 | `spec/INTERFACE_CONTRACT_SPEC.md` | Execution | Slot definitions; **inter-skill information flow**; v1 single-layer resolution; declaration of items not mappable to PACT (method-independent) |
 | `contracts/` | Execution | Contract schema, resolution rules, two domain examples (construction, software engineering) |
 | `knowledge/` | Knowledge | Ontology entries and method registry (deterministically queryable, not for reading through) |
-| `adr/` | Governance | ADR format notes and governance decision records (ADR-0001–ADR-0006) |
-| **`scripts/`** | **Support** | **Auxiliary checking scripts: STATE reconciliation, source compilation landings, GLOSSARY/JSONL sync specification** |
+| `adr/` | Governance | ADR format notes and governance decision records (ADR-0001–ADR-0007) |
+| **`scripts/`** | **Support** | **Auxiliary checking scripts: STATE reconciliation, source compilation landings, anchor resolution and validation, GLOSSARY/JSONL sync specification** |
 | `validation/CHECKLIST.md` | Execution | Checklist generated from `COMPILATION_META.md` + `spec/methods/deterministic-checker.md` |
 | **`validation/test-cases/`** | **Execution** | **Counter-example test case library (3 currently on disk)** |
 

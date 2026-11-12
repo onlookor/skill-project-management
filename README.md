@@ -42,13 +42,14 @@
 | **`spec/COMPILATION_METHODS.md`** | **编译方法注册表** | **有哪些编译方法、当前启用哪个、为什么、替换历史** |
 | **`spec/CONTEXT_ASSEMBLY.md`** | **执行** | **上下文装配规范：四场景加载集、token 预算、装配清单** |
 | **`spec/GROUNDING_CRITERIA.md`** | **执行** | **接地完成判据：六条判据、状态语义、判据记录** |
+| **`spec/ANCHOR_SPEC.md`** | **规范** | **锚点与引用规范：稳定 ID、标题路径、指纹基线、失效显式报错** |
 | **`spec/methods/deterministic-checker.md`** | **具体编译方法** | **确定性校验器方法的声明：覆盖范围、P1–P6 论证、check_id 注册表、翻译规范** |
 | `spec/ASSUMPTION_PROTOCOL.md` | 执行 | `assumption` 区块的格式与验证条件规范（方法无关） |
 | `spec/INTERFACE_CONTRACT_SPEC.md` | 执行 | 槽位定义；**技能间信息流**；v1 单层解析；PACT 不可映射项声明（方法无关） |
 | `contracts/` | 执行 | 契约 schema、解析规则、两个领域样例（建筑施工、软件工程） |
 | `knowledge/` | 知识 | 本体条目与方法注册表（可确定性查询，不供通读） |
-| `adr/` | 治理 | ADR 格式说明与治理决策记录（ADR-0001–ADR-0006） |
-| **`scripts/`** | **辅助** | **辅助检查脚本：STATE 对账、来源编译落点、GLOSSARY/JSONL 同步规格** |
+| `adr/` | 治理 | ADR 格式说明与治理决策记录（ADR-0001–ADR-0007） |
+| **`scripts/`** | **辅助** | **辅助检查脚本：STATE 对账、来源编译落点、锚点解析与校验、GLOSSARY/JSONL 同步规格** |
 | `validation/CHECKLIST.md` | 执行 | 由 `COMPILATION_META.md` + `spec/methods/deterministic-checker.md` 生成的检查清单 |
 | **`validation/test-cases/`** | **执行** | **反例检验用例库（当前 3 个已落盘）** |
 
@@ -70,4 +71,4 @@
 
 **日常使用（要把技能接进一个项目）**：`AGENTS.md` 第 6、6bis 条 → `spec/CONTEXT_ASSEMBLY.md` → `spec/INTERFACE_CONTRACT_SPEC.md` 的槽位定义 → `contracts/examples/` 里最接近的样例 → 在自己的领域技能目录放置契约文件 → `validation/CHECKLIST.md` → 部署前按 `spec/GROUNDING_CRITERIA.md` 判定。
 
-**治理修改（要改动成文法、来源或编译）**：`CONSTITUTION.md` 全文 → `adr/0001-*.md`、`adr/0002-*.md`、`adr/0003-*.md`、`adr/0004-*.md`、`adr/0005-*.md`、`adr/0006-*.md` → `adr/ADR-TEMPLATE.md` → `SOURCE_LEDGER.md` 的登记规则 → 若涉及术语，读 `GLOSSARY.md` 第 4、5 节与 `CONSTITUTION.md` 第 11 条 → 若涉及编译，读 `spec/COMPILATION_META.md` 与 `spec/COMPILATION_METHODS.md` → 变更完成后追加 `CHANGELOG.md` 批次、更新 `TODO.md` 状态；发现错误登记 `ERRATA.md`。
+**治理修改（要改动成文法、来源或编译）**：`CONSTITUTION.md` 全文 → `adr/0001-*.md`、`adr/0002-*.md`、`adr/0003-*.md`、`adr/0004-*.md`、`adr/0005-*.md`、`adr/0006-*.md`、`adr/0007-*.md` → `adr/ADR-TEMPLATE.md` → `SOURCE_LEDGER.md` 的登记规则 → 若涉及术语，读 `GLOSSARY.md` 第 4、5 节与 `CONSTITUTION.md` 第 11 条 → 若涉及编译，读 `spec/COMPILATION_META.md` 与 `spec/COMPILATION_METHODS.md` → 若涉及引用或锚点，读 `spec/ANCHOR_SPEC.md` 并运行 `scripts/check_anchors.py` → 变更完成后追加 `CHANGELOG.md` 批次、更新 `TODO.md` 状态；发现错误登记 `ERRATA.md`。

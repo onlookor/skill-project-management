@@ -1,0 +1,126 @@
+{
+  "version": 1,
+  "algorithm": "sha256(normalize(lines))",
+  "anchors": {
+    "rule:G-A1": {
+      "path": "GRAMMAR.md",
+      "heading": "G-A1",
+      "sha256": "0394197e9a0b569c1e0893dc6c41a437f391506a725b97e32e5e33714031c313"
+    },
+    "rule:G-A2": {
+      "path": "GRAMMAR.md",
+      "heading": "G-A2",
+      "sha256": "a4519548f2f206c8c0f379ce171ffd62310497e634e2a61e68ba0ef9511f567b"
+    },
+    "rule:G-B1": {
+      "path": "GRAMMAR.md",
+      "heading": "G-B1",
+      "sha256": "988c5e87cdcfa2aae1041db6dd66bd04bc182f6cb3f3bf167a25cdeb84bdda49"
+    },
+    "rule:G-B2": {
+      "path": "GRAMMAR.md",
+      "heading": "G-B2",
+      "sha256": "650dd4f329fcc2573287c1129a89f1a5ffbee9fd0c61d691d05a65cc51dbf0ab"
+    },
+    "rule:G-C1": {
+      "path": "GRAMMAR.md",
+      "heading": "G-C1",
+      "sha256": "19dae5e6400fff145e212837dd9d08db2cb979fba5980beb3db79f8d93f860e8"
+    },
+    "rule:G-C2": {
+      "path": "GRAMMAR.md",
+      "heading": "G-C2",
+      "sha256": "24c715ad1f8266692ce94d877224e6f30cfe50cd133b6843a7fcfb3ad0506070"
+    },
+    "rule:G-D1": {
+      "path": "GRAMMAR.md",
+      "heading": "G-D1",
+      "sha256": "0852215102b9a40e705733b9a9a1b6cc967d857f3fc2bf3b8802c131550700e2"
+    },
+    "rule:G-D2": {
+      "path": "GRAMMAR.md",
+      "heading": "G-D2",
+      "sha256": "bfc035f9b4c082f0a51b6571bf1282a7ad6c054f543fda32807ef1a59a11381c"
+    },
+    "rule:G-E1": {
+      "path": "GRAMMAR.md",
+      "heading": "G-E1",
+      "sha256": "24d25fc6a911e0b30e12f4442676699ca5cb80415e99ba6d4242f8c3436df7d7"
+    },
+    "rule:G-E2": {
+      "path": "GRAMMAR.md",
+      "heading": "G-E2",
+      "sha256": "65a17f549e18d5303ce5356f90d79b2e4d81671d136a4b6974e889a1ef1ac7c3"
+    },
+    "rule:G-F1": {
+      "path": "GRAMMAR.md",
+      "heading": "G-F1",
+      "sha256": "3208e5bdcd524fa8d1782289b1e74f0ec435577bdea5b1b6cb3964949d25b421"
+    },
+    "rule:G-F2": {
+      "path": "GRAMMAR.md",
+      "heading": "G-F2",
+      "sha256": "2583c1f20f539f84cb876a6fa23486334026ce5341971d474f6702c0eb95e4f6"
+    },
+    "rule:G-F3": {
+      "path": "GRAMMAR.md",
+      "heading": "G-F3",
+      "sha256": "42531efd5078e6d6527cb9ee7d34d836392dacb972cc4254c6ea625bbacffd7a"
+    },
+    "rule:G-F4": {
+      "path": "GRAMMAR.md",
+      "heading": "G-F4",
+      "sha256": "ed91b4860590a372a82b5869d36ff445227137d0638f89ba15a94aec04535271"
+    },
+    "rule:G-G1": {
+      "path": "GRAMMAR.md",
+      "heading": "G-G1",
+      "sha256": "6eb9cb693670364cf96f7665587990472f1838ddd68181e27515023832fbad87"
+    },
+    "rule:G-G2": {
+      "path": "GRAMMAR.md",
+      "heading": "G-G2",
+      "sha256": "ccfe7e805d0786b022134f16f74607eaeaa1ddf874c8084f8786c7b7a828b018"
+    },
+    "rule:G-G3": {
+      "path": "GRAMMAR.md",
+      "heading": "G-G3",
+      "sha256": "4aec4a678880981256d2645c3be9eb2acc649ce589ba7aaa190a1048c121c87f"
+    },
+    "source:GB-T-37507-2025": {
+      "path": "SOURCE_LEDGER.md",
+      "heading": "GB-T-37507-2025",
+      "sha256": "04bc28e4988cfd440c280cbd23a9ec38b70c8878e98355378b8ddd76bfb9842f"
+    },
+    "source:ISO21502-2020": {
+      "path": "SOURCE_LEDGER.md",
+      "heading": "ISO21502-2020",
+      "sha256": "7bd79fa5a6b6318a31d7adabf269feee8daf1df2e966d44158f8722299f26243"
+    },
+    "source:PMBOK8-2025": {
+      "path": "SOURCE_LEDGER.md",
+      "heading": "PMBOK8-2025",
+      "sha256": "200a2bd4eb984b5d61aa3c67b65b14928f50636e1a45b9855a7b3f45b05364d0"
+    },
+    "source:PRINCE2-2023": {
+      "path": "SOURCE_LEDGER.md",
+      "heading": "PRINCE2-2023",
+      "sha256": "1b751be279d170343ead1e24cf69855b76223aacb9a980ae6cad6f61f57d305d"
+    },
+    "source:ProjectCO-2024": {
+      "path": "SOURCE_LEDGER.md",
+      "heading": "ProjectCO-2024",
+      "sha256": "3d208e4dc5ba62c9f72a0e9fbc8f9c70381716782cdec3ef99b37b060631b70b"
+    },
+    "source:SPRINGER-PMBOK-2024": {
+      "path": "SOURCE_LEDGER.md",
+      "heading": "SPRINGER-PMBOK-2024",
+      "sha256": "17337ffef0e610b07eb1b2ddb8cda043fced45f49649dc98d4480d2b8b35c32b"
+    },
+    "source:ThingFO-2021": {
+      "path": "SOURCE_LEDGER.md",
+      "heading": "ThingFO-2021",
+      "sha256": "522e388e2b9da4d5e3b5ce5de053973be277472eaa32a3530feccadcd042a4e2"
+    }
+  }
+}

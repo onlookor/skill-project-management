@@ -63,8 +63,8 @@
 
 ### 执行纪律
 
-1. 校验器按本表逐项执行，输出 `pass` / `fail` / `cannot_evaluate`（`COMPILATION_SPEC.md` 第 3 节）。
+1. 校验器按本表逐项执行，输出 `pass` / `fail` / `cannot_evaluate`（`spec/methods/deterministic-checker.md` 第 4.2 节）。
 2. `cannot_evaluate` 不等于 `pass`；缺失输入必须报告。
 3. 规则状态为 `pending_reanchor` 或 `assumption` 的检查项，校验器输出携带 `rule_status`；宿主据此仅记录而不阻断。
 4. 生成模型只消费校验器的输出，不消费本清单本身（`CONSTITUTION.md` 第 1 条）。
-5. 本清单由 `spec/COMPILATION_SPEC.md` 第 2 节注册表机械生成；不一致时重建。
+5. 本清单由 `spec/methods/deterministic-checker.md` 附录 A 的注册表机械生成；不一致时重建。

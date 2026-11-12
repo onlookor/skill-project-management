@@ -20,9 +20,9 @@
 | 编号 | 性质 | 工作项 | 治理路径 | 前置依赖 | 状态 |
 |---|---|---|---|---|---|
 | T-010 | 解析器实现规格 | 为 `contracts/resolver.md` 补充解析器的参考实现伪代码（供宿主实现时参照） | 结构性变更需 ADR | 无 | `open` |
-| T-011 | 检查器实现规格 | 为 `spec/methods/deterministic-checker.md` 附录 A 注册表中的每个 check 补充参考实现的输入/输出样例 | 结构性变更需 ADR | 无 | `open`（**引用路径已从 `COMPILATION_SPEC.md` 更新为 `COMPILATION_META.md` + `spec/methods/deterministic-checker.md`**） |
+| T-011 | 检查器实现规格 | 为 `spec/methods/deterministic-checker.md` 附录 A 注册表中的每个 check 补充参考实现的输入/输出样例 | 结构性变更需 ADR | 无 | `open`（引用路径已更新为 `spec/COMPILATION_META.md` + `spec/methods/deterministic-checker.md`） |
 | T-012 | 多层合并启用评估 | 评估是否启用多层契约合并（`spec/INTERFACE_CONTRACT_SPEC.md` 第 6 节）；启用需 ADR 论证真实需求 | ADR | 三个以上技能接入 | `open` |
-| T-013 | PACT 适配验证 | 在宿主安装 PACT 时验证 `COMPILATION_SPEC.md` 第 8 节与 `resolver.md` 第 3 节的可映射/不可映射声明是否与实际 PACT 行为一致 | 执行层补丁 | PACT 可用 | `open` |
+| T-013 | PACT 适配验证 | 在宿主安装 PACT 时验证 `spec/INTERFACE_CONTRACT_SPEC.md` 第 8 节与 `contracts/resolver.md` 第 3 节的可映射/不可映射声明是否与实际 PACT 行为一致 | 执行层补丁 | PACT 可用 | `open` |
 
 ### 知识层填充
 
@@ -75,7 +75,7 @@
 
 | 编号 | 性质 | 工作项 | 治理路径 | 前置依赖 | 状态 |
 |---|---|---|---|---|---|
-| T-070 | 引用修复 | 全仓库检索 `spec/COMPILATION_SPEC.md` 的残留引用，更新为 `spec/COMPILATION_META.md` + `spec/methods/deterministic-checker.md` 的对应位置 | 执行层补丁（不需 ADR） | 无 | `open` |
+| T-070 | 引用修复 | 全仓库检索已删除编译规范的残留引用，更新为 `spec/COMPILATION_META.md` + `spec/methods/deterministic-checker.md` 的对应位置 | 执行层补丁（不需 ADR） | 无 | `done`（2026-11-12，`scripts/check_anchors.py` 复核为 0 错误） |
 | T-071 | 一致性检查 | 建立 `spec/COMPILATION_METHODS.md` 的方法登记与 `spec/methods/{method-id}.md` 声明文件的一致性检查项（名称、适用范围、状态） | 执行层补丁 | T-060–T-063 | `open` |
 | T-072 | 一致性检查 | 建立 `spec/COMPILATION_META.md` 第 2 条（P1–P6）与各方法声明文件第 3–7 节的覆盖检查项（每个方法必须逐条论证 P1–P6） | 执行层补丁 | T-060–T-063 | `open` |
 
@@ -129,5 +129,7 @@
 
 | 编号 | 性质 | 工作项 | 治理路径 | 前置依赖 | 状态 |
 |---|---|---|---|---|---|
-| T-114 | 一致性检查 | 建立“文档中所有 `grounding_ref` 都指向 `SOURCE_LEDGER.md` 的 active 条目”的闭环检查，并与 `check_ledger_landings.py` 合并为一次运行 | 执行层补丁 | 无 | `open` |
+| T-114 | 一致性检查 | 建立“文档中所有 `grounding_ref` 都指向 `SOURCE_LEDGER.md` 的 active 条目”的闭环检查，并与 `check_ledger_landings.py` 合并为一次运行 | 执行层补丁 | 无 | `done`（2026-11-12，已由 `scripts/check_anchors.py` 实现，与落点检查同批运行） |
 | T-115 | 来源核验 | 复核 `SPRINGER-PMBOK-2024` 的 `pending:T-112` 状态；正文长期不可得时，决定是保留为待落点条目还是移出登记表 | 来源治理（ADR） | T-112 | `open` |
+| T-116 | 流程接入 | 把 `scripts/check_anchors.py` 纳入提交前检查清单，与 `check_ledger_landings.py` 同批运行 | 执行层补丁 | 无 | `open` |
+| T-117 | 引用登记 | 为 `SKILL.md`、`validation/test-cases/TC-*.md` 等尚未创建的引用建立计划项登记，避免长期以“示例/计划”身份存在 | 执行层补丁 | 无 | `open` |

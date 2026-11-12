@@ -83,6 +83,7 @@ project-management-grounding/
 │   ├── COMPILATION_METHODS.md      # 编译方法注册表：方法列表、启用状态、替换历史
 │   ├── CONTEXT_ASSEMBLY.md         # 上下文装配规范：四场景加载集、token 预算、装配清单
 │   ├── GROUNDING_CRITERIA.md       # 接地完成判据：六条判据、状态语义、判据记录
+│   ├── ANCHOR_SPEC.md              # 锚点与引用规范：稳定 ID、标题路径、指纹、失效语义
 │   ├── methods/
 │   │   └── deterministic-checker.md  # CM-DET-CHECKER 方法声明（含 check_id 注册表、翻译规范）
 │   ├── ASSUMPTION_PROTOCOL.md      # assumption 协议（方法无关）
@@ -109,12 +110,15 @@ project-management-grounding/
 │   ├── 0003-version-and-state-governance.md
 │   ├── 0004-artifact-baseline-by-commit.md
 │   ├── 0005-source-ledger-scope.md
-│   └── 0006-knowledge-sources-vs-normative-basis.md
+│   ├── 0006-knowledge-sources-vs-normative-basis.md
+│   └── 0007-anchor-discipline.md
 │
 ├── scripts/
 │   ├── README.md                   # 辅助脚本目录说明
 │   ├── check_glossary_sync.md      # GLOSSARY/JSONL 同步检查规格
 │   ├── check_ledger_landings.py    # 来源编译落点检查（可运行）
+│   ├── check_anchors.py            # 锚点解析与校验（可运行）
+│   ├── anchor_baseline.json        # 规则/来源文本块的指纹基线
 │   └── check_state.py              # STATE 与 git 跟踪文件的对账脚本（可运行）
 │
 └── validation/
@@ -150,6 +154,7 @@ project-management-grounding/
 | `spec/INTERFACE_CONTRACT_SPEC.md` | 交付方 | 槽位定义变化、连接实例格式变化 | 结构性变更需 ADR |
 | `spec/CONTEXT_ASSEMBLY.md` | 交付方 | 装配场景变化、切片规则变化 | 结构性变更需 ADR；切片调整需 CHANGELOG |
 | `spec/GROUNDING_CRITERIA.md` | 人类责任方 | 判据新增需 ADR；可查方式调整需 CHANGELOG | ADR（新增判据）；CHANGELOG（可查方式） |
+| `spec/ANCHOR_SPEC.md` | 人类责任方 | 锚点形态、失效语义、指纹算法变化需 ADR；措辞澄清需 CHANGELOG | ADR；基线随规则/来源变更重冻 |
 | `contracts/` | 交付方 | 槽位定义变化、样例更新 | 结构性变更需 ADR |
 | `knowledge/` | 任何执行者 | 条目新增/变更（受 `CONSTITUTION.md` 第 2、3 条约束） | 随来源治理 |
 | `adr/` | 任何执行者 | 治理决策发生 | 状态 `proposed` 即时登记，`accepted` 需人类责任方 |

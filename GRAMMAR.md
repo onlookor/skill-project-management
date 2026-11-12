@@ -2,7 +2,7 @@
 
 规则组 B 的 `pending_reanchor` 条目在重新锚定完成前不编译为阻断性检查。
 
-**权威关系**：本文件是立法文件。其修改须遵循 `CONSTITUTION.md` 第 4 条（ADR）与第 3 条（准入条件）。本文件不包含执行细节；执行细节见 `spec/COMPILATION_SPEC.md`。
+**权威关系**：本文件是立法文件。其修改须遵循 `CONSTITUTION.md` 第 4 条（ADR）与第 3 条（准入条件）。本文件不包含执行细节；执行细节见 `spec/COMPILATION_META.md` 与 `spec/methods/deterministic-checker.md`。
 
 ### 使用说明
 
@@ -13,7 +13,7 @@
 | **陈述** | 自足的条件式陈述（满足 `CONSTITUTION.md` 第 7.1、7.2 级自包含） |
 | `grounding_ref` | 指向 `SOURCE_LEDGER.md` 的条目 ID，且该条目的 `claim_mapping` 必须包含本条规则 |
 | `provenance_note` | 形式化边界说明：哪些内容是来源的，哪些是技能自身的形式化贡献 |
-| `check` | 在 `spec/COMPILATION_SPEC.md` 中注册的检查项标识 |
+| `check` | 在 `spec/methods/deterministic-checker.md` 附录 A 中注册的检查项标识 |
 | `severity` | `block`（阻断）/ `warn`（告警）/ `advisory`（提示） |
 | `applicability` | 规则适用条件（`CONSTITUTION.md` 第 3.5 条）。不适用时降级为 `advisory`，不失效 |
 
