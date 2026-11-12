@@ -1,0 +1,5 @@
+#!/usr/bin/env sh
+# 提交前阻断：原始资料、OCR/文本层转储、成段原文（CONSTITUTION 第 13 条）
+set -e
+root=$(git rev-parse --show-toplevel)
+python3 "$root/scripts/check_no_raw_material.py" --root "$root"

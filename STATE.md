@@ -21,6 +21,7 @@
 | 范围 | 默认状态 |
 |---|---|
 | `./` | `active` |
+| `.githooks/` | `active` |
 | `spec/` | `active` |
 | `contracts/` | `active` |
 | `contracts/examples/` | `example` |

@@ -111,7 +111,12 @@ project-management-grounding/
 │   ├── 0004-artifact-baseline-by-commit.md
 │   ├── 0005-source-ledger-scope.md
 │   ├── 0006-knowledge-sources-vs-normative-basis.md
-│   └── 0007-anchor-discipline.md
+│   ├── 0007-anchor-discipline.md
+│   ├── 0008-reanchor-dimension-rules.md
+│   └── 0009-no-raw-material-in-git.md
+│
+├── .githooks/
+│   └── pre-commit                  # 阻断原始资料入库（CONSTITUTION 第 13 条）
 │
 ├── scripts/
 │   ├── README.md                   # 辅助脚本目录说明
@@ -119,6 +124,7 @@ project-management-grounding/
 │   ├── check_ledger_landings.py    # 来源编译落点检查（可运行）
 │   ├── check_anchors.py            # 锚点解析与校验（可运行）
 │   ├── anchor_baseline.json        # 规则/来源文本块的指纹基线
+│   ├── check_no_raw_material.py    # 原始资料/OCR/成段原文的阻断式检查（可运行）
 │   └── check_state.py              # STATE 与 git 跟踪文件的对账脚本（可运行）
 │
 └── validation/
@@ -211,6 +217,17 @@ project-management-grounding/
 - **PACT 若存在**：作为**可选的运行时准入层**，把本技能的规则编译为 `Token` 类型与 `Precondition`。**必须诚实声明不可映射项**（OR 分支、时钟相关规则、字段级问责写入）。无 PACT 时，技能自身完备。
 - **外部领域本体若存在**：作为**可选的语义扩展**，填充约束分类维度。**无外部领域本体时，约束分类退回通用分类（目标/环境/方案）**。领域本体与该领域技能的映射关系在对应领域的契约中（如 `contracts/examples/software-engineering.pm-contract.yaml`）以 `assumption` 形式存在，附带验证条件（与该领域技能原文一致），不冒充已确认事实。
 - **任何领域技能若存在**：作为**横向对等体**，通过契约文件填充槽位。**没有任何领域技能享有特殊地位**；需求工程、软件工程、建筑施工与任何未来领域技能，都是可声明的槽位填充者。技能间的具体连接实例（如需求→软件的产物流动）登记在 `contracts/examples/` 或部署配置中，不进入成文法。
+
+### 7bis. 原始资料与提取产物的存放与提交纪律
+
+**依据**：`CONSTITUTION.md` 第 13 条。本条只规定执行层面的存放位置与操作顺序，不改变禁令本身。
+
+1. **提取产物一律落在仓库外**。约定目录为 `/tmp/pm-extract-<source-id>-<date>/`，存放 `pdftotext` 文本层输出、`pdftoppm` 渲染图、Tesseract OCR 结果与任何逐页转储。**不得**落在仓库目录内，也不得放进 `resources/`。
+2. **`resources/` 只在本地只读使用**。不复制、不打包、不 `git add`；`.gitignore` 已忽略 `resources/` 与文档类扩展名，但忽略规则不是许可。
+3. **引用外部文献只写可复核的定位与自己的话**。默认写法是“页码定位 + 自述摘要”；确需引证术语或条款措辞时，单条不超过一行或一句，并附来源 `id` 与页码（见 `CONSTITUTION.md` 第 13.2 条）。
+4. **提交前必须运行检查器**：`python3 scripts/check_no_raw_material.py`。本仓库已提供 `.githooks/pre-commit`，用 `git config core.hooksPath .githooks` 启用；未启用钩子的部署必须在 `git add` 前手工执行，二者等价。
+5. **检查器命中即停止提交**，不得用 `--no-verify` 绕过。确需新增例外（例如将来要提交一张合法图片资产），走 ADR 并在检查器中登记路径豁免，而不是删除规则或放宽阈值。
+6. **发现已跟踪内容违规时**：先报告文件与位置，再改为“页码定位 + 自述摘要”或移出仓库，并在 `ERRATA.md` 登记；不静默删除他人的内容。
 
 ### 8. 不做的事
 

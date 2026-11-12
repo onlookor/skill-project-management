@@ -7,3 +7,44 @@ Thumbs.db
 # Python 缓存
 __pycache__/
 *.pyc
+
+# ---- 原始资料与提取产物（禁入库，见 CONSTITUTION 第 13 条）----
+# 原始文档与电子书
+resources/
+*.pdf
+*.epub
+*.mobi
+*.azw3
+*.djvu
+*.chm
+*.ps
+*.doc
+*.docx
+*.ppt
+*.pptx
+*.xls
+*.xlsx
+# 扫描件与位图页面
+*.tif
+*.tiff
+*.png
+*.jpg
+*.jpeg
+*.bmp
+*.webp
+# 压缩包
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.gz
+*.7z
+*.rar
+# 文本层转储、OCR 与页面渲染的常见命名
+*.ocr.txt
+*-ocr.txt
+ocr-*/
+extracted/
+extract/
+page-*.txt
+pages-*.txt

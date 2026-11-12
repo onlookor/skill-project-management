@@ -183,3 +183,18 @@
 - **验证**：`scripts/check_state.py`、`scripts/check_ledger_landings.py`、`scripts/check_anchors.py` 全部通过；锚点指纹基线已按规则文本变更重新冻结。
 - **关联 ADR**：ADR-0008（accepted）
 - **状态**：生效
+
+---
+
+### 批次 0016 — 2026-11-12 — 原始资料与提取产物禁入库，并接入阻断式检查
+
+- **涉及文件**：
+  - 修改：`CONSTITUTION.md`（新增第 13 条；第 5 条保护清单增列第 13 条）、`AGENTS.md`（新增第 7bis 条；第 4 条目录树加入 `.githooks/` 与 `check_no_raw_material.py`）、`.gitignore`（原始资料、扫描件、压缩包与提取产物命名）、`scripts/README.md`（脚本清单、运行方式、判定规则与阈值）、`TODO.md`（新增 T-120）
+  - 新建：`scripts/check_no_raw_material.py`、`.githooks/pre-commit`、`adr/0009-no-raw-material-in-git.md`
+- **变更摘要**：把“PDF 原文与成段摘录不得进 git”从说明升级为可阻断的纪律。第 13 条明确四类禁止内容（原始资料、提取产物、成段原文、可替代原作的改写）与四类允许形态（页码定位、来源标识、单条不超过一行或一句并附出处的最短引证、自述转述），并规定检查失败即阻断提交。检查器扫描已跟踪文件，按扩展名、体积、引用长度、连续长行、页码序列、目录点线、替换字符与控制字符判定；pre-commit 钩子调用同一脚本。
+- **扫描结果**：当前 51 个跟踪文件 0 错误；全历史 `git log --all --diff-filter=A` 未发现任何文档/电子书/图片/压缩包类文件被加入过；最大跟踪文件 35 KB（`GLOSSARY.md`）；未发现贴入 Markdown 的成段原文。
+- **负例验证**：在临时仓库放入伪造 PDF、600 KiB 文本、500 字符引用、8 行页码序列，检查器报出 `RM-EXT`、`RM-SIZE`、`RM-QUOTE`、`RM-PAGESEQ` 并以 1 退出；启用钩子后同一提交被拒绝（`git commit` 退出码 1），仓库只保留基线提交。
+- **取舍说明**：引用块阈值按现有文档上限（343 字符）留出余量取 800 字符；连续长行阈值按现有最长连续段（6 行）取 15 行。检查器只覆盖“可机械判定”的形态，纯改写型替代无法凭文本特征识别，由第 13.1 条第 4 项与人工评审兜底，不宣称检查器能覆盖全部违规。
+- **钩子接入**：`git config core.hooksPath .githooks`（当前克隆已启用；该设置不入库，克隆方需自行执行，等价命令已写入 `scripts/README.md` 与 `AGENTS.md` 第 7bis 条）。
+- **关联 ADR**：ADR-0009（accepted）
+- **状态**：生效

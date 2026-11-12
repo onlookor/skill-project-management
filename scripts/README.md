@@ -11,6 +11,7 @@
 | `check_anchors.py` | 解析并校验全仓锚点：禁止行号 locator、文件/稳定 ID/章节号/标题路径可解析、`grounding_ref` 指向 active 来源、规则与来源文本块指纹未漂移 | `spec/ANCHOR_SPEC.md` | 已实现 |
 | `anchor_baseline.json` | `check_anchors.py` 的指纹基线（`rule:*` 与 `source:*`），内容变更后重冻 | `spec/ANCHOR_SPEC.md` 第 5 节 | 数据文件 |
 | `check_glossary_sync` | 检查 `GLOSSARY.md` 的 A 类条目与 `knowledge/anchored-entries.jsonl` 的定义一致性 | `check_glossary_sync.md` | 未实现（T-090） |
+| `check_no_raw_material.py` | 阻断式检查：已跟踪文件中不得出现原始资料（PDF/EPUB/扫描件等）、文本层/OCR 转储与成段原文 | `CONSTITUTION.md` 第 13 条 | 已实现 |
 
 ### 运行方式
 
@@ -18,6 +19,7 @@
 python3 scripts/check_state.py
 python3 scripts/check_ledger_landings.py
 python3 scripts/check_anchors.py
+python3 scripts/check_no_raw_material.py
 ```
 
 `check_state.py` 退出码：`0` 通过；`1` 存在错误（逐条列出）；`2` `STATE.md` 结构无法解析或不在 git 仓库中。
@@ -25,6 +27,22 @@ python3 scripts/check_anchors.py
 `check_ledger_landings.py` 退出码：`0` 通过（可有待落点警告）；`1` 存在错误；`2` 登记表结构无法解析。
 
 `check_anchors.py` 退出码：`0` 通过（可有警告/提示）；`1` 存在错误；`2` 结构或基线无法解析。规则/来源被有意修改后，用 `--write-baseline` 重冻基线，并把基线变更与内容变更同批提交。`--root` 可指向副本，用于插行负例演练。
+
+`check_no_raw_material.py` 退出码：`0` 通过；`1` 发现违规（逐条列出规则码与位置，提交应被阻断）；`2` 不在 git 仓库中。判定规则：
+
+| 规则码 | 判定 |
+|---|---|
+| `RM-EXT` | 被跟踪文件扩展名属于文档/电子书/扫描件/压缩包 |
+| `RM-BINARY` | 文本扩展名下出现 NUL 字节或无法按 UTF-8 解码 |
+| `RM-SIZE` | 单文件超过 512 KiB |
+| `RM-QUOTE` | 单条引用超过 400 字符，或连续引用块超过 800 字符 |
+| `RM-PROSEBLOCK` | 连续 15 行以上每行不少于 100 字符（PDF 文本转储的行形态） |
+| `RM-PAGESEQ` | 连续 5 行以上为页码或纯数字 |
+| `RM-DOTLEADER` | 单行出现 30 个以上连续点（目录转储） |
+| `RM-MOJIBAKE` | 出现 U+FFFD 替换字符 |
+| `RM-CONTROL` | 出现除制表符/换行外的 C0 控制字符 |
+
+提交前接入：`git config core.hooksPath .githooks`（只对当前克隆生效）。未启用钩子时，在 `git add` 前手工运行该脚本，效果等价。检查器命中时不得用 `--no-verify` 绕过；新增例外须走 ADR 并在脚本中登记路径豁免。
 
 ### 脚本的定位
 
