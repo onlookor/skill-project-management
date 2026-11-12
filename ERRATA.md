@@ -101,6 +101,15 @@
 - **波及文件**：`CONSTITUTION.md`、`spec/COMPILATION_META.md`、`spec/methods/deterministic-checker.md`、`AGENTS.md`、`README.md`、`manifest.json`。
 - **状态**：`closed`（2026-11-11）
 
+#### E-012 — Zenodo 候选条目“未核验”状态已解除，确认存在但领域不符不入表
+
+- **原表述**：`SOURCE_LEDGER.md` 候选表记为“来源接地不能防止幻觉”的 zenodo 论文，评审未核验，标题、作者、DOI 均未确认。
+- **问题**：条目长期停留在“疑似幻觉”状态，无法判断是登记错误还是检索不足。
+- **发现方式**：2026-11-12 实际检索 Zenodo API 与搜索引擎。
+- **修正**：确认存在两项同日预印本记录：`10.5281/zenodo.18039274`（题名 *Source-Grounding Does Not Prevent Hallucinations: A Controlled Replication Study of Google NotebookLM*）与 `10.5281/zenodo.18043672`（题名 *RAG: Source-Grounding Does Not Prevent Hallucinations in NotebookLM*），作者均为 Jennifer Evans，发布日期均为 2025-12-24，资源类型均为 Preprint。**不是幻觉**。但论文主题为 RAG 与幻觉机制，不属于通用项目管理知识，按 `CONSTITUTION.md` 第 2.6 条领域测试**仍不入表**；候选条目改记为“已核实存在、领域不符”。
+- **波及文件**：`SOURCE_LEDGER.md`。
+- **状态**：`closed`（2026-11-12）
+
 ### 3. 待核验的存疑表述
 
 以下表述已进入技能包，但尚未经外部来源核验。**它们不构成阻断，但在核验完成前不得作为“已接地”的依据**（`spec/GROUNDING_CRITERIA.md` G1 的 `assumption` 接受机制已覆盖）：

@@ -163,7 +163,7 @@
 | 候选 | 未入表理由 |
 |---|---|
 | PMBOK 的 OWL 本体（Silega 等 2024 提出；早期讨论误记为“Szwed / 340 类”） | **有可靠来源但尚未获取**：Springer 章节页与摘要可查（见 `SPRINGER-PMBOK-2024`），正文未获取、已向通讯作者请求。“340 类”无出处，不得引用。 |
-| “来源接地不能防止幻觉”的 zenodo 论文 | 评审未核验，标题、作者、DOI 均未确认。当前**不登记**；待实际检索核验后，结论登记于 `ERRATA.md`。 |
+| “来源接地不能防止幻觉”的 zenodo 论文 | **已核实存在**：Jennifer Evans, *Source-Grounding Does Not Prevent Hallucinations: A Controlled Replication Study of Google NotebookLM*, Zenodo preprint, DOI `10.5281/zenodo.18039274`（2025-12-24）；同日另有标题略异的预印本 `10.5281/zenodo.18043672`。主题为 RAG 与幻觉机制，**不属于通用项目管理知识**，按 `CONSTITUTION.md` 第 2.6 条领域测试不入表。核查记录见 `ERRATA.md` E-012。 |
 | 厂商博客、非官方镜像 PDF（含 `PRINCE2® 7th Edition（无水印）.pdf`） | `CONSTITUTION.md` 第 2.3 条排除。 |
 
 ---
@@ -175,4 +175,4 @@
 | `active`（本地副本已获取） | ISO21502-2020、PRINCE2-2023、ProjectCO-2024、ThingFO-2021、PMBOK8-2025 |
 | `active`（仅权威页面/交叉印证） | GB-T-37507-2025、SPRINGER-PMBOK-2024 |
 | 待核对项 | ISO 21502:2020 的过程组/主题组矩阵；PRINCE2-2023 的具体条款措辞；Spring 章节正文 |
-| 候选（未入表） | OWL 本体（未获取）、zenodo 条目（未核验）、厂商/非官方镜像（排除） |
+| 候选（未入表） | OWL 本体（未获取）、zenodo 条目（已核实存在但领域不符）、厂商/非官方镜像（排除） |
