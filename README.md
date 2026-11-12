@@ -1,3 +1,5 @@
+> 中文 | [English](README.en.md)
+
 ## 项目管理接地编译技能
 
 **一句话定位**：把通用项目管理知识编译为**可判定、可溯源、可由小型本地 LLM 执行**的规则与条目，使“项目管理”在不依赖特定领域技能的前提下获得与需求工程、软件工程技能对等的可组合性。
@@ -67,4 +69,4 @@
 
 **日常使用（要把技能接进一个项目）**：`AGENTS.md` 第 6、6bis 条 → `spec/CONTEXT_ASSEMBLY.md` → `spec/INTERFACE_CONTRACT_SPEC.md` 的槽位定义 → `contracts/examples/` 里最接近的样例 → 在自己的领域技能目录放置契约文件 → `validation/CHECKLIST.md` → 部署前按 `spec/GROUNDING_CRITERIA.md` 判定。
 
-**治理修改（要改动成文法、来源或编译）**：`CONSTITUTION.md` 全文 → `adr/0001-*.md`、`adr/0002-*.md`、`adr/0003-*.md`、`adr/0004-*.md` → `adr/ADR-TEMPLATE.md` → `SOURCE_LEDGER.md` 的登记规则 → 若涉及术语，读 `GLOSSARY.md` 第 4、5 节与 `CONSTITUTION.md` 第 11 条 → 若涉及编译，读 `spec/COMPILATION_META.md` 与 `spec/COMPILATION_METHODS.md` → 变更完成后追加 `CHANGELOG.md` 批次、更新 `TODO.md` 状态；发现错误登记 `ERRATA.md`。
+**治理修改（要改动成文法、来源或编译）**：`CONSTITUTION.md` 全文 → `adr/0001-*.md`、`adr/0002-*.md`、`adr/0003-*.md`、`adr/0004-*.md`、`adr/0005-*.md`、`adr/0006-*.md` → `adr/ADR-TEMPLATE.md` → `SOURCE_LEDGER.md` 的登记规则 → 若涉及术语，读 `GLOSSARY.md` 第 4、5 节与 `CONSTITUTION.md` 第 11 条 → 若涉及编译，读 `spec/COMPILATION_META.md` 与 `spec/COMPILATION_METHODS.md` → 变更完成后追加 `CHANGELOG.md` 批次、更新 `TODO.md` 状态；发现错误登记 `ERRATA.md`。
