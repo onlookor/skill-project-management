@@ -31,7 +31,7 @@
 | `id` | `ISO21502-2020` |
 | `citation` | ISO 21502:2020, *Project, programme and portfolio management — Guidance on project management*. International Organization for Standardization. |
 | `version` | 2020 版 |
-| `local_path` | `resources/pm/ISO 21502-2020.pdf` |
+| `local_path` | `resources/pm/[ISO 21502_2020] Project, programme and portfolio management — Guidance on project management{ISO}(2020, ISO){108252832} libgen.li.pdf` |
 | `status` | `active` |
 | `authority_tier` | `international_standard` |
 | `verified_date` | 2026-11-12 |
@@ -65,7 +65,7 @@
 | `id` | `PRINCE2-2023` |
 | `citation` | AXELOS. *Managing Successful Projects with PRINCE2*, 7th edition. The Stationery Office, 2023. |
 | `version` | 7th edition (2023) |
-| `local_path` | `resources/pm/PRINCE2® 7th Edition - 原版带水印.pdf`（官方水印版） |
+| `local_path` | `resources/pm/Managing Successful Projects with PRINCE2® -Edition 7（原版带水印） - PeopleCert - 7, 2023 - PEOPLECERT INTERNATIONAL LIMITED - isbn139789925344505.pdf`（官方水印版） |
 | `status` | `active` |
 | `authority_tier` | `official_doc`（方法论官方手册；非国际标准，但为广泛接受的权威实践框架） |
 | `verified_date` | 2026-11-12 |
@@ -74,7 +74,7 @@
 | `claim_mapping` | `GRAMMAR.md`：G-C1（关注产品）、G-E1（定义角色与职责、问责不可委托）、G-E2（同上）、G-F1（持续业务验证 + 定义角色与职责）、G-F2（关注产品 + 阶段收尾）、G-G1、G-G2、G-G3（根据环境裁剪）；`knowledge/`：`Accountable`、`Responsible`、`Deliverable` 条目定义 |
 | `compilation_landing` | `rule:G-C1`；`rule:G-E1`；`rule:G-E2`；`rule:G-F1`；`rule:G-F2`；`rule:G-G1`；`rule:G-G2`；`rule:G-G3`；`knowledge:Accountable`；`knowledge:Responsible`；`knowledge:Deliverable` |
 | **核验状态** | **本地副本已获取**。官方水印版可核对具体条款措辞；**逐条核对尚未执行**。G-F1、G-F2、G-G1–G3 的 `assumption` 状态与此直接相关。 |
-| **非官方镜像排除** | `resources/pm/PRINCE2® 7th Edition（无水印）.pdf` 为未经授权的水印移除版本，按 `CONSTITUTION.md` 第 2.3 条**不得**作为 `grounding_ref` 的依据；仅官方水印版可用于核对。 |
+| **非官方镜像排除** | `resources/pm/Managing Successful Projects with PRINCE2®（无水印） - Andy Murray - 7, 2023 - PeopleCert International Limited - isbn139789925344505.pdf` 为未经授权的水印移除版本，按 `CONSTITUTION.md` 第 2.3 条**不得**作为 `grounding_ref` 的依据；仅官方水印版可用于核对。 |
 
 #### ProjectCO-2024
 
@@ -83,7 +83,7 @@
 | `id` | `ProjectCO-2024` |
 | `citation` | Olsina, L., Becker, P., & Papa, M. F. (2024). The Project Management Ontology called ProjectCO: Architectural Aspects, Concepts, and Usefulness. *CIbSE 2024*, pp. 61–75. |
 | `version` | 2024 会议论文版 |
-| `local_path` | `resources/pm/ProjectCO - CIbSE 2024 (Olsina et al.).pdf` |
+| `local_path` | `resources/pm/The Project Management Ontology called ProjectCO Architectural Aspects, Concepts, and Usefulness（原稿，位图插图）.pdf` |
 | `status` | `active` |
 | `authority_tier` | `peer_reviewed` |
 | `verified_date` | 2026-11-12 |
@@ -100,7 +100,7 @@
 | `id` | `ThingFO-2021` |
 | `citation` | Olsina, L. (2023). ThingFO v1.3's Terms, Properties, Relationships and Axioms — Foundational Ontology for Things. arXiv:2107.09129（v1.3）。 |
 | `version` | v1.3（2023-12；本地副本） |
-| `local_path` | `resources/pm/Olsina-ThingFO v1.3 (Dec 2023).pdf` |
+| `local_path` | `resources/pm/Thing Foundational Ontology ThingFO v1.3’s Terms, Properties, Relationships and Axioms - arXiv 2107.09129v2.pdf` |
 | `status` | `active` |
 | `authority_tier` | `preprint` |
 | `verified_date` | 2026-11-12 |
@@ -117,7 +117,7 @@
 | `id` | `PMBOK8-2025` |
 | `citation` | Project Management Institute. *A Guide to the Project Management Body of Knowledge (PMBOK Guide)*, 8th Edition. PMI, 2025. |
 | `version` | 8th Edition (2025-11) |
-| `local_path` | `resources/pm/PMBOK 8th.pdf`；`resources/pm/PMBOK第8版.epub` |
+| `local_path` | `resources/pm/A Guide to the Project Management Body of Knowledge (PMBOK® - Project Management Institute PMI - 8, 2026 - isbn139781628258301.pdf`；`resources/pm/A Guide to the Project Management Body of Knowledge (PMBOK® - Project Management Institute Pmi - PMBOK® Guide, 8, 2026 - isbn139781628258295.epub` |
 | `status` | `active` |
 | `authority_tier` | `official_doc` |
 | `verified_date` | 2026-11-12 |
@@ -164,7 +164,7 @@
 |---|---|
 | PMBOK 的 OWL 本体（Silega 等 2024 提出；早期讨论误记为“Szwed / 340 类”） | **有可靠来源但尚未获取**：Springer 章节页与摘要可查（见 `SPRINGER-PMBOK-2024`），正文未获取、已向通讯作者请求。“340 类”无出处，不得引用。 |
 | “来源接地不能防止幻觉”的 zenodo 论文 | **已核实存在**：Jennifer Evans, *Source-Grounding Does Not Prevent Hallucinations: A Controlled Replication Study of Google NotebookLM*, Zenodo preprint, DOI `10.5281/zenodo.18039274`（2025-12-24）；同日另有标题略异的预印本 `10.5281/zenodo.18043672`。主题为 RAG 与幻觉机制，**不属于通用项目管理知识**，按 `CONSTITUTION.md` 第 2.6 条领域测试不入表。核查记录见 `ERRATA.md` E-012。 |
-| 厂商博客、非官方镜像 PDF（含 `PRINCE2® 7th Edition（无水印）.pdf`） | `CONSTITUTION.md` 第 2.3 条排除。 |
+| 厂商博客、非官方镜像 PDF（含 `resources/pm/Managing Successful Projects with PRINCE2®（无水印） - Andy Murray - 7, 2023 - PeopleCert International Limited - isbn139789925344505.pdf`） | `CONSTITUTION.md` 第 2.3 条排除。 |
 
 ---
 
