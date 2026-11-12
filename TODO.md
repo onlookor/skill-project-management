@@ -122,7 +122,7 @@
 
 | 编号 | 性质 | 工作项 | 治理路径 | 前置依赖 | 状态 |
 |---|---|---|---|---|---|
-| T-112 | 来源核验 | 取得 Springer 章节 `10.1007/978-3-031-50495-2_13` 全文后，核对其 OWL 本体与“reasoner 一致性检查”的论断，决定是否将其作为知识层条目的来源；在此之前 `SPRINGER-PMBOK-2024` 仅元数据可用。**2026-11-12 致信尝试因 SMTP 535 认证失败未发出，需改用机构邮箱、ResearchGate 或人工渠道（ERRATA E-015）** | 来源治理（ADR） | 通讯作者提供全文 | `open` |
+| T-112 | 来源核验 | 取得 Springer 章节 `10.1007/978-3-031-50495-2_13` 全文后，核对其 OWL 本体与“reasoner 一致性检查”的论断，决定是否将其作为知识层条目的来源；在此之前 `SPRINGER-PMBOK-2024` 仅元数据可用。**2026-11-12 致信尝试因 SMTP 535 认证失败未发出，需改用机构邮箱、ResearchGate 或人工渠道（ERRATA E-015）；网页端手动发送见 T-121** | 来源治理（ADR） | 通讯作者提供全文 | `open` |
 | T-113 | 来源核验 | 核对本地 ISO 21502:2020 副本的“过程组/主题组”结构，决定 G-B1、G-B2 是否解除 `pending_reanchor` | 来源治理（ADR） | 无（本地副本已具备） | `done`（2026-11-12：逐页核对确认无该矩阵；G-B1/G-B2 按第 6/7 章改写并解除 `pending_reanchor`，ADR-0008，CHANGELOG 批次 0015） |
 
 ### 新增：来源准入与落点检查（ADR-0006）
@@ -146,3 +146,43 @@
 | 编号 | 性质 | 工作项 | 治理路径 | 前置依赖 | 状态 |
 |---|---|---|---|---|---|
 | T-120 | 治理 | 若确需从已发布历史中移除误提交的原始资料，制定独立 ADR：明确影响范围、协作者同步方式与是否重写历史；ADR-0009 只约束新提交 | 治理（ADR） | 实际发生历史违规 | `open` |
+
+### 新增：待用户手动发送的邮件（批次 0017）
+
+| 编号 | 性质 | 工作项 | 治理路径 | 前置依赖 | 状态 |
+|---|---|---|---|---|---|
+| T-121 | 治理 | 由用户经网页端手动发送请求全文的邮件：收件人 `silega@sfedu.ru`，发信人 `wgzhi@hotmail.com`，署名 Gengzhi Wei。正文见下方附录。SMTP 客户端通道因服务器停用基础认证（`535 5.7.139`）不可用，本项**未发送**；不得记为已发送 | 无（人工操作） | 用户手动发送 | `open`（待用户手动发送） |
+
+#### 附录：T-121 邮件正文（英文）
+
+```text
+To: silega@sfedu.ru
+From: wgzhi@hotmail.com
+Subject: Request for full text — "A Formal Representation of Standards for Project Management: Case PMBOK" (DOI 10.1007/978-3-031-50495-2_13)
+
+Dear Dr. Silega,
+
+I am Gengzhi Wei, working on an open-source project-management grounding skill:
+https://github.com/onlookor/skill-project-management
+
+The project turns general project-management knowledge into mechanically checkable
+rules, and every rule must be anchored to a source that can be verified.
+
+Your chapter "A Formal Representation of Standards for Project Management: Case
+PMBOK" (Silega, Lapshin, Rogozov, et al., Springer, 2024,
+DOI 10.1007/978-3-031-50495-2_13) is directly relevant to this work: the OWL
+representation of PMBOK and the reasoner-based consistency checking you describe
+are the closest prior art we have found for grounding rules in a formal ontology.
+The full text is behind a paywall, so I can currently see only the abstract and
+metadata.
+
+Would you be willing to share a copy of the full text (a preprint or accepted
+manuscript is fine) for research use? It would let us check the ontology's classes
+and axioms against our source ledger instead of relying on the abstract.
+
+Thank you for your time.
+
+Best regards,
+Gengzhi Wei
+wgzhi@hotmail.com
+```
