@@ -108,11 +108,13 @@ project-management-grounding/
 │   ├── 0002-compilation-meta-vs-methods.md
 │   ├── 0003-version-and-state-governance.md
 │   ├── 0004-artifact-baseline-by-commit.md
-│   └── 0005-source-ledger-scope.md
+│   ├── 0005-source-ledger-scope.md
+│   └── 0006-knowledge-sources-vs-normative-basis.md
 │
 ├── scripts/
 │   ├── README.md                   # 辅助脚本目录说明
 │   ├── check_glossary_sync.md      # GLOSSARY/JSONL 同步检查规格
+│   ├── check_ledger_landings.py    # 来源编译落点检查（可运行）
 │   └── check_state.py              # STATE 与 git 跟踪文件的对账脚本（可运行）
 │
 └── validation/

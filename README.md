@@ -44,8 +44,8 @@
 | `spec/INTERFACE_CONTRACT_SPEC.md` | 执行 | 槽位定义；**技能间信息流**；v1 单层解析；PACT 不可映射项声明（方法无关） |
 | `contracts/` | 执行 | 契约 schema、解析规则、两个领域样例（建筑施工、软件工程） |
 | `knowledge/` | 知识 | 本体条目与方法注册表（可确定性查询，不供通读） |
-| `adr/` | 治理 | ADR 格式说明与治理决策记录（ADR-0001–ADR-0005） |
-| **`scripts/`** | **辅助** | **辅助检查脚本规格（GLOSSARY/JSONL 同步检查）** |
+| `adr/` | 治理 | ADR 格式说明与治理决策记录（ADR-0001–ADR-0006） |
+| **`scripts/`** | **辅助** | **辅助检查脚本：STATE 对账、来源编译落点、GLOSSARY/JSONL 同步规格** |
 | `validation/CHECKLIST.md` | 执行 | 由 `COMPILATION_META.md` + `spec/methods/deterministic-checker.md` 生成的检查清单 |
 | **`validation/test-cases/`** | **执行** | **反例检验用例库（当前 3 个已落盘）** |
 

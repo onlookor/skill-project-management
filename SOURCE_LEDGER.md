@@ -18,6 +18,7 @@
 | `verification_method` | `local_copy_check`（本地版本核对）/ `authority_page`（权威页面访问）/ `cross_reference`（交叉印证）/ `pending`（待核验） |
 | `allowed_uses` | 允许的用途范围 |
 | `claim_mapping` | 论断级映射：本条目支持 `GRAMMAR.md` 或 `knowledge/` 中的哪些具体规则/条目 |
+| `compilation_landing` | 编译落点：`rule:<规则号>` / `knowledge:<术语>` / `method:<方法号>` / `check:<check_id>`；正文未取得时写 `pending:<TODO 编号>` |
 
 ---
 
@@ -37,6 +38,7 @@
 | `verification_method` | `local_copy_check`（本地 PDF 已获取）；**过程组/主题组矩阵尚未逐页核对** |
 | `allowed_uses` | 项目定义、约束管理、过程组/主题组分类（**结构待核对**）、采购主题、时间主题、收尾过程 |
 | `claim_mapping` | `GRAMMAR.md`：G-A1、G-A2、G-D1、G-D2、G-F3、G-F4；`knowledge/`：`Project`、`Constraint`、`Outcome` 条目定义 |
+| `compilation_landing` | `rule:G-A1`；`rule:G-A2`；`rule:G-D1`；`rule:G-D2`；`rule:G-F3`；`rule:G-F4`；`knowledge:Project`；`knowledge:Constraint`；`knowledge:Outcome` |
 | **核验状态** | **本地副本已获取**。标准存在性、版本与正文可访问性已确认；“五过程组 × 十主题组”矩阵在 2020 版中的具体形态**未核对**。该未核对项直接导致 G-B1、G-B2 处于 `pending_reanchor`（核对待办见 T-113）。 |
 
 #### GB-T-37507-2025
@@ -53,6 +55,7 @@
 | `verification_method` | `cross_reference`（评审方提供的信息；本环境无法直接访问全国标准信息公共服务平台） |
 | `allowed_uses` | 作为 `ISO21502-2020` 的**中文锚点**，在中文环境部署时优先引用；内容语义与 ISO 21502:2020 一致，不构成独立来源 |
 | `claim_mapping` | 同 `ISO21502-2020`；本条目是语言锚点，不扩展 `claim_mapping` 范围 |
+| `compilation_landing` | `rule:G-A1`；`rule:G-A2`；`rule:G-D1`；`rule:G-D2`；`rule:G-F3`；`rule:G-F4`（与 `ISO21502-2020` 同一批落点） |
 | **核验状态** | **交叉印证**。评审反馈确认存在且等同采用 ISO 21502:2020；本环境未独立访问。登记时标注为 `cross_reference`。 |
 
 #### PRINCE2-2023
@@ -69,6 +72,7 @@
 | `verification_method` | `local_copy_check`（本地官方水印版已获取） |
 | `allowed_uses` | 七项原则（持续业务验证、从经验中学习、定义角色与职责、按阶段管理、例外管理、关注产品、根据环境裁剪）；角色模型（最终责任不可委托）；产品描述要求；裁剪原则 |
 | `claim_mapping` | `GRAMMAR.md`：G-C1（关注产品）、G-E1（定义角色与职责、问责不可委托）、G-E2（同上）、G-F1（持续业务验证 + 定义角色与职责）、G-F2（关注产品 + 阶段收尾）、G-G1、G-G2、G-G3（根据环境裁剪）；`knowledge/`：`Accountable`、`Responsible`、`Deliverable` 条目定义 |
+| `compilation_landing` | `rule:G-C1`；`rule:G-E1`；`rule:G-E2`；`rule:G-F1`；`rule:G-F2`；`rule:G-G1`；`rule:G-G2`；`rule:G-G3`；`knowledge:Accountable`；`knowledge:Responsible`；`knowledge:Deliverable` |
 | **核验状态** | **本地副本已获取**。官方水印版可核对具体条款措辞；**逐条核对尚未执行**。G-F1、G-F2、G-G1–G3 的 `assumption` 状态与此直接相关。 |
 | **非官方镜像排除** | `resources/pm/PRINCE2® 7th Edition（无水印）.pdf` 为未经授权的水印移除版本，按 `CONSTITUTION.md` 第 2.3 条**不得**作为 `grounding_ref` 的依据；仅官方水印版可用于核对。 |
 
@@ -86,6 +90,7 @@
 | `verification_method` | `local_copy_check`（本地 PDF 已获取） |
 | `allowed_uses` | 核心层领域无关概念：`Project`、`Actor`、`Commitment`、`Deliverable`、`Constraint`、`Outcome`、`Assertion`；核心概念的“cross-cutting, domain-independent”定位 |
 | `claim_mapping` | `GRAMMAR.md`：G-A1、G-A2、G-D1、G-E1；`knowledge/`：`Project`、`Actor`、`Commitment`、`Deliverable`、`Constraint`、`Outcome` 条目定义 |
+| `compilation_landing` | `rule:G-A1`；`rule:G-A2`；`rule:G-D1`；`rule:G-E1`；`knowledge:Project`；`knowledge:Actor`；`knowledge:Commitment`；`knowledge:Deliverable`；`knowledge:Constraint`；`knowledge:Outcome` |
 | **核验状态** | **本地副本已获取**。会议与论文存在性确认；正文可核对。本表不引用“45 个核心术语”等未经核对的内部数字。G-A1 的四元组合取形式为技能自身贡献，不宣称是 ProjectCO 原文的表述。 |
 
 #### ThingFO-2021
@@ -102,6 +107,7 @@
 | `verification_method` | `local_copy_check`（本地 v1.3 副本已获取） |
 | `allowed_uses` | `Assertion` 作为“人类关于 Particulars 和 Universals 不同方面的陈述”的定义；断言的可区分性 |
 | `claim_mapping` | `GRAMMAR.md`：G-C1、G-C2；`knowledge/`：`Assertion` 条目定义 |
+| `compilation_landing` | `rule:G-C1`；`rule:G-C2`；`knowledge:Assertion`；`knowledge:Subject` |
 | **核验状态** | **本地副本已获取**。`authority_tier` 仍为 `preprint`，在与其他 `peer_reviewed` 来源冲突时优先级较低。 |
 
 #### PMBOK8-2025
@@ -117,7 +123,8 @@
 | `verified_date` | 2026-11-12 |
 | `verification_method` | `local_copy_check`（本地 PDF 与 EPUB 均已获取） |
 | `allowed_uses` | **仅限原则层面的交叉验证**。用于检查本技能规则是否与广泛接受的项目管理原则相抵触；**不作为任何规则的直接锚定依据** |
-| `claim_mapping` | 无直接映射。本条目是“一致性检查来源”，不是“规则锚定来源” |
+| `claim_mapping` | 无直接规则映射。本条目是“一致性检查来源”，不是“规则锚定来源” |
+| `compilation_landing` | `method:M-EST-01`；`method:M-DEC-01`；`method:M-RISK-01`；`method:M-EV-01`（仅作为方法条目的原则层交叉验证依据） |
 | **核验状态** | **本地副本已获取**。第 7 版已于本决策（ADR-0005）删除；如需引用具体原则表述，以本版为准。 |
 
 #### SPRINGER-PMBOK-2024
@@ -134,6 +141,7 @@
 | `verification_method` | `authority_page`（Springer 章节页可访问：题名、作者与机构、摘要、参考文献、通讯作者）；**正文未获取（付费墙）**，已于 2026-11-12 向通讯作者请求全文 |
 | `allowed_uses` | PMBOK 的 OWL 本体化表示与基于 reasoner 的一致性检查（**在正文取得并核对前，不得作为任何规则的锚定依据**） |
 | `claim_mapping` | 无。当前仅登记“该工作存在且主题为 PMBOK 的形式化表示”，不映射任何规则 |
+| `compilation_landing` | `pending:T-112`（正文未获取，暂无落点；落点补齐前不得被任何 `grounding_ref` 引用） |
 | **核验状态** | **元数据核验，正文未获取**。摘要确认其构建了表示项目管理标准/指南的 OWL 本体；具体类、属性、公理与验证结果均未核对。 |
 
 ---

@@ -1,21 +1,25 @@
 ## 辅助脚本
 
-**性质**：本目录存放技能的辅助检查脚本及其规格。`check_state.py` 已实现且可直接运行；`check_glossary_sync` 仍为规格，实现登记于 `TODO.md` T-090。
+**性质**：本目录存放技能的辅助检查脚本及其规格。`check_state.py` 与 `check_ledger_landings.py` 已实现且可直接运行；`check_glossary_sync` 仍为规格，实现登记于 `TODO.md` T-090。
 
 ### 脚本清单
 
 | 脚本 | 用途 | 规格文件 | 实现状态 |
 |---|---|---|---|
 | `check_state.py` | 以 `git ls-files` 核对 `STATE.md`：漏登、登了不存在的文件、状态值非法 | 无独立规格（规则见 `STATE.md` 与本文件“脚本的定位”） | 已实现 |
+| `check_ledger_landings.py` | 核对 `SOURCE_LEDGER.md` 每个 active 来源条目是否声明编译落点，且落点在 `GRAMMAR.md`、`knowledge/`、方法条目或检查项中真实存在 | 无独立规格（规则见 `CONSTITUTION.md` 第 2.6 条） | 已实现 |
 | `check_glossary_sync` | 检查 `GLOSSARY.md` 的 A 类条目与 `knowledge/anchored-entries.jsonl` 的定义一致性 | `check_glossary_sync.md` | 未实现（T-090） |
 
 ### 运行方式
 
 ```
 python3 scripts/check_state.py
+python3 scripts/check_ledger_landings.py
 ```
 
-退出码：`0` 通过；`1` 存在错误（逐条列出）；`2` `STATE.md` 结构无法解析或不在 git 仓库中。
+`check_state.py` 退出码：`0` 通过；`1` 存在错误（逐条列出）；`2` `STATE.md` 结构无法解析或不在 git 仓库中。
+
+`check_ledger_landings.py` 退出码：`0` 通过（可有待落点警告）；`1` 存在错误；`2` 登记表结构无法解析。
 
 ### 脚本的定位
 
