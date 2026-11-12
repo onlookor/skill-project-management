@@ -11,30 +11,21 @@
 
 ### 2. 已登记条目
 
-#### E-001 — Jarke 三世界 = 本技能三空间的未确认等同
-
-- **原表述**：在早期讨论中，将 Jarke 三世界（subject world / system world / usage world）等同于本技能的三空间（问题/事实/解），并试图将其登记入 `SOURCE_LEDGER.md`。
-- **问题**：未经原文核验的等同；三世界与三空间的语义是否等价、结构是否同构，均未确认。
-- **发现方式**：外部评审指出。
-- **修正**：`SOURCE_LEDGER.md` 的候选来源清单中排除 Jarke；`spec/INTERFACE_CONTRACT_SPEC.md` 第 7 节的三空间映射以 `assumption`（用途 B）形式存在，验证条件为“与软件工程技能原文对齐”，不以 Jarke 为锚。
-- **波及文件**：`SOURCE_LEDGER.md`、`spec/INTERFACE_CONTRACT_SPEC.md`、`GLOSSARY.md`（B 类术语“三值逻辑”的引用不涉及 Jarke）。
-- **状态**：`closed`（2026-11-11）
-
 #### E-002 — Szwed 的 PMBOK OWL 本体“reasoner 验证”表述张冠李戴
 
 - **原表述**：早期讨论中将“reasoner 自动验证一致性”的表述归于 Szwed 的 PMBOK OWL 本体（340 类）。
 - **问题**：该表述实际出自 Silega 等 2024 年论文（Springer, CIIP 2023），与 Szwed 的工作是两回事；“340 类”无可核验出处。
 - **发现方式**：外部评审指出。
-- **修正**：`SOURCE_LEDGER.md` 的候选来源清单中排除 Szwed 与 Silega 两条，标注“待核验原文后走 ADR 再决定是否引入”；`GLOSSARY.md` 不登记相关术语。
+- **修正**：`SOURCE_LEDGER.md` 的候选来源清单中排除 Szwed 条；Silega 等 2024 的工作后续按 ADR-0005 以 `SPRINGER-PMBOK-2024` 登记（正文未获取）。
 - **波及文件**：`SOURCE_LEDGER.md`。
 - **状态**：`closed`（2026-11-11）
 
 #### E-003 — PMBOK 版本漂移未在登记表中显式声明
 
-- **原表述**：`SOURCE_LEDGER.md` 的 `PMBOK7-2021` 条目在初版中未记录“PMBOK 已出至第 8 版（2025-11）”这一事实。
-- **问题**：版本漂移未显式声明，可能使读者误以为 7th edition 是当前版本。
+- **原表述**：`SOURCE_LEDGER.md` 的 PMBOK 条目在初版中未记录“PMBOK 已出至第 8 版（2025-11）”这一事实。
+- **问题**：版本漂移未显式声明，可能使读者误以为第 7 版是当前版本。
 - **发现方式**：外部评审指出。
-- **修正**：`PMBOK7-2021` 条目备注中加入“PMBOK 已出至第 8 版（2025-11）；本表暂不引入，理由：本技能规则尚未依赖第 8 版的结构；引入需 ADR”；`GLOSSARY.md` 的 `T-E-001 PMBOK` 条目同步说明。
+- **修正**：初版条目备注中补记版本漂移；后续按 ADR-0005 删除第 7 版条目，第 8 版以 `PMBOK8-2025` 入表（本地 PDF 与 EPUB 均已获取）。
 - **波及文件**：`SOURCE_LEDGER.md`、`GLOSSARY.md`。
 - **状态**：`closed`（2026-11-11）
 

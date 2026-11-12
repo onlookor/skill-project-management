@@ -73,7 +73,7 @@ assumption_refs:
       alignment_criterion: "类型名与形态名在该文档中存在"
       on_mismatch: "修订本契约文件的对应槽位值"
   - id: "A-CONTRACT-CE-02"
-    statement: "constraint_domains 的 generic_class 归类（structural_load→environment、fire_safety→goal 等）与该领域技能的三空间或通用分类声明一致"
+    statement: "constraint_domains 的 generic_class 归类（structural_load→environment、fire_safety→goal 等）与该领域技能的通用分类声明一致"
     verification:
       type: "alignment_check"
       target_document: "construction-engineering/SKILL.md"

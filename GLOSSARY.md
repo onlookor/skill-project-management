@@ -184,7 +184,7 @@
 - `status`：`active`
 
 **T-B-006 待对齐映射（alignment mapping）**
-- 定义：`assumption` 的用途 B。两个体系（如本技能的约束分类与三空间本体）之间的对应关系，以假设形式存在，验证条件为“与目标文档的指定章节一致”。
+- 定义：`assumption` 的用途 B。两个体系（如本技能的约束分类与某个领域技能提供的本体）之间的对应关系，以假设形式存在，验证条件为“与目标文档的指定章节一致”。
 - `first_used_in`：`spec/ASSUMPTION_PROTOCOL.md` 第 4 节
 - `status`：`active`
 
@@ -254,7 +254,7 @@
 - `status`：`active`
 
 **T-B-020 可选插件**
-- 定义：不构成技能完备性前提的组件：PACT、三空间本体、任何外部本体框架、任何编译方法（`CONSTITUTION.md` 第 8 条、第 10.3 条）。插件的存在增强能力，缺失不构成技能不完整。
+- 定义：不构成技能完备性前提的组件：PACT、外部领域本体、任何外部本体框架、任何编译方法（`CONSTITUTION.md` 第 8 条、第 10.3 条）。插件的存在增强能力，缺失不构成技能不完整。
 - `first_used_in`：`CONSTITUTION.md` 第 8 条
 - `status`：`active`
 
@@ -318,7 +318,7 @@
 - `status`：`active`
 
 **T-C-012 退化路径（degradation path）**
-- 定义：方法声明文件中规定的、在缺少某依赖（如谓词求值能力、PACT、三空间）时的退路。退路必须满足 P1–P6。确定性校验器的退化路径为“检查清单 + 人类评审”（`runtime: deterministic-checker/human-fallback`）。
+- 定义：方法声明文件中规定的、在缺少某依赖（如谓词求值能力、PACT、外部领域本体）时的退路。退路必须满足 P1–P6。确定性校验器的退化路径为“检查清单 + 人类评审”（`runtime: deterministic-checker/human-fallback`）。
 - `first_used_in`：`spec/methods/deterministic-checker.md` 第 10 节
 - `status`：`active`
 
@@ -360,7 +360,7 @@
 - `status`：`active`
 
 **T-D-005 ADR**
-- 定义：Architecture Decision Record，治理决策记录。格式遵循 Nygard 五要素（标题 / 状态 / 背景 / 决定 / 结果）并扩展 `serves_charter`、`grounding_refs`、`affected_files` 字段。状态：`proposed` / `accepted` / `deprecated` / `superseded`。只有 `accepted` 状态的 ADR 才能作为修改立法文件的依据。模板见 `adr/ADR-TEMPLATE.md`。
+- 定义：Architecture Decision Record，治理决策记录。格式可选 Nygard、MADR、Y-Statement 三种之一（见 `adr/README.md`），并扩展 `serves_charter`、`grounding_refs`、`affected_files` 字段。状态：`proposed` / `accepted` / `deprecated` / `superseded`。只有 `accepted` 状态的 ADR 才能作为修改立法文件的依据。模板见 `adr/ADR-TEMPLATE.md`。
 - `first_used_in`：`CONSTITUTION.md` 第 4 条
 - `status`：`active`
 
@@ -409,8 +409,8 @@
 > 本类条目是描述性的，不是规范性锚点（规范性锚点在 `SOURCE_LEDGER.md`）。首次出现必须内联展开。
 
 **T-E-001 PMBOK**
-- 定义：Project Management Body of Knowledge，PMI 发布的项目管理知识体系指南。当前 7th Edition (2021)；8th Edition (2025-11) 存在但本技能未引入（版本漂移记录于 `SOURCE_LEDGER.md` 的 `PMBOK7-2021` 条目）。
-- `grounding_ref`：`PMBOK7-2021`（仅原则层交叉验证，不作规则锚定）
+- 定义：Project Management Body of Knowledge，PMI 发布的项目管理知识体系指南。当前 8th Edition (2025-11)，本技能以本地副本作原则层交叉验证（`SOURCE_LEDGER.md` 的 `PMBOK8-2025` 条目）。
+- `grounding_ref`：`PMBOK8-2025`（仅原则层交叉验证，不作规则锚定）
 - `first_used_in`：`SOURCE_LEDGER.md`
 - `status`：`active`
 
@@ -421,7 +421,7 @@
 - `status`：`active`
 
 **T-E-003 ISO 21502:2020**
-- 定义：国际标准化组织发布的《Project, programme and portfolio management — Guidance on project management》。取代 ISO 21500:2012（已废止）。
+- 定义：国际标准化组织发布的《Project, programme and portfolio management — Guidance on project management》。本技能采用 2020 版；其过程组/主题组结构尚待核对（`TODO.md` T-113）。
 - `grounding_ref`：`ISO21502-2020`
 - `first_used_in`：`SOURCE_LEDGER.md`
 - `status`：`active`
@@ -434,7 +434,7 @@
 
 **T-E-005 WBS**
 - 定义：Work Breakdown Structure，工作分解结构。把项目范围分解为可管理的工作包的方法。登记为方法条目 `M-DEC-01`。
-- `grounding_ref`：`PMBOK7-2021`（仅原则层交叉验证；方法条目待补充更精确来源，见 `TODO.md` T-004）
+- `grounding_ref`：`PMBOK8-2025`（仅原则层交叉验证；方法条目待补充更精确来源，见 `TODO.md` T-004）
 - `first_used_in`：`knowledge/methods/registry-skeleton.md` M-DEC-01
 - `status`：`active`
 
@@ -446,7 +446,7 @@
 
 **T-E-007 EVM / EVA**
 - 定义：Earned Value Management / Earned Value Analysis，挣值管理/挣值分析。量化进度与成本偏差的方法，核心指标：PV、EV、AC、SV、CV、SPI、CPI。登记为方法条目 `M-EV-01`。
-- `grounding_ref`：`PMBOK7-2021`（仅原则层交叉验证；方法条目待补充更精确来源，见 `TODO.md` T-004）
+- `grounding_ref`：`PMBOK8-2025`（仅原则层交叉验证；方法条目待补充更精确来源，见 `TODO.md` T-004）
 - `first_used_in`：`knowledge/methods/registry-skeleton.md` M-EV-01
 - `status`：`active`
 

@@ -102,11 +102,13 @@ project-management-grounding/
 │       └── registry-skeleton.md    # 方法注册表（估算、WBS、风险、挣值、采购；首批 5 条）
 │
 ├── adr/
-│   ├── ADR-TEMPLATE.md             # 治理决策模板（Nygard 五要素 + 扩展字段）
+│   ├── README.md                   # ADR 格式说明（Nygard / MADR / Y-Statement）与必填治理字段
+│   ├── ADR-TEMPLATE.md             # 治理决策模板（默认 Nygard 五要素 + 扩展字段）
 │   ├── 0001-separate-grammar-from-governance.md
 │   ├── 0002-compilation-meta-vs-methods.md
 │   ├── 0003-version-and-state-governance.md
-│   └── 0004-artifact-baseline-by-commit.md
+│   ├── 0004-artifact-baseline-by-commit.md
+│   └── 0005-source-ledger-scope.md
 │
 ├── scripts/
 │   ├── README.md                   # 辅助脚本目录说明
@@ -200,7 +202,7 @@ project-management-grounding/
 - **宿主提供**：确定性校验器、契约解析器、白板存储（若存在）、批准状态写入接口。
 - **本技能提供**：规则、来源、方法条目、检查清单规格、契约 schema、`assumption` 协议。
 - **PACT 若存在**：作为**可选的运行时准入层**，把本技能的规则编译为 `Token` 类型与 `Precondition`。**必须诚实声明不可映射项**（OR 分支、时钟相关规则、字段级问责写入）。无 PACT 时，技能自身完备。
-- **三空间本体若存在**：作为**可选的语义扩展**，填充约束分类维度。**无三空间时，约束分类退回通用分类（目标/环境/方案）**。三空间与 SE 技能的映射关系在 `spec/INTERFACE_CONTRACT_SPEC.md` 中以 `assumption` 形式存在，附带验证条件（与 SE 技能原文一致），不冒充已确认事实。
+- **外部领域本体若存在**：作为**可选的语义扩展**，填充约束分类维度。**无外部领域本体时，约束分类退回通用分类（目标/环境/方案）**。领域本体与该领域技能的映射关系在对应领域的契约中（如 `contracts/examples/software-engineering.pm-contract.yaml`）以 `assumption` 形式存在，附带验证条件（与该领域技能原文一致），不冒充已确认事实。
 - **任何领域技能若存在**：作为**横向对等体**，通过契约文件填充槽位。**没有任何领域技能享有特殊地位**；需求工程、软件工程、建筑施工与任何未来领域技能，都是可声明的槽位填充者。技能间的具体连接实例（如需求→软件的产物流动）登记在 `contracts/examples/` 或部署配置中，不进入成文法。
 
 ### 8. 不做的事

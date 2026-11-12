@@ -1,5 +1,7 @@
 # ADR-NNNN: [决策标题]
 
+> **格式选择**：本模板采用 Nygard 五要素。也可改用 MADR 或 Y-Statement，三种格式的取舍与必填治理字段见 `adr/README.md`。选定后删去本提示行。
+
 - **状态**：proposed | accepted | deprecated | superseded（被 ADR-XXXX 取代）
 - **日期**：YYYY-MM-DD
 - **决策者**：[人类责任方标识]

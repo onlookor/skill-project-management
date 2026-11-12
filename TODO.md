@@ -117,3 +117,10 @@
 | T-109 | 产物版本链重构 | `spec/COMPILATION_META.md` 第 10 条与 `spec/methods/deterministic-checker.md` 第 9 节以“文件头版本”为输入定义产物版本与对齐检查；文件层去版本后该链失效，需裁定替代口径 | ADR（改变已有规则的编译结果） | 用户裁定 | `[done]`（ADR-0004；CHANGELOG 批次 0007） |
 | T-110 | 发布一致性检查 | 建立 `manifest.json` 的包版本与最新 annotated tag 的一致性检查，避免两处记录漂移 | 执行层补丁 | `manifest.json` 已建立 | `open` |
 | T-111 | 产物基线字段 | 为 `validation/CHECKLIST.md` 补充 `source_commit` 字段并在生成流程中写入；在此之前现有清单视为“基线未记录”，装配时按过期处理（ADR-0004） | 执行层补丁 | 无 | `open` |
+
+### 新增：来源表收缩后跟进（ADR-0005）
+
+| 编号 | 性质 | 工作项 | 治理路径 | 前置依赖 | 状态 |
+|---|---|---|---|---|---|
+| T-112 | 来源核验 | 取得 Springer 章节 `10.1007/978-3-031-50495-2_13` 全文后，核对其 OWL 本体与“reasoner 一致性检查”的论断，决定是否将其作为知识层条目的来源；在此之前 `SPRINGER-PMBOK-2024` 仅元数据可用 | 来源治理（ADR） | 通讯作者提供全文 | `open` |
+| T-113 | 来源核验 | 核对本地 `resources/pm/ISO 21502-2020.pdf` 的过程组/主题组矩阵结构，决定 G-B1、G-B2 是否解除 `pending_reanchor` | 来源治理（ADR） | 无（本地副本已具备） | `open` |

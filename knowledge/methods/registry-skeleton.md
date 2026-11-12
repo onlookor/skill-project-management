@@ -33,7 +33,7 @@ method = {
 | `inputs` | 任务清单、三个估计值、估计依据（历史数据/专家判断） |
 | `outputs` | 期望值、标准差、置信区间 |
 | `scale_applicability` | `small` / `medium` / `large` |
-| `grounding_ref` | `PMBOK7-2021`（仅原则层交叉验证；具体公式为通用运筹学方法，本技能不宣称其为 PMBOK 原文） |
+| `grounding_ref` | `PMBOK8-2025`（仅原则层交叉验证；具体公式为通用运筹学方法，本技能不宣称其为 PMBOK 原文） |
 | `provenance_note` | PERT 公式为通用运筹学方法；本条目将其作为估算方法登记，不宣称 PMBOK 原文包含该公式。`grounding_ref` 指向 PMBOK 仅用于原则层一致性检查。**待补充更精确的来源锚定**（登记于 `TODO.md`）。 |
 
 #### M-DEC-01 WBS 工作分解
@@ -48,7 +48,7 @@ method = {
 | `inputs` | 项目范围陈述、Deliverable 清单 |
 | `outputs` | WBS 层级结构、工作包清单 |
 | `scale_applicability` | `small` / `medium` / `large` |
-| `grounding_ref` | `PMBOK7-2021`（仅原则层交叉验证） |
+| `grounding_ref` | `PMBOK8-2025`（仅原则层交叉验证） |
 | `provenance_note` | WBS 为通用项目管理方法；本条目登记其步骤，不宣称 PMBOK 原文的逐字表述。**待补充更精确的来源锚定**（登记于 `TODO.md`）。 |
 
 #### M-RISK-01 风险登记与评估
@@ -59,11 +59,11 @@ method = {
 | `method_name` | 风险登记与评估（Risk Register and Assessment） |
 | `category` | `risk` |
 | `when_to_use` | 项目启动时及每个阶段关口 |
-| `steps` | 1. 识别风险（来源：三空间事实、历史项目、专家判断）；2. 评估概率与影响（定性：高/中/低；定量：若数据可得）；3. 计算风险值 = 概率 × 影响；4. 为每个风险指定应对策略（规避/转移/减轻/接受）；5. 指定风险 owner（Responsible）；6. 登记触发条件与监测指标 |
+| `steps` | 1. 识别风险（来源：项目事实、历史项目、专家判断）；2. 评估概率与影响（定性：高/中/低；定量：若数据可得）；3. 计算风险值 = 概率 × 影响；4. 为每个风险指定应对策略（规避/转移/减轻/接受）；5. 指定风险 owner（Responsible）；6. 登记触发条件与监测指标 |
 | `inputs` | 项目背景、历史数据、专家判断 |
 | `outputs` | 风险登记册、应对计划、监测指标 |
 | `scale_applicability` | `small` / `medium` / `large` |
-| `grounding_ref` | `PMBOK7-2021`（仅原则层交叉验证） |
+| `grounding_ref` | `PMBOK8-2025`（仅原则层交叉验证） |
 | `provenance_note` | 风险登记为通用项目管理方法；本条目登记其步骤。**待补充更精确的来源锚定**（登记于 `TODO.md`）。 |
 
 #### M-EV-01 挣值分析
@@ -78,7 +78,7 @@ method = {
 | `inputs` | 工作包计划价值、完成百分比、实际成本 |
 | `outputs` | SV、CV、SPI、CPI、预测（EAC、ETC） |
 | `scale_applicability` | `medium` / `large`（小项目数据粒度可能不足） |
-| `grounding_ref` | `PMBOK7-2021`（仅原则层交叉验证） |
+| `grounding_ref` | `PMBOK8-2025`（仅原则层交叉验证） |
 | `provenance_note` | 挣值分析为通用项目管理方法；本条目登记其公式与步骤。**待补充更精确的来源锚定**（登记于 `TODO.md`）。 |
 
 #### M-PROC-01 采购流程
