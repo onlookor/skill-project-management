@@ -11,7 +11,7 @@
 | 规则组 | 覆盖状态 | 产物形态 |
 |---|---|---|
 | A（项目存在条件） | 完整覆盖 | 检查项规格 + 检查清单 |
-| B（过程组/主题组正交） | 完整覆盖，但规则状态为 `pending_reanchor`；产物携带 `rule_status`，按 META P6 降级为 `advisory` | 检查项规格（带状态标记） |
+| B（过程组/主题组双标签） | 完整覆盖；规则状态为 `active`（ADR-0008），`severity` 保持 `advisory`，产物携带 `rule_status`；升级为 `block` 需样例契约证据（T-118） | 检查项规格（带状态标记） |
 | C（交付物可断言） | 完整覆盖 | 检查项规格 + 检查清单 |
 | D（变更追溯） | 完整覆盖 | 检查项规格 + 检查清单 |
 | E（角色最小完备性） | 完整覆盖 | 检查项规格 + 检查清单 |
@@ -20,7 +20,7 @@
 
 ### 1.2 不可映射项
 
-**本方法无不可映射项。** 全部规则组均可被本方法编译为检查条件。规则状态（`pending_reanchor`、`assumption`）导致的降级不是“不可映射”，是 META P6 的合规执行——产物仍被编译，只是携带状态标记并被宿主按 `advisory` 处理。
+**本方法无不可映射项。** 全部规则组均可被本方法编译为检查条件。规则状态（当前为 F、G 组的 `assumption`）导致的降级不是“不可映射”，是 META P6 的合规执行——产物仍被编译，只是携带状态标记并被宿主按 `advisory` 处理。
 
 **唯一的方法层限制**：`check_id` 的判定逻辑依赖宿主提供的谓词求值能力（Datalog / JSON 条件求值 / SQL / 其他）。若宿主无法提供任何谓词求值能力，本方法退化为“检查清单 + 人工执行”——此时本方法的 P2（可判定性）由人类评审承担，P4（证据保全）由人工记录承担；方法的其余性质不变。这一退化路径是 META 第 3.7 条“无插件完备性”的合法形态，登记于本文件第 10 节。
 
@@ -278,8 +278,8 @@
 |---|---|---|---|---|
 | `PROJECT_MINIMAL_EXISTENCE` | G-A1 | `Project`、`Actor`、`Outcome`、`Commitment`、`Constraint` 节点 | 四类节点均存在且 `Commitment` 的 `by` 指向 `Actor`、`to` 指向 `Outcome` | `active` |
 | `CONSTRAINT_ANCHOR_REQUIRED` | G-A2 | 管理活动/产物节点、`Constraint` 节点 | 每个管理活动/产物至少有一条 `constrained_by` 边指向已登记 `Constraint` | `active` |
-| `DUAL_DIMENSION_ANNOTATION` | G-B1 | 管理项节点 | 每个管理项携带 `process_group` 与 `subject_group` 两个标签且值在枚举内 | `pending_reanchor` |
-| `DIMENSION_VALUE_CLOSED` | G-B2 | 管理项的标签值 | 标签值 ∈ 所锚定标准的枚举 ∪ 契约声明的 `subject_group_extension` | `pending_reanchor` |
+| `DUAL_DIMENSION_ANNOTATION` | G-B1 | 管理项节点 | 每个管理项携带 `process_group` 与 `subject_group` 两个标签且值在枚举内 | `active` |
+| `DIMENSION_VALUE_CLOSED` | G-B2 | 管理项的标签值 | 标签值 ∈ 所锚定标准的枚举 ∪ 契约声明的 `subject_group_extension` | `active` |
 | `DELIVERABLE_ASSERTION_LINK` | G-C1 | `Deliverable` 节点、`Assertion` 节点 | 每个 `Deliverable` 至少有一条 `asserted_by` 边指向 `Assertion` | `active` |
 | `ASSERTION_MUTUAL_EXCLUSION` | G-C2 | 同一 `Deliverable` 的多条 `Assertion` | 不存在两条 `active` 断言对同一 `Subject` 同一属性给出不相容值 | `active`（`warn`） |
 | `CHANGE_CONSTRAINT_LINK` | G-D1 | 变更提议节点、`Constraint` 节点 | 每个变更提议至少有一条边指向 `Constraint`，且边类型 ∈ {`mitigates`, `exacerbates`, `trades_off`} | `active` |

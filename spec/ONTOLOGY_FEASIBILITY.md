@@ -119,7 +119,7 @@
 |---|---|---|
 | `GRAMMAR.md` | 不改规则文本；形状用 `pm:implementsRule` 与 `pm:implementsCheck` 反向标注 | 本体是**派生工件**，不是来源；`grounding_ref` 仍须指向 `SOURCE_LEDGER` 的 active 条目 |
 | `knowledge/anchored-entries.jsonl` | JSONL 继续是 A 类概念的权威；本体通过 `pm:anchoredEntry` 指针引用，不复制定义 | 两处同时写定义会产生“双真相源”；本轮只做单向引用 |
-| `validation/CHECKLIST.md` | 每条形状对应一行已有检查项；CHECKLIST 仍是人类可读的权威投影 | 当前 B 组检查项的状态注记过期（仍写 `pending_reanchor`），映射前须先重建 |
+| `validation/CHECKLIST.md` | 每条形状对应一行已有检查项；CHECKLIST 仍是人类可读的权威投影 | B 组状态注记已与 ADR-0008 同步（v0.5.0），映射前按当前清单重建 |
 | `CM-DET-CHECKER` | `pyshacl` 作为宿主“其他谓词求值能力”的一种实现；不新增方法 | 若形状成为**编译产物本身**，则属于方法层变更，需按 META 第 3 条另行论证；本轮不这样做 |
 | `SOURCE_LEDGER.md` | `PMBOK8-2025` 目前只允许“原则层交叉验证” | **这是当前真正的阻塞**：作为概念层来源需先修订 `allowed_uses` 与 `claim_mapping`（ADR） |
 
