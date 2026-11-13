@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
-"""以 git ls-files 为准核对 STATE.md：漏登、登了不存在的文件、状态值非法均报错。
+"""以 git ls-files 为准核对 STATE.md，并核对 manifest.json 与最新 annotated tag 的一致性。
 
 用法：python3 scripts/check_state.py
-退出码：0 = 通过；1 = 存在错误；2 = STATE.md 结构无法解析。
+退出码：0 = 通过；1 = 存在错误；2 = STATE.md 或 manifest.json 结构无法解析。
 """
 
+import json
 import re
 import subprocess
 import sys
 from pathlib import Path
 
 STATE_FILE = "STATE.md"
+MANIFEST_FILE = "manifest.json"
 
 STATE_ENTRY_RE = re.compile(r"^-\s+`([a-z_]+)`：")
 TABLE_ROW_RE = re.compile(r"^\|\s*`([^`]+)`\s*\|\s*`([^`]+)`")
@@ -81,6 +83,44 @@ def resolve(path: str, defaults: list[tuple[str, str]]):
     return max(matches, key=lambda item: item[0])[1]
 
 
+def check_release(root: Path) -> tuple[list[str], str]:
+    """核对 manifest.json 与最新 annotated tag。结构无法解析时以 2 退出。"""
+    manifest_path = root / MANIFEST_FILE
+    if not manifest_path.is_file():
+        print(f"[错误] 未找到 {MANIFEST_FILE}，无法核对发布点。")
+        sys.exit(2)
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        print(f"[错误] {MANIFEST_FILE} 不是合法 JSON，无法核对发布点。")
+        sys.exit(2)
+
+    version = manifest.get("package_version")
+    release_tag = manifest.get("release_tag")
+    if not version or not release_tag:
+        print(f"[错误] {MANIFEST_FILE} 缺少 package_version 或 release_tag。")
+        sys.exit(2)
+
+    result = subprocess.run(
+        ["git", "describe", "--abbrev=0"], cwd=root, capture_output=True, text=True
+    )
+    if result.returncode != 0:
+        return (["[错误] 仓库中没有可用的 annotated tag，无法核对发布点。"], "")
+
+    tag = result.stdout.strip()
+    errors: list[str] = []
+    if tag != release_tag:
+        errors.append(
+            f"[错误] manifest release_tag `{release_tag}` 与最新 annotated tag `{tag}` 不一致"
+        )
+    expected = tag[1:] if tag.startswith("v") else tag
+    if version != expected:
+        errors.append(
+            f"[错误] manifest package_version `{version}` 与 tag `{tag}` 推得的版本 `{expected}` 不一致"
+        )
+    return errors, f"{version} ↔ {tag}"
+
+
 def main() -> int:
     root = repo_root()
     state_path = root / STATE_FILE
@@ -121,18 +161,23 @@ def main() -> int:
     for path in unresolved:
         errors.append(f"[错误] 漏登：{path}（无匹配的目录默认值，且不在例外表）")
 
+    release_errors, release_summary = check_release(root)
+    errors.extend(release_errors)
+
     print(
         f"STATE 对账：{len(files)} 个跟踪文件，"
         f"{len(defaults)} 条目录默认值，{len(exceptions)} 条例外，"
         f"状态取值 {len(allowed)} 个"
     )
+    if release_summary:
+        print(f"发布一致性：manifest {release_summary}")
     if errors:
         for item in errors:
             print(item)
         print(f"[失败] {len(errors)} 项错误。")
         return 1
 
-    print("[通过] 全部跟踪文件均有合法状态，例外表无悬空条目。")
+    print("[通过] 全部跟踪文件均有合法状态，例外表无悬空条目；发布点一致。")
     return 0
 
 

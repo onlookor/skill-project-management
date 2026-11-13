@@ -245,3 +245,21 @@
 - **验证**：`scripts/check_state.py`（89 个跟踪文件，0 错误）、`scripts/check_ledger_landings.py`（0 错误 1 警告，警告为 SPRINGER-PMBOK-2024 待 T-112）、`scripts/check_anchors.py`（46 个 Markdown 文件，0 错误 0 警告）、`scripts/check_no_raw_material.py`（0 错误）。锚点基线未改动，因为规则与来源文本块未变。
 - **关联 ADR**：无（治理层改动待 ADR-0011 批准）
 - **状态**：生效（仅文档；治理条文改动未生效）
+
+---
+
+### 批次 0021 — 2026-11-13 — 落库最小治理改造：调度层、TODO 重组与发布一致性检查
+
+- **涉及文件**：
+  - 新建：`adr/0011-schedule-layer-and-plan.md`
+  - 修改：`CONSTITUTION.md`（第 4 条新增调度层一句）、`AGENTS.md`（3.1、3.2、3.3、新增 3.4、第 4 条目录树与维护责任表、第 8 条）、`ROADMAP.md`（移除现状诊断，改为只保留目标、里程碑、依赖与执行内容）、`TODO.md`（按 M0–M7 重组、增加里程碑列、统一状态、补 `blocked-external`）、`STATE.md`（维护规则一句）、`README.md`、`README.en.md`（`TODO.md` 描述与 ADR 范围）、`scripts/check_state.py`（发布一致性核对）、`scripts/README.md`、`spec/GOVERNANCE_RESTRUCTURE.md`（标注为已批准的审查附件）
+- **变更摘要**：
+  1. 现状诊断（九条 TODO 结构缺陷、两条事实缺口、调度层重叠与治理结构问题）移入 ADR-0011；`ROADMAP.md` 不再记录判断与理由，只保留目标 D1–D5、M0–M7 与出口条件、关键路径、T-xxx 映射、工作量量级、TODO 处置与发布安排。
+  2. 按最小方案落库：`CONSTITUTION.md` 第 4 条增加“调度层变更不属实质性修改”一句；第 1 条调度层说明、第 5 条第 2 项扩容、独立检查脚本三项未做。
+  3. `AGENTS.md` 修正 3.2 的关闭规则冲突（保留行、标 `done`、附证据），把 TODO 收窄为单点台账；新增 3.4 定义 `ROADMAP.md`；目录树与维护责任表加入 `ROADMAP.md`；第 8 条增加两条禁止项。
+  4. `TODO.md` 重组为 M0–M7 八个章节，新增里程碑列，状态统一为 `open` / `in-progress` / `blocked-external` / `done` / `dropped`；外部阻塞项（T-012、T-013、T-052、T-112、T-115、T-119、T-121）标注解锁条件；重复项加交叉引用而不合并编号；共 72 行（65 个未完成、7 个已关闭）。
+  5. T-110 落地：`scripts/check_state.py` 增加 `manifest.json` 的 `package_version` / `release_tag` 与最新 annotated tag 的一致性核对，结构无法解析时以 2 退出。T-110 标记 `done`。
+  6. 新增 T-127（规则组 B 签注同步）与 T-128（`v0.5.0` 发布），归入 M0。
+- **验证**：`scripts/check_state.py`（92 个跟踪文件，0 错误；发布一致性 `0.4.0` ↔ `v0.4.0`）、`scripts/check_ledger_landings.py`（0 错误 1 警告，警告为 SPRINGER-PMBOK-2024 待 T-112）、`scripts/check_anchors.py`（47 个 Markdown 文件，0 错误 0 警告）、`scripts/check_no_raw_material.py`（0 错误）。锚点基线未改动。
+- **关联 ADR**：ADR-0011（accepted）
+- **状态**：生效

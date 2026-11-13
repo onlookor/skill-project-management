@@ -30,7 +30,7 @@
 | **`QUICKSTART.md`** | **Entry** | **Quick start: minimal walkthrough plus an LLM integration example** |
 | `AGENTS.md` | Execution | Execution conventions: source acquisition (local first), schedule discipline, authoritative directory structure, mechanized checking |
 | `CHANGELOG.md` | Scheduling | The sole register of change history (rules in Article 3.1 of `AGENTS.md`) |
-| `TODO.md` | Scheduling | The sole register of follow-up work (rules in Article 3.2 of `AGENTS.md`) |
+| `TODO.md` | Scheduling | Ledger of individual work items (rules in Article 3.2 of `AGENTS.md`; order and exit conditions in `ROADMAP.md`) |
 | **`ROADMAP.md`** | **Scheduling** | **Roadmap: goals and completion criteria, milestones and exit conditions, critical path, release points** |
 | `STATE.md` | Scheduling | The sole register of the current status of each file |
 | **`ERRATA.md`** | **Scheduling** | **Hallucination correction ledger: compilation errors, external review dispositions, statements pending verification** |

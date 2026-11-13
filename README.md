@@ -30,7 +30,7 @@
 | **`QUICKSTART.md`** | **入口** | **快速开始：最小走查样例 + LLM 接合示例** |
 | `AGENTS.md` | 执行 | 执行约定：资料获取（本地优先）、schedule 纪律、目录结构权威、检查机械化 |
 | `CHANGELOG.md` | 调度 | 变更历史的唯一登记处（规则见 `AGENTS.md` 第 3.1 条） |
-| `TODO.md` | 调度 | 后续工作的唯一登记处（规则见 `AGENTS.md` 第 3.2 条） |
+| `TODO.md` | 调度 | 单点工作项的台账（规则见 `AGENTS.md` 第 3.2 条；顺序与出口见 `ROADMAP.md`） |
 | **`ROADMAP.md`** | **调度** | **路线图：目标与完成判据、里程碑与出口条件、关键路径、发布点** |
 | `STATE.md` | 调度 | 逐文件当前状态的唯一登记处 |
 | **`ERRATA.md`** | **调度** | **幻觉更正台账：编制错误、外部评审处置、待核验表述** |
@@ -51,7 +51,7 @@
 | `contracts/` | 执行 | 契约 schema、解析规则、两个领域样例（建筑施工、软件工程） |
 | `knowledge/` | 知识 | 本体条目与方法注册表（可确定性查询，不供通读） |
 | `ontology/` | 派生工件 | 自建本体（`active`：92 类 / 35 对象属性 / 40 过程 / 124 工件 / 185 工具与技术 / 24 条形状；非规范、非来源，边界见 `CONSTITUTION.md` 第 13.6 条） |
-| `adr/` | 治理 | ADR 格式说明与治理决策记录（ADR-0001–ADR-0010） |
+| `adr/` | 治理 | ADR 格式说明与治理决策记录（ADR-0001–ADR-0011） |
 | **`scripts/`** | **辅助** | **辅助检查脚本：STATE 对账、来源编译落点、锚点解析与校验、GLOSSARY/JSONL 同步规格** |
 | `validation/CHECKLIST.md` | 执行 | 由 `COMPILATION_META.md` + `spec/methods/deterministic-checker.md` 生成的检查清单 |
 | **`validation/test-cases/`** | **执行** | **反例检验用例库（当前 3 个已落盘）** |

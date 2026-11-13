@@ -101,6 +101,8 @@
 - `spec/COMPILATION_META.md` 第 3 条中会改变已有规则编译结果的结构性变更；
 - `spec/INTERFACE_CONTRACT_SPEC.md` 中槽位定义或合并语义的结构性变更。
 
+调度层文件（`ROADMAP.md`、`TODO.md`、`STATE.md`、`CHANGELOG.md`、`ERRATA.md`）的变更不构成本条所称实质性修改；其纪律由 `AGENTS.md` 的 schedule 条款规定，且不得改变任何规范语义。
+
 ADR 的格式见 `adr/README.md`：可选用 Nygard（标题 / 状态 / 背景 / 决定 / 结果）、MADR 或 Y-Statement 三种格式之一。无论选用哪种格式，都必须携带以下治理字段：
 
 - `serves_charter`：本决策服务于 `CHARTER.md` 的哪条承诺，或声明它要修改哪条承诺；

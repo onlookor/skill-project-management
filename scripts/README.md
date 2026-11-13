@@ -6,7 +6,7 @@
 
 | 脚本 | 用途 | 规格文件 | 实现状态 |
 |---|---|---|---|
-| `check_state.py` | 以 `git ls-files` 核对 `STATE.md`：漏登、登了不存在的文件、状态值非法 | 无独立规格（规则见 `STATE.md` 与本文件“脚本的定位”） | 已实现 |
+| `check_state.py` | 以 `git ls-files` 核对 `STATE.md`：漏登、登了不存在的文件、状态值非法；并核对 `manifest.json` 的 `package_version` / `release_tag` 与最新 annotated tag 一致 | 无独立规格（规则见 `STATE.md` 与本文件“脚本的定位”） | 已实现 |
 | `check_ledger_landings.py` | 核对 `SOURCE_LEDGER.md` 每个 active 来源条目是否声明编译落点，且落点在 `GRAMMAR.md`、`knowledge/`、方法条目或检查项中真实存在 | 无独立规格（规则见 `CONSTITUTION.md` 第 2.6 条） | 已实现 |
 | `check_anchors.py` | 解析并校验全仓锚点：禁止行号 locator、文件/稳定 ID/章节号/标题路径可解析、`grounding_ref` 指向 active 来源、规则与来源文本块指纹未漂移 | `spec/ANCHOR_SPEC.md` | 已实现 |
 | `anchor_baseline.json` | `check_anchors.py` 的指纹基线（`rule:*` 与 `source:*`），内容变更后重冻 | `spec/ANCHOR_SPEC.md` 第 5 节 | 数据文件 |
@@ -26,7 +26,7 @@ python3 scripts/validate_ontology.py --matrix
 
 `validate_ontology.py` 退出码：`0` 通过；`1` 出现非预期结果（本体不通过或某条形状未被 fixture 判出）；`2` 缺少 `rdflib`/`pyshacl` 或结构无法解析——此时必须报“无法评估”，不得视为通过。
 
-`check_state.py` 退出码：`0` 通过；`1` 存在错误（逐条列出）；`2` `STATE.md` 结构无法解析或不在 git 仓库中。
+`check_state.py` 退出码：`0` 通过；`1` 存在错误（逐条列出）；`2` `STATE.md` 或 `manifest.json` 结构无法解析、缺少字段，或不在 git 仓库中。
 
 `check_ledger_landings.py` 退出码：`0` 通过（可有待落点警告）；`1` 存在错误；`2` 登记表结构无法解析。
 
