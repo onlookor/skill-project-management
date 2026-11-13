@@ -153,6 +153,14 @@
 |---|---|---|---|---|---|
 | T-121 | 治理 | 由用户经网页端手动发送请求全文的邮件：收件人 `silega@sfedu.ru`，发信人 `wgzhi@hotmail.com`，署名 Gengzhi Wei。正文见下方附录。SMTP 客户端通道因服务器停用基础认证（`535 5.7.139`）不可用，本项**未发送**；不得记为已发送 | 无（人工操作） | 用户手动发送 | `open`（待用户手动发送） |
 
+### 新增：自建本体（批次 0018）
+
+| 编号 | 性质 | 工作项 | 治理路径 | 前置依赖 | 状态 |
+|---|---|---|---|---|---|
+| T-122 | 原型 | 按 `spec/ONTOLOGY_FEASIBILITY.md` 第 3 节构建最小本体：`ontology/pmbok8-core.ttl`（7 域 + 5 焦点区 + 40 过程 + 约 10 个核心概念）、`pmbok8-shapes.ttl`（8–12 条形状，只映射已有 `check_id`）、3 个 fixture、`scripts/validate_ontology.py` 包装脚本；完成“形状 ↔ 规则文本”逐条对照（P1c） | CHANGELOG（内容与格式）；不新增编译方法 | 无（工具链需 `rdflib`、`pyshacl`） | `open` |
+| T-123 | 来源治理 | 评估是否修订 `SOURCE_LEDGER.md` 中 `PMBOK8-2025` 的 `allowed_uses` 与 `claim_mapping`，使其可作为概念层（而非仅原则层交叉验证）依据；修订需 ADR，并说明对 P1a 与 `check_ledger_landings.py` 的影响 | 来源治理（ADR） | T-122 原型结果、T-124 许可结论 | `open` |
+| T-124 | 风险 | 对“从受版权保护的 PMBOK 8th 自建本体并公开于 MIT 仓库”做许可/衍生作品风险评估（本地副本声明仅限个人使用、禁止 AI 训练与复制）；评估结论决定本体是否可公开发布，或仅保留在本地/私有分支 | 治理（ADR 或外部法律意见） | 无 | `open` |
+
 #### 附录：T-121 邮件正文（英文）
 
 ```text

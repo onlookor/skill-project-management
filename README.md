@@ -43,12 +43,14 @@
 | **`spec/CONTEXT_ASSEMBLY.md`** | **执行** | **上下文装配规范：四场景加载集、token 预算、装配清单** |
 | **`spec/GROUNDING_CRITERIA.md`** | **执行** | **接地完成判据：六条判据、状态语义、判据记录** |
 | **`spec/ANCHOR_SPEC.md`** | **规范** | **锚点与引用规范：稳定 ID、标题路径、指纹基线、失效显式报错** |
+| `spec/ONTOLOGY_FEASIBILITY.md` | 评估 | 自建本体的可行性评估与方案对比（非规范，不改变规则） |
 | **`spec/methods/deterministic-checker.md`** | **具体编译方法** | **确定性校验器方法的声明：覆盖范围、P1–P6 论证、check_id 注册表、翻译规范** |
 | `spec/ASSUMPTION_PROTOCOL.md` | 执行 | `assumption` 区块的格式与验证条件规范（方法无关） |
 | `spec/INTERFACE_CONTRACT_SPEC.md` | 执行 | 槽位定义；**技能间信息流**；v1 单层解析；PACT 不可映射项声明（方法无关） |
 | `contracts/` | 执行 | 契约 schema、解析规则、两个领域样例（建筑施工、软件工程） |
 | `knowledge/` | 知识 | 本体条目与方法注册表（可确定性查询，不供通读） |
-| `adr/` | 治理 | ADR 格式说明与治理决策记录（ADR-0001–ADR-0007） |
+| `ontology/` | 派生工件 | 自建本体（`skeleton`，非规范、非来源；边界见 `CONSTITUTION.md` 第 13.6 条） |
+| `adr/` | 治理 | ADR 格式说明与治理决策记录（ADR-0001–ADR-0010） |
 | **`scripts/`** | **辅助** | **辅助检查脚本：STATE 对账、来源编译落点、锚点解析与校验、GLOSSARY/JSONL 同步规格** |
 | `validation/CHECKLIST.md` | 执行 | 由 `COMPILATION_META.md` + `spec/methods/deterministic-checker.md` 生成的检查清单 |
 | **`validation/test-cases/`** | **执行** | **反例检验用例库（当前 3 个已落盘）** |

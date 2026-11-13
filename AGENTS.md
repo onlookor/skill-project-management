@@ -84,6 +84,7 @@ project-management-grounding/
 │   ├── CONTEXT_ASSEMBLY.md         # 上下文装配规范：四场景加载集、token 预算、装配清单
 │   ├── GROUNDING_CRITERIA.md       # 接地完成判据：六条判据、状态语义、判据记录
 │   ├── ANCHOR_SPEC.md              # 锚点与引用规范：稳定 ID、标题路径、指纹、失效语义
+│   ├── ONTOLOGY_FEASIBILITY.md     # 自建本体的可行性评估与方案对比（评估报告，非规范）
 │   ├── methods/
 │   │   └── deterministic-checker.md  # CM-DET-CHECKER 方法声明（含 check_id 注册表、翻译规范）
 │   ├── ASSUMPTION_PROTOCOL.md      # assumption 协议（方法无关）
@@ -102,6 +103,9 @@ project-management-grounding/
 │   └── methods/
 │       └── registry-skeleton.md    # 方法注册表（估算、WBS、风险、挣值、采购；首批 5 条）
 │
+├── ontology/
+│   └── README.md                   # 自建本体（skeleton）：格式、边界、状态与检查规则
+│
 ├── adr/
 │   ├── README.md                   # ADR 格式说明（Nygard / MADR / Y-Statement）与必填治理字段
 │   ├── ADR-TEMPLATE.md             # 治理决策模板（默认 Nygard 五要素 + 扩展字段）
@@ -113,7 +117,8 @@ project-management-grounding/
 │   ├── 0006-knowledge-sources-vs-normative-basis.md
 │   ├── 0007-anchor-discipline.md
 │   ├── 0008-reanchor-dimension-rules.md
-│   └── 0009-no-raw-material-in-git.md
+│   ├── 0009-no-raw-material-in-git.md
+│   └── 0010-self-authored-ontology-in-git.md
 │
 ├── .githooks/
 │   └── pre-commit                  # 阻断原始资料入库（CONSTITUTION 第 13 条）
@@ -163,6 +168,7 @@ project-management-grounding/
 | `spec/ANCHOR_SPEC.md` | 人类责任方 | 锚点形态、失效语义、指纹算法变化需 ADR；措辞澄清需 CHANGELOG | ADR；基线随规则/来源变更重冻 |
 | `contracts/` | 交付方 | 槽位定义变化、样例更新 | 结构性变更需 ADR |
 | `knowledge/` | 任何执行者 | 条目新增/变更（受 `CONSTITUTION.md` 第 2、3 条约束） | 随来源治理 |
+| `ontology/` | 交付方 | 自建本体的内容与格式（受 `CONSTITUTION.md` 第 13.6 条约束） | CHANGELOG（内容/格式）；提升为来源或编译方法时需 ADR |
 | `adr/` | 任何执行者 | 治理决策发生 | 状态 `proposed` 即时登记，`accepted` 需人类责任方 |
 | `validation/` | 交付方 | 规则变化时由 `spec/COMPILATION_META.md` + 启用的方法声明重建 | 随规则演进 |
 | `validation/test-cases/` | 交付方 | 用例新增/修正 | 随用例更新 |
@@ -228,6 +234,12 @@ project-management-grounding/
 4. **提交前必须运行检查器**：`python3 scripts/check_no_raw_material.py`。本仓库已提供 `.githooks/pre-commit`，用 `git config core.hooksPath .githooks` 启用；未启用钩子的部署必须在 `git add` 前手工执行，二者等价。
 5. **检查器命中即停止提交**，不得用 `--no-verify` 绕过。确需新增例外（例如将来要提交一张合法图片资产），走 ADR 并在检查器中登记路径豁免，而不是删除规则或放宽阈值。
 6. **发现已跟踪内容违规时**：先报告文件与位置，再改为“页码定位 + 自述摘要”或移出仓库，并在 `ERRATA.md` 登记；不静默删除他人的内容。
+7. **自建本体（`CONSTITUTION.md` 第 13.6 条）**：
+   - 只放 `ontology/`；主格式为 Turtle（`.ttl`、`.shacl.ttl`），`.owl`/`.rdf`/`.nt`/`.n3`/`.jsonld` 仅作生成导出，仍受同一内容检查。
+   - 每个文件头部必须写 `# self-authored: true`、`# source_id: <SOURCE_LEDGER id>`、`# source_pages: <定位>`；每个术语带 `dcterms:source` 与 `pm:sourcePage`。
+   - 定义必须自写一句话；不得逐句对应原文，不得复制段落、列表、表格行、图注。写不出定义时省略定义并标 `definition_status: pending`，不得用原文改写凑数。
+   - 本体是派生工件，不是来源；在 ADR 提升前不得作为 `grounding_ref`，不得直接充当规则依据；`STATE.md` 中默认状态为 `skeleton`。
+   - 提交前同样运行 `scripts/check_no_raw_material.py`；本体文件命中 `RM-ONTO-*` 或 `RM-PROSEBLOCK` 同样阻断提交。
 
 ### 8. 不做的事
 

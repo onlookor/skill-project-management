@@ -15,6 +15,13 @@
   RM-DOTLEADER 单行出现 30 个以上连续点（PDF 目录提取特征）
   RM-MOJIBAKE  出现 U+FFFD 替换字符（错误解码后粘贴的提取文本）
   RM-CONTROL   出现除制表符/换行以外的 C0 控制字符
+  RM-ONTO-HEADER  本体文件缺少 self-authored / source_id 头注释
+  RM-ONTO-LITERAL 本体文件的字符串字面量超过 400 字符（疑似原文转录）
+  RM-ONTO-COMMENT 本体文件的单行注释超过 400 字符（疑似原文转录）
+
+本体文件（CONSTITUTION.md 第 13.6 条）：`.ttl` 等 RDF 序列化允许入库，但仍受
+体积、二进制、乱码、控制字符、点线、页码序列与长文本检查；连续 15 行以上的
+长注释行按 RM-PROSEBLOCK 处理。
 """
 
 import argparse
@@ -35,11 +42,17 @@ TEXT_EXTS = {
     ".toml", ".cfg", ".ini", ".sh", "",
 }
 
+ONTOLOGY_EXTS = {".ttl", ".nt", ".n3", ".owl", ".rdf", ".jsonld"}
+TURTLE_EXTS = {".ttl"}
+
 MAX_FILE_BYTES = 512 * 1024
 MAX_QUOTE_LINE_CHARS = 400
 MAX_QUOTE_BLOCK_CHARS = 800
+MAX_LITERAL_CHARS = 400
 PROSE_LINE_CHARS = 100
 PROSE_BLOCK_RUN = 15
+ONTO_PROSE_LINE_CHARS = 80
+ONTO_PROSE_BLOCK_RUN = 12
 PAGE_SEQ_RUN = 5
 
 PAGE_LINE_RE = re.compile(
@@ -47,6 +60,8 @@ PAGE_LINE_RE = re.compile(
 )
 DOTLEADER_RE = re.compile(r"\.{30,}")
 CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
+TRIPLE_QUOTE_RE = re.compile(r'"""(.*?)"""', re.S)
+SINGLE_QUOTE_RE = re.compile(r'"(?:\\.|[^"\\\n])*"')
 
 
 class Finding:
@@ -66,6 +81,105 @@ def tracked_files(root):
         ["git", "ls-files", "-z"], cwd=root, capture_output=True, check=True
     ).stdout
     return [p for p in out.decode("utf-8").split("\0") if p]
+
+
+def check_ontology_text(rel, text, suffix):
+    """本体文件的附加检查：头注释、超长字面量、超长注释与注释行形态。
+
+    本体允许入库，但“自写”必须可机械识别，且不能夹带原文转录。
+    """
+    findings = []
+
+    lines = text.splitlines()
+    if suffix in TURTLE_EXTS:
+        head = "\n".join(lines[:40]).lower()
+        if "self-authored" not in head or "source_id" not in head:
+            findings.append(
+                Finding(
+                    "RM-ONTO-HEADER", rel, 1,
+                    "缺少 self-authored / source_id 头注释（CONSTITUTION 13.6）",
+                )
+            )
+
+    triple_spans = []
+    for m in TRIPLE_QUOTE_RE.finditer(text):
+        triple_spans.append((m.start(), m.end()))
+        body = m.group(1)
+        if len(body) > MAX_LITERAL_CHARS:
+            lineno = text[: m.start()].count("\n") + 1
+            findings.append(
+                Finding(
+                    "RM-ONTO-LITERAL", rel, lineno,
+                    f"三引号字面量 {len(body)} 字符，超过阈值 {MAX_LITERAL_CHARS}",
+                )
+            )
+
+    for m in SINGLE_QUOTE_RE.finditer(text):
+        if any(start <= m.start() < end for start, end in triple_spans):
+            continue
+        body = m.group(0)[1:-1]
+        if len(body) > MAX_LITERAL_CHARS:
+            lineno = text[: m.start()].count("\n") + 1
+            findings.append(
+                Finding(
+                    "RM-ONTO-LITERAL", rel, lineno,
+                    f"字符串字面量 {len(body)} 字符，超过阈值 {MAX_LITERAL_CHARS}",
+                )
+            )
+
+    prose_run = 0
+    page_run = 0
+    for lineno, line in enumerate(lines, 1):
+        if CONTROL_RE.search(line):
+            findings.append(
+                Finding("RM-CONTROL", rel, lineno, "出现 C0 控制字符，疑似二进制/OCR 输出")
+            )
+        if DOTLEADER_RE.search(line):
+            findings.append(
+                Finding("RM-DOTLEADER", rel, lineno, "出现 30 个以上连续点，疑似 PDF 目录转储")
+            )
+
+        stripped = line.strip()
+        if not stripped.startswith("#"):
+            prose_run = 0
+            page_run = 0
+            continue
+
+        body = stripped.lstrip("#").strip()
+        if len(body) > MAX_QUOTE_LINE_CHARS:
+            findings.append(
+                Finding(
+                    "RM-ONTO-COMMENT", rel, lineno,
+                    f"注释行 {len(body)} 字符，超过阈值 {MAX_QUOTE_LINE_CHARS}",
+                )
+            )
+
+        if len(body) >= ONTO_PROSE_LINE_CHARS:
+            prose_run += 1
+            if prose_run == ONTO_PROSE_BLOCK_RUN:
+                findings.append(
+                    Finding(
+                        "RM-PROSEBLOCK", rel, lineno,
+                        f"连续 {ONTO_PROSE_BLOCK_RUN} 行注释每行不少于 "
+                        f"{ONTO_PROSE_LINE_CHARS} 字符，疑似原文转储",
+                    )
+                )
+        else:
+            prose_run = 0
+
+        if PAGE_LINE_RE.match(body):
+            page_run += 1
+            if page_run == PAGE_SEQ_RUN:
+                findings.append(
+                    Finding(
+                        "RM-PAGESEQ", rel, lineno,
+                        f"连续 {PAGE_SEQ_RUN} 行注释为页码/纯数字，疑似整页转录",
+                    )
+                )
+        else:
+            page_run = 0
+
+    return findings
 
 
 def check_file(root, rel):
@@ -88,7 +202,7 @@ def check_file(root, rel):
             )
         )
 
-    if suffix not in TEXT_EXTS:
+    if suffix not in TEXT_EXTS and suffix not in ONTOLOGY_EXTS:
         return findings
 
     raw = path.read_bytes()
@@ -107,6 +221,10 @@ def check_file(root, rel):
         findings.append(
             Finding("RM-MOJIBAKE", rel, line, "出现 U+FFFD 替换字符，疑似提取文本直接粘贴")
         )
+
+    if suffix in ONTOLOGY_EXTS:
+        findings.extend(check_ontology_text(rel, text, suffix))
+        return findings
 
     quote_block = 0
     quote_block_start = None
@@ -199,7 +317,8 @@ def main():
         f"原始资料入库检查：{len(files)} 个跟踪文件；"
         f"{len(findings)} 个错误，阈值（体积 {MAX_FILE_BYTES}B / 单条引用 "
         f"{MAX_QUOTE_LINE_CHARS} 字符 / 引用块 {MAX_QUOTE_BLOCK_CHARS} 字符 / "
-        f"连续长行 {PROSE_BLOCK_RUN} 行）"
+        f"连续长行 {PROSE_BLOCK_RUN} 行 / 本体字面量与注释 {MAX_LITERAL_CHARS} 字符 / "
+        f"本体连续长注释 {ONTO_PROSE_BLOCK_RUN} 行）"
     )
     if findings:
         print("[阻断] CONSTITUTION 第 13 条：上述内容不得提交。", file=sys.stderr)

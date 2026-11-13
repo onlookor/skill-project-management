@@ -26,6 +26,7 @@
 | `contracts/` | `active` |
 | `contracts/examples/` | `example` |
 | `knowledge/` | `active` |
+| `ontology/` | `skeleton` |
 | `adr/` | `accepted` |
 | `scripts/` | `active` |
 | `validation/` | `active` |

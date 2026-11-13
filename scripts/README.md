@@ -11,7 +11,7 @@
 | `check_anchors.py` | 解析并校验全仓锚点：禁止行号 locator、文件/稳定 ID/章节号/标题路径可解析、`grounding_ref` 指向 active 来源、规则与来源文本块指纹未漂移 | `spec/ANCHOR_SPEC.md` | 已实现 |
 | `anchor_baseline.json` | `check_anchors.py` 的指纹基线（`rule:*` 与 `source:*`），内容变更后重冻 | `spec/ANCHOR_SPEC.md` 第 5 节 | 数据文件 |
 | `check_glossary_sync` | 检查 `GLOSSARY.md` 的 A 类条目与 `knowledge/anchored-entries.jsonl` 的定义一致性 | `check_glossary_sync.md` | 未实现（T-090） |
-| `check_no_raw_material.py` | 阻断式检查：已跟踪文件中不得出现原始资料（PDF/EPUB/扫描件等）、文本层/OCR 转储与成段原文 | `CONSTITUTION.md` 第 13 条 | 已实现 |
+| `check_no_raw_material.py` | 阻断式检查：已跟踪文件中不得出现原始资料（PDF/EPUB/扫描件等）、文本层/OCR 转储与成段原文；允许受控的自建本体（`CONSTITUTION.md` 第 13.6 条） | `CONSTITUTION.md` 第 13 条 | 已实现 |
 
 ### 运行方式
 
@@ -41,6 +41,11 @@ python3 scripts/check_no_raw_material.py
 | `RM-DOTLEADER` | 单行出现 30 个以上连续点（目录转储） |
 | `RM-MOJIBAKE` | 出现 U+FFFD 替换字符 |
 | `RM-CONTROL` | 出现除制表符/换行外的 C0 控制字符 |
+| `RM-ONTO-HEADER` | `.ttl` 前 40 行缺少 `self-authored` 或 `source_id` 头注释 |
+| `RM-ONTO-LITERAL` | 本体文件中的字符串/三引号字面量超过 400 字符 |
+| `RM-ONTO-COMMENT` | 本体文件中的单行 `#` 注释超过 400 字符 |
+
+**本体的受控放行**（`CONSTITUTION.md` 第 13.6 条）：`.ttl`、`.shacl.ttl`、`.owl`、`.rdf`、`.nt`、`.n3`、`.jsonld` 允许入库，但**不豁免**体积、二进制、乱码、控制字符、点线、页码序列与长文本检查。本体文件的连续长注释行按 `RM-PROSEBLOCK` 处理（本体适用更严阈值：连续 12 行、每行 80 字符，以覆盖 PDF 换行后的段落形态）；头注释与 provenance 要求见 `ontology/README.md`。放行只针对“自写定义 + 标准术语标签”的本体，不针对原文转录。
 
 提交前接入：`git config core.hooksPath .githooks`（只对当前克隆生效）。未启用钩子时，在 `git add` 前手工运行该脚本，效果等价。检查器命中时不得用 `--no-verify` 绕过；新增例外须走 ADR 并在脚本中登记路径豁免。
 
