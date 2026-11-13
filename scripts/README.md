@@ -6,7 +6,7 @@
 
 | 脚本 | 用途 | 规格文件 | 实现状态 |
 |---|---|---|---|
-| `check_state.py` | 以 `git ls-files` 核对 `STATE.md`：漏登、登了不存在的文件、状态值非法；并核对 `manifest.json` 的 `package_version` / `release_tag` 与最新 annotated tag 一致，且该 tag 指向 `HEAD` | 无独立规格（规则见 `STATE.md` 与本文件“脚本的定位”） | 已实现 |
+| `check_state.py` | 以 `git ls-files` 核对 `STATE.md`：漏登、登了不存在的文件、状态值非法；并核对 `manifest.json` 的 `package_version` / `release_tag` 与最新 annotated tag 一致，且该 tag 指向 `HEAD`；`release_state=development` 时仅把“HEAD 领先于 tag”降为警告 | 无独立规格（规则见 `STATE.md`、`AGENTS.md` 3.5 与本文件“脚本的定位”） | 已实现 |
 | `check_ledger_landings.py` | 核对 `SOURCE_LEDGER.md` 每个 active 来源条目是否声明编译落点，且落点在 `GRAMMAR.md`、`knowledge/`、方法条目或检查项中真实存在 | 无独立规格（规则见 `CONSTITUTION.md` 第 2.6 条） | 已实现 |
 | `check_anchors.py` | 解析并校验全仓锚点：禁止行号 locator、文件/稳定 ID/章节号/标题路径可解析、`grounding_ref` 指向 active 来源、规则与来源文本块指纹未漂移 | `spec/ANCHOR_SPEC.md` | 已实现 |
 | `anchor_baseline.json` | `check_anchors.py` 的指纹基线（`rule:*` 与 `source:*`），内容变更后重冻 | `spec/ANCHOR_SPEC.md` 第 5 节 | 数据文件 |
@@ -26,7 +26,7 @@ python3 scripts/validate_ontology.py --matrix
 
 `validate_ontology.py` 退出码：`0` 通过；`1` 出现非预期结果（本体不通过或某条形状未被 fixture 判出）；`2` 缺少 `rdflib`/`pyshacl` 或结构无法解析——此时必须报“无法评估”，不得视为通过。
 
-`check_state.py` 退出码：`0` 通过；`1` 存在错误（逐条列出）；`2` `STATE.md` 或 `manifest.json` 结构无法解析、缺少字段，或不在 git 仓库中。
+`check_state.py` 退出码：`0` 通过（开发态下“HEAD 领先于 tag”只输出警告）；`1` 存在错误（逐条列出）；`2` `STATE.md` 或 `manifest.json` 结构无法解析、缺少字段、`release_state` 非法，或不在 git 仓库中。`release_state` 缺失按 `released` 严格处理；`development` 不豁免 tag 名、版本号、annotated 与祖先关系判断。
 
 `check_ledger_landings.py` 退出码：`0` 通过（可有待落点警告）；`1` 存在错误；`2` 登记表结构无法解析。
 
@@ -51,7 +51,16 @@ python3 scripts/validate_ontology.py --matrix
 
 **本体的受控放行**（`CONSTITUTION.md` 第 13.6 条）：`.ttl`、`.shacl.ttl`、`.owl`、`.rdf`、`.nt`、`.n3`、`.jsonld` 允许入库，但**不豁免**体积、二进制、乱码、控制字符、点线、页码序列与长文本检查。本体文件的连续长注释行按 `RM-PROSEBLOCK` 处理（本体适用更严阈值：连续 12 行、每行 80 字符，以覆盖 PDF 换行后的段落形态）；头注释与 provenance 要求见 `ontology/README.md`。放行只针对“自写定义 + 标准术语标签”的本体，不针对原文转录。
 
-提交前接入：`git config core.hooksPath .githooks`（只对当前克隆生效）。未启用钩子时，在 `git add` 前手工运行该脚本，效果等价。检查器命中时不得用 `--no-verify` 绕过；新增例外须走 ADR 并在脚本中登记路径豁免。
+提交前接入：每个克隆需自行执行 `git config core.hooksPath .githooks`（只对当前克隆生效）。钩子依次运行四个检查器，任一失败即阻断提交：
+
+```
+python3 scripts/check_no_raw_material.py
+python3 scripts/check_anchors.py
+python3 scripts/check_ledger_landings.py
+python3 scripts/check_state.py
+```
+
+未启用钩子时，在 `git add` 前手工按上述顺序运行，效果等价。检查器命中时不得用 `--no-verify` 绕过；唯一例外是 `AGENTS.md` 第 3.5 条规定的发布引导提交（tag 只能指向已存在提交），该提交后必须立即打 tag 并复跑四个检查器。新增其他例外须走 ADR 并在脚本中登记路径豁免。
 
 ### 脚本的定位
 

@@ -83,8 +83,15 @@ def resolve(path: str, defaults: list[tuple[str, str]]):
     return max(matches, key=lambda item: item[0])[1]
 
 
-def check_release(root: Path) -> tuple[list[str], str]:
-    """核对 manifest.json 与最新 annotated tag。结构无法解析时以 2 退出。"""
+RELEASE_STATES = {"development", "released"}
+
+
+def check_release(root: Path) -> tuple[list[str], list[str], str]:
+    """核对 manifest.json 与最新 annotated tag。结构无法解析时以 2 退出。
+
+    release_state 必须显式声明：development 或 released；缺失按 released 严格处理。
+    development 只把“HEAD 领先于 tag”降为警告，tag 名/版本号/annotated/祖先关系仍严格校验。
+    """
     manifest_path = root / MANIFEST_FILE
     if not manifest_path.is_file():
         print(f"[错误] 未找到 {MANIFEST_FILE}，无法核对发布点。")
@@ -101,14 +108,28 @@ def check_release(root: Path) -> tuple[list[str], str]:
         print(f"[错误] {MANIFEST_FILE} 缺少 package_version 或 release_tag。")
         sys.exit(2)
 
+    release_state = manifest.get("release_state", "released")
+    if release_state not in RELEASE_STATES:
+        print(
+            f"[错误] {MANIFEST_FILE} 的 release_state 非法：`{release_state}`"
+            "（只允许 development / released）。"
+        )
+        sys.exit(2)
+
     result = subprocess.run(
         ["git", "describe", "--abbrev=0"], cwd=root, capture_output=True, text=True
     )
     if result.returncode != 0:
-        return (["[错误] 仓库中没有可用的 annotated tag，无法核对发布点。"], "")
+        return (["[错误] 仓库中没有可用的 annotated tag，无法核对发布点。"], [], "")
 
     tag = result.stdout.strip()
     errors: list[str] = []
+    warnings: list[str] = []
+    tag_type = subprocess.run(
+        ["git", "cat-file", "-t", f"refs/tags/{tag}"], cwd=root, capture_output=True, text=True
+    )
+    if tag_type.returncode != 0 or tag_type.stdout.strip() != "tag":
+        errors.append(f"[错误] tag `{tag}` 不是 annotated tag，不能作为发布点")
     if tag != release_tag:
         errors.append(
             f"[错误] manifest release_tag `{release_tag}` 与最新 annotated tag `{tag}` 不一致"
@@ -128,11 +149,33 @@ def check_release(root: Path) -> tuple[list[str], str]:
     if head.returncode != 0 or tag_commit.returncode != 0:
         errors.append(f"[错误] 无法解析 HEAD 或 tag `{tag}` 的提交，无法确认发布点")
     elif head.stdout.strip() != tag_commit.stdout.strip():
-        errors.append(
-            f"[错误] annotated tag `{tag}` 未指向 HEAD（当前 {head.stdout.strip()[:12]}），"
-            "发布点与工作区不一致"
+        ancestor = subprocess.run(
+            ["git", "merge-base", "--is-ancestor", tag_commit.stdout.strip(), "HEAD"],
+            cwd=root,
         )
-    return errors, f"{version} ↔ {tag}"
+        if release_state == "development" and ancestor.returncode == 0:
+            ahead = subprocess.run(
+                ["git", "rev-list", "--count", f"{tag}..HEAD"],
+                cwd=root,
+                capture_output=True,
+                text=True,
+            )
+            count = ahead.stdout.strip() if ahead.returncode == 0 else "未知数量"
+            warnings.append(
+                f"[警告] 开发态（release_state=development）：HEAD 领先 `{tag}` {count} 个提交；"
+                "发布点未重定，发布时须更新 release_state 与 tag"
+            )
+        elif release_state == "development":
+            errors.append(
+                f"[错误] HEAD 与 tag `{tag}` 分叉（tag 不是 HEAD 的祖先），"
+                "开发态豁免不适用"
+            )
+        else:
+            errors.append(
+                f"[错误] annotated tag `{tag}` 未指向 HEAD（当前 {head.stdout.strip()[:12]}），"
+                "发布点与工作区不一致；开发中须显式声明 release_state=development"
+            )
+    return errors, warnings, f"{version} ↔ {tag}（{release_state}）"
 
 
 def main() -> int:
@@ -175,7 +218,7 @@ def main() -> int:
     for path in unresolved:
         errors.append(f"[错误] 漏登：{path}（无匹配的目录默认值，且不在例外表）")
 
-    release_errors, release_summary = check_release(root)
+    release_errors, release_warnings, release_summary = check_release(root)
     errors.extend(release_errors)
 
     print(
@@ -185,6 +228,8 @@ def main() -> int:
     )
     if release_summary:
         print(f"发布一致性：manifest {release_summary}")
+    for item in release_warnings:
+        print(item)
     if errors:
         for item in errors:
             print(item)

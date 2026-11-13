@@ -65,6 +65,20 @@
 - **计划级动作**：里程碑内允许不分配 T 编号的计划级动作（整理、一次性命令、核对）；需要跨里程碑追踪的动作，必须在越过当前里程碑前登记为 `TODO.md` 条目，再在本文件引用。
 - **纪律**：里程碑增删与顺序变更记 `CHANGELOG.md`；进度更新不记；关闭里程碑必须附出口证据（命令与结论、文件路径、计数）；不得静默删除里程碑，取消的里程碑标 `dropped` 并写明理由。本文件不承载版本号，发布点以 annotated tag 为准。
 
+#### 3.5 发布态声明与开发态豁免
+
+`manifest.json` 的 `release_state` 是发布闸门的**显式开关**，只允许两个值：
+
+- `released`：最新 annotated tag 必须指向 `HEAD`；领先、落后或分叉均为错误。
+- `development`：仍严格校验 tag 是否为 annotated、`release_tag` 与 `package_version` 是否和 tag 一致、tag 是否为 `HEAD` 的祖先；仅当 tag 是 `HEAD` 的祖先时，把“`HEAD` 领先于 tag”降为警告。分叉仍为错误。
+
+纪律：
+
+- **不得自动推断**。缺省（字段缺失）按 `released` 严格处理；非法值按结构错误（退出码 2）处理。不得根据分支名、提交数量或人工口头说明推断状态。
+- 状态切换必须写入 `manifest.json` 并随提交生效，不得只改工作区。
+- 发布提交的引导顺序固定：tag 只能指向已存在的提交，因此“把 `release_state` 改为 `released` 并递增版本”的提交需以 `git commit --no-verify` 提交，随后立即打 annotated tag 并运行四个检查器。其他提交不得使用 `--no-verify`。
+- 发布点仍只有一个：以 annotated tag 声明（ADR-0003）；`development` 只说明 `HEAD` 领先于最近发布点，不产生第二个发布点。
+
 ### 4. 目录结构（唯一权威）
 
 本技能目录的完整结构如下。**本节是目录结构的唯一权威**；`README.md` 中的文件地图只是导航，与本节冲突时以本节为准。
@@ -251,8 +265,8 @@ project-management-grounding/
 1. **提取产物一律落在仓库外**。约定目录为 `/tmp/pm-extract-<source-id>-<date>/`，存放 `pdftotext` 文本层输出、`pdftoppm` 渲染图、Tesseract OCR 结果与任何逐页转储。**不得**落在仓库目录内，也不得放进 `resources/`。
 2. **`resources/` 只在本地只读使用**。不复制、不打包、不 `git add`；`.gitignore` 已忽略 `resources/` 与文档类扩展名，但忽略规则不是许可。
 3. **引用外部文献只写可复核的定位与自己的话**。默认写法是“页码定位 + 自述摘要”；确需引证术语或条款措辞时，单条不超过一行或一句，并附来源 `id` 与页码（见 `CONSTITUTION.md` 第 13.2 条）。
-4. **提交前必须运行检查器**：`python3 scripts/check_no_raw_material.py`。本仓库已提供 `.githooks/pre-commit`，用 `git config core.hooksPath .githooks` 启用；未启用钩子的部署必须在 `git add` 前手工执行，二者等价。
-5. **检查器命中即停止提交**，不得用 `--no-verify` 绕过。确需新增例外（例如将来要提交一张合法图片资产），走 ADR 并在检查器中登记路径豁免，而不是删除规则或放宽阈值。
+4. **提交前必须运行四个检查器**：`check_no_raw_material.py`、`check_anchors.py`、`check_ledger_landings.py`、`check_state.py`。本仓库已提供 `.githooks/pre-commit`，每个克隆需自行执行 `git config core.hooksPath .githooks` 启用；未启用钩子的部署必须在 `git add` 前手工逐个运行，等价命令见 `scripts/README.md`。
+5. **检查器命中即停止提交**，不得用 `--no-verify` 绕过。唯一例外是第 3.5 条规定的发布引导提交（`release_state` 改为 `released` 并递增版本），该提交必须紧接 annotated tag 与四个检查器的复跑。确需新增其他例外（例如将来要提交一张合法图片资产），走 ADR 并在检查器中登记路径豁免，而不是删除规则或放宽阈值。
 6. **发现已跟踪内容违规时**：先报告文件与位置，再改为“页码定位 + 自述摘要”或移出仓库，并在 `ERRATA.md` 登记；不静默删除他人的内容。
 7. **自建本体（`CONSTITUTION.md` 第 13.6 条）**：
    - 只放 `ontology/`；主格式为 Turtle（`.ttl`、`.shacl.ttl`），`.owl`/`.rdf`/`.nt`/`.n3`/`.jsonld` 仅作生成导出，仍受同一内容检查。

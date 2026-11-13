@@ -279,3 +279,18 @@
 - **验证**：四个检查器退出码均为 0；`check_state.py` 发布一致性为 `0.5.0` ↔ `v0.5.0`，tag 指向 `HEAD`。
 - **关联 ADR**：ADR-0011、ADR-0008、ADR-0004
 - **状态**：生效
+
+---
+
+### 批次 0023 — 2026-11-13 — 发布闸门开发态豁免与提交前四检查器接入
+
+- **涉及文件**：
+  - 修改：`manifest.json`（新增 `release_state`）、`scripts/check_state.py`（显式发布态与 tag 校验）、`.githooks/pre-commit`（四检查器）、`AGENTS.md`（新增 3.5、修订 7bis）、`scripts/README.md`、`CHANGELOG.md`（本批次）
+- **变更摘要**：
+  1. `manifest.json` 的 `release_state` 显式声明 `development` 或 `released`；字段缺失按 `released` 严格处理，非法值退出 2；不得根据分支名、提交数或口头说明自动推断。
+  2. `development` 仅把“HEAD 领先于 tag”降为警告；`release_tag` / `package_version` 一致性、tag 是否为 annotated、tag 是否为 HEAD 的祖先（分叉即错误）仍严格校验。
+  3. `.githooks/pre-commit` 依次运行 `check_no_raw_material.py`、`check_anchors.py`、`check_ledger_landings.py`、`check_state.py`，任一失败即阻断；每个克隆需执行 `git config core.hooksPath .githooks`。
+  4. 发布引导提交（切回 `released` 并递增版本）是 `--no-verify` 的唯一例外：tag 只能指向已存在提交；该提交后必须立即打 annotated tag 并复跑四个检查器。
+- **验证**：负例提交被 `check_anchors.py` 阻断（退出码 1，未产生提交）；本批次提交由四检查器放行；开发态 `check_state.py` 退出 0 并输出领先警告，移除 `release_state` 后退出 1。
+- **关联 ADR**：无（操作约定，规则出处 `AGENTS.md` 3.5；不改变发布点定义与立法文件）
+- **状态**：生效

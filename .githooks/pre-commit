@@ -1,5 +1,16 @@
 #!/usr/bin/env sh
-# 提交前阻断：原始资料、OCR/文本层转储、成段原文（CONSTITUTION 第 13 条）
-set -e
-root=$(git rev-parse --show-toplevel)
-python3 "$root/scripts/check_no_raw_material.py" --root "$root"
+# 提交前检查：四个检查器全部通过才允许提交（AGENTS.md 3.5、7bis）
+# 每个克隆需自行启用：git config core.hooksPath .githooks
+set -u
+root=$(git rev-parse --show-toplevel) || exit 1
+cd "$root" || exit 1
+
+for script in check_no_raw_material.py check_anchors.py check_ledger_landings.py check_state.py; do
+  echo "[pre-commit] 运行 scripts/$script"
+  if ! python3 "scripts/$script"; then
+    echo "[pre-commit] 阻断：scripts/$script 未通过，提交已取消。" >&2
+    exit 1
+  fi
+done
+
+echo "[pre-commit] 四个检查器全部通过。"
