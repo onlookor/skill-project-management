@@ -31,6 +31,7 @@
 | `AGENTS.md` | Execution | Execution conventions: source acquisition (local first), schedule discipline, authoritative directory structure, mechanized checking |
 | `CHANGELOG.md` | Scheduling | The sole register of change history (rules in Article 3.1 of `AGENTS.md`) |
 | `TODO.md` | Scheduling | The sole register of follow-up work (rules in Article 3.2 of `AGENTS.md`) |
+| **`ROADMAP.md`** | **Scheduling** | **Roadmap: goals and completion criteria, milestones and exit conditions, critical path, release points** |
 | `STATE.md` | Scheduling | The sole register of the current status of each file |
 | **`ERRATA.md`** | **Scheduling** | **Hallucination correction ledger: compilation errors, external review dispositions, statements pending verification** |
 | `CHARTER.md` | Intent | Why the skill exists, whom it serves, testable commitments C1–C6, horizontal relations with domain skills |

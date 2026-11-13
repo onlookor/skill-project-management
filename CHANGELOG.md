@@ -231,3 +231,17 @@
   3. 工件与工具的自写定义未逐条完成，登记为 T-126；不以原文改写填充。
 - **关联 ADR**：ADR-0010（accepted）
 - **状态**：生效
+
+---
+
+### 批次 0020 — 2026-11-13 — 引入计划层并给出治理结构改造提案
+
+- **涉及文件**：
+  - 新建：`ROADMAP.md`、`spec/GOVERNANCE_RESTRUCTURE.md`
+  - 修改：`README.md`、`README.en.md`（文件地图各加一行 `ROADMAP.md`）
+- **变更摘要**：按任务台账的实际结构给出判断：`TODO.md` 作为单点台账够用，作为排序与验收依据不足。具体缺陷九条（按批次分组导致同一目标分散、无依赖图与关键路径、无出口条件、无量级、重复与重叠、状态记号不统一、关闭规则自相矛盾、无发布 lane、无外部阻塞状态），另有两条事实缺口（规则组 B 的 `pending_reanchor` 签注已过期；`validation/CHECKLIST.md` 缺 `source_commit`）。据此新增 `ROADMAP.md`：目标 D1–D5、M0–M7 里程碑与可验证出口条件、关键路径与并行关系、全部 64 个未完成条目的唯一归属、按条目数与人工判断量给出的工作量量级、`TODO.md` 保留为台账的处置建议，以及 `v0.4.0` 之后 11 个提交按 minor 定为 `v0.5.0` 的发布安排。
+- **治理提案**：`spec/GOVERNANCE_RESTRUCTURE.md` 给出诊断（各文件职责、权威边界、`STATE`/`CHANGELOG`/`TODO`/计划层四者分工与冲突、六条治理结构问题）、目标结构（五层与冲突裁决顺序）、`CONSTITUTION.md`/`AGENTS.md`/`README.md`/`STATE.md`/`TODO.md` 的逐条改法、迁移与防断链措施、代价与风险，以及最小与完整两档方案。推荐最小方案，并把 `manifest.json` 与 tag 的一致性检查并入现有脚本。
+- **未提交内容**：`CONSTITUTION.md`、`AGENTS.md`、`STATE.md`、`TODO.md` 的实质改动，以及 ADR-0011，均未落库，待批准后按提案第 4 节的顺序执行。本批次只登记文档层面的新增与导航更新。
+- **验证**：`scripts/check_state.py`（89 个跟踪文件，0 错误）、`scripts/check_ledger_landings.py`（0 错误 1 警告，警告为 SPRINGER-PMBOK-2024 待 T-112）、`scripts/check_anchors.py`（46 个 Markdown 文件，0 错误 0 警告）、`scripts/check_no_raw_material.py`（0 错误）。锚点基线未改动，因为规则与来源文本块未变。
+- **关联 ADR**：无（治理层改动待 ADR-0011 批准）
+- **状态**：生效（仅文档；治理条文改动未生效）
