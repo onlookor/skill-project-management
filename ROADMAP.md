@@ -10,7 +10,7 @@
 - 不登记已发生的变更——那是 `CHANGELOG.md` 的职责。
 - 不记录现状诊断与决策理由——那是 ADR-0011 的职责。
 
-**当前基线**：`v0.4.0`（2026-11-11）。此后已有 11 个提交未打 tag。本计划把下一个发布点定为 **`v0.5.0`**。
+**当前基线**：`v0.5.0`（2026-11-13，已推送 origin）。M0 关闭点：`v0.5.1`（本地，待推送）。
 
 ## 1. 目标与完成判据
 
@@ -31,13 +31,18 @@
 ### M0 基线与发布卫生
 
 - **目标**：让现有产物不再自相矛盾，并建立第一个可回退的发布点。
-- **工作项**：T-111、T-116、T-127、T-128。T-110 已完成（批次 0021：`scripts/check_state.py` 已核对 `manifest.json` 与最新 annotated tag）。
+- **工作项**：T-111、T-116、T-127、T-128（均已完成）。T-110 已完成（批次 0021：`scripts/check_state.py` 已核对 `manifest.json` 与最新 annotated tag）。
 - **出口条件**：
   1. `validation/CHECKLIST.md` 与 `spec/methods/deterministic-checker.md` 中，规则组 B 不再出现 `pending_reanchor`，且与 ADR-0008 的结论一致；规则组 F、G 的 `assumption` 标注按实际状态保留（T-127）。
   2. `validation/CHECKLIST.md` 含 `source_commit` 字段，值等于生成时的提交标识（T-111）。
   3. `python3 scripts/check_state.py`、`python3 scripts/check_ledger_landings.py`、`python3 scripts/check_anchors.py`、`python3 scripts/check_no_raw_material.py` 均为 0（T-110、T-116）。
   4. `manifest.json` 的 `package_version` 与 `release_tag` 和 `git describe --tags --exact-match` 一致（T-110、T-128）。
-  5. 存在指向该提交的 annotated tag `v0.5.0`（T-128）。
+  5. 存在指向该提交的 annotated tag：M0 初版为 `v0.5.0`（批次 0022），关闭点为 `v0.5.1`（批次 0024）。
+- **状态**：已关闭（2026-11-13，批次 0024）。关闭点 `v0.5.1`；`manifest.json` 为 `0.5.1` / `v0.5.1` / `released`，tag 指向关闭提交。
+- **关闭证据**：
+  - 出口 1–2：规则组 B 三处签注均为 `active`；`validation/CHECKLIST.md` 的 `source_commit = b16e3b8`（批次 0022）。
+  - 出口 3–4：四个检查器 0 错误（含 pre-commit 接入后的正例提交）；`manifest 0.5.1 ↔ v0.5.1`。
+  - 出口 5：annotated tag `v0.5.1` 指向关闭提交（`git describe --tags --exact-match` 输出 `v0.5.1`）。
 - **依赖**：无。**并行**：可与 M3、M4 同时开始，但 M1 要等它的 `source_commit` 口径落地。
 
 ### M1 可执行校验器 v0
@@ -50,7 +55,7 @@
   3. 同一输入快照连续运行两次，结论与证据一致；回放记录的存放位置与比对方法已定义（T-103）。
   4. `ROLE_MINIMAL_COMPLETENESS` 的 warn/block 拆分有 ADR，且用例分别覆盖“问责结构缺失”与“角色合并声明缺失”（T-100）。
   5. 退化路径（`runtime: deterministic-checker/human-fallback`）有运行记录，P1–P6 逐条给出满足或不可满足的结论（T-081）。
-- **依赖**：M0。**并行**：无（关键路径）。
+- **依赖**：M0（已关闭 2026-11-13）。**并行**：无（关键路径）。
 
 ### M2 反例库覆盖
 
