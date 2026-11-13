@@ -263,3 +263,19 @@
 - **验证**：`scripts/check_state.py`（92 个跟踪文件，0 错误；发布一致性 `0.4.0` ↔ `v0.4.0`）、`scripts/check_ledger_landings.py`（0 错误 1 警告，警告为 SPRINGER-PMBOK-2024 待 T-112）、`scripts/check_anchors.py`（47 个 Markdown 文件，0 错误 0 警告）、`scripts/check_no_raw_material.py`（0 错误）。锚点基线未改动。
 - **关联 ADR**：ADR-0011（accepted）
 - **状态**：生效
+
+---
+
+### 批次 0022 — 2026-11-13 — M0 收口：已决事项落库、产物基线与 v0.5.0
+
+- **涉及文件**：
+  - 修改：`adr/0011-schedule-layer-and-plan.md`（决定 10–12 与跟进事项）、`AGENTS.md`（3.2 状态归属、3.4 计划级动作）、`ROADMAP.md`（第 6 节入口、第 8 节计划级动作）、`spec/methods/deterministic-checker.md`（规则组 B 的状态与 1.2 节）、`spec/COMPILATION_METHODS.md`（`CM-DET-CHECKER` 的 `scope` 行）、`spec/ONTOLOGY_FEASIBILITY.md`（接合表一处过期事实）、`validation/CHECKLIST.md`（B 组状态与 `source_commit`）、`scripts/check_state.py`（tag 指向 `HEAD` 判断）、`scripts/README.md`、`manifest.json`（`0.5.0`）、`TODO.md`（T-111、T-127、T-128 关闭）、`CHANGELOG.md`（本批次）
+- **变更摘要**：
+  1. 三条已决事项补入 ADR-0011：ROADMAP 允许不分配 T 编号的计划级动作（需跨里程碑追踪者先登记 T 条目）；`blocked-external` 只定义于 `AGENTS.md` 3.2，不进入 `CONSTITUTION.md` 第 9 条；TODO 重复项暂不合并，只加交叉引用，编号语义不动。
+  2. T-127：规则组 B 在 `validation/CHECKLIST.md`、`spec/methods/deterministic-checker.md` 与 `spec/COMPILATION_METHODS.md` 中统一为 `active`，`severity` 保持 `advisory`（ADR-0008）；F、G 组的 `assumption` 保留。
+  3. T-111：`validation/CHECKLIST.md` 增加 `source_commit`，值为方法声明最后变更所在提交 `b16e3b8`（ADR-0004）。
+  4. T-128：按 minor 规则发布 `v0.5.0`（`v0.4.0` 后无规范条文或契约 schema 的向后不兼容变更）；`manifest.json` 改为 `0.5.0` / `v0.5.0`；annotated tag `v0.5.0` 指向本批次提交，仅本地创建、未 push。
+  5. `scripts/check_state.py` 的发布一致性检查增加“最新 annotated tag 必须指向 `HEAD`”判断，修复只比对版本字符串与 tag 名的假通过路径。
+- **验证**：四个检查器退出码均为 0；`check_state.py` 发布一致性为 `0.5.0` ↔ `v0.5.0`，tag 指向 `HEAD`。
+- **关联 ADR**：ADR-0011、ADR-0008、ADR-0004
+- **状态**：生效

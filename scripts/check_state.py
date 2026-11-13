@@ -118,6 +118,20 @@ def check_release(root: Path) -> tuple[list[str], str]:
         errors.append(
             f"[错误] manifest package_version `{version}` 与 tag `{tag}` 推得的版本 `{expected}` 不一致"
         )
+
+    head = subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=root, capture_output=True, text=True
+    )
+    tag_commit = subprocess.run(
+        ["git", "rev-parse", f"{tag}^{{commit}}"], cwd=root, capture_output=True, text=True
+    )
+    if head.returncode != 0 or tag_commit.returncode != 0:
+        errors.append(f"[错误] 无法解析 HEAD 或 tag `{tag}` 的提交，无法确认发布点")
+    elif head.stdout.strip() != tag_commit.stdout.strip():
+        errors.append(
+            f"[错误] annotated tag `{tag}` 未指向 HEAD（当前 {head.stdout.strip()[:12]}），"
+            "发布点与工作区不一致"
+        )
     return errors, f"{version} ↔ {tag}"
 
 

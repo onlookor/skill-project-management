@@ -12,11 +12,11 @@
 |---|---|---|---|---|---|---|
 | T-070 | M0 | 引用修复 | 全仓库检索已删除编译规范的残留引用，更新为 `spec/COMPILATION_META.md` + `spec/methods/deterministic-checker.md` 的对应位置 | 执行层补丁（不需 ADR） | 无 | `done`（2026-11-12，`scripts/check_anchors.py` 复核为 0 错误） |
 | T-110 | M0 | 发布一致性检查 | 建立 `manifest.json` 的包版本与最新 annotated tag 的一致性检查，避免两处记录漂移（已并入 `scripts/check_state.py`） | 执行层补丁 | 无 | `done`（2026-11-13，批次 0021；`0.4.0` ↔ `v0.4.0` 通过） |
-| T-111 | M0 | 产物基线字段 | 为 `validation/CHECKLIST.md` 补充 `source_commit` 字段并在生成流程中写入；在此之前现有清单视为“基线未记录”，装配时按过期处理（ADR-0004） | 执行层补丁 | 无 | `open` |
+| T-111 | M0 | 产物基线字段 | 为 `validation/CHECKLIST.md` 补充 `source_commit` 字段并在生成流程中写入；在此之前现有清单视为“基线未记录”，装配时按过期处理（ADR-0004） | 执行层补丁 | 无 | `done`（2026-11-13：`source_commit` = `b16e3b8`，方法声明最后变更提交；批次 0022） |
 | T-114 | M0 | 一致性检查 | 建立“文档中所有 `grounding_ref` 都指向 `SOURCE_LEDGER.md` 的 active 条目”的闭环检查，并与 `check_ledger_landings.py` 合并为一次运行 | 执行层补丁 | 无 | `done`（2026-11-12，已由 `scripts/check_anchors.py` 实现，与落点检查同批运行） |
 | T-116 | M0 | 流程接入 | 把 `scripts/check_anchors.py` 纳入提交前检查清单，与 `check_ledger_landings.py` 同批运行 | 执行层补丁 | 无 | `open` |
-| T-127 | M0 | 规范层补丁 | 把规则组 B 的 `pending_reanchor` 签注同步为 `active`：`validation/CHECKLIST.md`、`spec/methods/deterministic-checker.md` 与方法条目摘要三处，与 ADR-0008 一致；规则组 F、G 的 `assumption` 标注按实际状态保留 | 执行层补丁 | 无 | `open` |
-| T-128 | M0 | 发布 | 打 annotated tag `v0.5.0`，同步 `manifest.json` 的 `package_version` 与 `release_tag`；发布说明记录批次与检查器结果 | CHANGELOG + tag | M0 其余条目完成，四个检查器为 0 | `open` |
+| T-127 | M0 | 规范层补丁 | 把规则组 B 的 `pending_reanchor` 签注同步为 `active`：`validation/CHECKLIST.md`、`spec/methods/deterministic-checker.md` 与方法条目摘要三处，与 ADR-0008 一致；规则组 F、G 的 `assumption` 标注按实际状态保留 | 执行层补丁 | 无 | `done`（2026-11-13：三处均为 `active`，`severity` 保持 `advisory`；批次 0022） |
+| T-128 | M0 | 发布 | 打 annotated tag `v0.5.0`，同步 `manifest.json` 的 `package_version` 与 `release_tag`；发布说明记录批次与检查器结果 | CHANGELOG + tag | M0 其余条目完成，四个检查器为 0 | `done`（2026-11-13：`manifest.json` 为 `0.5.0` / `v0.5.0`；本地 annotated tag `v0.5.0` 指向批次 0022 提交，未 push；批次 0022） |
 
 ### M1 可执行校验器 v0
 

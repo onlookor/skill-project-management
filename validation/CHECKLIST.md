@@ -2,6 +2,7 @@
 
 **生成依据**：`spec/COMPILATION_META.md`（编译元框架，P1–P6 与准入条件）+ `spec/methods/deterministic-checker.md`（CM-DET-CHECKER 方法的 check_id 注册表与翻译规范）。
 **性质**：本清单是检查项规格的人类可读投影，**不是检查执行器**。执行由确定性校验器按 `spec/methods/deterministic-checker.md` 的注册表执行。清单与注册表不一致时以注册表为准，重建本清单。
+**source_commit**：`b16e3b86474ea9af0c18e1e3fddd5004c23f898e`（生成基线；源文件为 `GRAMMAR.md`、`SOURCE_LEDGER.md`、`spec/methods/deterministic-checker.md` 与 `knowledge/` 谓词定义，见 ADR-0004）
 
 ### 规则组 A
 
@@ -12,12 +13,12 @@
 
 ### 规则组 B
 
-> 规则组 B 整体状态 `pending_reanchor`；以下检查项在重新锚定完成前仅输出 `advisory`。
+> 规则组 B 整体状态 `active`（ADR-0008）；以下检查项 `severity` 保持 `advisory`，升级为 `block` 需样例契约证据（T-118）。
 
 | check_id | 规则 | severity（实际） | 规则状态 | 输入摘要 | 判定摘要 |
 |---|---|---|---|---|---|
-| `DUAL_DIMENSION_ANNOTATION` | G-B1 | `advisory` | `pending_reanchor` | 管理项节点 | 每个管理项携带 process_group 与 subject_group 两标签 |
-| `DIMENSION_VALUE_CLOSED` | G-B2 | `advisory` | `pending_reanchor` | 管理项的标签值 | 标签值 ∈ 枚举 ∪ 契约声明的 subject_group_extension |
+| `DUAL_DIMENSION_ANNOTATION` | G-B1 | `advisory` | `active` | 管理项节点 | 每个管理项携带 process_group 与 subject_group 两标签 |
+| `DIMENSION_VALUE_CLOSED` | G-B2 | `advisory` | `active` | 管理项的标签值 | 标签值 ∈ 枚举 ∪ 契约声明的 subject_group_extension |
 
 ### 规则组 C
 
@@ -65,6 +66,6 @@
 
 1. 校验器按本表逐项执行，输出 `pass` / `fail` / `cannot_evaluate`（`spec/methods/deterministic-checker.md` 第 4.2 节）。
 2. `cannot_evaluate` 不等于 `pass`；缺失输入必须报告。
-3. 规则状态为 `pending_reanchor` 或 `assumption` 的检查项，校验器输出携带 `rule_status`；宿主据此仅记录而不阻断。
+3. 规则状态为 `assumption`（或将来出现的 `pending_reanchor`）的检查项，校验器输出携带 `rule_status`；宿主据此仅记录而不阻断。
 4. 生成模型只消费校验器的输出，不消费本清单本身（`CONSTITUTION.md` 第 1 条）。
 5. 本清单由 `spec/methods/deterministic-checker.md` 附录 A 的注册表机械生成；不一致时重建。
