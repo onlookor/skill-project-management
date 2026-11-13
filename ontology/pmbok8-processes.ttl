@@ -1,0 +1,1021 @@
+# self-authored: true
+# source_id: PMBOK8-2025
+# Individuals: seven performance domains, five focus areas, forty processes and their I/O.
+# Definitions and structure are written for this repository; no source text is copied.
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix pm: <https://example.org/pm#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+pm:proc_AcquireResources a pm:Process ;
+    skos:prefLabel "Acquire Resources"@en,
+        "获取资源"@zh ;
+    pm:belongsToDomain pm:dom_Resources ;
+    pm:hasFocusArea pm:fa_Executing ;
+    pm:hasInput pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_ChangeRequests,
+        pm:art_EnterpriseEnvironmentalFactorUpdates,
+        pm:art_OrganizationalProcessAssetUpdates,
+        pm:art_PhysicalOrVirtualResourceAssignments,
+        pm:art_ProjectDocumentUpdates,
+        pm:art_ProjectManagementPlanUpdates,
+        pm:art_ProjectTeamAssignments,
+        pm:art_ResourceCalendars ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.6.2.3" ;
+    pm:sourcePage 83 ;
+    pm:usesTechnique pm:tt_DecisionMaking,
+        pm:tt_InterpersonalAndTeamSkills,
+        pm:tt_Preassignment,
+        pm:tt_VirtualTeams .
+
+pm:proc_AssessAndImplementChanges a pm:Process ;
+    skos:prefLabel "Assess and Implement Changes"@en,
+        "评估并实施变更"@zh ;
+    pm:belongsToDomain pm:dom_Governance ;
+    pm:hasFocusArea pm:fa_MonitoringAndControlling ;
+    pm:hasInput pm:art_ChangeRequests,
+        pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan,
+        pm:art_WorkPerformanceReports ;
+    pm:hasOutput pm:art_ApprovedChangeRequests,
+        pm:art_ProjectDocumentUpdates,
+        pm:art_ProjectManagementPlanUpdates ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.1.6.8" ;
+    pm:sourcePage 29 ;
+    pm:usesTechnique pm:tt_BacklogManagement,
+        pm:tt_ChangeControlTools,
+        pm:tt_DataAnalysis,
+        pm:tt_DecisionMaking,
+        pm:tt_ExpertJudgment,
+        pm:tt_IntegratedChangeControl,
+        pm:tt_Meetings .
+
+pm:proc_CloseProjectOrPhase a pm:Process ;
+    skos:prefLabel "Close Project or Phase"@en,
+        "结束项目或阶段"@zh ;
+    pm:belongsToDomain pm:dom_Governance ;
+    pm:hasFocusArea pm:fa_Closing ;
+    pm:hasInput pm:art_AcceptedDeliverables,
+        pm:art_Agreements,
+        pm:art_BusinessDocuments,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProcurementDocumentation,
+        pm:art_ProjectCharter,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_FinalProductServiceOrResultTransition,
+        pm:art_FinalReport,
+        pm:art_OrganizationalProcessAssetUpdates,
+        pm:art_ProjectDocumentUpdates ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.1.6.9" ;
+    pm:sourcePage 31 ;
+    pm:usesTechnique pm:tt_DataAnalysis,
+        pm:tt_ExpertJudgment,
+        pm:tt_Meetings .
+
+pm:proc_DefineScope a pm:Process ;
+    skos:prefLabel "Define Scope"@en,
+        "定义范围"@zh ;
+    pm:belongsToDomain pm:dom_Scope ;
+    pm:hasFocusArea pm:fa_Planning ;
+    pm:hasInput pm:art_AssumptionLog,
+        pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectCharter,
+        pm:art_ProjectManagementPlan,
+        pm:art_RequirementsDocumentation ;
+    pm:hasOutput pm:art_ProjectDocuments ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.2.2.3" ;
+    pm:sourcePage 42 ;
+    pm:usesTechnique pm:tt_DataAnalysis,
+        pm:tt_DecisionMaking,
+        pm:tt_Decomposition,
+        pm:tt_ExpertJudgment,
+        pm:tt_InterpersonalAndTeamSkills,
+        pm:tt_ProductAnalysis .
+
+pm:proc_DevelopBudget a pm:Process ;
+    skos:prefLabel "Develop Budget"@en,
+        "制定预算"@zh ;
+    pm:belongsToDomain pm:dom_Finance ;
+    pm:hasFocusArea pm:fa_Planning ;
+    pm:hasInput pm:art_Agreements,
+        pm:art_BusinessDocuments,
+        pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_CostBaseline,
+        pm:art_ProjectDocumentUpdates,
+        pm:art_ProjectFundingRequirements ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.4.2.3" ;
+    pm:sourcePage 65 ;
+    pm:usesTechnique pm:tt_CostAggregation,
+        pm:tt_DataAnalysis,
+        pm:tt_ExpertJudgment,
+        pm:tt_Financing,
+        pm:tt_FundingLimitReconciliation,
+        pm:tt_HistoricalInformationReview .
+
+pm:proc_DevelopSchedule a pm:Process ;
+    skos:prefLabel "Develop Schedule"@en,
+        "制定进度计划"@zh ;
+    pm:belongsToDomain pm:dom_Schedule ;
+    pm:hasFocusArea pm:fa_Planning ;
+    pm:hasInput pm:art_Agreements,
+        pm:art_DevelopmentApproach,
+        pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectCharter,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_ChangeRequests,
+        pm:art_ProjectCalendars,
+        pm:art_ProjectDocumentUpdates,
+        pm:art_ProjectManagementPlanUpdates,
+        pm:art_ProjectSchedule,
+        pm:art_ScheduleBaseline,
+        pm:art_ScheduleData ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.3.2.2" ;
+    pm:sourcePage 50 ;
+    pm:usesTechnique pm:tt_AgileReleasePlanning,
+        pm:tt_CriticalChainMethod,
+        pm:tt_CriticalPathMethod,
+        pm:tt_DataAnalysis,
+        pm:tt_Decomposition,
+        pm:tt_DependencyDeterminationAndIntegration,
+        pm:tt_EstimationTechniques,
+        pm:tt_ExpertJudgment,
+        pm:tt_LeadsAndLags,
+        pm:tt_LogicalRelationship,
+        pm:tt_PrecedenceDiagrammingMethod,
+        pm:tt_ProjectManagementInformationSystem,
+        pm:tt_ReserveAnalysis,
+        pm:tt_RollingWavePlanning,
+        pm:tt_ScheduleCompression,
+        pm:tt_ScheduleNetworkAnalysis,
+        pm:tt_Voting .
+
+pm:proc_DevelopScopeStructure a pm:Process ;
+    skos:prefLabel "Develop Scope Structure"@en,
+        "建立范围结构"@zh ;
+    pm:belongsToDomain pm:dom_Scope ;
+    pm:hasFocusArea pm:fa_Planning ;
+    pm:hasInput pm:art_ApprovedChanges,
+        pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_ProductBacklog,
+        pm:art_ScopeBaseline,
+        pm:art_UserStories,
+        pm:art_WBSDictionary,
+        pm:art_WorkBreakdownStructure ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.2.2.4" ;
+    pm:sourcePage 43 ;
+    pm:usesTechnique pm:tt_Brainstorming,
+        pm:tt_Decomposition,
+        pm:tt_ExpertJudgment .
+
+pm:proc_ElicitAndAnalyzeRequirements a pm:Process ;
+    skos:prefLabel "Elicit and Analyze Requirements"@en,
+        "收集并分析需求"@zh ;
+    pm:belongsToDomain pm:dom_Scope ;
+    pm:hasFocusArea pm:fa_Planning ;
+    pm:hasInput pm:art_Agreements,
+        pm:art_BusinessCase,
+        pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectCharter,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_RequirementsDocumentation ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.2.2.2" ;
+    pm:sourcePage 41 ;
+    pm:usesTechnique pm:tt_DataAnalysis,
+        pm:tt_DataGathering,
+        pm:tt_DataRepresentation,
+        pm:tt_DecisionMaking,
+        pm:tt_DesignThinking,
+        pm:tt_ExpertJudgment,
+        pm:tt_InterpersonalAndTeamSkills,
+        pm:tt_Meetings,
+        pm:tt_PrioritizationRanking .
+
+pm:proc_EstimateCosts a pm:Process ;
+    skos:prefLabel "Estimate Costs"@en,
+        "估算成本"@zh ;
+    pm:belongsToDomain pm:dom_Finance ;
+    pm:hasFocusArea pm:fa_Planning ;
+    pm:hasInput pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_MakeOrBuyDecisions,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan,
+        pm:art_WorkPackageEstimation ;
+    pm:hasOutput pm:art_BasisOfEstimates,
+        pm:art_CostEstimates,
+        pm:art_ProjectDocumentUpdates ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.4.2.2" ;
+    pm:sourcePage 63 ;
+    pm:usesTechnique pm:tt_AnalogousEstimating,
+        pm:tt_BottomUpEstimating,
+        pm:tt_DataAnalysis,
+        pm:tt_DecisionMaking,
+        pm:tt_ExpertJudgment,
+        pm:tt_MultipointEstimating,
+        pm:tt_ParametricEstimating,
+        pm:tt_ProjectManagementInformationSystem .
+
+pm:proc_EstimateResources a pm:Process ;
+    skos:prefLabel "Estimate Resources"@en,
+        "估算资源"@zh ;
+    pm:belongsToDomain pm:dom_Resources ;
+    pm:hasFocusArea pm:fa_Planning ;
+    pm:hasInput pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan,
+        pm:art_ProjectSchedule ;
+    pm:hasOutput pm:art_BasisOfEstimates,
+        pm:art_ProjectDocumentUpdates,
+        pm:art_ResourceBreakdownStructure,
+        pm:art_ResourceRequirements ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.6.2.2" ;
+    pm:sourcePage 82 ;
+    pm:usesTechnique pm:tt_AnalogousEstimating,
+        pm:tt_AugmentedReality,
+        pm:tt_BottomUpEstimating,
+        pm:tt_BranchAndBound,
+        pm:tt_ConstructiveCostModel,
+        pm:tt_DataAnalysis,
+        pm:tt_DataGathering,
+        pm:tt_ExpertJudgment,
+        pm:tt_GeneticAlgorithms,
+        pm:tt_Meetings,
+        pm:tt_ParametricEstimating,
+        pm:tt_PredictiveAnalytics,
+        pm:tt_ProjectManagementInformationSystem,
+        pm:tt_VirtualReality .
+
+pm:proc_IdentifyRisks a pm:Process ;
+    skos:prefLabel "Identify Risks"@en,
+        "识别风险"@zh ;
+    pm:belongsToDomain pm:dom_Risk ;
+    pm:hasFocusArea pm:fa_Planning ;
+    pm:hasInput pm:art_Agreements,
+        pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_ProjectDocumentUpdates,
+        pm:art_RiskRegister,
+        pm:art_RiskReport ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.7.2.2" ;
+    pm:sourcePage 97 ;
+    pm:usesTechnique pm:tt_DataAnalysis,
+        pm:tt_DataGathering,
+        pm:tt_ExpertJudgment,
+        pm:tt_InterpersonalAndTeamSkills,
+        pm:tt_Meetings,
+        pm:tt_PromptLists .
+
+pm:proc_IdentifyStakeholders a pm:Process ;
+    skos:prefLabel "Identify Stakeholders"@en,
+        "识别相关方"@zh ;
+    pm:belongsToDomain pm:dom_Stakeholders ;
+    pm:hasFocusArea pm:fa_Initiating ;
+    pm:hasInput pm:art_Agreements,
+        pm:art_BusinessDocuments,
+        pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectCharter,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_ChangeRequests,
+        pm:art_ProjectDocumentUpdates,
+        pm:art_ProjectManagementPlanUpdates,
+        pm:art_StakeholderRegister ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.5.2.1" ;
+    pm:sourcePage 71 ;
+    pm:usesTechnique pm:tt_DataAnalysis,
+        pm:tt_DataGathering,
+        pm:tt_DataRepresentation,
+        pm:tt_ExpertJudgment,
+        pm:tt_Meetings .
+
+pm:proc_ImplementRiskResponses a pm:Process ;
+    skos:prefLabel "Implement Risk Responses"@en,
+        "实施风险应对"@zh ;
+    pm:belongsToDomain pm:dom_Risk ;
+    pm:hasFocusArea pm:fa_Executing ;
+    pm:hasInput pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_ChangeRequests,
+        pm:art_ProjectDocumentUpdates ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.7.2.5" ;
+    pm:sourcePage 100 ;
+    pm:usesTechnique pm:tt_ExpertJudgment,
+        pm:tt_InterpersonalAndTeamSkills,
+        pm:tt_ProjectManagementInformationSystem .
+
+pm:proc_InitiateProjectOrPhase a pm:Process ;
+    skos:prefLabel "Initiate Project or Phase"@en,
+        "启动项目或阶段"@zh ;
+    pm:belongsToDomain pm:dom_Governance ;
+    pm:hasFocusArea pm:fa_Initiating ;
+    pm:hasInput pm:art_Agreements,
+        pm:art_BusinessDocuments,
+        pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets ;
+    pm:hasOutput pm:art_AssumptionLog,
+        pm:art_ProjectCharter ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.1.6.1" ;
+    pm:sourcePage 17 ;
+    pm:usesTechnique pm:tt_DataGathering,
+        pm:tt_ExpertJudgment,
+        pm:tt_InterpersonalAndTeamSkills,
+        pm:tt_Meetings,
+        pm:tt_ProjectCanvas,
+        pm:tt_ResponsibilityAssignmentMatrix .
+
+pm:proc_IntegrateAndAlignProjectPlans a pm:Process ;
+    skos:prefLabel "Integrate and Align Project Plans"@en,
+        "整合并对齐项目计划"@zh ;
+    pm:belongsToDomain pm:dom_Governance ;
+    pm:hasFocusArea pm:fa_Planning ;
+    pm:hasInput pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_OutputsFromOtherProcesses,
+        pm:art_ProjectCharter ;
+    pm:hasOutput pm:art_ProjectManagementPlan ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.1.6.2" ;
+    pm:sourcePage 19 ;
+    pm:usesTechnique pm:tt_DataGathering,
+        pm:tt_ExpertJudgment,
+        pm:tt_InterpersonalAndTeamSkills,
+        pm:tt_Meetings,
+        pm:tt_ProjectCanvas .
+
+pm:proc_LeadTheTeam a pm:Process ;
+    skos:prefLabel "Lead the Team"@en,
+        "领导团队"@zh ;
+    pm:belongsToDomain pm:dom_Resources ;
+    pm:hasFocusArea pm:fa_Executing ;
+    pm:hasInput pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssetsSixThinking,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan,
+        pm:art_TeamPerformanceAssessments ;
+    pm:hasOutput pm:art_ChangeRequests,
+        pm:art_EnterpriseEnvironmentalFactorUpdates,
+        pm:art_OrganizationalProcessAssetUpdatesOfTheDeBonoGroup,
+        pm:art_ProjectDocumentUpdates,
+        pm:art_ProjectManagementPlanUpdates,
+        pm:art_TeamPerformanceAssessments ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.6.2.4" ;
+    pm:sourcePage 85 ;
+    pm:usesTechnique pm:tt_Colocation,
+        pm:tt_CommunicationTechnology,
+        pm:tt_DataAnalysis,
+        pm:tt_EmotionalIntelligence,
+        pm:tt_IndividualAndTeamAssessments,
+        pm:tt_InterpersonalAndTeamSkills,
+        pm:tt_Leadership,
+        pm:tt_Meetings,
+        pm:tt_OrganizationalCulturalIntelligence,
+        pm:tt_ProblemSolving,
+        pm:tt_ProjectManagementInformationSystem,
+        pm:tt_RecognitionAndRewards,
+        pm:tt_Retrospectives,
+        pm:tt_TuckmanLadder,
+        pm:tt_VirtualTeams .
+
+pm:proc_ManageCommunications a pm:Process ;
+    skos:prefLabel "Manage Communications"@en,
+        "管理沟通"@zh ;
+    pm:belongsToDomain pm:dom_Stakeholders ;
+    pm:hasFocusArea pm:fa_Executing ;
+    pm:hasInput pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan,
+        pm:art_WorkPerformanceReports ;
+    pm:hasOutput pm:art_OrganizationalProcessAssetUpdates,
+        pm:art_ProjectCommunications,
+        pm:art_ProjectDocumentUpdates,
+        pm:art_ProjectManagementPlanUpdates ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.5.2.5" ;
+    pm:sourcePage 75 ;
+    pm:usesTechnique pm:tt_CommunicationMethods,
+        pm:tt_CommunicationSkills,
+        pm:tt_CommunicationTechnology,
+        pm:tt_InterpersonalAndTeamSkills,
+        pm:tt_Meetings,
+        pm:tt_ProjectManagementInformationSystem,
+        pm:tt_ProjectReporting .
+
+pm:proc_ManageProjectExecution a pm:Process ;
+    skos:prefLabel "Manage Project Execution"@en,
+        "管理项目执行"@zh ;
+    pm:belongsToDomain pm:dom_Governance ;
+    pm:hasFocusArea pm:fa_Executing ;
+    pm:hasInput pm:art_ApprovedChangeRequests,
+        pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_ChangeRequests,
+        pm:art_Deliverables,
+        pm:art_IssueLog,
+        pm:art_OrganizationalProcessAssetUpdates,
+        pm:art_ProjectDocumentUpdates,
+        pm:art_ProjectManagementPlanUpdates,
+        pm:art_WorkPerformanceData ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.1.6.4" ;
+    pm:sourcePage 22 ;
+    pm:usesTechnique pm:tt_ExpertJudgment,
+        pm:tt_Meetings,
+        pm:tt_ProjectManagementInformationSystem .
+
+pm:proc_ManageProjectKnowledge a pm:Process ;
+    skos:prefLabel "Manage Project Knowledge"@en,
+        "管理项目知识"@zh ;
+    pm:belongsToDomain pm:dom_Governance ;
+    pm:hasFocusArea pm:fa_Executing ;
+    pm:hasInput pm:art_Deliverables,
+        pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_LessonsLearnedRegister,
+        pm:art_OrganizationalProcessAssetUpdates,
+        pm:art_ProjectManagementPlanUpdates ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.1.6.6" ;
+    pm:sourcePage 25 ;
+    pm:usesTechnique pm:tt_AfterActionReviews,
+        pm:tt_ExpertJudgment,
+        pm:tt_InProgressPostmortems,
+        pm:tt_InformationManagement,
+        pm:tt_InterpersonalAndTeamSkills,
+        pm:tt_KnowledgeManagement,
+        pm:tt_Storytelling .
+
+pm:proc_ManageQualityAssurance a pm:Process ;
+    skos:prefLabel "Manage Quality Assurance"@en,
+        "管理质量保证"@zh ;
+    pm:belongsToDomain pm:dom_Governance ;
+    pm:hasFocusArea pm:fa_Executing ;
+    pm:hasInput pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_ChangeRequests,
+        pm:art_ProjectDocumentUpdates,
+        pm:art_ProjectManagementPlanUpdates,
+        pm:art_QualityReports ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.1.6.5" ;
+    pm:sourcePage 23 ;
+    pm:usesTechnique pm:tt_Audits,
+        pm:tt_Checklists,
+        pm:tt_DataRepresentation,
+        pm:tt_DecisionMaking,
+        pm:tt_ProblemSolving,
+        pm:tt_ProcessImprovement .
+
+pm:proc_ManageStakeholderEngagement a pm:Process ;
+    skos:prefLabel "Manage Stakeholder Engagement"@en,
+        "管理相关方参与"@zh ;
+    pm:belongsToDomain pm:dom_Stakeholders ;
+    pm:hasFocusArea pm:fa_Executing ;
+    pm:hasInput pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_ChangeRequests,
+        pm:art_ProjectDocumentUpdates,
+        pm:art_ProjectManagementPlanUpdates ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.5.2.4" ;
+    pm:sourcePage 74 ;
+    pm:usesTechnique pm:tt_CommunicationSkills,
+        pm:tt_ExpertJudgment,
+        pm:tt_GroundRules,
+        pm:tt_InterpersonalAndTeamSkills,
+        pm:tt_Meetings .
+
+pm:proc_MonitorAndControlFinances a pm:Process ;
+    skos:prefLabel "Monitor and Control Finances"@en,
+        "监控财务"@zh ;
+    pm:belongsToDomain pm:dom_Finance ;
+    pm:hasFocusArea pm:fa_MonitoringAndControlling ;
+    pm:hasInput pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan,
+        pm:art_WorkPerformanceData ;
+    pm:hasOutput pm:art_ChangeRequests,
+        pm:art_FundingProposals,
+        pm:art_ProjectDocumentUpdates,
+        pm:art_ProjectManagementPlanUpdates,
+        pm:art_RevenueAndCostForecasts,
+        pm:art_WorkPerformanceInformation ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.4.2.4" ;
+    pm:sourcePage 65 ;
+    pm:usesTechnique pm:tt_DataAnalysis,
+        pm:tt_ExpertJudgment,
+        pm:tt_ProjectManagementInformationSystem,
+        pm:tt_ToCompletePerformanceIndex .
+
+pm:proc_MonitorAndControlProjectPerformance a pm:Process ;
+    skos:prefLabel "Monitor and Control Project Performance"@en,
+        "监控项目绩效"@zh ;
+    pm:belongsToDomain pm:dom_Governance ;
+    pm:hasFocusArea pm:fa_MonitoringAndControlling ;
+    pm:hasInput pm:art_Agreements,
+        pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan,
+        pm:art_WorkPerformanceInformation ;
+    pm:hasOutput pm:art_ChangeRequests,
+        pm:art_ProjectDocumentUpdates,
+        pm:art_ProjectManagementPlanUpdates,
+        pm:art_WorkPerformanceReports ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.1.6.7" ;
+    pm:sourcePage 27 ;
+    pm:usesTechnique pm:tt_DataAnalysis,
+        pm:tt_DecisionMaking,
+        pm:tt_ExpertJudgment,
+        pm:tt_InformationRadiators,
+        pm:tt_Meetings,
+        pm:tt_ProjectDashboards,
+        pm:tt_VisualControls .
+
+pm:proc_MonitorAndControlResourcing a pm:Process ;
+    skos:prefLabel "Monitor and Control Resourcing"@en,
+        "监控资源投入"@zh ;
+    pm:belongsToDomain pm:dom_Resources ;
+    pm:hasFocusArea pm:fa_MonitoringAndControlling ;
+    pm:hasInput pm:art_Agreements,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan,
+        pm:art_WorkPerformanceData ;
+    pm:hasOutput pm:art_ChangeRequests,
+        pm:art_ProjectDocumentUpdates,
+        pm:art_ProjectManagementPlanUpdates,
+        pm:art_WorkPerformanceInformation ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.6.2.5" ;
+    pm:sourcePage 87 ;
+    pm:usesTechnique pm:tt_BranchAndBound,
+        pm:tt_ContinuousImprovement,
+        pm:tt_ControlCharts,
+        pm:tt_DataAnalysis,
+        pm:tt_InterpersonalAndTeamSkills,
+        pm:tt_ProblemSolving,
+        pm:tt_ProjectManagementInformationSystem,
+        pm:tt_TheoryOfConstraints,
+        pm:tt_ValueStreamMapping .
+
+pm:proc_MonitorAndControlSchedule a pm:Process ;
+    skos:prefLabel "Monitor and Control Schedule"@en,
+        "监控进度"@zh ;
+    pm:belongsToDomain pm:dom_Schedule ;
+    pm:hasFocusArea pm:fa_MonitoringAndControlling ;
+    pm:hasInput pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProductBacklog,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan,
+        pm:art_WorkPerformanceData ;
+    pm:hasOutput pm:art_ChangeRequests,
+        pm:art_ProjectDocumentUpdates,
+        pm:art_ProjectManagementPlanUpdates,
+        pm:art_ScheduleForecasts,
+        pm:art_WorkPerformanceInformation ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.3.2.3" ;
+    pm:sourcePage 54 ;
+    pm:usesTechnique pm:tt_BranchAndBound,
+        pm:tt_CriticalChainMethod,
+        pm:tt_CriticalPathMethod,
+        pm:tt_DataAnalysis,
+        pm:tt_LeadsAndLags,
+        pm:tt_ProjectManagementInformationSystem,
+        pm:tt_ScheduleCompression,
+        pm:tt_Velocity .
+
+pm:proc_MonitorAndControlScope a pm:Process ;
+    skos:prefLabel "Monitor and Control Scope"@en,
+        "监控范围"@zh ;
+    pm:belongsToDomain pm:dom_Scope ;
+    pm:hasFocusArea pm:fa_MonitoringAndControlling ;
+    pm:hasInput pm:art_ApprovedChangeRequests,
+        pm:art_Deliverables,
+        pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan,
+        pm:art_QualityMetrics ;
+    pm:hasOutput pm:art_ChangeRequests,
+        pm:art_ProjectDocumentUpdates,
+        pm:art_ProjectManagementPlanUpdates,
+        pm:art_QualityControlMeasurements,
+        pm:art_QualityReports,
+        pm:art_VerifiedDeliverables,
+        pm:art_WorkPerformanceInformation ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.2.2.5" ;
+    pm:sourcePage 43 ;
+    pm:usesTechnique pm:tt_DataAnalysis,
+        pm:tt_PerformanceReviews,
+        pm:tt_ProcessAutomations,
+        pm:tt_TestingProductEvaluations .
+
+pm:proc_MonitorCommunications a pm:Process ;
+    skos:prefLabel "Monitor Communications"@en,
+        "监控沟通"@zh ;
+    pm:belongsToDomain pm:dom_Stakeholders ;
+    pm:hasFocusArea pm:fa_MonitoringAndControlling ;
+    pm:hasInput pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan,
+        pm:art_WorkPerformanceData ;
+    pm:hasOutput pm:art_ChangeRequests,
+        pm:art_ProjectDocumentUpdates,
+        pm:art_ProjectManagementPlanUpdates,
+        pm:art_WorkPerformanceInformation ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.5.2.7" ;
+    pm:sourcePage 77 ;
+    pm:usesTechnique pm:tt_DataRepresentation,
+        pm:tt_ExpertJudgment,
+        pm:tt_InterpersonalAndTeamSkills,
+        pm:tt_Meetings,
+        pm:tt_ProjectManagementInformationSystem .
+
+pm:proc_MonitorRisks a pm:Process ;
+    skos:prefLabel "Monitor Risks"@en,
+        "监控风险"@zh ;
+    pm:belongsToDomain pm:dom_Risk ;
+    pm:hasFocusArea pm:fa_MonitoringAndControlling ;
+    pm:hasInput pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan,
+        pm:art_WorkPerformanceData,
+        pm:art_WorkPerformanceReports ;
+    pm:hasOutput pm:art_ChangeRequests,
+        pm:art_OrganizationalProcessAssetUpdates,
+        pm:art_ProjectDocumentUpdates,
+        pm:art_ProjectManagementPlanUpdates,
+        pm:art_WorkPerformanceInformation ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.7.2.6" ;
+    pm:sourcePage 101 ;
+    pm:usesTechnique pm:tt_Audits,
+        pm:tt_DataAnalysis,
+        pm:tt_Meetings .
+
+pm:proc_MonitorStakeholderEngagement a pm:Process ;
+    skos:prefLabel "Monitor Stakeholder Engagement"@en,
+        "监控相关方参与"@zh ;
+    pm:belongsToDomain pm:dom_Stakeholders ;
+    pm:hasFocusArea pm:fa_MonitoringAndControlling ;
+    pm:hasInput pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan,
+        pm:art_WorkPerformanceData ;
+    pm:hasOutput pm:art_ChangeRequests,
+        pm:art_ProjectDocumentUpdates,
+        pm:art_ProjectManagementPlanUpdates,
+        pm:art_WorkPerformanceInformation ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.5.2.6" ;
+    pm:sourcePage 76 ;
+    pm:usesTechnique pm:tt_CommunicationSkills,
+        pm:tt_DataAnalysis,
+        pm:tt_DataRepresentation,
+        pm:tt_DecisionMaking,
+        pm:tt_InterpersonalAndTeamSkills,
+        pm:tt_Meetings .
+
+pm:proc_PerformRiskAnalysis a pm:Process ;
+    skos:prefLabel "Perform Risk Analysis"@en,
+        "开展风险分析"@zh ;
+    pm:belongsToDomain pm:dom_Risk ;
+    pm:hasFocusArea pm:fa_Planning ;
+    pm:hasInput pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_ProjectDocumentUpdates ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.7.2.3" ;
+    pm:sourcePage 98 ;
+    pm:usesTechnique pm:tt_DataAnalysis,
+        pm:tt_DataRepresentation,
+        pm:tt_ExpertJudgment,
+        pm:tt_InterpersonalAndTeamSkills,
+        pm:tt_RiskCategorization .
+
+pm:proc_PlanCommunicationsManagement a pm:Process ;
+    skos:prefLabel "Plan Communications Management"@en,
+        "规划沟通管理"@zh ;
+    pm:belongsToDomain pm:dom_Stakeholders ;
+    pm:hasFocusArea pm:fa_Planning ;
+    pm:hasInput pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectCharter,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_ProjectDocumentUpdates,
+        pm:art_ProjectManagementPlanUpdates ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.5.2.3" ;
+    pm:sourcePage 73 ;
+    pm:usesTechnique pm:tt_CommunicationMethods,
+        pm:tt_CommunicationModels,
+        pm:tt_CommunicationRequirementsAnalysis,
+        pm:tt_CommunicationTechnology,
+        pm:tt_DataRepresentation,
+        pm:tt_ExpertJudgment,
+        pm:tt_InterpersonalAndTeamSkills,
+        pm:tt_Meetings .
+
+pm:proc_PlanFinancialManagement a pm:Process ;
+    skos:prefLabel "Plan Financial Management"@en,
+        "规划财务管理"@zh ;
+    pm:belongsToDomain pm:dom_Finance ;
+    pm:hasFocusArea pm:fa_Planning ;
+    pm:hasInput pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectCharter,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_FinancialManagementPlan,
+        pm:art_FundingStrategy ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.4.2.1" ;
+    pm:sourcePage 63 ;
+    pm:usesTechnique pm:tt_DataAnalysis,
+        pm:tt_ExpertJudgment,
+        pm:tt_Meetings .
+
+pm:proc_PlanResourceManagement a pm:Process ;
+    skos:prefLabel "Plan Resource Management"@en,
+        "规划资源管理"@zh ;
+    pm:belongsToDomain pm:dom_Resources ;
+    pm:hasFocusArea pm:fa_Planning ;
+    pm:hasInput pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectCharter,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_ProjectDocumentUpdates,
+        pm:art_ProjectManagementPlanUpdates,
+        pm:art_TeamCharter ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.6.2.1" ;
+    pm:sourcePage 81 ;
+    pm:usesTechnique pm:tt_DataAnalysis,
+        pm:tt_DataGathering,
+        pm:tt_DataRepresentation,
+        pm:tt_ExpertJudgment,
+        pm:tt_GreenHumanResourceManagement,
+        pm:tt_Meetings,
+        pm:tt_OrganizationalTheory,
+        pm:tt_ResourceBasedView .
+
+pm:proc_PlanRiskManagement a pm:Process ;
+    skos:prefLabel "Plan Risk Management"@en,
+        "规划风险管理"@zh ;
+    pm:belongsToDomain pm:dom_Risk ;
+    pm:hasFocusArea pm:fa_Planning ;
+    pm:hasInput pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectCharter,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_ProjectManagementPlanUpdates ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.7.2.1" ;
+    pm:sourcePage 96 ;
+    pm:usesTechnique pm:tt_DataAnalysis,
+        pm:tt_DataGathering,
+        pm:tt_ExpertJudgment,
+        pm:tt_Meetings .
+
+pm:proc_PlanRiskResponses a pm:Process ;
+    skos:prefLabel "Plan Risk Responses"@en,
+        "规划风险应对"@zh ;
+    pm:belongsToDomain pm:dom_Risk ;
+    pm:hasFocusArea pm:fa_Planning ;
+    pm:hasInput pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_ChangeRequests,
+        pm:art_ProjectDocumentUpdates,
+        pm:art_ProjectManagementPlanUpdates ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.7.2.4" ;
+    pm:sourcePage 99 ;
+    pm:usesTechnique pm:tt_ContingentResponseStrategies,
+        pm:tt_DataAnalysis,
+        pm:tt_DataGathering,
+        pm:tt_DecisionMaking,
+        pm:tt_ExpertJudgment,
+        pm:tt_InterpersonalAndTeamSkills,
+        pm:tt_StrategiesForOpportunities,
+        pm:tt_StrategiesForOverallProjectRisk,
+        pm:tt_StrategiesForThreats .
+
+pm:proc_PlanScheduleManagement a pm:Process ;
+    skos:prefLabel "Plan Schedule Management"@en,
+        "规划进度管理"@zh ;
+    pm:belongsToDomain pm:dom_Schedule ;
+    pm:hasFocusArea pm:fa_Planning ;
+    pm:hasInput pm:art_DevelopmentApproach,
+        pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectCharter,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_ProjectManagementPlanUpdates ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.3.2.1" ;
+    pm:sourcePage 49 ;
+    pm:usesTechnique pm:tt_DataAnalysis,
+        pm:tt_ExpertJudgment,
+        pm:tt_Meetings .
+
+pm:proc_PlanScopeManagement a pm:Process ;
+    skos:prefLabel "Plan Scope Management"@en,
+        "规划范围管理"@zh ;
+    pm:belongsToDomain pm:dom_Scope ;
+    pm:hasFocusArea pm:fa_Planning ;
+    pm:hasInput pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectCharter,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_ProjectManagementPlanUpdates ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.2.2.1" ;
+    pm:sourcePage 40 ;
+    pm:usesTechnique pm:tt_DataAnalysis,
+        pm:tt_DataGathering,
+        pm:tt_ExpertJudgment,
+        pm:tt_TestAndInspectionPlanning .
+
+pm:proc_PlanSourcingStrategy a pm:Process ;
+    skos:prefLabel "Plan Sourcing Strategy"@en,
+        "规划采购策略"@zh ;
+    pm:belongsToDomain pm:dom_Governance ;
+    pm:hasFocusArea pm:fa_Planning ;
+    pm:hasInput pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectCharter,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_SourcingStrategyPlan ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.1.6.3" ;
+    pm:sourcePage 20 ;
+    pm:usesTechnique pm:tt_DocumentAnalysis,
+        pm:tt_ExpertJudgment,
+        pm:tt_MarketResearch .
+
+pm:proc_PlanStakeholderEngagement a pm:Process ;
+    skos:prefLabel "Plan Stakeholder Engagement"@en,
+        "规划相关方参与"@zh ;
+    pm:belongsToDomain pm:dom_Stakeholders ;
+    pm:hasFocusArea pm:fa_Planning ;
+    pm:hasInput pm:art_Agreements,
+        pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectCharter,
+        pm:art_ProjectDocuments,
+        pm:art_ProjectManagementPlan ;
+    pm:hasOutput pm:art_ProjectManagementPlanUpdates ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.5.2.2" ;
+    pm:sourcePage 72 ;
+    pm:usesTechnique pm:tt_DataAnalysis,
+        pm:tt_DataGathering,
+        pm:tt_DataRepresentation,
+        pm:tt_DecisionMaking,
+        pm:tt_ExpertJudgment,
+        pm:tt_Meetings .
+
+pm:proc_ValidateScope a pm:Process ;
+    skos:prefLabel "Validate Scope"@en,
+        "验收范围"@zh ;
+    pm:belongsToDomain pm:dom_Scope ;
+    pm:hasFocusArea pm:fa_MonitoringAndControlling ;
+    pm:hasInput pm:art_EnterpriseEnvironmentalFactors,
+        pm:art_OrganizationalProcessAssets,
+        pm:art_ProjectDocuments,
+        pm:art_VerifiedDeliverables ;
+    pm:hasOutput pm:art_AcceptedDeliverables,
+        pm:art_ChangeRequests,
+        pm:art_LessonsLearnedUpdates,
+        pm:art_ProjectDocumentUpdates ;
+    pm:ioStatus "complete" ;
+    pm:processCode "2.2.2.6" ;
+    pm:sourcePage 45 ;
+    pm:usesTechnique pm:tt_DataAnalysis,
+        pm:tt_DataGathering,
+        pm:tt_DecisionMaking,
+        pm:tt_ProcessAnalysis .
+
+<https://example.org/pm/ontology/pmbok8> a owl:Ontology .
+
+pm:fa_Closing a pm:FocusArea ;
+    skos:definition "The focus area in which the work is concluded, accepted and handed over."@en ;
+    skos:prefLabel "Closing"@en,
+        "收尾"@zh .
+
+pm:fa_Initiating a pm:FocusArea ;
+    skos:definition "The focus area in which the work is authorized and initially framed."@en ;
+    skos:prefLabel "Initiating"@en,
+        "启动"@zh .
+
+pm:dom_Schedule a pm:PerformanceDomain ;
+    skos:definition "The domain that covers timing, sequencing and delivery dates."@en ;
+    skos:prefLabel "Schedule"@en,
+        "进度"@zh .
+
+pm:dom_Finance a pm:PerformanceDomain ;
+    skos:definition "The domain that covers funding, cost and financial performance."@en ;
+    skos:prefLabel "Finance"@en,
+        "财务"@zh .
+
+pm:dom_Resources a pm:PerformanceDomain ;
+    skos:definition "The domain that covers people, capacity and other means of doing the work."@en ;
+    skos:prefLabel "Resources"@en,
+        "资源"@zh .
+
+pm:dom_Risk a pm:PerformanceDomain ;
+    skos:definition "The domain that covers uncertainty and its treatment."@en ;
+    skos:prefLabel "Risk"@en,
+        "风险"@zh .
+
+pm:dom_Scope a pm:PerformanceDomain ;
+    skos:definition "The domain that covers what the work must and must not include."@en ;
+    skos:prefLabel "Scope"@en,
+        "范围"@zh .
+
+pm:dom_Stakeholders a pm:PerformanceDomain ;
+    skos:definition "The domain that covers engagement, communication and expectations."@en ;
+    skos:prefLabel "Stakeholders"@en,
+        "相关方"@zh .
+
+pm:fa_Executing a pm:FocusArea ;
+    skos:definition "The focus area in which the planned work is carried out."@en ;
+    skos:prefLabel "Executing"@en,
+        "执行"@zh .
+
+pm:dom_Governance a pm:PerformanceDomain ;
+    skos:definition "The domain that covers authorization, direction and oversight of the work."@en ;
+    skos:prefLabel "Governance"@en,
+        "治理"@zh .
+
+pm:fa_MonitoringAndControlling a pm:FocusArea ;
+    skos:definition "The focus area in which performance is compared with plans and corrected."@en ;
+    skos:prefLabel "Monitoring and Controlling"@en,
+        "监控"@zh .
+
+pm:fa_Planning a pm:FocusArea ;
+    skos:definition "The focus area in which approach, scope, timing and controls are defined."@en ;
+    skos:prefLabel "Planning"@en,
+        "规划"@zh .
+

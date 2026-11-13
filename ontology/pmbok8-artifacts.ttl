@@ -1,0 +1,862 @@
+# self-authored: true
+# source_id: PMBOK8-2025
+# Individuals: artifact taxonomy with categories and page anchors.
+# Definitions and structure are written for this repository; no source text is copied.
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix pm: <https://example.org/pm#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+pm:art_AcceptedDeliverables a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Accepted deliverables"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ActivityAttributes a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Activity attributes"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ActivityList a pm:Artifact ;
+    skos:prefLabel "Activity list"@en ;
+    pm:artifactCategory "data" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_Agreements a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Agreements"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ApprovedChangeRequests a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Approved change requests"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ApprovedChanges a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Approved changes"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_AssumptionLog a pm:Artifact,
+        pm:Register ;
+    skos:prefLabel "Assumption log"@en ;
+    pm:artifactCategory "register" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_Backlog a pm:Artifact ;
+    skos:prefLabel "Backlog"@en ;
+    pm:artifactCategory "data" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_BasisOfEstimates a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Basis of estimates"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_BenefitsManagementPlan a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Benefits management plan"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_BidDocuments a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Bid documents"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_BusinessCase a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Business case"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_BusinessDocuments a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Business documents"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ChangeLog a pm:Artifact,
+        pm:Register ;
+    skos:prefLabel "Change log"@en ;
+    pm:artifactCategory "register" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ChangeManagementPlan a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Change management plan"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ChangeRequests a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Change requests"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_Claims a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Claims"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_CommunicationsManagementPlan a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Communications management plan"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_CommunicationsManagementPlanUpdates a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Communications management plan updates"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ConfigurationManagementPlan a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Configuration management plan"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_Contracts a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Contracts"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_CostBaseline a pm:Artifact,
+        pm:Baseline ;
+    skos:prefLabel "Cost baseline"@en ;
+    pm:artifactCategory "baseline" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_CostBaselineUpdates a pm:Artifact,
+        pm:Baseline ;
+    skos:prefLabel "Cost baseline updates"@en ;
+    pm:artifactCategory "baseline" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_CostEstimates a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Cost estimates"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_CostForecasts a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Cost forecasts"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_Deliverable a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Deliverable"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_Deliverables a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Deliverables"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_DevelopmentApproach a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Development approach"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_DurationEstimates a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Duration estimates"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_EnterpriseEnvironmentalFactorUpdates a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Enterprise environmental factor updates"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_EnterpriseEnvironmentalFactors a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Enterprise environmental factors (EEFs)"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_FinalProductServiceOrResultTransition a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Final product, service, or result transition"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_FinalReport a pm:Artifact,
+        pm:Report ;
+    skos:prefLabel "Final report"@en ;
+    pm:artifactCategory "report" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_FinancialManagementPlan a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Financial management plan"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_FundingProposals a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Funding proposals"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_FundingStrategy a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Funding strategy"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_IndividualPerformanceAssessments a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Individual performance assessments"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_IssueLog a pm:Artifact,
+        pm:Register ;
+    skos:prefLabel "Issue log"@en ;
+    pm:artifactCategory "register" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_LessonsLearnedRegister a pm:Artifact,
+        pm:Register ;
+    skos:prefLabel "Lessons learned register"@en ;
+    pm:artifactCategory "register" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_LessonsLearnedUpdates a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Lessons learned updates"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_MakeOrBuyAnalysisAndDecisions a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Make-or-buy analysis and decisions"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_MakeOrBuyDecisions a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Make-or-buy decisions"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_MilestoneList a pm:Artifact ;
+    skos:prefLabel "Milestone list"@en ;
+    pm:artifactCategory "data" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_OrganizationalCharts a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Organizational charts"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_OrganizationalProcessAssetUpdates a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Organizational process asset (OPA) updates"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_OrganizationalProcessAssetUpdatesOfTheDeBonoGroup a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Organizational process asset updates of The de Bono Group."@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_OrganizationalProcessAssets a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Organizational process assets (OPAs)"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_OrganizationalProcessAssetsSixThinking a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Organizational process assets Six Thinking"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_OutputsFromOtherProcesses a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Outputs from other processes"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_Payments a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Payments"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_PerformanceMeasurementBaseline a pm:Artifact,
+        pm:Baseline ;
+    skos:prefLabel "Performance measurement baseline (PMB)"@en ;
+    pm:artifactCategory "baseline" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_PhysicalOrVirtualResourceAssignments a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Physical or virtual resource assignments"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_PositionDescriptions a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Position descriptions"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ProcurementAgreements a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Procurement agreements"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ProcurementDocumentation a pm:Artifact ;
+    skos:prefLabel "Procurement documentation"@en ;
+    pm:artifactCategory "data" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ProcurementManagementPlan a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Procurement management plan"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_Product a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Product"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ProductBacklog a pm:Artifact ;
+    skos:prefLabel "Product backlog"@en ;
+    pm:artifactCategory "data" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ProjectCalendars a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Project calendars"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ProjectCharter a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Project charter"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ProjectCommunications a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Project communications"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ProjectDocumentUpdates a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Project document updates"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ProjectDocuments a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Project documents"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ProjectFundingRequirements a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Project funding requirements"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ProjectManagementPlan a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Project management plan"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ProjectManagementPlanUpdates a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Project management plan updates"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ProjectSchedule a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Project schedule"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ProjectScheduleNetworkDiagram a pm:Artifact ;
+    skos:prefLabel "Project schedule network diagram"@en ;
+    pm:artifactCategory "data" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ProjectScopeStatement a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Project scope statement"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ProjectTeamAssignments a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Project team assignments"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_Proposals a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Proposals"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_Prototypes a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Prototypes"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_QualityControlMeasurements a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Quality control measurements"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_QualityManagementPlan a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Quality management plan"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_QualityMetrics a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Quality metrics"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_QualityReports a pm:Artifact,
+        pm:Report ;
+    skos:prefLabel "Quality reports"@en ;
+    pm:artifactCategory "report" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_QualityTestAndEvaluationDocuments a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Quality test and evaluation documents"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_RequirementsDocumentation a pm:Artifact ;
+    skos:prefLabel "Requirements documentation"@en ;
+    pm:artifactCategory "data" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_RequirementsManagementPlan a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Requirements management plan"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_RequirementsTraceabilityMatrix a pm:Artifact ;
+    skos:prefLabel "Requirements traceability matrix"@en ;
+    pm:artifactCategory "data" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ResourceAssignments a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Resource assignments"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ResourceBreakdownStructure a pm:Artifact ;
+    skos:prefLabel "Resource breakdown structure"@en ;
+    pm:artifactCategory "data" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_ResourceCalendar a pm:Artifact ;
+    skos:prefLabel "Resource calendar"@en ;
+    pm:artifactCategory "data" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_ResourceCalendars a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Resource calendars"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ResourceHistograms a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Resource histograms"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_ResourceManagementPlan a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Resource management plan"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_ResourceRequirements a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Resource requirements"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_ResponsibilityAssignmentMatrix a pm:Artifact ;
+    skos:prefLabel "Responsibility assignment matrix"@en ;
+    pm:artifactCategory "data" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_RevenueAndCostForecasts a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Revenue and cost forecasts"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_RevenueForecasts a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Revenue forecasts"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_RiskManagementPlan a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Risk management plan"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_RiskRegister a pm:Artifact,
+        pm:Register ;
+    skos:prefLabel "Risk register"@en ;
+    pm:artifactCategory "register" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_RiskRegisterUpdates a pm:Artifact,
+        pm:Register ;
+    skos:prefLabel "Risk register updates"@en ;
+    pm:artifactCategory "register" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_RiskReport a pm:Artifact,
+        pm:Report ;
+    skos:prefLabel "Risk report"@en ;
+    pm:artifactCategory "report" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_ScheduleBaseline a pm:Artifact,
+        pm:Baseline ;
+    skos:prefLabel "Schedule baseline"@en ;
+    pm:artifactCategory "baseline" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_ScheduleBaselineUpdates a pm:Artifact,
+        pm:Baseline ;
+    skos:prefLabel "Schedule baseline updates"@en ;
+    pm:artifactCategory "baseline" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_ScheduleData a pm:Artifact ;
+    skos:prefLabel "Schedule data"@en ;
+    pm:artifactCategory "data" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_ScheduleForecasts a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Schedule forecasts"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_ScheduleManagementPlan a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Schedule management plan"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_ScopeBaseline a pm:Artifact,
+        pm:Baseline ;
+    skos:prefLabel "Scope baseline"@en ;
+    pm:artifactCategory "baseline" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_ScopeManagementPlan a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Scope management plan"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_SkillMatrix a pm:Artifact ;
+    skos:prefLabel "Skill matrix"@en ;
+    pm:artifactCategory "data" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_SourceSelectionCriteria a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Source selection criteria"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_SourcingStrategyPlan a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Sourcing strategy plan"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_StakeholderEngagementPlan a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Stakeholder engagement plan"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_StakeholderRegister a pm:Artifact,
+        pm:Register ;
+    skos:prefLabel "Stakeholder register"@en ;
+    pm:artifactCategory "register" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_StatusReport a pm:Artifact,
+        pm:Report ;
+    skos:prefLabel "Status report"@en ;
+    pm:artifactCategory "report" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_SupplierAgreements a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Supplier agreements"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_TeamCharter a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Team charter"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_TeamPerformanceAssessments a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Team performance assessments"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_TeamPerformanceAssignments a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Team performance assignments"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_TestAndEvaluationDocuments a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Test and evaluation documents"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_TransitionPlan a pm:Artifact,
+        pm:Plan ;
+    skos:prefLabel "Transition plan"@en ;
+    pm:artifactCategory "plan" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_UserStories a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "User stories"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_VerifiedDeliverables a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Verified deliverables"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_VirtualResourceAssignments a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Virtual resource assignments"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_WBSDictionary a pm:Artifact ;
+    skos:prefLabel "WBS dictionary"@en ;
+    pm:artifactCategory "data" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_WorkBreakdownStructure a pm:Artifact ;
+    skos:prefLabel "Work breakdown structure (WBS)"@en ;
+    pm:artifactCategory "data" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_WorkPackage a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Work package"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+pm:art_WorkPackageEstimation a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Work package estimation"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_WorkPerformanceData a pm:Artifact ;
+    skos:prefLabel "Work performance data"@en ;
+    pm:artifactCategory "data" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_WorkPerformanceInformation a pm:Artifact ;
+    skos:prefLabel "Work performance information"@en ;
+    pm:artifactCategory "data" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_WorkPerformanceReports a pm:Artifact,
+        pm:Report ;
+    skos:prefLabel "Work performance reports"@en ;
+    pm:artifactCategory "report" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 .
+
+pm:art_WorkPerformanceReviews a pm:Artifact,
+        pm:Document ;
+    skos:prefLabel "Work performance reviews"@en ;
+    pm:artifactCategory "document" ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 113 .
+
+<https://example.org/pm/ontology/pmbok8> a owl:Ontology .
+

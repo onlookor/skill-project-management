@@ -1,0 +1,1128 @@
+# self-authored: true
+# source_id: PMBOK8-2025
+# Individuals: tools and techniques with purpose categories and page anchors.
+# Definitions and structure are written for this repository; no source text is copied.
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix pm: <https://example.org/pm#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+pm:tt_Advertising a pm:ToolOrTechnique ;
+    skos:prefLabel "Advertising"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "procurement" .
+
+pm:tt_AffinityDiagram a pm:ToolOrTechnique ;
+    skos:prefLabel "Affinity diagram"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "representation" .
+
+pm:tt_AfterActionReviews a pm:ToolOrTechnique ;
+    skos:prefLabel "After-action reviews (AARs)"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_AgileReleasePlanning a pm:ToolOrTechnique ;
+    skos:prefLabel "Agile release planning"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "scheduling" .
+
+pm:tt_AlternativeAnalysis a pm:ToolOrTechnique ;
+    skos:prefLabel "Alternative analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "data-analysis" .
+
+pm:tt_AnalogousEstimating a pm:ToolOrTechnique ;
+    skos:prefLabel "Analogous estimating"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "estimation" .
+
+pm:tt_ArtificialIntelligence a pm:ToolOrTechnique ;
+    skos:prefLabel "Artificial intelligence (AI)"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_AssumptionAndConstraintAnalysis a pm:ToolOrTechnique ;
+    skos:prefLabel "Assumption and constraint analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "data-analysis" .
+
+pm:tt_Audits a pm:ToolOrTechnique ;
+    skos:prefLabel "Audits"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "quality" .
+
+pm:tt_AugmentedReality a pm:ToolOrTechnique ;
+    skos:prefLabel "Augmented reality (AR)"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_AutocraticDecisionMaking a pm:ToolOrTechnique ;
+    skos:prefLabel "Autocratic decision-making"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "decision" .
+
+pm:tt_BacklogManagement a pm:ToolOrTechnique ;
+    skos:prefLabel "Backlog management"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "scheduling" .
+
+pm:tt_BacklogRefinement a pm:ToolOrTechnique ;
+    skos:prefLabel "Backlog refinement"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "scheduling" .
+
+pm:tt_Benchmarking a pm:ToolOrTechnique ;
+    skos:prefLabel "Benchmarking"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "quality" .
+
+pm:tt_BenefitsMapping a pm:ToolOrTechnique ;
+    skos:prefLabel "Benefits mapping"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "representation" .
+
+pm:tt_BidderConferences a pm:ToolOrTechnique ;
+    skos:prefLabel "Bidder conferences"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "procurement" .
+
+pm:tt_BottomUpEstimating a pm:ToolOrTechnique ;
+    skos:prefLabel "Bottom-up estimating"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "estimation" .
+
+pm:tt_Brainstorming a pm:DataGatheringTechnique,
+        pm:ToolOrTechnique ;
+    skos:prefLabel "Brainstorming"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "data-gathering" .
+
+pm:tt_BranchAndBound a pm:ToolOrTechnique ;
+    skos:prefLabel "Branch and bound"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_BurndownChart a pm:ToolOrTechnique ;
+    skos:prefLabel "Burndown chart"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "scheduling" .
+
+pm:tt_BurnupChart a pm:ToolOrTechnique ;
+    skos:prefLabel "Burnup chart"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "scheduling" .
+
+pm:tt_CauseAndEffectDiagram a pm:ToolOrTechnique ;
+    skos:prefLabel "Cause-and-effect diagram"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "quality" .
+
+pm:tt_CentralizedManagementAndLeadership a pm:ToolOrTechnique ;
+    skos:prefLabel "Centralized management and leadership"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "interpersonal" .
+
+pm:tt_ChangeControlTools a pm:ToolOrTechnique ;
+    skos:prefLabel "Change control tools"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_Checklists a pm:ToolOrTechnique ;
+    skos:prefLabel "Checklists"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "quality" .
+
+pm:tt_ClaimsAdministration a pm:ToolOrTechnique ;
+    skos:prefLabel "Claims administration"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "procurement" .
+
+pm:tt_CoachingAndMentoring a pm:ToolOrTechnique ;
+    skos:prefLabel "Coaching and mentoring"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "interpersonal" .
+
+pm:tt_CodeOfAccounts a pm:ToolOrTechnique ;
+    skos:prefLabel "Code of accounts"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_Colocation a pm:ToolOrTechnique ;
+    skos:prefLabel "Colocation"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_CommunicationCompetence a pm:ToolOrTechnique ;
+    skos:prefLabel "Communication competence"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "communication" .
+
+pm:tt_CommunicationMethods a pm:ToolOrTechnique ;
+    skos:prefLabel "Communication methods"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "communication" .
+
+pm:tt_CommunicationModels a pm:ToolOrTechnique ;
+    skos:prefLabel "Communication models"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "representation" .
+
+pm:tt_CommunicationRequirementsAnalysis a pm:ToolOrTechnique ;
+    skos:prefLabel "Communication requirements analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "communication" .
+
+pm:tt_CommunicationSkills a pm:ToolOrTechnique ;
+    skos:prefLabel "Communication skills"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "communication" .
+
+pm:tt_CommunicationStylesAssessment a pm:ToolOrTechnique ;
+    skos:prefLabel "Communication styles assessment"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "communication" .
+
+pm:tt_CommunicationTechnology a pm:ToolOrTechnique ;
+    skos:prefLabel "Communication technology"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "communication" .
+
+pm:tt_ConflictManagement a pm:ToolOrTechnique ;
+    skos:prefLabel "Conflict management"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "interpersonal" .
+
+pm:tt_ConstructiveCostModel a pm:ToolOrTechnique ;
+    skos:prefLabel "Constructive cost model (COCOMO)"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "representation" .
+
+pm:tt_ContingencyReserves a pm:ToolOrTechnique ;
+    skos:prefLabel "Contingency reserves"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "risk" .
+
+pm:tt_ContingentResponseStrategies a pm:ToolOrTechnique ;
+    skos:prefLabel "Contingent response strategies"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "risk" .
+
+pm:tt_ContinuousImprovement a pm:ToolOrTechnique ;
+    skos:prefLabel "Continuous improvement"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_ControlCharts a pm:ToolOrTechnique ;
+    skos:prefLabel "Control charts"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "quality" .
+
+pm:tt_CostAggregation a pm:ToolOrTechnique ;
+    skos:prefLabel "Cost aggregation"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_CostBenefitAnalysis a pm:ToolOrTechnique ;
+    skos:prefLabel "Cost-benefit analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "data-analysis" .
+
+pm:tt_CostOfQuality a pm:ToolOrTechnique ;
+    skos:prefLabel "Cost of quality (CoQ)"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "quality" .
+
+pm:tt_CriticalChainMethod a pm:ToolOrTechnique ;
+    skos:prefLabel "Critical chain method"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "scheduling" .
+
+pm:tt_CriticalChainProjectManagement a pm:ToolOrTechnique ;
+    skos:prefLabel "Critical chain project management (CCPM)"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "scheduling" .
+
+pm:tt_CriticalPathDrag a pm:ToolOrTechnique ;
+    skos:prefLabel "Critical path drag"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "scheduling" .
+
+pm:tt_CriticalPathDragCost a pm:ToolOrTechnique ;
+    skos:prefLabel "Critical path drag cost"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "scheduling" .
+
+pm:tt_CriticalPathMethod a pm:ToolOrTechnique ;
+    skos:prefLabel "Critical path method (CPM)"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "scheduling" .
+
+pm:tt_CriticalThinking a pm:ToolOrTechnique ;
+    skos:prefLabel "Critical thinking"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_CulturalAwareness a pm:ToolOrTechnique ;
+    skos:prefLabel "Cultural awareness"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "interpersonal" .
+
+pm:tt_DailyCoordinationMeeting a pm:ToolOrTechnique ;
+    skos:prefLabel "Daily coordination meeting"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "communication" .
+
+pm:tt_DataAnalysis a pm:ToolOrTechnique ;
+    skos:prefLabel "Data analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "data-analysis" .
+
+pm:tt_DataGathering a pm:ToolOrTechnique ;
+    skos:prefLabel "Data gathering"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_DataRepresentation a pm:ToolOrTechnique ;
+    skos:prefLabel "Data representation"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "communication" .
+
+pm:tt_DecisionMaking a pm:ToolOrTechnique ;
+    skos:prefLabel "Decision-making"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "decision" .
+
+pm:tt_DecisionTreeAnalysis a pm:ToolOrTechnique ;
+    skos:prefLabel "Decision tree analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "risk" .
+
+pm:tt_Decomposition a pm:ToolOrTechnique ;
+    skos:prefLabel "Decomposition"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_DependencyDeterminationAndIntegration a pm:ToolOrTechnique ;
+    skos:prefLabel "Dependency determination and integration"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_DesignThinking a pm:ToolOrTechnique ;
+    skos:prefLabel "Design thinking"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_DistributedManagementAndLeadership a pm:ToolOrTechnique ;
+    skos:prefLabel "Distributed management and leadership"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "interpersonal" .
+
+pm:tt_DocumentAnalysis a pm:DataGatheringTechnique,
+        pm:ToolOrTechnique ;
+    skos:prefLabel "Document analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "data-gathering" .
+
+pm:tt_EarnedValueAnalysis a pm:ToolOrTechnique ;
+    skos:prefLabel "Earned value (EV) analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "data-analysis" .
+
+pm:tt_EmotionalIntelligence a pm:ToolOrTechnique ;
+    skos:prefLabel "Emotional intelligence"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "interpersonal" .
+
+pm:tt_EstimationTechniques a pm:ToolOrTechnique ;
+    skos:prefLabel "Estimation techniques"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "estimation" .
+
+pm:tt_ExpertJudgment a pm:ToolOrTechnique ;
+    skos:prefLabel "Expert judgment"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_Facilitation a pm:ToolOrTechnique ;
+    skos:prefLabel "Facilitation"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "interpersonal" .
+
+pm:tt_Feedback a pm:ToolOrTechnique ;
+    skos:prefLabel "Feedback"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "communication" .
+
+pm:tt_Financing a pm:ToolOrTechnique ;
+    skos:prefLabel "Financing"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_Flowchart a pm:ToolOrTechnique ;
+    skos:prefLabel "Flowchart"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "representation" .
+
+pm:tt_FocusGroups a pm:DataGatheringTechnique,
+        pm:ToolOrTechnique ;
+    skos:prefLabel "Focus groups"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "data-gathering" .
+
+pm:tt_FundingLimitReconciliation a pm:ToolOrTechnique ;
+    skos:prefLabel "Funding limit reconciliation"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_GeneticAlgorithms a pm:ToolOrTechnique ;
+    skos:prefLabel "Genetic algorithms"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_GreenHumanResourceManagement a pm:ToolOrTechnique ;
+    skos:prefLabel "Green human resource management"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_GroundRules a pm:ToolOrTechnique ;
+    skos:prefLabel "Ground rules"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "interpersonal" .
+
+pm:tt_HierarchicalCharts a pm:ToolOrTechnique ;
+    skos:prefLabel "Hierarchical charts"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "representation" .
+
+pm:tt_HistoricalInformationReview a pm:DataGatheringTechnique,
+        pm:ToolOrTechnique ;
+    skos:prefLabel "Historical information review"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "data-gathering" .
+
+pm:tt_InProgressPostmortems a pm:ToolOrTechnique ;
+    skos:prefLabel "In-progress postmortems"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_IncrementalDelivery a pm:ToolOrTechnique ;
+    skos:prefLabel "Incremental delivery"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_IndividualAndTeamAssessments a pm:ToolOrTechnique ;
+    skos:prefLabel "Individual and team assessments"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_InfluenceDiagrams a pm:ToolOrTechnique ;
+    skos:prefLabel "Influence diagrams"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "representation" .
+
+pm:tt_Influencing a pm:ToolOrTechnique ;
+    skos:prefLabel "Influencing"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "interpersonal" .
+
+pm:tt_InformationManagement a pm:ToolOrTechnique ;
+    skos:prefLabel "Information management"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "communication" .
+
+pm:tt_InformationRadiators a pm:ToolOrTechnique ;
+    skos:prefLabel "Information radiators"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "representation" .
+
+pm:tt_Inspections a pm:ToolOrTechnique ;
+    skos:prefLabel "Inspections"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "quality" .
+
+pm:tt_IntegratedChangeControl a pm:ToolOrTechnique ;
+    skos:prefLabel "Integrated change control"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_InterpersonalAndTeamSkills a pm:ToolOrTechnique ;
+    skos:prefLabel "Interpersonal and team skills"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_Interviews a pm:DataGatheringTechnique,
+        pm:ToolOrTechnique ;
+    skos:prefLabel "Interviews"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "data-gathering" .
+
+pm:tt_IterationBurndownChart a pm:ToolOrTechnique ;
+    skos:prefLabel "Iteration burndown chart"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "scheduling" .
+
+pm:tt_KnowledgeManagement a pm:ToolOrTechnique ;
+    skos:prefLabel "Knowledge management"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_Leadership a pm:ToolOrTechnique ;
+    skos:prefLabel "Leadership"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "interpersonal" .
+
+pm:tt_LeadsAndLags a pm:ToolOrTechnique ;
+    skos:prefLabel "Leads and lags"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "scheduling" .
+
+pm:tt_LogicalRelationship a pm:ToolOrTechnique ;
+    skos:prefLabel "Logical relationship"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_MakeOrBuyAnalysisAndDecisions a pm:ToolOrTechnique ;
+    skos:prefLabel "Make-or-buy analysis and decisions"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "procurement" .
+
+pm:tt_ManagementReserves a pm:ToolOrTechnique ;
+    skos:prefLabel "Management reserves"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "risk" .
+
+pm:tt_MarketResearch a pm:ToolOrTechnique ;
+    skos:prefLabel "Market research"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "procurement" .
+
+pm:tt_MeetingManagement a pm:ToolOrTechnique ;
+    skos:prefLabel "Meeting management"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "communication" .
+
+pm:tt_Meetings a pm:ToolOrTechnique ;
+    skos:prefLabel "Meetings"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "communication" .
+
+pm:tt_MindMapping a pm:ToolOrTechnique ;
+    skos:prefLabel "Mind mapping"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "representation" .
+
+pm:tt_Motivation a pm:ToolOrTechnique ;
+    skos:prefLabel "Motivation"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "interpersonal" .
+
+pm:tt_MulticriteriaDecisionAnalysis a pm:ToolOrTechnique ;
+    skos:prefLabel "Multicriteria decision analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "decision" .
+
+pm:tt_MultipointEstimating a pm:ToolOrTechnique ;
+    skos:prefLabel "Multipoint estimating"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "estimation" .
+
+pm:tt_Negotiation a pm:ToolOrTechnique ;
+    skos:prefLabel "Negotiation"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "procurement" .
+
+pm:tt_Networking a pm:ToolOrTechnique ;
+    skos:prefLabel "Networking"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "scheduling" .
+
+pm:tt_NominalGroup a pm:ToolOrTechnique ;
+    skos:prefLabel "Nominal group"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "decision" .
+
+pm:tt_NonverbalCommunication a pm:ToolOrTechnique ;
+    skos:prefLabel "Nonverbal communication"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "communication" .
+
+pm:tt_ObservationConversation a pm:DataGatheringTechnique,
+        pm:ToolOrTechnique ;
+    skos:prefLabel "Observation/conversation"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "data-gathering" .
+
+pm:tt_OrganizationalCharts a pm:ToolOrTechnique ;
+    skos:prefLabel "Organizational charts"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "representation" .
+
+pm:tt_OrganizationalCulturalIntelligence a pm:ToolOrTechnique ;
+    skos:prefLabel "Organizational cultural intelligence"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_OrganizationalTheory a pm:ToolOrTechnique ;
+    skos:prefLabel "Organizational theory"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_ParametricEstimating a pm:ToolOrTechnique ;
+    skos:prefLabel "Parametric estimating"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "estimation" .
+
+pm:tt_PerformanceReviews a pm:ToolOrTechnique ;
+    skos:prefLabel "Performance reviews"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "data-analysis" .
+
+pm:tt_PoliticalAwareness a pm:ToolOrTechnique ;
+    skos:prefLabel "Political awareness"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "interpersonal" .
+
+pm:tt_PositionDescriptions a pm:ToolOrTechnique ;
+    skos:prefLabel "Position descriptions"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_Preassignment a pm:ToolOrTechnique ;
+    skos:prefLabel "Preassignment"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_PrecedenceDiagrammingMethod a pm:ToolOrTechnique ;
+    skos:prefLabel "Precedence diagramming method"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "scheduling" .
+
+pm:tt_PredictiveAnalytics a pm:ToolOrTechnique ;
+    skos:prefLabel "Predictive analytics"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_Presentations a pm:ToolOrTechnique ;
+    skos:prefLabel "Presentations"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "communication" .
+
+pm:tt_PrioritizationRanking a pm:ToolOrTechnique ;
+    skos:prefLabel "Prioritization/ranking"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "decision" .
+
+pm:tt_ProbabilityAndImpactMatrix a pm:ToolOrTechnique ;
+    skos:prefLabel "Probability and impact matrix"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "risk" .
+
+pm:tt_ProblemSolving a pm:ToolOrTechnique ;
+    skos:prefLabel "Problem-solving"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_ProcessAnalysis a pm:ToolOrTechnique ;
+    skos:prefLabel "Process analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "quality" .
+
+pm:tt_ProcessAutomations a pm:ToolOrTechnique ;
+    skos:prefLabel "Process automations"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_ProcessImprovement a pm:ToolOrTechnique ;
+    skos:prefLabel "Process improvement"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_ProductAnalysis a pm:ToolOrTechnique ;
+    skos:prefLabel "Product analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "data-analysis" .
+
+pm:tt_ProjectCanvas a pm:ToolOrTechnique ;
+    skos:prefLabel "Project canvas"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "representation" .
+
+pm:tt_ProjectDashboards a pm:ToolOrTechnique ;
+    skos:prefLabel "Project dashboards"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "representation" .
+
+pm:tt_ProjectManagementInformationSystem a pm:ToolOrTechnique ;
+    skos:prefLabel "Project management information system (PMIS)"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_ProjectReporting a pm:ToolOrTechnique ;
+    skos:prefLabel "Project reporting"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "communication" .
+
+pm:tt_PromptLists a pm:ToolOrTechnique ;
+    skos:prefLabel "Prompt lists"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "risk" .
+
+pm:tt_Prototypes a pm:ToolOrTechnique ;
+    skos:prefLabel "Prototypes"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_QualityAudits a pm:ToolOrTechnique ;
+    skos:prefLabel "Quality audits"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "quality" .
+
+pm:tt_QuestionnairesAndSurveys a pm:DataGatheringTechnique,
+        pm:ToolOrTechnique ;
+    skos:prefLabel "Questionnaires and surveys"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "data-gathering" .
+
+pm:tt_RACIChart a pm:ToolOrTechnique ;
+    skos:prefLabel "RACI chart"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "representation" .
+
+pm:tt_RecognitionAndRewards a pm:ToolOrTechnique ;
+    skos:prefLabel "Recognition and rewards"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "interpersonal" .
+
+pm:tt_RegressionAnalysis a pm:ToolOrTechnique ;
+    skos:prefLabel "Regression analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "data-analysis" .
+
+pm:tt_ReserveAnalysis a pm:ToolOrTechnique ;
+    skos:prefLabel "Reserve analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "risk" .
+
+pm:tt_ResourceBasedView a pm:ToolOrTechnique ;
+    skos:prefLabel "Resource-based view"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_ResourceLeveling a pm:ToolOrTechnique ;
+    skos:prefLabel "Resource leveling"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "scheduling" .
+
+pm:tt_ResourceOptimizationTechnique a pm:ToolOrTechnique ;
+    skos:prefLabel "Resource optimization technique"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_ResourceSmoothing a pm:ToolOrTechnique ;
+    skos:prefLabel "Resource smoothing"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "scheduling" .
+
+pm:tt_ResponsibilityAssignmentMatrix a pm:ToolOrTechnique ;
+    skos:prefLabel "Responsibility assignment matrix"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "representation" .
+
+pm:tt_Retrospectives a pm:ToolOrTechnique ;
+    skos:prefLabel "Retrospectives"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_RiskCategorization a pm:ToolOrTechnique ;
+    skos:prefLabel "Risk categorization"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "risk" .
+
+pm:tt_RiskProbabilityAndImpactAssessment a pm:ToolOrTechnique ;
+    skos:prefLabel "Risk probability and impact assessment"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "risk" .
+
+pm:tt_RollingWavePlanning a pm:ToolOrTechnique ;
+    skos:prefLabel "Rolling wave planning"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "scheduling" .
+
+pm:tt_RootCauseAnalysis a pm:ToolOrTechnique ;
+    skos:prefLabel "Root cause analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "quality" .
+
+pm:tt_SWOTAnalysis a pm:ToolOrTechnique ;
+    skos:prefLabel "SWOT (strengths, weaknesses, opportunities, threats) analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "risk" .
+
+pm:tt_ScheduleCompression a pm:ToolOrTechnique ;
+    skos:prefLabel "Schedule compression"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "scheduling" .
+
+pm:tt_ScheduleNetworkAnalysis a pm:ToolOrTechnique ;
+    skos:prefLabel "Schedule network analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "scheduling" .
+
+pm:tt_SensitivityAnalysis a pm:ToolOrTechnique ;
+    skos:prefLabel "Sensitivity analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "risk" .
+
+pm:tt_ServantLeadership a pm:ToolOrTechnique ;
+    skos:prefLabel "Servant leadership"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "interpersonal" .
+
+pm:tt_Simulation a pm:ToolOrTechnique ;
+    skos:prefLabel "Simulation"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "risk" .
+
+pm:tt_SprintReview a pm:ToolOrTechnique ;
+    skos:prefLabel "Sprint review"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_StakeholderAnalysis a pm:ToolOrTechnique ;
+    skos:prefLabel "Stakeholder analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "data-analysis" .
+
+pm:tt_StakeholderEngagementAssessmentMatrix a pm:ToolOrTechnique ;
+    skos:prefLabel "Stakeholder engagement assessment matrix"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "representation" .
+
+pm:tt_StakeholderMappingRepresentation a pm:ToolOrTechnique ;
+    skos:prefLabel "Stakeholder mapping/representation"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "representation" .
+
+pm:tt_Storytelling a pm:ToolOrTechnique ;
+    skos:prefLabel "Storytelling"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "communication" .
+
+pm:tt_StrategiesForOpportunities a pm:ToolOrTechnique ;
+    skos:prefLabel "Strategies for opportunities"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_StrategiesForOverallProjectRisk a pm:ToolOrTechnique ;
+    skos:prefLabel "Strategies for overall project risk"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "risk" .
+
+pm:tt_StrategiesForThreats a pm:ToolOrTechnique ;
+    skos:prefLabel "Strategies for threats"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_TeamBuilding a pm:ToolOrTechnique ;
+    skos:prefLabel "Team building"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "interpersonal" .
+
+pm:tt_TechnicalPerformanceAnalysis a pm:ToolOrTechnique ;
+    skos:prefLabel "Technical performance analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "data-analysis" .
+
+pm:tt_TestAndInspectionPlanning a pm:ToolOrTechnique ;
+    skos:prefLabel "Test and inspection planning"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "quality" .
+
+pm:tt_TestingProductEvaluations a pm:ToolOrTechnique ;
+    skos:prefLabel "Testing/product evaluations"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "quality" .
+
+pm:tt_TextOrientedFormats a pm:ToolOrTechnique ;
+    skos:prefLabel "Text-oriented formats"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_TheoryOfConstraints a pm:ToolOrTechnique ;
+    skos:prefLabel "Theory of constraints (TOC)"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "data-analysis" .
+
+pm:tt_ThreePointEstimating a pm:ToolOrTechnique ;
+    skos:prefLabel "Three-point estimating"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "estimation" .
+
+pm:tt_ToCompletePerformanceIndex a pm:ToolOrTechnique ;
+    skos:prefLabel "To-complete performance index (TCPI)"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_Training a pm:ToolOrTechnique ;
+    skos:prefLabel "Training"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "interpersonal" .
+
+pm:tt_TrendAnalysis a pm:ToolOrTechnique ;
+    skos:prefLabel "Trend analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "data-analysis" .
+
+pm:tt_TuckmanLadder a pm:ToolOrTechnique ;
+    skos:prefLabel "Tuckman ladder"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_ValueEngineering a pm:ToolOrTechnique ;
+    skos:prefLabel "Value engineering"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_ValueStreamMapping a pm:ToolOrTechnique ;
+    skos:prefLabel "Value stream mapping"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "quality" .
+
+pm:tt_VarianceAnalysis a pm:ToolOrTechnique ;
+    skos:prefLabel "Variance analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "data-analysis" .
+
+pm:tt_Velocity a pm:ToolOrTechnique ;
+    skos:prefLabel "Velocity"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "estimation" .
+
+pm:tt_VirtualCollaborationTools a pm:ToolOrTechnique ;
+    skos:prefLabel "Virtual collaboration tools"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_VirtualReality a pm:ToolOrTechnique ;
+    skos:prefLabel "Virtual reality (VR)"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_VirtualTeams a pm:ToolOrTechnique ;
+    skos:prefLabel "Virtual teams"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_VisualControls a pm:ToolOrTechnique ;
+    skos:prefLabel "Visual controls"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 1 ;
+    pm:techniqueCategory "representation" .
+
+pm:tt_Voting a pm:ToolOrTechnique ;
+    skos:prefLabel "Voting"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "decision" .
+
+pm:tt_WarRoom a pm:ToolOrTechnique ;
+    skos:prefLabel "War room"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "general" .
+
+pm:tt_WhatIfAnalysis a pm:ToolOrTechnique ;
+    skos:prefLabel "What-if analysis"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "risk" .
+
+pm:tt_WorkPerformanceReviews a pm:ToolOrTechnique ;
+    skos:prefLabel "Work performance reviews"@en ;
+    pm:definitionStatus "taxonomy-only" ;
+    pm:sourcePage 145 ;
+    pm:techniqueCategory "data-analysis" .
+
+<https://example.org/pm/ontology/pmbok8> a owl:Ontology .
+

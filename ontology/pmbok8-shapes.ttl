@@ -1,0 +1,249 @@
+# self-authored: true
+# source_id: PMBOK8-2025
+# SHACL shapes over the self-authored vocabulary; no source text is copied.
+@prefix pm: <https://example.org/pm#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+pm:s01_process_domain_cardinality a sh:NodeShape ;
+    rdfs:label "process-domain-cardinality"@en ;
+    sh:targetClass pm:Process ;
+    sh:message "Each process must belong to exactly one performance domain."@en ;
+    sh:property [
+        sh:path pm:belongsToDomain ;
+        sh:minCount 1 ; sh:maxCount 1 ;
+        sh:message "Each process must belong to exactly one performance domain."@en ;
+    ] .
+
+pm:s02_process_focus_area a sh:NodeShape ;
+    rdfs:label "process-focus-area"@en ;
+    sh:targetClass pm:Process ;
+    sh:message "Each process must name at least one focus area."@en ;
+    sh:property [
+        sh:path pm:hasFocusArea ;
+        sh:minCount 1 ;
+        sh:message "Each process must name at least one focus area."@en ;
+    ] .
+
+pm:s03_process_input a sh:NodeShape ;
+    rdfs:label "process-input"@en ;
+    sh:targetClass pm:Process ;
+    sh:message "Each process must consume at least one artifact."@en ;
+    sh:property [
+        sh:path pm:hasInput ;
+        sh:minCount 1 ;
+        sh:message "Each process must consume at least one artifact."@en ;
+    ] .
+
+pm:s04_process_output a sh:NodeShape ;
+    rdfs:label "process-output"@en ;
+    sh:targetClass pm:Process ;
+    sh:message "Each process must produce at least one artifact."@en ;
+    sh:property [
+        sh:path pm:hasOutput ;
+        sh:minCount 1 ;
+        sh:message "Each process must produce at least one artifact."@en ;
+    ] .
+
+pm:s05_process_domain_class a sh:NodeShape ;
+    rdfs:label "process-domain-class"@en ;
+    sh:targetClass pm:Process ;
+    sh:message "The domain of a process must be a performance domain."@en ;
+    sh:property [
+        sh:path pm:belongsToDomain ;
+        sh:class pm:PerformanceDomain ;
+        sh:message "The domain of a process must be a performance domain."@en ;
+    ] .
+
+pm:s06_process_focus_class a sh:NodeShape ;
+    rdfs:label "process-focus-class"@en ;
+    sh:targetClass pm:Process ;
+    sh:message "The focus area of a process must be a focus area."@en ;
+    sh:property [
+        sh:path pm:hasFocusArea ;
+        sh:class pm:FocusArea ;
+        sh:message "The focus area of a process must be a focus area."@en ;
+    ] .
+
+pm:s07_process_label_en a sh:NodeShape ;
+    rdfs:label "process-label-en"@en ;
+    sh:targetClass pm:Process ;
+    sh:message "Each process must carry an English preferred label."@en ;
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:qualifiedValueShape [ sh:languageIn ( "en" ) ] ; sh:qualifiedMinCount 1 ;
+        sh:message "Each process must carry an English preferred label."@en ;
+    ] .
+
+pm:s08_process_label_zh a sh:NodeShape ;
+    rdfs:label "process-label-zh"@en ;
+    sh:targetClass pm:Process ;
+    sh:message "Each process must carry a Chinese preferred label."@en ;
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:qualifiedValueShape [ sh:languageIn ( "zh" ) ] ; sh:qualifiedMinCount 1 ;
+        sh:message "Each process must carry a Chinese preferred label."@en ;
+    ] .
+
+pm:s09_process_code a sh:NodeShape ;
+    rdfs:label "process-code"@en ;
+    sh:targetClass pm:Process ;
+    sh:message "Each process must carry its structural code."@en ;
+    sh:property [
+        sh:path pm:processCode ;
+        sh:minCount 1 ;
+        sh:message "Each process must carry its structural code."@en ;
+    ] .
+
+pm:s10_process_source_page a sh:NodeShape ;
+    rdfs:label "process-source-page"@en ;
+    sh:targetClass pm:Process ;
+    sh:message "Each process must record the page where its structure was verified."@en ;
+    sh:property [
+        sh:path pm:sourcePage ;
+        sh:minCount 1 ;
+        sh:message "Each process must record the page where its structure was verified."@en ;
+    ] .
+
+pm:s11_process_io_status a sh:NodeShape ;
+    rdfs:label "process-io-status"@en ;
+    sh:targetClass pm:Process ;
+    sh:message "The I/O status of a process must be complete or pending."@en ;
+    sh:property [
+        sh:path pm:ioStatus ;
+        sh:in ( "complete" "pending" ) ;
+        sh:message "The I/O status of a process must be complete or pending."@en ;
+    ] .
+
+pm:s12_domain_definition a sh:NodeShape ;
+    rdfs:label "domain-definition"@en ;
+    sh:targetClass pm:PerformanceDomain ;
+    sh:message "Each performance domain must carry a self-authored definition."@en ;
+    sh:property [
+        sh:path skos:definition ;
+        sh:minCount 1 ;
+        sh:message "Each performance domain must carry a self-authored definition."@en ;
+    ] .
+
+pm:s13_domain_process a sh:NodeShape ;
+    rdfs:label "domain-process"@en ;
+    sh:targetClass pm:PerformanceDomain ;
+    sh:message "Each performance domain must own at least one process."@en ;
+    sh:property [
+        sh:path [ sh:inversePath pm:belongsToDomain ] ;
+        sh:minCount 1 ;
+        sh:message "Each performance domain must own at least one process."@en ;
+    ] .
+
+pm:s14_focus_definition a sh:NodeShape ;
+    rdfs:label "focus-definition"@en ;
+    sh:targetClass pm:FocusArea ;
+    sh:message "Each focus area must carry a self-authored definition."@en ;
+    sh:property [
+        sh:path skos:definition ;
+        sh:minCount 1 ;
+        sh:message "Each focus area must carry a self-authored definition."@en ;
+    ] .
+
+pm:s15_focus_process a sh:NodeShape ;
+    rdfs:label "focus-process"@en ;
+    sh:targetClass pm:FocusArea ;
+    sh:message "Each focus area must cover at least one process."@en ;
+    sh:property [
+        sh:path [ sh:inversePath pm:hasFocusArea ] ;
+        sh:minCount 1 ;
+        sh:message "Each focus area must cover at least one process."@en ;
+    ] .
+
+pm:s16_artifact_category a sh:NodeShape ;
+    rdfs:label "artifact-category"@en ;
+    sh:targetClass pm:Artifact ;
+    sh:message "Artifact category must come from the controlled list."@en ;
+    sh:property [
+        sh:path pm:artifactCategory ;
+        sh:in ( "plan" "baseline" "register" "report" "data" "document" ) ;
+        sh:message "Artifact category must come from the controlled list."@en ;
+    ] .
+
+pm:s17_artifact_label a sh:NodeShape ;
+    rdfs:label "artifact-label"@en ;
+    sh:targetClass pm:Artifact ;
+    sh:message "Each artifact must carry a preferred label."@en ;
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:minCount 1 ;
+        sh:message "Each artifact must carry a preferred label."@en ;
+    ] .
+
+pm:s18_artifact_source_page a sh:NodeShape ;
+    rdfs:label "artifact-source-page"@en ;
+    sh:targetClass pm:Artifact ;
+    sh:message "Each artifact must record a page anchor."@en ;
+    sh:property [
+        sh:path pm:sourcePage ;
+        sh:minCount 1 ;
+        sh:message "Each artifact must record a page anchor."@en ;
+    ] .
+
+pm:s19_artifact_definition_status a sh:NodeShape ;
+    rdfs:label "artifact-definition-status"@en ;
+    sh:targetClass pm:Artifact ;
+    sh:message "Artifact definition status must come from the controlled list."@en ;
+    sh:property [
+        sh:path pm:definitionStatus ;
+        sh:in ( "complete" "taxonomy-only" "pending" ) ;
+        sh:message "Artifact definition status must come from the controlled list."@en ;
+    ] .
+
+pm:s20_technique_category a sh:NodeShape ;
+    rdfs:label "technique-category"@en ;
+    sh:targetClass pm:ToolOrTechnique ;
+    sh:message "Technique category must come from the controlled list."@en ;
+    sh:property [
+        sh:path pm:techniqueCategory ;
+        sh:in ( "data-gathering" "data-analysis" "representation" "decision" "communication" "interpersonal" "estimation" "scheduling" "risk" "quality" "procurement" "general" ) ;
+        sh:message "Technique category must come from the controlled list."@en ;
+    ] .
+
+pm:s21_technique_label a sh:NodeShape ;
+    rdfs:label "technique-label"@en ;
+    sh:targetClass pm:ToolOrTechnique ;
+    sh:message "Each tool or technique must carry a preferred label."@en ;
+    sh:property [
+        sh:path skos:prefLabel ;
+        sh:minCount 1 ;
+        sh:message "Each tool or technique must carry a preferred label."@en ;
+    ] .
+
+pm:s22_class_definition a sh:NodeShape ;
+    rdfs:label "class-definition"@en ;
+    sh:targetClass owl:Class ;
+    sh:message "Every class must carry a self-authored definition."@en ;
+    sh:property [
+        sh:path skos:definition ;
+        sh:minCount 1 ;
+        sh:message "Every class must carry a self-authored definition."@en ;
+    ] .
+
+pm:s23_property_domain a sh:NodeShape ;
+    rdfs:label "property-domain"@en ;
+    sh:targetClass owl:ObjectProperty ;
+    sh:message "Every object property must declare a domain."@en ;
+    sh:property [
+        sh:path rdfs:domain ;
+        sh:minCount 1 ;
+        sh:message "Every object property must declare a domain."@en ;
+    ] .
+
+pm:s24_property_range a sh:NodeShape ;
+    rdfs:label "property-range"@en ;
+    sh:targetClass owl:ObjectProperty ;
+    sh:message "Every object property must declare a range."@en ;
+    sh:property [
+        sh:path rdfs:range ;
+        sh:minCount 1 ;
+        sh:message "Every object property must declare a range."@en ;
+    ] .

@@ -12,6 +12,7 @@
 | `anchor_baseline.json` | `check_anchors.py` 的指纹基线（`rule:*` 与 `source:*`），内容变更后重冻 | `spec/ANCHOR_SPEC.md` 第 5 节 | 数据文件 |
 | `check_glossary_sync` | 检查 `GLOSSARY.md` 的 A 类条目与 `knowledge/anchored-entries.jsonl` 的定义一致性 | `check_glossary_sync.md` | 未实现（T-090） |
 | `check_no_raw_material.py` | 阻断式检查：已跟踪文件中不得出现原始资料（PDF/EPUB/扫描件等）、文本层/OCR 转储与成段原文；允许受控的自建本体（`CONSTITUTION.md` 第 13.6 条） | `CONSTITUTION.md` 第 13 条 | 已实现 |
+| `validate_ontology.py` | 用 `rdflib` + `pyshacl` 校验 `ontology/` 本体与 24 条 SHACL 形状；`--matrix` 逐条运行违规 fixture，确认每条形状能判出违规 | 无独立规格（边界见 `CONSTITUTION.md` 第 13.6 条与 `ontology/README.md`） | 已实现（可选依赖） |
 
 ### 运行方式
 
@@ -20,7 +21,10 @@ python3 scripts/check_state.py
 python3 scripts/check_ledger_landings.py
 python3 scripts/check_anchors.py
 python3 scripts/check_no_raw_material.py
+python3 scripts/validate_ontology.py --matrix
 ```
+
+`validate_ontology.py` 退出码：`0` 通过；`1` 出现非预期结果（本体不通过或某条形状未被 fixture 判出）；`2` 缺少 `rdflib`/`pyshacl` 或结构无法解析——此时必须报“无法评估”，不得视为通过。
 
 `check_state.py` 退出码：`0` 通过；`1` 存在错误（逐条列出）；`2` `STATE.md` 结构无法解析或不在 git 仓库中。
 

@@ -1,0 +1,1127 @@
+# self-authored: true
+# source_id: PMBOK8-2025
+# Vocabulary: classes, object properties and datatype properties.
+# Definitions and structure are written for this repository; no source text is copied.
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix pm: <https://example.org/pm#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+pm:AIActor a owl:Class ;
+    rdfs:label "AI actor"@en ;
+    rdfs:subClassOf pm:Actor ;
+    skos:definition "A software agent that performs bounded tasks and whose outputs still require human accountability."@en ;
+    skos:prefLabel "AI actor"@en,
+        "人工智能行动主体"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Baseline a owl:Class ;
+    rdfs:label "Baseline"@en ;
+    rdfs:subClassOf pm:Artifact ;
+    skos:definition "An approved fixed reference against which later performance is compared."@en ;
+    skos:prefLabel "Baseline"@en,
+        "基线"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:BenefitRealization a owl:Class ;
+    rdfs:label "Benefit realization"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "The process through which intended benefits are actually obtained and measured."@en ;
+    skos:prefLabel "Benefit realization"@en,
+        "收益实现"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Budget a owl:Class ;
+    rdfs:label "Budget"@en ;
+    rdfs:subClassOf pm:Artifact ;
+    skos:definition "An artifact that allocates authorized funds across scope and time."@en ;
+    skos:prefLabel "Budget"@en,
+        "预算"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:BusinessCase a owl:Class ;
+    rdfs:label "Business case"@en ;
+    rdfs:subClassOf pm:Artifact ;
+    skos:definition "An artifact that argues why a proposed investment is worth undertaking."@en ;
+    skos:prefLabel "Business case"@en,
+        "商业论证"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:ChangeRequest a owl:Class ;
+    rdfs:label "Change request"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A formal proposal to alter an approved scope, plan or baseline."@en ;
+    skos:prefLabel "Change request"@en,
+        "变更请求"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Communication a owl:Class ;
+    rdfs:label "Communication"@en ;
+    rdfs:subClassOf pm:Artifact ;
+    skos:definition "An artifact or exchange that conveys information to an audience."@en ;
+    skos:prefLabel "Communication"@en,
+        "沟通"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:CommunicationTechnique a owl:Class ;
+    rdfs:label "Communication technique"@en ;
+    rdfs:subClassOf pm:ToolOrTechnique ;
+    skos:definition "A tool or technique whose purpose is to exchange information."@en ;
+    skos:prefLabel "Communication technique"@en,
+        "沟通技术"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Contract a owl:Class ;
+    rdfs:label "Contract"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A binding agreement that creates enforceable obligations between parties."@en ;
+    skos:prefLabel "Contract"@en,
+        "合同"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:CostConstraint a owl:Class ;
+    rdfs:label "Cost constraint"@en ;
+    rdfs:subClassOf pm:Constraint ;
+    skos:definition "A limit on funding or allowable expenditure."@en ;
+    skos:prefLabel "Cost constraint"@en,
+        "成本约束"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Customer a owl:Class ;
+    rdfs:label "Customer"@en ;
+    rdfs:subClassOf pm:Role ;
+    skos:definition "The role that receives and judges the value of the result."@en ;
+    skos:prefLabel "Customer"@en,
+        "客户"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:DataAnalysisTechnique a owl:Class ;
+    rdfs:label "Data analysis technique"@en ;
+    rdfs:subClassOf pm:ToolOrTechnique ;
+    skos:definition "A tool or technique whose purpose is to interpret information."@en ;
+    skos:prefLabel "Data analysis technique"@en,
+        "数据分析技术"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:DataGatheringTechnique a owl:Class ;
+    rdfs:label "Data gathering technique"@en ;
+    rdfs:subClassOf pm:ToolOrTechnique ;
+    skos:definition "A tool or technique whose purpose is to obtain information."@en ;
+    skos:prefLabel "Data gathering technique"@en,
+        "数据收集技术"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:DataRepresentationTechnique a owl:Class ;
+    rdfs:label "Data representation technique"@en ;
+    rdfs:subClassOf pm:ToolOrTechnique ;
+    skos:definition "A tool or technique whose purpose is to display information in a readable form."@en ;
+    skos:prefLabel "Data representation technique"@en,
+        "数据表示技术"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:DecisionMakingTechnique a owl:Class ;
+    rdfs:label "Decision-making technique"@en ;
+    rdfs:subClassOf pm:ToolOrTechnique ;
+    skos:definition "A tool or technique whose purpose is to choose among alternatives."@en ;
+    skos:prefLabel "Decision-making technique"@en,
+        "决策技术"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Dependency a owl:Class ;
+    rdfs:label "Dependency"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A constraint in which one item's timing or value depends on another."@en ;
+    skos:prefLabel "Dependency"@en,
+        "依赖关系"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Document a owl:Class ;
+    rdfs:label "Document"@en ;
+    rdfs:subClassOf pm:Artifact ;
+    skos:definition "An artifact whose main purpose is to record information for reference."@en ;
+    skos:prefLabel "Document"@en,
+        "文档"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Estimate a owl:Class ;
+    rdfs:label "Estimate"@en ;
+    rdfs:subClassOf pm:Artifact ;
+    skos:definition "An artifact that gives an approximate value for effort, cost, duration or resources."@en ;
+    skos:prefLabel "Estimate"@en,
+        "估算"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:EstimationTechnique a owl:Class ;
+    rdfs:label "Estimation technique"@en ;
+    rdfs:subClassOf pm:ToolOrTechnique ;
+    skos:definition "A tool or technique whose purpose is to produce an approximate value."@en ;
+    skos:prefLabel "Estimation technique"@en,
+        "估算技术"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:GovernanceBody a owl:Class ;
+    rdfs:label "Governance body"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A group with formal authority to approve, direct or oversee the work."@en ;
+    skos:prefLabel "Governance body"@en,
+        "治理机构"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:HumanActor a owl:Class ;
+    rdfs:label "Human actor"@en ;
+    rdfs:subClassOf pm:Actor ;
+    skos:definition "A person acting in a project or governance capacity."@en ;
+    skos:prefLabel "Human actor"@en,
+        "人类行动主体"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:InterpersonalSkill a owl:Class ;
+    rdfs:label "Interpersonal skill"@en ;
+    rdfs:subClassOf pm:ToolOrTechnique ;
+    skos:definition "A human capability applied to influence, support or coordinate people."@en ;
+    skos:prefLabel "Interpersonal skill"@en,
+        "人际技能"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:LegalEntity a owl:Class ;
+    rdfs:label "Legal entity"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "An organization or person recognized as able to enter agreements and carry liability."@en ;
+    skos:prefLabel "Legal entity"@en,
+        "法律实体"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:LessonLearned a owl:Class ;
+    rdfs:label "Lesson learned"@en ;
+    rdfs:subClassOf pm:KnowledgeAsset ;
+    skos:definition "A knowledge asset describing what happened and what should change next time."@en ;
+    skos:prefLabel "Lesson learned"@en,
+        "经验教训"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Lifecycle a owl:Class ;
+    rdfs:label "Lifecycle"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "The sequence of stages through which a project or product passes."@en ;
+    skos:prefLabel "Lifecycle"@en,
+        "生命周期"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Organization a owl:Class ;
+    rdfs:label "Organization"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A body of people with assigned authority and shared processes that owns or sponsors work."@en ;
+    skos:prefLabel "Organization"@en,
+        "组织"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:PMO a owl:Class ;
+    rdfs:label "Project management office"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "An organizational unit that standardizes and supports project management practice."@en ;
+    skos:prefLabel "Project management office"@en,
+        "项目管理办公室"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Plan a owl:Class ;
+    rdfs:label "Plan"@en ;
+    rdfs:subClassOf pm:Artifact ;
+    skos:definition "An artifact that states intended approach, scope, timing or controls."@en ;
+    skos:prefLabel "Plan"@en,
+        "计划"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Policy a owl:Class ;
+    rdfs:label "Policy"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A standing rule that constrains decisions across the organization."@en ;
+    skos:prefLabel "Policy"@en,
+        "政策"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Portfolio a owl:Class ;
+    rdfs:label "Portfolio"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "The collection of projects, programs and related work an organization funds and steers as one investment set."@en ;
+    skos:prefLabel "Portfolio"@en,
+        "项目组合"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Procedure a owl:Class ;
+    rdfs:label "Procedure"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A prescribed sequence of steps for performing a recurring action."@en ;
+    skos:prefLabel "Procedure"@en,
+        "程序"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:ProcurementDocument a owl:Class ;
+    rdfs:label "Procurement document"@en ;
+    rdfs:subClassOf pm:Artifact ;
+    skos:definition "An artifact used to solicit, evaluate or formalize an external supply arrangement."@en ;
+    skos:prefLabel "Procurement document"@en,
+        "采购文件"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:ProcurementTechnique a owl:Class ;
+    rdfs:label "Procurement technique"@en ;
+    rdfs:subClassOf pm:ToolOrTechnique ;
+    skos:definition "A tool or technique whose purpose is to shape or run an external supply arrangement."@en ;
+    skos:prefLabel "Procurement technique"@en,
+        "采购技术"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Product a owl:Class ;
+    rdfs:label "Product"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A tangible or intangible thing produced for use or sale."@en ;
+    skos:prefLabel "Product"@en,
+        "产品"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Program a owl:Class ;
+    rdfs:label "Program"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A group of related projects coordinated to obtain benefits that separate management would not deliver."@en ;
+    skos:prefLabel "Program"@en,
+        "项目集"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:ProjectManager a owl:Class ;
+    rdfs:label "Project manager"@en ;
+    rdfs:subClassOf pm:Role ;
+    skos:definition "The role accountable for leading the work toward its agreed results."@en ;
+    skos:prefLabel "Project manager"@en,
+        "项目经理"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:QualityConstraint a owl:Class ;
+    rdfs:label "Quality constraint"@en ;
+    rdfs:subClassOf pm:Constraint ;
+    skos:definition "A limit on acceptable quality characteristics or methods."@en ;
+    skos:prefLabel "Quality constraint"@en,
+        "质量约束"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:QualityRecord a owl:Class ;
+    rdfs:label "Quality record"@en ;
+    rdfs:subClassOf pm:Artifact ;
+    skos:definition "An artifact that evidences a quality activity or measurement."@en ;
+    skos:prefLabel "Quality record"@en,
+        "质量记录"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:QualityTechnique a owl:Class ;
+    rdfs:label "Quality technique"@en ;
+    rdfs:subClassOf pm:ToolOrTechnique ;
+    skos:definition "A tool or technique whose purpose is to plan, assure or control quality."@en ;
+    skos:prefLabel "Quality technique"@en,
+        "质量技术"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Register a owl:Class ;
+    rdfs:label "Register"@en ;
+    rdfs:subClassOf pm:Artifact ;
+    skos:definition "An artifact that keeps a structured, evolving list of items of one kind."@en ;
+    skos:prefLabel "Register"@en,
+        "登记册"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Report a owl:Class ;
+    rdfs:label "Report"@en ;
+    rdfs:subClassOf pm:Artifact ;
+    skos:definition "An artifact that communicates status, analysis or conclusions to an audience."@en ;
+    skos:prefLabel "Report"@en,
+        "报告"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Requirement a owl:Class ;
+    rdfs:label "Requirement"@en ;
+    rdfs:subClassOf pm:Artifact ;
+    skos:definition "A stated need or condition that a result must satisfy."@en ;
+    skos:prefLabel "Requirement"@en,
+        "需求"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Resource a owl:Class ;
+    rdfs:label "Resource"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A person, asset, facility or supply needed to perform work."@en ;
+    skos:prefLabel "Resource"@en,
+        "资源"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:ResourceConstraint a owl:Class ;
+    rdfs:label "Resource constraint"@en ;
+    rdfs:subClassOf pm:Constraint ;
+    skos:definition "A limit on the availability or composition of resources."@en ;
+    skos:prefLabel "Resource constraint"@en,
+        "资源约束"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Result a owl:Class ;
+    rdfs:label "Result"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "The end state of an activity, whether intended or not."@en ;
+    skos:prefLabel "Result"@en,
+        "结果"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:RiskConstraint a owl:Class ;
+    rdfs:label "Risk constraint"@en ;
+    rdfs:subClassOf pm:Constraint ;
+    skos:definition "A limit on acceptable exposure or required risk treatment."@en ;
+    skos:prefLabel "Risk constraint"@en,
+        "风险约束"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:RiskTechnique a owl:Class ;
+    rdfs:label "Risk technique"@en ;
+    rdfs:subClassOf pm:ToolOrTechnique ;
+    skos:definition "A tool or technique whose purpose is to identify, analyse or respond to uncertainty."@en ;
+    skos:prefLabel "Risk technique"@en,
+        "风险技术"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:ScheduleConstraint a owl:Class ;
+    rdfs:label "Schedule constraint"@en ;
+    rdfs:subClassOf pm:Constraint ;
+    skos:definition "A limit on timing, sequencing or deadlines."@en ;
+    skos:prefLabel "Schedule constraint"@en,
+        "进度约束"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:SchedulingTechnique a owl:Class ;
+    rdfs:label "Scheduling technique"@en ;
+    rdfs:subClassOf pm:ToolOrTechnique ;
+    skos:definition "A tool or technique whose purpose is to build or adjust a schedule."@en ;
+    skos:prefLabel "Scheduling technique"@en,
+        "进度技术"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:ScopeConstraint a owl:Class ;
+    rdfs:label "Scope constraint"@en ;
+    rdfs:subClassOf pm:Constraint ;
+    skos:definition "A limit on what the work may include or exclude."@en ;
+    skos:prefLabel "Scope constraint"@en,
+        "范围约束"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Service a owl:Class ;
+    rdfs:label "Service"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "An ongoing capability delivered to users under defined conditions."@en ;
+    skos:prefLabel "Service"@en,
+        "服务"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Specification a owl:Class ;
+    rdfs:label "Specification"@en ;
+    rdfs:subClassOf pm:Artifact ;
+    skos:definition "An artifact that states measurable characteristics a result must have."@en ;
+    skos:prefLabel "Specification"@en,
+        "规格说明"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Sponsor a owl:Class ;
+    rdfs:label "Sponsor"@en ;
+    rdfs:subClassOf pm:Role ;
+    skos:definition "The role that authorizes the work and owns its business justification."@en ;
+    skos:prefLabel "Sponsor"@en,
+        "发起人"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Stakeholder a owl:Class ;
+    rdfs:label "Stakeholder"@en ;
+    rdfs:subClassOf pm:Role ;
+    skos:definition "The role held by anyone who affects, is affected by, or cares about the work."@en ;
+    skos:prefLabel "Stakeholder"@en,
+        "相关方"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Supplier a owl:Class ;
+    rdfs:label "Supplier"@en ;
+    rdfs:subClassOf pm:Role ;
+    skos:definition "The role that provides goods or services under an agreement."@en ;
+    skos:prefLabel "Supplier"@en,
+        "供应商"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Team a owl:Class ;
+    rdfs:label "Team"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "The group of people who perform the project work and share accountability for its results."@en ;
+    skos:prefLabel "Team"@en,
+        "团队"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:TeamMember a owl:Class ;
+    rdfs:label "Team member"@en ;
+    rdfs:subClassOf pm:Role ;
+    skos:definition "The role that performs assigned work and contributes to team results."@en ;
+    skos:prefLabel "Team member"@en,
+        "团队成员"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:ValueProposition a owl:Class ;
+    rdfs:label "Value proposition"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A statement of the value a result is expected to create and for whom."@en ;
+    skos:prefLabel "Value proposition"@en,
+        "价值主张"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:WorkPackage a owl:Class ;
+    rdfs:label "Work package"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "The lowest manageable unit of scope for which cost and duration can be estimated."@en ;
+    skos:prefLabel "Work package"@en,
+        "工作包"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:WorkPerformanceData a owl:Class ;
+    rdfs:label "Work performance data"@en ;
+    rdfs:subClassOf pm:Artifact ;
+    skos:definition "Raw observations collected while the work is being performed."@en ;
+    skos:prefLabel "Work performance data"@en,
+        "工作绩效数据"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:WorkPerformanceInformation a owl:Class ;
+    rdfs:label "Work performance information"@en ;
+    rdfs:subClassOf pm:Artifact ;
+    skos:definition "Performance data interpreted against plans and baselines."@en ;
+    skos:prefLabel "Work performance information"@en,
+        "工作绩效信息"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:WorkPerformanceReport a owl:Class ;
+    rdfs:label "Work performance report"@en ;
+    rdfs:subClassOf pm:Artifact ;
+    skos:definition "A packaged view of performance information for decision makers."@en ;
+    skos:prefLabel "Work performance report"@en,
+        "工作绩效报告"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:accountableFor a owl:ObjectProperty ;
+    rdfs:label "accountable for"@en ;
+    rdfs:domain pm:Actor ;
+    rdfs:range pm:Entity ;
+    skos:definition "Names what an actor answers for, independent of who performs it."@en ;
+    skos:prefLabel "accountable for"@en,
+        "对……负责"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:artifactCategory a owl:DatatypeProperty ;
+    rdfs:label "artifact category"@en ;
+    rdfs:domain pm:Artifact ;
+    rdfs:range xsd:string ;
+    skos:definition "Classifies an artifact as a plan, baseline, register, report, data set or document."@en ;
+    skos:prefLabel "artifact category"@en,
+        "工件类别"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:assignedTo a owl:ObjectProperty ;
+    rdfs:label "assigned to"@en ;
+    rdfs:domain pm:Commitment ;
+    rdfs:range pm:Actor ;
+    skos:definition "Names the actor who carries a commitment."@en ;
+    skos:prefLabel "assigned to"@en,
+        "指派给"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:authorizes a owl:ObjectProperty ;
+    rdfs:label "authorizes"@en ;
+    rdfs:domain pm:ProjectCharter ;
+    rdfs:range pm:Project ;
+    skos:definition "Records that a charter formally starts a project."@en ;
+    skos:prefLabel "authorizes"@en,
+        "授权"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:belongsToDomain a owl:ObjectProperty ;
+    rdfs:label "belongs to domain"@en ;
+    rdfs:domain pm:Process ;
+    rdfs:range pm:PerformanceDomain ;
+    skos:definition "Links a process to the one performance domain that owns it."@en ;
+    skos:prefLabel "belongs to domain"@en,
+        "所属绩效域"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:contributesTo a owl:ObjectProperty ;
+    rdfs:label "contributes to"@en ;
+    rdfs:domain pm:Outcome ;
+    rdfs:range pm:Benefit ;
+    skos:definition "Records that an outcome is expected to create a benefit."@en ;
+    skos:prefLabel "contributes to"@en,
+        "贡献于"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:definitionStatus a owl:DatatypeProperty ;
+    rdfs:label "definition status"@en ;
+    rdfs:domain pm:Entity ;
+    rdfs:range xsd:string ;
+    skos:definition "Says whether a self-authored definition is complete, taxonomy-only or pending."@en ;
+    skos:prefLabel "definition status"@en,
+        "定义状态"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:delegatesTo a owl:ObjectProperty ;
+    rdfs:label "delegates to"@en ;
+    rdfs:domain pm:Actor ;
+    rdfs:range pm:Actor ;
+    skos:definition "Records that one actor transfers execution while retaining accountability."@en ;
+    skos:prefLabel "delegates to"@en,
+        "委派给"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:dependsOn a owl:ObjectProperty ;
+    rdfs:label "depends on"@en ;
+    rdfs:domain pm:Activity ;
+    rdfs:range pm:Activity ;
+    skos:definition "Records that one activity cannot proceed without another."@en ;
+    skos:prefLabel "depends on"@en,
+        "依赖于"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:governedBy a owl:ObjectProperty ;
+    rdfs:label "governed by"@en ;
+    rdfs:domain pm:Project ;
+    rdfs:range pm:GovernanceFramework ;
+    skos:definition "Names the governance framework that constrains a project."@en ;
+    skos:prefLabel "governed by"@en,
+        "受……治理"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:hasAssumption a owl:ObjectProperty ;
+    rdfs:label "has assumption"@en ;
+    rdfs:domain pm:Entity ;
+    rdfs:range pm:Assumption ;
+    skos:definition "Attaches a statement accepted without proof to an entity."@en ;
+    skos:prefLabel "has assumption"@en,
+        "具有假设"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:hasConstraint a owl:ObjectProperty ;
+    rdfs:label "has constraint"@en ;
+    rdfs:domain pm:Entity ;
+    rdfs:range pm:Constraint ;
+    skos:definition "Attaches a limiting condition to an entity."@en ;
+    skos:prefLabel "has constraint"@en,
+        "具有约束"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:hasDecision a owl:ObjectProperty ;
+    rdfs:label "has decision"@en ;
+    rdfs:domain pm:Entity ;
+    rdfs:range pm:Decision ;
+    skos:definition "Attaches a committed choice to an entity."@en ;
+    skos:prefLabel "has decision"@en,
+        "具有决策"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:hasExitCriteria a owl:ObjectProperty ;
+    rdfs:label "has exit criteria"@en ;
+    rdfs:domain pm:Stage ;
+    rdfs:range pm:AcceptanceCriterion ;
+    skos:definition "Names the criteria that must hold before a stage may close."@en ;
+    skos:prefLabel "has exit criteria"@en,
+        "退出准则"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:hasFocusArea a owl:ObjectProperty ;
+    rdfs:label "has focus area"@en ;
+    rdfs:domain pm:Process ;
+    rdfs:range pm:FocusArea ;
+    skos:definition "Links a process to the focus area in which it is normally performed."@en ;
+    skos:prefLabel "has focus area"@en,
+        "所属焦点区"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:hasInput a owl:ObjectProperty ;
+    rdfs:label "has input"@en ;
+    rdfs:domain pm:Process ;
+    rdfs:range pm:Artifact ;
+    skos:definition "Names an artifact a process consumes."@en ;
+    skos:prefLabel "has input"@en,
+        "输入"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:hasIssue a owl:ObjectProperty ;
+    rdfs:label "has issue"@en ;
+    rdfs:domain pm:Entity ;
+    rdfs:range pm:Issue ;
+    skos:definition "Attaches a current problem to an entity."@en ;
+    skos:prefLabel "has issue"@en,
+        "具有问题"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:hasMilestone a owl:ObjectProperty ;
+    rdfs:label "has milestone"@en ;
+    rdfs:domain pm:Schedule ;
+    rdfs:range pm:Milestone ;
+    skos:definition "Names a milestone contained in a schedule."@en ;
+    skos:prefLabel "has milestone"@en,
+        "具有里程碑"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:hasOutput a owl:ObjectProperty ;
+    rdfs:label "has output"@en ;
+    rdfs:domain pm:Process ;
+    rdfs:range pm:Artifact ;
+    skos:definition "Names an artifact a process produces or updates."@en ;
+    skos:prefLabel "has output"@en,
+        "输出"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:hasPhase a owl:ObjectProperty ;
+    rdfs:label "has phase"@en ;
+    rdfs:domain pm:Project ;
+    rdfs:range pm:Phase ;
+    skos:definition "Names a management phase of a project."@en ;
+    skos:prefLabel "has phase"@en,
+        "具有分期"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:hasResponse a owl:ObjectProperty ;
+    rdfs:label "has response"@en ;
+    rdfs:domain pm:Risk ;
+    rdfs:range pm:Entity ;
+    skos:definition "Names the planned response to a risk."@en ;
+    skos:prefLabel "has response"@en,
+        "应对"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:hasRisk a owl:ObjectProperty ;
+    rdfs:label "has risk"@en ;
+    rdfs:domain pm:Entity ;
+    rdfs:range pm:Risk ;
+    skos:definition "Attaches an uncertain event or condition to an entity."@en ;
+    skos:prefLabel "has risk"@en,
+        "具有风险"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:hasRole a owl:ObjectProperty ;
+    rdfs:label "has role"@en ;
+    rdfs:domain pm:Entity ;
+    rdfs:range pm:Role ;
+    skos:definition "Associates an entity with a role played in or around it."@en ;
+    skos:prefLabel "has role"@en,
+        "具有角色"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:hasSource a owl:ObjectProperty ;
+    rdfs:label "has source"@en ;
+    rdfs:domain pm:Constraint ;
+    rdfs:range pm:Entity ;
+    skos:definition "Names where a constraint originates."@en ;
+    skos:prefLabel "has source"@en,
+        "来源"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:hasStage a owl:ObjectProperty ;
+    rdfs:label "has stage"@en ;
+    rdfs:domain pm:Project ;
+    rdfs:range pm:Stage ;
+    skos:definition "Names a stage through which a project passes."@en ;
+    skos:prefLabel "has stage"@en,
+        "具有阶段"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:hasTailoringRecord a owl:ObjectProperty ;
+    rdfs:label "has tailoring record"@en ;
+    rdfs:domain pm:Project ;
+    rdfs:range pm:TailoringRecord ;
+    skos:definition "Links a project to the record of its method adaptations."@en ;
+    skos:prefLabel "has tailoring record"@en,
+        "具有裁剪记录"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:ioStatus a owl:DatatypeProperty ;
+    rdfs:label "I/O status"@en ;
+    rdfs:domain pm:Process ;
+    rdfs:range xsd:string ;
+    skos:definition "Says whether the input/output links for a process are complete or still being verified."@en ;
+    skos:prefLabel "I/O status"@en,
+        "输入输出状态"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:measures a owl:ObjectProperty ;
+    rdfs:label "measures"@en ;
+    rdfs:domain pm:QualityMetric ;
+    rdfs:range pm:Entity ;
+    skos:definition "Names the thing a metric is defined to quantify."@en ;
+    skos:prefLabel "measures"@en,
+        "度量"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:mitigates a owl:ObjectProperty ;
+    rdfs:label "mitigates"@en ;
+    rdfs:domain pm:Risk ;
+    rdfs:range pm:Entity ;
+    skos:definition "Records that a risk response reduces an exposure."@en ;
+    skos:prefLabel "mitigates"@en,
+        "缓解"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:owns a owl:ObjectProperty ;
+    rdfs:label "owns"@en ;
+    rdfs:domain pm:Actor ;
+    rdfs:range pm:Artifact ;
+    skos:definition "Records which actor is the custodian of an artifact."@en ;
+    skos:prefLabel "owns"@en,
+        "拥有"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:partOf a owl:ObjectProperty ;
+    rdfs:label "part of"@en ;
+    rdfs:domain pm:Entity ;
+    rdfs:range pm:Entity ;
+    skos:definition "Records a whole-part relation between two entities."@en ;
+    skos:prefLabel "part of"@en,
+        "属于"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:polarity a owl:DatatypeProperty ;
+    rdfs:label "polarity"@en ;
+    rdfs:domain pm:Assertion ;
+    rdfs:range xsd:string ;
+    skos:definition "Marks whether an assertion is affirmed, denied or still unverified."@en ;
+    skos:prefLabel "polarity"@en,
+        "极性"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:precedes a owl:ObjectProperty ;
+    rdfs:label "precedes"@en ;
+    rdfs:domain pm:Activity ;
+    rdfs:range pm:Activity ;
+    skos:definition "Records an ordering between two activities."@en ;
+    skos:prefLabel "precedes"@en,
+        "先于"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:processCode a owl:DatatypeProperty ;
+    rdfs:label "process code"@en ;
+    rdfs:domain pm:Process ;
+    rdfs:range xsd:string ;
+    skos:definition "Stable identifier of a process within the reference structure."@en ;
+    skos:prefLabel "process code"@en,
+        "过程编号"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:realizes a owl:ObjectProperty ;
+    rdfs:label "realizes"@en ;
+    rdfs:domain pm:Deliverable ;
+    rdfs:range pm:Outcome ;
+    skos:definition "Records that an accepted output brings about an outcome."@en ;
+    skos:prefLabel "realizes"@en,
+        "实现"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:references a owl:ObjectProperty ;
+    rdfs:label "references"@en ;
+    rdfs:domain pm:Artifact ;
+    rdfs:range pm:Entity ;
+    skos:definition "Records that one artifact cites another entity."@en ;
+    skos:prefLabel "references"@en,
+        "引用"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:resolves a owl:ObjectProperty ;
+    rdfs:label "resolves"@en ;
+    rdfs:domain pm:Decision ;
+    rdfs:range pm:Issue ;
+    skos:definition "Records that a decision closes an issue."@en ;
+    skos:prefLabel "resolves"@en,
+        "解决"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:responsibleFor a owl:ObjectProperty ;
+    rdfs:label "responsible for"@en ;
+    rdfs:domain pm:Actor ;
+    rdfs:range pm:Entity ;
+    skos:definition "Names the work an actor performs."@en ;
+    skos:prefLabel "responsible for"@en,
+        "执行……"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:sourcePage a owl:DatatypeProperty ;
+    rdfs:label "source page"@en ;
+    rdfs:domain pm:Entity ;
+    rdfs:range xsd:integer ;
+    skos:definition "Printed page in the local reference at which the term or relation was located."@en ;
+    skos:prefLabel "source page"@en,
+        "来源页码"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:techniqueCategory a owl:DatatypeProperty ;
+    rdfs:label "technique category"@en ;
+    rdfs:domain pm:ToolOrTechnique ;
+    rdfs:range xsd:string ;
+    skos:definition "Classifies a tool or technique by the management purpose it serves."@en ;
+    skos:prefLabel "technique category"@en,
+        "技术类别"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:triggers a owl:ObjectProperty ;
+    rdfs:label "triggers"@en ;
+    rdfs:domain pm:Risk ;
+    rdfs:range pm:Issue ;
+    skos:definition "Records that a risk has materialized as an issue."@en ;
+    skos:prefLabel "triggers"@en,
+        "触发"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:usesTechnique a owl:ObjectProperty ;
+    rdfs:label "uses technique"@en ;
+    rdfs:domain pm:Process ;
+    rdfs:range pm:ToolOrTechnique ;
+    skos:definition "Names a tool or technique applied by a process."@en ;
+    skos:prefLabel "uses technique"@en,
+        "使用技术"@zh ;
+    pm:definitionStatus "complete" .
+
+<https://example.org/pm/ontology/pmbok8> a owl:Ontology ;
+    rdfs:label "Self-authored PMBOK 8th conceptual vocabulary"@en ;
+    rdfs:comment "Structure and definitions written for this repository; term names are standard labels."@en .
+
+pm:AcceptanceCriterion a owl:Class ;
+    rdfs:label "Acceptance criterion"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A condition that a result must meet to be accepted."@en ;
+    skos:prefLabel "Acceptance criterion"@en,
+        "验收准则"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Assertion a owl:Class ;
+    rdfs:label "Assertion"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A claim about the work that can be true, false or still unverified."@en ;
+    skos:prefLabel "Assertion"@en,
+        "断言"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Assumption a owl:Class ;
+    rdfs:label "Assumption"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A statement accepted as true for planning purposes without current proof."@en ;
+    skos:prefLabel "Assumption"@en,
+        "假设"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Benefit a owl:Class ;
+    rdfs:label "Benefit"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A measurable gain that an outcome is expected to create for a stakeholder."@en ;
+    skos:prefLabel "Benefit"@en,
+        "收益"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Commitment a owl:Class ;
+    rdfs:label "Commitment"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "An accepted obligation by an actor to deliver something by a condition."@en ;
+    skos:prefLabel "Commitment"@en,
+        "承诺"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Deliverable a owl:Class ;
+    rdfs:label "Deliverable"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A verifiable output that a receiving party can accept or reject."@en ;
+    skos:prefLabel "Deliverable"@en,
+        "可交付成果"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:FocusArea a owl:Class ;
+    rdfs:label "Focus area"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A stage-oriented lens describing what management attention concentrates on."@en ;
+    skos:prefLabel "Focus area"@en,
+        "焦点区"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:GovernanceFramework a owl:Class ;
+    rdfs:label "Governance framework"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A set of authorities, policies and oversight mechanisms for steering work."@en ;
+    skos:prefLabel "Governance framework"@en,
+        "治理框架"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:KnowledgeAsset a owl:Class ;
+    rdfs:label "Knowledge asset"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "Reusable understanding that can improve later work."@en ;
+    skos:prefLabel "Knowledge asset"@en,
+        "知识资产"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Milestone a owl:Class ;
+    rdfs:label "Milestone"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A zero-duration marker denoting a significant point in the schedule."@en ;
+    skos:prefLabel "Milestone"@en,
+        "里程碑"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:PerformanceDomain a owl:Class ;
+    rdfs:label "Performance domain"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A cluster of related management concerns that jointly shape delivery performance."@en ;
+    skos:prefLabel "Performance domain"@en,
+        "绩效域"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Phase a owl:Class ;
+    rdfs:label "Phase"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A grouping of related project work used for management and reporting."@en ;
+    skos:prefLabel "Phase"@en,
+        "阶段（项目分期）"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:ProjectCharter a owl:Class ;
+    rdfs:label "Project charter"@en ;
+    rdfs:subClassOf pm:Artifact ;
+    skos:definition "An artifact that authorizes a project and names its accountable manager."@en ;
+    skos:prefLabel "Project charter"@en,
+        "项目章程"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:QualityMetric a owl:Class ;
+    rdfs:label "Quality metric"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A defined measure with a target used to judge quality."@en ;
+    skos:prefLabel "Quality metric"@en,
+        "质量度量"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Schedule a owl:Class ;
+    rdfs:label "Schedule"@en ;
+    rdfs:subClassOf pm:Artifact ;
+    skos:definition "An artifact that places activities and milestones on a time axis."@en ;
+    skos:prefLabel "Schedule"@en,
+        "进度计划"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:TailoringRecord a owl:Class ;
+    rdfs:label "Tailoring record"@en ;
+    rdfs:subClassOf pm:Artifact ;
+    skos:definition "An artifact that records which method elements were adapted and why."@en ;
+    skos:prefLabel "Tailoring record"@en,
+        "裁剪记录"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Decision a owl:Class ;
+    rdfs:label "Decision"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A committed choice among alternatives with an owner and a rationale."@en ;
+    skos:prefLabel "Decision"@en,
+        "决策"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Outcome a owl:Class ;
+    rdfs:label "Outcome"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A change in state or capability that the work is meant to bring about."@en ;
+    skos:prefLabel "Outcome"@en,
+        "成果"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Stage a owl:Class ;
+    rdfs:label "Stage"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A bounded portion of the life cycle with its own entry and exit conditions."@en ;
+    skos:prefLabel "Stage"@en,
+        "阶段"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Issue a owl:Class ;
+    rdfs:label "Issue"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A current condition that already affects or blocks the work and needs resolution."@en ;
+    skos:prefLabel "Issue"@en,
+        "问题"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Activity a owl:Class ;
+    rdfs:label "Activity"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A scheduled piece of work with a start, a finish and a defined output."@en ;
+    skos:prefLabel "Activity"@en,
+        "活动"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Risk a owl:Class ;
+    rdfs:label "Risk"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "An uncertain event or condition that would affect objectives if it occurs."@en ;
+    skos:prefLabel "Risk"@en,
+        "风险"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Project a owl:Class ;
+    rdfs:label "Project"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A temporary undertaking that produces one or more defined results for a requesting party."@en ;
+    skos:prefLabel "Project"@en,
+        "项目"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Process a owl:Class ;
+    rdfs:label "Process"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A repeatable set of activities that transforms inputs into outputs within a management domain."@en ;
+    skos:prefLabel "Process"@en,
+        "过程"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Role a owl:Class ;
+    rdfs:label "Role"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A bundle of expected duties and decision rights that an actor can hold."@en ;
+    skos:prefLabel "Role"@en,
+        "角色"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Actor a owl:Class ;
+    rdfs:label "Actor"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "Anything that can hold a role, take decisions or be assigned work."@en ;
+    skos:prefLabel "Actor"@en,
+        "行动主体"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Constraint a owl:Class ;
+    rdfs:label "Constraint"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A limit that narrows the acceptable options for the work."@en ;
+    skos:prefLabel "Constraint"@en,
+        "约束"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:ToolOrTechnique a owl:Class ;
+    rdfs:label "Tool or technique"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A repeatable aid or method used to perform a management activity."@en ;
+    skos:prefLabel "Tool or technique"@en,
+        "工具与技术"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Artifact a owl:Class ;
+    rdfs:label "Artifact"@en ;
+    rdfs:subClassOf pm:Entity ;
+    skos:definition "A managed information item that is produced, updated or consumed during the work."@en ;
+    skos:prefLabel "Artifact"@en,
+        "工件"@zh ;
+    pm:definitionStatus "complete" .
+
+pm:Entity a owl:Class ;
+    rdfs:label "Entity"@en ;
+    skos:definition "Anything this vocabulary can talk about; the common root of every modelled type."@en ;
+    skos:prefLabel "Entity"@en,
+        "实体"@zh ;
+    pm:definitionStatus "complete" .
+

@@ -1,0 +1,49 @@
+# self-authored: true
+# source_id: PMBOK8-2025
+# Negative fixture for shape s24_property_range.
+@prefix pm: <https://example.org/pm#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+pm:dom_Test a pm:PerformanceDomain ;
+    skos:prefLabel "Test domain"@en ;
+    skos:definition "A domain used only by this fixture." .
+
+pm:fa_Test a pm:FocusArea ;
+    skos:prefLabel "Test focus"@en ;
+    skos:definition "A focus area used only by this fixture." .
+
+pm:art_Test a pm:Artifact ;
+    skos:prefLabel "Test artifact"@en ;
+    pm:artifactCategory "plan" ;
+    pm:sourcePage 1 ;
+    pm:definitionStatus "taxonomy-only" .
+
+pm:tt_Test a pm:ToolOrTechnique ;
+    skos:prefLabel "Test tool"@en ;
+    pm:techniqueCategory "general" ;
+    pm:sourcePage 1 ;
+    pm:definitionStatus "taxonomy-only" .
+
+pm:proc_Test a pm:Process ;
+    skos:prefLabel "Test process"@en ;
+    skos:prefLabel "测试过程"@zh ;
+    pm:processCode "9.9.9.9" ;
+    pm:sourcePage 1 ;
+    pm:ioStatus "complete" ;
+    pm:belongsToDomain pm:dom_Test ;
+    pm:hasFocusArea pm:fa_Test ;
+    pm:hasInput pm:art_Test ;
+    pm:hasOutput pm:art_Test .
+
+pm:TestClass a owl:Class ;
+    skos:prefLabel "Test class"@en ;
+    skos:definition "A class used only by this fixture." .
+
+pm:testProperty a owl:ObjectProperty ;
+    skos:prefLabel "test property"@en ;
+    skos:definition "A property used only by this fixture." ;
+    rdfs:domain pm:Entity ;
+    rdfs:domain pm:Entity .

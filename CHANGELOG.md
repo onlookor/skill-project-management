@@ -205,14 +205,29 @@
 
 - **涉及文件**：
   - 新建：`spec/ONTOLOGY_FEASIBILITY.md`、`adr/0010-self-authored-ontology-in-git.md`、`ontology/README.md`
-  - 修改：`CONSTITUTION.md`（第 13.2 条新增第 5 项；新增 13.6；第 5 条保护清单措辞）、`AGENTS.md`（第 7bis 条新增第 7 项；第 4 条目录树与维护责任表）、`scripts/check_no_raw_material.py`（本体扩展名与 `RM-ONTO-*`）、`scripts/README.md`、`STATE.md`（新增 `ontology/` 默认状态）、`README.md`（文件地图）、`TODO.md`（新增 T-122–T-124）
-- **变更摘要**：对“从本地 PMBOK 8th 自建以约束为主的小规模本体”做可行性评估，并与“手工知识条目 + 反例用例 + 全文档级编译”的基线逐项对比。评估结论为：技术可行，但只值得做“概念骨架 + 8–12 条 SHACL 形状 + 3 个 fixture”的最小原型；全量本体不划算；本体应保持 `skeleton`、非规范、非来源。治理侧同步放开一条受控通道：第 13.6 条允许“自写定义 + 标准术语标签”的本体入库，原始资料、提取产物、成段原文与可替代原作的改写仍严禁；检查器新增头注释、超长字面量与超长注释检查。
+  - 修改：`CONSTITUTION.md`（第 13.2 条新增第 5 项；新增 13.6；第 5 条保护清单措辞）、`AGENTS.md`（第 7bis 条新增第 7 项；第 4 条目录树与维护责任表）、`scripts/check_no_raw_material.py`（本体扩展名与 `RM-ONTO-*`）、`scripts/README.md`、`STATE.md`（新增 `ontology/` 默认状态）、`README.md`（文件地图）、`TODO.md`（新增 T-122–T-123）
+- **变更摘要**：对“从本地 PMBOK 8th 自建以约束为主的本体”做可行性评估，并与“手工知识条目 + 反例用例 + 全文档级编译”的基线逐项对比，给出最小原型与全量两档规模。评估结论为：技术可行，采用 SHACL-first；本体保持非规范、非来源。治理侧同步放开一条受控通道：第 13.6 条允许“自写定义 + 标准术语标签”的本体入库，原始资料、提取产物、成段原文与可替代原作的改写仍严禁；检查器新增头注释、超长字面量与超长注释检查。
 - **事实更正**：本地 PMBOK 8th 正文显示该版**恢复**了过程式结构——5 个 Focus Areas、7 个绩效域、40 个非规定性过程（Governance 9、Scope 6、Schedule 3、Finance 4、Stakeholders 7、Resources 5、Risk 6），第 4 章为输入/输出、第 5 章为工具与技术。因此“第 8 版缺少过程式类层次”不成立；它缺少的是机器可读本体，不是过程层次。
-- **验证**：四个检查器通过（`check_state.py` 0、`check_ledger_landings.py` 0 错误 1 警告、`check_anchors.py` 0 错误 0 警告、`check_no_raw_material.py` 0 错误）。真实负例（临时仓库，不入库）：合规 `.ttl` 通过；含 600 字符转录字面量的 `.ttl` 报 `RM-ONTO-LITERAL`；缺头注释的 `.ttl` 报 `RM-ONTO-HEADER`；600 字符注释行报 `RM-ONTO-COMMENT`；连续 15 行 100+ 字符注释报 `RM-PROSEBLOCK`；伪造 PDF 仍报 `RM-EXT`；全部以非零码退出。
+- **验证**：四个检查器通过（`check_state.py` 0、`check_ledger_landings.py` 0 错误 1 警告、`check_anchors.py` 0 错误 0 警告、`check_no_raw_material.py` 0 错误）。真实负例（临时仓库，不入库）：通过 `.ttl` 通过；含 600 字符转录字面量的 `.ttl` 报 `RM-ONTO-LITERAL`；缺头注释的 `.ttl` 报 `RM-ONTO-HEADER`；600 字符注释行报 `RM-ONTO-COMMENT`；连续 15 行 100+ 字符注释报 `RM-PROSEBLOCK`；伪造 PDF 仍报 `RM-EXT`；全部以非零码退出。
 - **取舍说明**：
   1. 批次号取 0018 而非 0017：0017 已在 `TODO.md` 中作为邮件登记标签出现，但未形成 CHANGELOG 条目；为避免同一编号指向两件事，本批顺延，0017 不复用。
   2. 第 13.6 条是对 13.1 第 4 项的边界澄清，不缩小 13.1 的四类禁止，也不降低 13.3 的阻断强度；不满足 13.6 的本体仍按 13.1 禁止。
   3. 未改动 `SOURCE_LEDGER.md`：`PMBOK8-2025` 的 `allowed_uses` 仍限“原则层交叉验证”，本体不得作为 `grounding_ref`；扩展来源用途另立 T-123 与 ADR。
-  4. 版权/许可风险未消：本地副本声明仅限个人使用、禁止 AI 训练与复制；本体公开发布前须做许可审查（T-124）。本批次只处理仓库纪律，不构成法律意见。
+- **关联 ADR**：ADR-0010（accepted）
+- **状态**：生效
+
+---
+
+### 批次 0019 — 2026-11-13 — 全量本体与形状校验
+
+- **涉及文件**：
+  - 新建：`ontology/pmbok8-vocab.ttl`、`ontology/pmbok8-processes.ttl`、`ontology/pmbok8-artifacts.ttl`、`ontology/pmbok8-tools.ttl`、`ontology/pmbok8-shapes.ttl`、`ontology/fixtures/valid.ttl`、`ontology/fixtures/invalid-*.ttl`（24 个）、`ontology/fixtures/manifest.json`、`scripts/validate_ontology.py`
+  - 修改：`ontology/README.md`、`STATE.md`（`ontology/` 改为 `active`）、`AGENTS.md`（第 4 条目录树、第 7bis 条状态）、`README.md`（文件地图）、`TODO.md`（T-122 关闭，新增 T-125、T-126）、`spec/ONTOLOGY_FEASIBILITY.md`（全量档）、`adr/0010-self-authored-ontology-in-git.md`（边界与结果）、`CONSTITUTION.md`（13.6 内容质量口径）
+- **变更摘要**：按全量档构建本体：92 个类、35 个对象属性、7 个数据类型属性、7 个绩效域、5 个焦点区、40 个过程及其输入/输出/技术链接、124 个工件、185 个工具与技术、24 条 SHACL 形状，以及每条形状对应的违规 fixture。工件与工具个体保留术语名、类别与页码，定义状态为 `taxonomy-only`；类与属性的定义全部自写。
+- **验证**：`python3 scripts/validate_ontology.py` 对本体现有全部 TTL 输出 `conforms: true`；`--matrix` 逐条运行 24 个违规 fixture，24/24 判出预期形状，`valid.ttl` 通过；缺少 `rdflib`/`pyshacl` 时退出码 2 并输出“无法评估”。`check_no_raw_material.py` 对本体文件保持通过（含 `RM-ONTO-HEADER`、`RM-ONTO-LITERAL`、`RM-ONTO-COMMENT`、`RM-PROSEBLOCK`）。
+- **取舍说明**：
+  1. 不修改 `GRAMMAR.md` 的 `grounding_ref`，不改任何 `check_id` 的绑定，不新增编译方法；形状只约束本体自身的结构。
+  2. 本体是派生工件，不是来源；`grounding_ref` 接入建议登记为 T-125。
+  3. 工件与工具的自写定义未逐条完成，登记为 T-126；不以原文改写填充。
 - **关联 ADR**：ADR-0010（accepted）
 - **状态**：生效

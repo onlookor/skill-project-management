@@ -153,13 +153,14 @@
 |---|---|---|---|---|---|
 | T-121 | 治理 | 由用户经网页端手动发送请求全文的邮件：收件人 `silega@sfedu.ru`，发信人 `wgzhi@hotmail.com`，署名 Gengzhi Wei。正文见下方附录。SMTP 客户端通道因服务器停用基础认证（`535 5.7.139`）不可用，本项**未发送**；不得记为已发送 | 无（人工操作） | 用户手动发送 | `open`（待用户手动发送） |
 
-### 新增：自建本体（批次 0018）
+### 新增：自建本体（批次 0018–0019）
 
 | 编号 | 性质 | 工作项 | 治理路径 | 前置依赖 | 状态 |
 |---|---|---|---|---|---|
-| T-122 | 原型 | 按 `spec/ONTOLOGY_FEASIBILITY.md` 第 3 节构建最小本体：`ontology/pmbok8-core.ttl`（7 域 + 5 焦点区 + 40 过程 + 约 10 个核心概念）、`pmbok8-shapes.ttl`（8–12 条形状，只映射已有 `check_id`）、3 个 fixture、`scripts/validate_ontology.py` 包装脚本；完成“形状 ↔ 规则文本”逐条对照（P1c） | CHANGELOG（内容与格式）；不新增编译方法 | 无（工具链需 `rdflib`、`pyshacl`） | `open` |
-| T-123 | 来源治理 | 评估是否修订 `SOURCE_LEDGER.md` 中 `PMBOK8-2025` 的 `allowed_uses` 与 `claim_mapping`，使其可作为概念层（而非仅原则层交叉验证）依据；修订需 ADR，并说明对 P1a 与 `check_ledger_landings.py` 的影响 | 来源治理（ADR） | T-122 原型结果、T-124 许可结论 | `open` |
-| T-124 | 风险 | 对“从受版权保护的 PMBOK 8th 自建本体并公开于 MIT 仓库”做许可/衍生作品风险评估（本地副本声明仅限个人使用、禁止 AI 训练与复制）；评估结论决定本体是否可公开发布，或仅保留在本地/私有分支 | 治理（ADR 或外部法律意见） | 无 | `open` |
+| T-122 | 本体构建 | 按 `spec/ONTOLOGY_FEASIBILITY.md` 第 3 节构建全量本体：`pmbok8-vocab.ttl`（92 类 / 35 对象属性 / 7 数据类型属性）、`pmbok8-processes.ttl`（7 域 + 5 焦点区 + 40 过程 + I/O）、`pmbok8-artifacts.ttl`（124 工件）、`pmbok8-tools.ttl`（185 工具与技术）、`pmbok8-shapes.ttl`（24 条形状）、24 个违规 fixture + 1 个通过 fixture、`scripts/validate_ontology.py` | CHANGELOG（内容与格式）；不新增编译方法 | 无（校验需 `rdflib`、`pyshacl`） | `done`（2026-11-13：24 条形状全部由对应 fixture 判出违规，本体全图 `conforms: true`） |
+| T-123 | 来源治理 | 评估是否修订 `SOURCE_LEDGER.md` 中 `PMBOK8-2025` 的 `allowed_uses` 与 `claim_mapping`，使其可作为概念层（而非仅原则层交叉验证）依据；修订需 ADR，并说明对 P1a 与 `check_ledger_landings.py` 的影响 | 来源治理（ADR） | T-122 | `open` |
+| T-125 | 接入建议 | 若将来把本体接成 `grounding_ref`：优先评估 G-A1（项目最小存在）、G-A2（断言主体）、G-C1（可交付物与断言）、G-D1（承诺链）、G-E1（约束锚定）与对应知识条目 `Project`、`Assertion`、`Deliverable`、`Commitment`、`Constraint`；先做“形状 ↔ 规则文本”逐条对照（P1c），再决定是否改来源用途 | 规范层（ADR） | T-123、P1c 对照 | `open` |
+| T-126 | 本体补全 | 为 124 个工件与 185 个工具与技术补齐自写定义（当前为 `taxonomy-only`，只保留术语名、类别与页码）；写不出自述定义者保持 `pending`，不得用原文改写凑数 | 执行层补丁（CHANGELOG） | 无 | `open` |
 
 #### 附录：T-121 邮件正文（英文）
 

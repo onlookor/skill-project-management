@@ -104,7 +104,13 @@ project-management-grounding/
 │       └── registry-skeleton.md    # 方法注册表（估算、WBS、风险、挣值、采购；首批 5 条）
 │
 ├── ontology/
-│   └── README.md                   # 自建本体（skeleton）：格式、边界、状态与检查规则
+│   ├── README.md                   # 自建本体（active）：文件、格式、边界与检查规则
+│   ├── pmbok8-vocab.ttl            # 92 类 / 35 对象属性 / 7 数据类型属性
+│   ├── pmbok8-processes.ttl        # 7 域 / 5 焦点区 / 40 过程与 I/O
+│   ├── pmbok8-artifacts.ttl        # 124 个工件个体
+│   ├── pmbok8-tools.ttl            # 185 个工具与技术条目
+│   ├── pmbok8-shapes.ttl           # 24 条 SHACL 形状
+│   └── fixtures/                   # 1 个通过图 + 24 个违规图 + 清单
 │
 ├── adr/
 │   ├── README.md                   # ADR 格式说明（Nygard / MADR / Y-Statement）与必填治理字段
@@ -130,6 +136,7 @@ project-management-grounding/
 │   ├── check_anchors.py            # 锚点解析与校验（可运行）
 │   ├── anchor_baseline.json        # 规则/来源文本块的指纹基线
 │   ├── check_no_raw_material.py    # 原始资料/OCR/成段原文的阻断式检查（可运行）
+│   ├── validate_ontology.py        # 本体与 SHACL 形状校验，含逐形状负例矩阵（可选依赖）
 │   └── check_state.py              # STATE 与 git 跟踪文件的对账脚本（可运行）
 │
 └── validation/
@@ -238,8 +245,8 @@ project-management-grounding/
    - 只放 `ontology/`；主格式为 Turtle（`.ttl`、`.shacl.ttl`），`.owl`/`.rdf`/`.nt`/`.n3`/`.jsonld` 仅作生成导出，仍受同一内容检查。
    - 每个文件头部必须写 `# self-authored: true`、`# source_id: <SOURCE_LEDGER id>`、`# source_pages: <定位>`；每个术语带 `dcterms:source` 与 `pm:sourcePage`。
    - 定义必须自写一句话；不得逐句对应原文，不得复制段落、列表、表格行、图注。写不出定义时省略定义并标 `definition_status: pending`，不得用原文改写凑数。
-   - 本体是派生工件，不是来源；在 ADR 提升前不得作为 `grounding_ref`，不得直接充当规则依据；`STATE.md` 中默认状态为 `skeleton`。
-   - 提交前同样运行 `scripts/check_no_raw_material.py`；本体文件命中 `RM-ONTO-*` 或 `RM-PROSEBLOCK` 同样阻断提交。
+   - 本体是派生工件，不是来源；在 ADR 提升前不得作为 `grounding_ref`，不得直接充当规则依据；`STATE.md` 中状态为 `active`（形状与负例校验通过后）。
+   - 提交前运行 `scripts/check_no_raw_material.py` 与 `scripts/validate_ontology.py --matrix`；本体文件命中 `RM-ONTO-*` 或 `RM-PROSEBLOCK` 同样阻断提交；缺少 `rdflib`/`pyshacl` 时校验以退出码 2 报“无法评估”。
 
 ### 8. 不做的事
 
