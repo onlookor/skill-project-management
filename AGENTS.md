@@ -247,6 +247,7 @@ project-management-grounding/
 │
 └── validation/
     ├── CHECKLIST.md                # CM-DET-CHECKER 的产物：检查清单（生成依据见正文）
+    ├── independent-review-package.md  # T-133 只读验收包（不含原型源码）
     ├── checker-prototype/
     │   └── checker.py              # T-107 最小原型：执行附录 A 的 34 个样例（纯标准库）
     └── test-cases/

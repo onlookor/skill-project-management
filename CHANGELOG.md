@@ -398,3 +398,17 @@
   - 五个检查器均退出 0；`check_gap_ledger.py` 仍为 4 条 `open`、到期 0、矩阵 12/17 `consistent`。
 - **关联 ADR**：无（执行层补丁；T-100 / T-130 / T-131 的裁定仍走 ADR）
 - **状态**：生效
+
+---
+
+### 批次 0030 — 2026-11-14 — 独立复核 TODO 与只读验收包
+
+- **涉及文件**：新增 `validation/independent-review-package.md`；修改 `TODO.md`（T-133）、`ROADMAP.md`（M2 工作项与出口 4、映射表）、`AGENTS.md`（目录树）、`CHANGELOG.md`（本批次）
+- **变更摘要**：
+  1. **登记 T-133（M2）**：明确 T-107 的 34/34 是样例与实现同源的自证，不构成独立证据；关闭条件是“由非同源实现或人工逐条比对规则正文得出独立结论并记录差异”，不得用原型自身运行结果关闭。
+  2. **只读验收包**：`validation/independent-review-package.md` 选定 `PROJECT_MINIMAL_EXISTENCE`（G-A1）、`DELIVERABLE_ASSERTION_LINK`（G-C1）、`CHANGE_CONSTRAINT_LINK`（G-D1），给出规则条款位置与陈述、6 个样例的原文位置与输入快照、原型实际判定与 `reason`、已知未覆盖项；**不包含原型源码**。
+  3. **里程碑绑定**：ROADMAP M2 出口新增第 4 条，独立复核未完成不得关闭 M2。
+- **钩子绕过**：无。
+- **验证**：`python3 validation/checker-prototype/checker.py` 仍为 34/34（100.0%）；五个检查器均退出 0。验收包中的 6 个样例与附录 A.1.1 / A.1.3 / A.1.4 逐字一致。
+- **关联 ADR**：无
+- **状态**：生效
