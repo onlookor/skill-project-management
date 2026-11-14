@@ -379,3 +379,22 @@
   - 负例 3（发布阻断）：主工作区临时改为 `M2` 后运行 `check_state.py`，输出“缺口台账核查未通过（退出码 1）……G-004 已到期未裁定”，退出 1。
 - **关联 ADR**：ADR-0012
 - **状态**：生效
+
+---
+
+### 批次 0029 — 2026-11-14 — T-107 最小原型与输入 schema
+
+- **涉及文件**：
+  - 新增：`validation/checker-prototype/checker.py`、`spec/CHECKER_INPUT_SCHEMA.md`
+  - 修改：`spec/methods/deterministic-checker.md`（A.1 增加 schema 指针）、`AGENTS.md`（目录树）、`TODO.md`（T-107 标 `done`）、`GAP_LEDGER.md`（核查记录）、`validation/CHECKLIST.md`（`source_commit` 推进）、`CHANGELOG.md`（本批次）
+- **变更摘要**：
+  1. **可运行原型**：纯标准库实现，直接解析附录 A.1 的 34 个 YAML 样例，按 A 表判定列输出 `check_id` / `source_rule` / `severity` / `rule_status` / `verdict` / `reason`，并与样例期望逐项比对。
+  2. **输入 schema 固定**：`spec/CHECKER_INPUT_SCHEMA.md` 定义通用约定、共享字段、17 个 `check_id` 的量化域、枚举与后续样例的遵循规则；附录 A 增加指针，后续样例不得自行引入字段。
+  3. **覆盖缺口显式化**：原型在输出中逐条声明 5 处“未覆盖规则正文”（G-001 / G-002 / G-003 / G-004 对应条件），不关闭台账条目，也不宣称全保真。
+  4. **依赖**：仅 Python 标准库；无第三方依赖，因此没有“缺依赖静默通过”的退化路径。
+- **钩子绕过**：无。
+- **验证**：
+  - `python3 validation/checker-prototype/checker.py`：34/34 样例通过（100.0%），17/17 个 `check_id` 全通过，退出 0；输出含全部未覆盖项。
+  - 五个检查器均退出 0；`check_gap_ledger.py` 仍为 4 条 `open`、到期 0、矩阵 12/17 `consistent`。
+- **关联 ADR**：无（执行层补丁；T-100 / T-130 / T-131 的裁定仍走 ADR）
+- **状态**：生效

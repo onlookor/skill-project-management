@@ -27,7 +27,7 @@
 | T-011 | M1 | 检查器实现规格 | 为 `spec/methods/deterministic-checker.md` 附录 A 注册表中的每个 check 补充参考实现的输入/输出样例 | 结构性变更需 ADR | 无 | `done`（2026-11-14：17/17 个 check_id 各补触发/不触发两组，共 34 个样例；批次 0027） |
 | T-100 | M1 | 检查器判定修正 | 修正 `ROLE_MINIMAL_COMPLETENESS` 的 warn/block 混合判定：区分“问责结构根本性缺失（block）”与“角色合并声明缺失（warn）”两种情形（见 `ERRATA.md` E-004；与 T-107 同批）；缺口台账编号 G-004 | 结构性变更需 ADR（改变已有规则的编译结果） | 无 | `open` |
 | T-103 | M1 | 检查回放机制 | 定义检查执行记录的回放机制：检查失败后如何以同一输入快照重放、如何比对两次结论、回放记录保存在哪里 | 执行层补丁 | 无 | `open` |
-| T-107 | M1 | 可执行原型 | 提供一个最小可执行的确定性校验器原型（哪怕只覆盖 3–5 个 `check_id`），以验证 `spec/methods/deterministic-checker.md` 的判定逻辑可被程序实现；`QUICKSTART.md` 的走查为手工推演，不构成可执行证据。**当前进度**：`validation/checker-prototype/checker.py` 已覆盖 17/17 个 `check_id`、34/34 个样例，输入 schema 见 `spec/CHECKER_INPUT_SCHEMA.md` | 执行层补丁 | T-011 | `in-progress` |
+| T-107 | M1 | 可执行原型 | 提供一个最小可执行的确定性校验器原型（哪怕只覆盖 3–5 个 `check_id`），以验证 `spec/methods/deterministic-checker.md` 的判定逻辑可被程序实现；`QUICKSTART.md` 的走查为手工推演，不构成可执行证据。**当前进度**：`validation/checker-prototype/checker.py` 已覆盖 17/17 个 `check_id`、34/34 个样例，输入 schema 见 `spec/CHECKER_INPUT_SCHEMA.md` | 执行层补丁 | T-011 | `done`（2026-11-14：34/34 样例、17/17 `check_id` 通过；批次 0029） |
 | T-041 | M1 | 验证套件 | 为 `GRAMMAR.md` 的 `active` 规则设计检查器测试用例（含 `pass` / `fail` / `cannot_evaluate` 三值覆盖；与 T-101 的用例补齐同批） | 结果登记 | T-011 | `open` |
 | T-042 | M1 | 验证套件 | 验证 `ASSUMPTION_PROTOCOL.md` 第 5 节的四条 `unknown` 处置纪律在检查器实现中一致 | 结果登记 | T-011 | `open` |
 | T-081 | M1 | 验证套件 | 验证 `CM-DET-CHECKER` 的退化路径（`runtime: deterministic-checker/human-fallback`）下 P1–P6 仍被满足 | 结果登记 | 无 | `open` |
