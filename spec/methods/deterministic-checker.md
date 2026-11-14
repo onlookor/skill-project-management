@@ -168,7 +168,7 @@
 
 - 检查清单的每行携带 `check_id`、规则编号、severity、规则状态、输入摘要、判定摘要；执行者（程序或人类）凭清单即可执行，不需要查阅 `GRAMMAR.md` 原文。
 - 判定摘要使用 `knowledge/` 中定义的谓词名与槽位名；这些名称在 `knowledge/anchored-entries.jsonl` 与 `spec/INTERFACE_CONTRACT_SPEC.md` 中有定义，执行者不需要查阅外部来源。
-- `grounding_ref` 保留在 `GRAMMAR.md` 中，不进入检查清单的执行路径——它是合法性锚点，不是执行前提（与 `CONSTITUTION.md` 第 7.2 级一致）。
+- `grounding_ref` 保留在 `GRAMMAR.md` 中并指向 `SOURCE_LEDGER.md` 条目，不进入检查清单的执行路径——它是合法性锚点，不是执行前提（与 `CONSTITUTION.md` 第 7.2 级一致）。
 
 **P5 与 `CONSTITUTION.md` 第 7 条的关系**：第 7 条约束 `GRAMMAR.md` 的规则陈述；P5 约束本方法的产物。二者是同一纪律在立法层与执行层的两次落实。
 
@@ -178,7 +178,7 @@
 
 本方法的产物中，`grounded` 与 `assumption` 的分离通过**字段级标记**实现：
 
-- 每个 `check_id` 规格携带 `grounding_refs` 字段，列出该检查项所依据的 `SOURCE_LEDGER.md` 条目 ID；
+- 每个 `check_id` 规格携带 `grounding_refs` 字段，列出该检查项所依据的 `SOURCE_LEDGER.md` 条目 ID；该字段名与知识条目的 `grounding_ref` 不同，后者只用于本体或规则到知识条目的绑定；
 - 若规则状态为 `assumption`，规格额外携带 `assumption_basis` 字段，指向 `GRAMMAR.md` 中对应规则的 `assumption_verification`；
 - 检查执行记录的 `rule_status` 字段区分三种状态。
 

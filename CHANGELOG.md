@@ -845,3 +845,26 @@
 - **涉及文件**：`spec/pilot/` 下 7 个新文件、`spec/M3_M4_PLAN.md`（状态头）、`spec/M3_M4_DECISIONS.md`（状态头）、`TODO.md`（T-138 `done`、T-139 `open`、T-123 补试点证据）、`STATE.md`（`spec/pilot/` 默认 `example`）、`AGENTS.md`（目录结构）、`CHANGELOG.md`。
 - **未改动**：`GLOSSARY.md`、`knowledge/anchored-entries.jsonl`、TTL 的 `skos:prefLabel`、`GRAMMAR.md` 的 `grounding_ref`、`SOURCE_LEDGER.md` 的 `claim_mapping`、`manifest.json`。
 - **状态**：生效（试点完成，放量未开始）
+
+---
+
+### 批次 0048 — 2026-11-14 — PMBOK8-2025 放宽至概念层、T-139 字段语义拆开、F-07 定性登记 G-019
+
+- **性质**：落实用户两项裁定与 F-07 定性。放宽 `PMBOK8-2025` 至概念层用途（附 ADR-0016）；把 `grounding_ref` 与来源归属拆成两种意图，迁移现有 10 条权威条目；判定 F-07 为检查器缺陷并登记 G-019。**D4 仍未定，未放量，未动判据 7 的外部抽样。**
+- **一、来源用途放宽**：`SOURCE_LEDGER.md` 的 `PMBOK8-2025`：
+  - `allowed_uses` 从“仅限原则层面”改为“概念层与原则层均可用（2026-11-14 用户授权，批次 0048）”，概念层用于知识条目的术语名、定义结构与页码范围证据，写入条目 `evidence[]`；
+  - 仍不包含：成段摘录入库（`CONSTITUTION.md` 第 13 条）、以原文替代自写定义、未核页的批量引用、规则正文的直接锚定（规则仍须经 `claim_mapping` 显式包含）；
+  - `verification_method` 记为“概念层页码已按 15 条试点逐条核对印刷页，未全文逐页核对”；`claim_mapping` 明确概念层来源归属不进本字段；
+  - 新增 `adr/0016-pmbok8-concept-layer-use.md`（`accepted`）作为实质变更依据。
+- **二、T-139 两种意图拆开**：
+  - `knowledge/anchored-entries.jsonl` 10 条权威条目删除 `grounding_ref`，来源改为 `evidence[]`（每项含 `source_id` / `locator` / `page` / `precision` / `verification`）；映射：Project/Actor/Commitment/Deliverable/Constraint/Outcome → `ProjectCO-2024`（Deliverable 另加 `ThingFO-2021`），Assertion/Subject → `ThingFO-2021`，Accountable/Responsible → `PRINCE2-2023`；
+  - `grounding_ref` 仅保留两种用途：规则/方法条目指向 `SOURCE_LEDGER.md` 条目 ID；本体或规则到知识条目的绑定取 `knowledge:<term>`；
+  - 语义写入 `spec/CHECKER_INPUT_SCHEMA.md` §1.16、`spec/ANCHOR_SPEC.md`、`GRAMMAR.md`、`GLOSSARY.md`（T-B-003）、`spec/methods/deterministic-checker.md`、`scripts/check_glossary_sync.md`、`scripts/README.md`；
+  - `scripts/check_anchors.py` 改为校验 `evidence[].source_id` 可解析到 active 来源，未新增检查器；
+  - 试点 15 条删除自指的 `grounding_ref`（原为把草稿 ID 当 `knowledge:` 值的自环），`evidence` 保留；`pilot-id-map.json` 增加 `grounding_ref_semantics` 说明，`knowledge_ref` 保留；
+  - 新增 `adr/0017-grounding-ref-vs-evidence.md`（`accepted`）作为字段语义拆分的结构性变更依据；用户裁定转录见 `validation/reviews/2026-11-14-t139-user-adjudication.md`，供检查器绑定核对。
+- **三、F-07 定性**：判为 `implementation-defect`。`RM-PROSEBLOCK` 已豁免 Markdown 表格行但未识别结构化 JSONL：连续 ≥15 行、每行 ≥100 字符即报“文本层转储”。当前 `anchored-entries.jsonl` 为 10 条尚不触发，扩到 15 条长行即阻断 M3 按条目铺开。登记 `G-019`（L1、`implementation-defect`、登记 M1、到期 M2、出口 `check-change`、关联 T-140），新增 TODO T-140。
+- **缺口状态**：19 条（`open` 3：G-017、G-018、G-019 / `closed` 16）。
+- **涉及文件**：`SOURCE_LEDGER.md`、`adr/0016-pmbok8-concept-layer-use.md`（新增）、`adr/0017-grounding-ref-vs-evidence.md`（新增）、`validation/reviews/2026-11-14-t139-user-adjudication.md`（新增）、`knowledge/anchored-entries.jsonl`、`scripts/check_anchors.py`、`scripts/checker-pins.json`、`scripts/spec-pins.json`、`scripts/README.md`、`scripts/check_glossary_sync.md`、`spec/CHECKER_INPUT_SCHEMA.md`、`spec/ANCHOR_SPEC.md`、`spec/methods/deterministic-checker.md`、`spec/pilot/pilot-entries.json`、`spec/pilot/pilot-id-map.json`、`spec/pilot/M3_M4_PILOT_REPORT.md`、`GLOSSARY.md`、`GRAMMAR.md`、`scripts/anchor_baseline.json`、`knowledge/glossary-usage.json`、`GAP_LEDGER.md`、`TODO.md`、`CHANGELOG.md`。
+- **未改动**：`manifest.json`、`ROADMAP.md`，以及判据 7 的外部抽样（维持 `blocked-external`）。
+- **状态**：生效（放量仍未开始）

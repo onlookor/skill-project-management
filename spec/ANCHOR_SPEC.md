@@ -20,7 +20,7 @@
 | 检查项 | `check:<check_id>` | `spec/methods/deterministic-checker.md` 附录 A 或 `validation/CHECKLIST.md` | 检查项被删或改名 |
 | 知识条目 | `knowledge:<term>` | `knowledge/anchored-entries.jsonl` 的 `term` | 条目被删或改名 |
 | 方法 | `method:M-EST-01` | `knowledge/methods/registry-skeleton.md` 的 `method_id` | 方法被删或改名 |
-| 来源 | `source:<id>`，或 `grounding_ref` 中的裸 `id` | `SOURCE_LEDGER.md` 的 `#### <id>` | 条目被删（ADR-0005 后删除即失效） |
+| 来源 | `source:<id>`，或规则/方法条目 `grounding_ref` 中的裸 `id` | `SOURCE_LEDGER.md` 的 `#### <id>` | 条目被删（ADR-0005 后删除即失效） |
 | 术语 | `T-A-001`、`term:T-A-001`、`GLOSSARY.md#T-A-001` | `GLOSSARY.md` 的术语标题 `**T-A-001 <名称>**` | 术语被删或改号 |
 | 待办 | `T-113`、`todo:T-113` | `TODO.md` 的行首编号 | 条目被删（按纪律不得删除，只能标 `[done]`/`[dropped]`） |
 | ADR | `ADR-0007`、`adr:0007` | `adr/0007-*.md` | 文件被删或改号 |
@@ -31,6 +31,8 @@
 **章节引用为什么合法**：章节号是结构地址，不是物理地址。在文件中插入一行不会改变 `第 2.6 条` 的解析结果；只有重编号才会失效，而重编号本身就是需要登记的实质变更。
 
 **外部资料的页码定位**：`SOURCE_LEDGER.md` 的核验状态可以用“印刷页 N / PDF 第 N 页”标注外部文献中的论据位置。这类页码**不是仓库锚点**，不参与 `scripts/check_anchors.py` 解析，也不得用于指代本仓库任何文件；它只服务于“该结论从哪一页得到”的可复核性。外部文献无稳定结构地址，页码是唯一可用的定位粒度，因此不适用第 3 条的禁令范围。
+
+**`grounding_ref` 的两种意图（T-139，2026-11-14）**：规则与方法条目的 `grounding_ref` 指向 `SOURCE_LEDGER.md` 的条目 ID；知识条目的来源归属写入 `evidence[]` 的 `source_id`，`grounding_ref` 不用于承载来源；本体或规则到知识条目的绑定取 `knowledge:<term>`。`scripts/check_anchors.py` 分别校验规则 `grounding_ref` 与知识条目 `evidence[].source_id`。
 
 ## 3. 禁止的形态
 

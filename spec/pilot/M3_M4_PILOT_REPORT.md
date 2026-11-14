@@ -1,6 +1,8 @@
 # M3/M4 试点报告（15 条草稿）
 
-> **性质**：试点记录，`authoritative: false`。不改变任何规格，不构成 M3/M4 出口。**批次**：0047（2026-11-14）。**D4**：未定，全部条目走 `DRAFT-K-<CAT>-<NN>`。
+> **性质**：试点记录，`authoritative: false`。不改变任何规格，不构成 M3/M4 出口。**初始批次**：0047；**更新批次**：0048（2026-11-14）。**D4**：未定，全部条目走 `DRAFT-K-<CAT>-<NN>`。
+>
+> **批次 0048 更新（2026-11-14）**：`T-123` 已裁定，`PMBOK8-2025` 的 `allowed_uses` 放宽到概念层；`T-139` 已落实，知识条目的来源归 `evidence[]`，`grounding_ref` 只用于规则/本体到条目的绑定；`F-07` 已定性为检查器缺陷并登记 `G-019`。下列判据与风险按更新后的口径重述。
 
 ## 1. 产出
 
@@ -28,7 +30,7 @@
 
 | # | 判据 | 判定 | 依据与保留 |
 |---|---|---|---|
-| 1 | 15 条均有 `definition`、`grounding_ref`、`sourcePage`、`definitionStatus`，无 `taxonomy-only` | **结构通过，实质有条件** | 15/15 字段齐全，0 条 `taxonomy-only`。但 `grounding_ref` 按 D3 指向 `knowledge:<draft-id>`，来源放在 `evidence`；全部依赖 `PMBOK8-2025`，而该来源当前 `allowed_uses` 仅限原则层交叉验证（T-123 未定），草稿不作权威锚定。 |
+| 1 | 15 条均有 `definition`、`sourcePage`、`definitionStatus`、`evidence`（含 `source_id`），无 `taxonomy-only` | **通过** | 15/15 字段齐全，0 条 `taxonomy-only`。T-139 后条目来源统一在 `evidence[]`，`grounding_ref` 不再作为条目字段；T-123 已授权 `PMBOK8-2025` 作概念层证据来源，仍禁止成段摘录与规则直接锚定。 |
 | 2 | 每条定义可在 1 次检索内回溯来源页码 | **通过** | 每条 `evidence` 含 `source_id` + `page` + `locator`；印刷页与 PDF 页偏移已实测（PDF 230 = 印刷 125），按印刷页写入。 |
 | 3 | G-A1/G-A2/G-C1/G-D1/G-E1 各至少 1 条可双向解析，零歧义 | **通过（映射层）** | `pilot-id-map.json` 的 `rule_bindings` 与 `reverse_rule_index` 一一对应，5/5 规则有绑定，反向无一对多歧义。尚未写入 `GRAMMAR.md` 的 `grounding_ref`，接入受 D4/T-125 门控。 |
 | 4 | 同一概念在 GLOSSARY / JSONL / TTL / 规则引用四处命名零冲突 | **部分通过，不计为满足** | 草稿层零冲突：草稿 ID 未进入 `GLOSSARY.md`、`knowledge/anchored-entries.jsonl`、TTL 的 `skos:prefLabel`、`GRAMMAR.md` 的 `grounding_ref`。但“零冲突”来自草稿不接入，权威层未被真正检验；D4 未定前无法完成该项。 |
@@ -49,9 +51,9 @@
 
 ## 5. 发现与风险
 
-**F-01（高，阻塞放量）来源授权未定。** 15 条草稿的来源证据全部指向 `PMBOK8-2025`，该来源在 `SOURCE_LEDGER.md` 的 `allowed_uses` 仅限原则层交叉验证，不能作为概念层条目的权威锚定。`T-123` 未关闭前，M3 放量会批量产生“有 grounding_ref 但无使用授权”的条目。建议把 `T-123` 提到 D4 同批拍板。
+**F-01（已解决，批次 0048）来源授权。** 15 条草稿的来源证据全部指向 `PMBOK8-2025`。用户已授权把该来源从“仅原则层”放宽到概念层，`SOURCE_LEDGER.md` 的 `allowed_uses` 已同步；仍不包含成段摘录入库、以原文替代自写定义、未核页的批量引用，以及规则正文的直接锚定。
 
-**F-02（高，阻塞放量）D3 的 `grounding_ref` 语义与现有 JSONL 冲突。** D3 选定 `grounding_ref` 指向 `knowledge:<term>`；现有 10 条 `knowledge/anchored-entries.jsonl` 的 `grounding_ref` 指向来源 ID。试点按 D3 写入并把来源移入 `evidence`，但这意味着两套条目语义不一致。放量前需二选一：调整 D3 表述，或给条目增加独立的 `source_ref` 并迁移现有 10 条。未在本批擅改。
+**F-02（已解决，批次 0048）`grounding_ref` 语义冲突。** 按 T-139 的“两种意图拆开”落实：知识条目的来源归属写入 `evidence[]`，现有 10 条已迁移；`grounding_ref` 只用于规则/本体到知识条目的绑定（`knowledge:<term>`），语义已写入 `spec/ANCHOR_SPEC.md`、`spec/CHECKER_INPUT_SCHEMA.md` 与 `GRAMMAR.md` 字段说明。
 
 **F-03（中）Monte Carlo 无个体 IRI。** 本体只有 `pm:tt_Simulation`，语义更宽。可接受为 `null` + 稳定自然键，或在 M3 放量时补 `pm:tt_MonteCarloSimulation` 个体；后者改变本体范围，需单独裁定。
 
@@ -61,11 +63,11 @@
 
 **F-06（低）产物双写风险。** 试点 MD 是 JSON 的人工投影。若 R10 要求“生成物与手写物分离”，放量前需补生成器；本批未引入。
 
-**F-07（低，存储形态）JSONL 与原始资料检查冲突。** 15 条草稿若写成每行一条的 JSONL，会形成连续 15 行以上长行，被 `check_no_raw_material` 判为“疑似文本层转储”。试点改用 JSON 数组（字段不变）规避该误报，未给检查器开例外。R10 的存储形态需在放量前定；若最终选 JSONL，应同时确定如何避免长行连续。
+**F-07（已定性：检查器缺陷，登记 `G-019`）原始资料检查误伤结构化长行。** 15 条草稿若写成每行一条的 JSONL，会形成连续 15 行以上、每行不少于 100 字符的记录，被 `check_no_raw_material` 的 `RM-PROSEBLOCK` 判为“疑似文本层转储”。该规则的本意是拦截 PDF/OCR 转储，且已对 Markdown 表格行开豁免，却没有区分结构化 JSON/JSONL；因此不是策略使然，而是过度匹配的实现缺陷。触发条件：**连续 ≥15 行、每行 ≥100 字符、不匹配 Markdown 表格行**。当前 `knowledge/anchored-entries.jsonl` 为 10 条，扩到 15 条即会阻断 M3 按条目铺开，故登记为 L1、到期 M2，处置出口建议 `check-change`。试点暂用 JSON 数组规避，未给检查器开例外。
 
 ## 6. 结论
 
 - 试点结构层面完成：15 条草稿、ID 映射、契约、产物样例、3 组冲突样例均落盘。
 - **六条止损中五条明确未触发，一条（外部抽样）因无非执行方而无法判定；用户指定的“双无条目”止损未命中。**
-- **不得据此放量。** 放量前至少需要：D4 拍板；`T-123` 来源使用授权裁定；F-02 的 `grounding_ref` 语义统一；外部抽样 5 条（判据 7）。
-- 本批未开始 M3 放量，未改动 `GLOSSARY.md`、`knowledge/anchored-entries.jsonl`、TTL 标签、`GRAMMAR.md` 的 `grounding_ref` 与 `SOURCE_LEDGER.claim_mapping`。
+- **不得据此放量。** 放量前至少需要：D4 拍板；外部抽样 5 条（判据 7）。`T-123` 与 `T-139` 已在批次 0048 解决。
+- 本批未开始 M3 放量。批次 0047 未改动 `GLOSSARY.md`、`knowledge/anchored-entries.jsonl`、TTL 标签、`GRAMMAR.md` 的 `grounding_ref` 与 `SOURCE_LEDGER.claim_mapping`；批次 0048 的迁移与规格更新见 `CHANGELOG.md`。

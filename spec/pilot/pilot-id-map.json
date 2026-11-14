@@ -8,7 +8,8 @@
   "notes": [
     "D4 未定，本表所有 formal_id 均为 null，不得把草稿 ID 或候选 IRI 当作正式 ID 使用。",
     "候选 IRI 只表示本体中语义最接近的个体，不等于可接受的等同映射；未解析项见 candidate_iri_reason。",
-    "草稿 ID 仅存在于 spec/pilot/ 内，不得进入 GLOSSARY.md、knowledge/anchored-entries.jsonl、TTL 的 skos:prefLabel、GRAMMAR.md 的 grounding_ref、SOURCE_LEDGER.claim_mapping。"
+    "草稿 ID 仅存在于 spec/pilot/ 内，不得进入 GLOSSARY.md、knowledge/anchored-entries.jsonl、TTL 的 skos:prefLabel、GRAMMAR.md 的 grounding_ref、SOURCE_LEDGER.claim_mapping。",
+    "条目不再携带 grounding_ref；草稿引用的来源全部在 evidence[] 中。"
   ],
   "entries": [
     {
@@ -283,5 +284,6 @@
     "null_iri_and_no_natural_key": 0,
     "rule_bindings": 5,
     "rule_bindings_with_entry": 5
-  }
+  },
+  "grounding_ref_semantics": "T-139 已定：知识条目的来源写入 evidence[].source_id；grounding_ref 只用于规则/本体到知识条目的绑定，取 knowledge:<term>。"
 }

@@ -17,7 +17,7 @@
 | `severity` | `block`（阻断）/ `warn`（告警）/ `advisory`（提示） |
 | `applicability` | 规则适用条件（`CONSTITUTION.md` 第 3.5 条）。不适用时降级为 `advisory`，不失效 |
 
-**术语**：本文件使用的机制术语（`Project`、`Actor`、`Commitment`、`Deliverable`、`Constraint`、`Outcome`、`Assertion`、`Subject`、`Accountable`、`Responsible`）在 `knowledge/anchored-entries.jsonl` 中有明确定义；`knowledge/` 条目携带各自的 `grounding_ref`。本文件的规则**不要求读者查阅外部原文即可理解**（`CONSTITUTION.md` 第 7.2 级）。
+**术语**：本文件使用的机制术语（`Project`、`Actor`、`Commitment`、`Deliverable`、`Constraint`、`Outcome`、`Assertion`、`Subject`、`Accountable`、`Responsible`）在 `knowledge/anchored-entries.jsonl` 中有明确定义；`knowledge/` 条目以 `evidence` 携带来源归属，`grounding_ref` 只用于规则或本体到条目的绑定（`knowledge:<term>`）。本文件的规则**不要求读者查阅外部原文即可理解**（`CONSTITUTION.md` 第 7.2 级）。
 
 ---
 

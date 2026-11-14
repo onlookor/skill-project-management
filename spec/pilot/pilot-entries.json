@@ -14,7 +14,6 @@
       "output_of": "pm:proc_InitiateProjectOrPhase",
       "authorizes": "pm:Project"
     },
-    "grounding_ref": "knowledge:DRAFT-K-ART-01",
     "sourcePage": 125,
     "evidence": [
       {
@@ -51,7 +50,6 @@
       "input_to": "pm:proc_InitiateProjectOrPhase",
       "outside_project": true
     },
-    "grounding_ref": "knowledge:DRAFT-K-ART-02",
     "sourcePage": 115,
     "evidence": [
       {
@@ -88,7 +86,6 @@
       "input_to": "pm:proc_InitiateProjectOrPhase",
       "measures": "benefits"
     },
-    "grounding_ref": "knowledge:DRAFT-K-ART-03",
     "sourcePage": 115,
     "evidence": [
       {
@@ -125,7 +122,6 @@
       "paired_with": "pm:art_RiskRegister",
       "records_state": "open|closed"
     },
-    "grounding_ref": "knowledge:DRAFT-K-ART-04",
     "sourcePage": 122,
     "evidence": [
       {
@@ -159,7 +155,6 @@
         "pm:proc_PlanRiskResponses"
       ]
     },
-    "grounding_ref": "knowledge:DRAFT-K-ART-05",
     "sourcePage": 136,
     "evidence": [
       {
@@ -190,7 +185,6 @@
       "output_of": "pm:proc_ManageQualityAssurance",
       "reports_on": "quality"
     },
-    "grounding_ref": "knowledge:DRAFT-K-ART-06",
     "sourcePage": 129,
     "evidence": [
       {
@@ -224,7 +218,6 @@
         "pm:proc_PlanRiskResponses"
       ]
     },
-    "grounding_ref": "knowledge:DRAFT-K-TOOL-01",
     "sourcePage": 146,
     "evidence": [
       {
@@ -257,7 +250,6 @@
         "pm:proc_DevelopBudget"
       ]
     },
-    "grounding_ref": "knowledge:DRAFT-K-TOOL-02",
     "sourcePage": 158,
     "evidence": [
       {
@@ -290,7 +282,6 @@
         "pm:proc_PerformRiskAnalysis"
       ]
     },
-    "grounding_ref": "knowledge:DRAFT-K-TOOL-03",
     "sourcePage": 163,
     "evidence": [
       {
@@ -324,7 +315,6 @@
         "pm:proc_PerformRiskAnalysis"
       ]
     },
-    "grounding_ref": "knowledge:DRAFT-K-TOOL-04",
     "sourcePage": 197,
     "evidence": [
       {
@@ -358,7 +348,6 @@
         "pm:proc_MonitorAndControlProjectPerformance"
       ]
     },
-    "grounding_ref": "knowledge:DRAFT-K-TOOL-05",
     "sourcePage": 168,
     "evidence": [
       {
@@ -392,7 +381,6 @@
         "pm:proc_MonitorAndControlProjectPerformance"
       ]
     },
-    "grounding_ref": "knowledge:DRAFT-K-TOOL-06",
     "sourcePage": 195,
     "evidence": [
       {
@@ -426,7 +414,6 @@
         "pm:art_ProjectCharter"
       ]
     },
-    "grounding_ref": "knowledge:DRAFT-K-PROC-01",
     "sourcePage": 17,
     "evidence": [
       {
@@ -458,7 +445,6 @@
         "pm:proc_InitiateProjectOrPhase"
       ]
     },
-    "grounding_ref": "knowledge:DRAFT-K-FA-01",
     "sourcePage": 70,
     "evidence": [
       {
@@ -492,7 +478,6 @@
         "pm:proc_IntegrateAndAlignProjectPlans"
       ]
     },
-    "grounding_ref": "knowledge:DRAFT-K-DOM-01",
     "sourcePage": 9,
     "evidence": [
       {

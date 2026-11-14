@@ -8,7 +8,7 @@
 |---|---|---|---|
 | `check_state.py` | 以 `git ls-files` 核对 `STATE.md`：漏登、登了不存在的文件、状态值非法；并核对 `manifest.json` 的 `package_version` / `release_tag` 与最新 annotated tag 一致，且该 tag 指向 `HEAD`；`release_state=development` 时仅把“HEAD 领先于 tag”降为警告；`v0.5.2` 起发布提交必须携带 `Hook-Bypass` 三项 trailer | 无独立规格（规则见 `STATE.md`、`AGENTS.md` 3.5 / 3.5.1 与本文件“脚本的定位”） | 已实现 |
 | `check_ledger_landings.py` | 核对 `SOURCE_LEDGER.md` 每个 active 来源条目是否声明编译落点，且落点在 `GRAMMAR.md`、`knowledge/`、方法条目或检查项中真实存在 | 无独立规格（规则见 `CONSTITUTION.md` 第 2.6 条） | 已实现 |
-| `check_anchors.py` | 解析并校验全仓锚点：禁止行号 locator、文件/稳定 ID/章节号/标题路径可解析、`grounding_ref` 指向 active 来源、规则与来源文本块指纹未漂移 | `spec/ANCHOR_SPEC.md` | 已实现 |
+| `check_anchors.py` | 解析并校验全仓锚点：禁止行号 locator、文件/稳定 ID/章节号/标题路径可解析、规则 `grounding_ref` 与知识条目 `evidence.source_id` 指向 active 来源、规则与来源文本块指纹未漂移 | `spec/ANCHOR_SPEC.md` | 已实现 |
 | `anchor_baseline.json` | `check_anchors.py` 的指纹基线（`rule:*` 与 `source:*`），内容变更后重冻 | `spec/ANCHOR_SPEC.md` 第 5 节 | 数据文件 |
 | `check_glossary_sync` | 检查 `GLOSSARY.md` 的 A 类条目与 `knowledge/anchored-entries.jsonl` 的定义一致性 | `check_glossary_sync.md` | 未实现（T-090） |
 | `check_no_raw_material.py` | 阻断式检查：已跟踪文件中不得出现原始资料（PDF/EPUB/扫描件等）、文本层/OCR 转储与成段原文；允许受控的自建本体（`CONSTITUTION.md` 第 13.6 条） | `CONSTITUTION.md` 第 13 条 | 已实现 |

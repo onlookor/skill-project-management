@@ -33,6 +33,7 @@
 13. **结论与原因**：`verdict ∈ {pass, fail, cannot_evaluate, not_applicable}`；`reason` 为稳定原因码，`pass` / `not_applicable` 时为 `null`。原因码只用于样例断言，不是新的规范词汇。
 14. **severity / rule_status**：由附录 A 与 `validation/CHECKLIST.md` 决定，不由输入携带；`assumption` 组按 P6 输出 `advisory`。子句级 severity 覆盖见附录 A.2。
 15. **多违规优先级（D4）**：`reason` 单值；聚合顺序为 **`fail` > `cannot_evaluate` > `pass`**——任一子句 `fail` 即判 `fail`，不存在 `fail` 时才由 `cannot_evaluate` 决定；同一 verdict 内按附录 A.2 的子句行序取第一条命中，`reason` 即该子句的原因码。**原型不输出 `violations[]`**：四值结论与单一 `reason` 是唯一承诺；需要逐子句明细的消费方按 A.2 行序自行复算。旧表述“全部子句结果以 `violations[]` 输出”已撤除，“`cannot_evaluate` 优先于 `fail`”已废止。
+16. **`grounding_ref` 与知识条目来源的分工（T-139，2026-11-14）**：本 schema 的检查输入不携带 `grounding_ref`。知识条目（`knowledge/anchored-entries.jsonl`）的来源归属写在 `evidence[]`，每项至少含 `source_id`，可附 `locator` / `page` / `precision`；`grounding_ref` 只用于规则或本体到知识条目的绑定，取 `knowledge:<term>`。规则正文的 `grounding_ref` 仍按 `GRAMMAR.md` 字段表指向 `SOURCE_LEDGER.md` 的条目 ID。两类意图不得混用同一字段。
 
 ## 2. 共享字段
 

@@ -86,7 +86,7 @@
         },
         {
           "file": "TODO.md",
-          "line": 80,
+          "line": 81,
           "form": "code"
         },
         {
@@ -226,12 +226,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 77,
+          "line": 78,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 107,
+          "line": 108,
           "form": "code"
         },
         {
@@ -426,12 +426,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 77,
+          "line": 78,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 80,
+          "line": 81,
           "form": "code"
         },
         {
@@ -461,22 +461,22 @@
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 206,
+          "line": 207,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 221,
+          "line": 222,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 237,
+          "line": 238,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 239,
+          "line": 240,
           "form": "code"
         },
         {
@@ -671,7 +671,7 @@
         },
         {
           "file": "TODO.md",
-          "line": 80,
+          "line": 81,
           "form": "code"
         },
         {
@@ -686,7 +686,7 @@
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 221,
+          "line": 222,
           "form": "code"
         },
         {
@@ -876,12 +876,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 77,
+          "line": 78,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 80,
+          "line": 81,
           "form": "code"
         },
         {
@@ -891,7 +891,7 @@
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 237,
+          "line": 238,
           "form": "code"
         },
         {
@@ -1071,12 +1071,12 @@
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 206,
+          "line": 207,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 237,
+          "line": 238,
           "form": "code"
         },
         {
@@ -1271,12 +1271,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 80,
+          "line": 81,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 241,
+          "line": 242,
           "form": "code"
         },
         {
@@ -1566,12 +1566,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 107,
+          "line": 108,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 119,
+          "line": 120,
           "form": "code"
         },
         {
@@ -1611,12 +1611,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 107,
+          "line": 108,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 119,
+          "line": 120,
           "form": "code"
         },
         {
@@ -1666,12 +1666,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 107,
+          "line": 108,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 119,
+          "line": 120,
           "form": "code"
         },
         {
@@ -1681,7 +1681,7 @@
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 51,
+          "line": 52,
           "form": "code"
         },
         {
@@ -1721,12 +1721,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 108,
+          "line": 109,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 119,
+          "line": 120,
           "form": "code"
         },
         {
@@ -1756,12 +1756,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 108,
+          "line": 109,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 119,
+          "line": 120,
           "form": "code"
         },
         {
@@ -1816,12 +1816,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 108,
+          "line": 109,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 119,
+          "line": 120,
           "form": "code"
         },
         {
@@ -2191,12 +2191,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 64,
+          "line": 65,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 65,
+          "line": 66,
           "form": "code"
         },
         {
@@ -2217,6 +2217,11 @@
         {
           "file": "adr/0013-unified-adjudication-of-check-semantics.md",
           "line": 63,
+          "form": "code"
+        },
+        {
+          "file": "adr/0017-grounding-ref-vs-evidence.md",
+          "line": 26,
           "form": "code"
         },
         {
@@ -2331,42 +2336,42 @@
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 47,
-          "form": "code"
-        },
-        {
-          "file": "spec/CHECKER_INPUT_SCHEMA.md",
           "line": 48,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 56,
+          "line": 49,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 131,
+          "line": 57,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 188,
+          "line": 132,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 220,
+          "line": 189,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 241,
+          "line": 221,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 246,
+          "line": 242,
+          "form": "code"
+        },
+        {
+          "file": "spec/CHECKER_INPUT_SCHEMA.md",
+          "line": 247,
           "form": "code"
         },
         {
@@ -2690,6 +2695,31 @@
           "form": "code"
         },
         {
+          "file": "CHANGELOG.md",
+          "line": 853,
+          "form": "code"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 860,
+          "form": "code"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 861,
+          "form": "code"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 862,
+          "form": "term_id"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 864,
+          "form": "code"
+        },
+        {
           "file": "CONSTITUTION.md",
           "line": 29,
           "form": "code"
@@ -2732,6 +2762,11 @@
         {
           "file": "CONSTITUTION.md",
           "line": 332,
+          "form": "code"
+        },
+        {
+          "file": "GAP_LEDGER.md",
+          "line": 131,
           "form": "code"
         },
         {
@@ -2881,17 +2916,17 @@
         },
         {
           "file": "TODO.md",
-          "line": 69,
+          "line": 70,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 72,
+          "line": 73,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 80,
+          "line": 81,
           "form": "code"
         },
         {
@@ -2932,6 +2967,61 @@
         {
           "file": "adr/0010-self-authored-ontology-in-git.md",
           "line": 25,
+          "form": "code"
+        },
+        {
+          "file": "adr/0017-grounding-ref-vs-evidence.md",
+          "line": 1,
+          "form": "code"
+        },
+        {
+          "file": "adr/0017-grounding-ref-vs-evidence.md",
+          "line": 8,
+          "form": "code"
+        },
+        {
+          "file": "adr/0017-grounding-ref-vs-evidence.md",
+          "line": 8,
+          "form": "term_id"
+        },
+        {
+          "file": "adr/0017-grounding-ref-vs-evidence.md",
+          "line": 12,
+          "form": "code"
+        },
+        {
+          "file": "adr/0017-grounding-ref-vs-evidence.md",
+          "line": 26,
+          "form": "code"
+        },
+        {
+          "file": "adr/0017-grounding-ref-vs-evidence.md",
+          "line": 28,
+          "form": "code"
+        },
+        {
+          "file": "adr/0017-grounding-ref-vs-evidence.md",
+          "line": 29,
+          "form": "code"
+        },
+        {
+          "file": "adr/0017-grounding-ref-vs-evidence.md",
+          "line": 30,
+          "form": "code"
+        },
+        {
+          "file": "adr/0017-grounding-ref-vs-evidence.md",
+          "line": 36,
+          "form": "code"
+        },
+        {
+          "file": "adr/0017-grounding-ref-vs-evidence.md",
+          "line": 44,
+          "form": "code"
+        },
+        {
+          "file": "adr/0017-grounding-ref-vs-evidence.md",
+          "line": 50,
           "form": "code"
         },
         {
@@ -2990,8 +3080,18 @@
           "form": "code"
         },
         {
+          "file": "spec/ANCHOR_SPEC.md",
+          "line": 35,
+          "form": "code"
+        },
+        {
           "file": "spec/ASSUMPTION_PROTOCOL.md",
           "line": 42,
+          "form": "code"
+        },
+        {
+          "file": "spec/CHECKER_INPUT_SCHEMA.md",
+          "line": 36,
           "form": "code"
         },
         {
@@ -3110,8 +3210,13 @@
           "form": "code"
         },
         {
+          "file": "spec/methods/deterministic-checker.md",
+          "line": 181,
+          "form": "code"
+        },
+        {
           "file": "spec/pilot/M3_M4_PILOT_REPORT.md",
-          "line": 31,
+          "line": 5,
           "form": "code"
         },
         {
@@ -3121,22 +3226,47 @@
         },
         {
           "file": "spec/pilot/M3_M4_PILOT_REPORT.md",
-          "line": 34,
+          "line": 35,
           "form": "code"
         },
         {
           "file": "spec/pilot/M3_M4_PILOT_REPORT.md",
-          "line": 54,
+          "line": 36,
           "form": "code"
         },
         {
           "file": "spec/pilot/M3_M4_PILOT_REPORT.md",
-          "line": 70,
+          "line": 56,
           "form": "code"
         },
         {
           "file": "spec/pilot/M3_M4_PILOT_REPORT.md",
-          "line": 71,
+          "line": 73,
+          "form": "code"
+        },
+        {
+          "file": "validation/reviews/2026-11-14-t139-user-adjudication.md",
+          "line": 4,
+          "form": "code"
+        },
+        {
+          "file": "validation/reviews/2026-11-14-t139-user-adjudication.md",
+          "line": 11,
+          "form": "code"
+        },
+        {
+          "file": "validation/reviews/2026-11-14-t139-user-adjudication.md",
+          "line": 13,
+          "form": "code"
+        },
+        {
+          "file": "validation/reviews/2026-11-14-t139-user-adjudication.md",
+          "line": 15,
+          "form": "code"
+        },
+        {
+          "file": "validation/reviews/2026-11-14-t139-user-adjudication.md",
+          "line": 16,
           "form": "code"
         }
       ]
@@ -3427,7 +3557,7 @@
         },
         {
           "file": "GAP_LEDGER.md",
-          "line": 116,
+          "line": 117,
           "form": "code"
         },
         {
@@ -3622,7 +3752,7 @@
         },
         {
           "file": "spec/ANCHOR_SPEC.md",
-          "line": 73,
+          "line": 75,
           "form": "code"
         },
         {
@@ -3642,12 +3772,7 @@
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 44,
-          "form": "code"
-        },
-        {
-          "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 47,
+          "line": 45,
           "form": "code"
         },
         {
@@ -3657,7 +3782,12 @@
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 201,
+          "line": 49,
+          "form": "code"
+        },
+        {
+          "file": "spec/CHECKER_INPUT_SCHEMA.md",
+          "line": 202,
           "form": "code"
         },
         {
@@ -3952,7 +4082,7 @@
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 246,
+          "line": 247,
           "form": "code"
         },
         {
@@ -4045,7 +4175,13 @@
     },
     "T-D-003": {
       "term": "GRAMMAR",
-      "locations": []
+      "locations": [
+        {
+          "file": "TODO.md",
+          "line": 57,
+          "form": "code"
+        }
+      ]
     },
     "T-D-004": {
       "term": "SOURCE_LEDGER",
@@ -4184,12 +4320,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 63,
+          "line": 64,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 75,
+          "line": 76,
           "form": "code"
         },
         {
@@ -4387,7 +4523,7 @@
         },
         {
           "file": "TODO.md",
-          "line": 72,
+          "line": 73,
           "form": "code"
         }
       ]
@@ -4397,7 +4533,7 @@
       "locations": [
         {
           "file": "TODO.md",
-          "line": 72,
+          "line": 73,
           "form": "code"
         }
       ]
@@ -4559,7 +4695,7 @@
         },
         {
           "file": "GAP_LEDGER.md",
-          "line": 124,
+          "line": 125,
           "form": "code"
         },
         {
@@ -4584,12 +4720,12 @@
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 184,
+          "line": 185,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 229,
+          "line": 230,
           "form": "code"
         },
         {

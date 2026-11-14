@@ -7,7 +7,7 @@
   2. 文件引用必须存在（排除通配符与占位符）；`resources/` 按部署外部资源处理。
   3. 稳定 ID 必须可解析：rule / check / knowledge / method / source / term / todo / adr。
   4. 章节引用（`` `X.md` 第 N 条/节 ``）的编号必须在目标文件中存在。
-  5. GRAMMAR 规则的 check 与 grounding_ref、CHECKLIST 的规则列、JSONL 的 grounding_ref 必须解析。
+  5. GRAMMAR 规则的 check 与 grounding_ref、CHECKLIST 的规则列、JSONL 条目的 evidence.source_id 必须解析。
   6. rule 与 source 文本块的指纹必须与 scripts/anchor_baseline.json 一致（只报漂移，不自动修改）。
 
 退出码：0 通过（可有警告/提示）；1 存在错误；2 结构或基线无法解析。
@@ -326,9 +326,14 @@ def main():
         if status and "active" in status.group(1):
             active_sources.add(sid)
     for entry in jsonl_entries:
-        ref = entry.get("grounding_ref")
-        if ref not in active_sources:
-            add(errors, "E-NO-TARGET", "knowledge/anchored-entries.jsonl", f"{entry.get('term')} -> {ref}")
+        evidence = entry.get("evidence")
+        if not isinstance(evidence, list) or not evidence:
+            add(errors, "E-NO-TARGET", "knowledge/anchored-entries.jsonl", f"{entry.get('term')} -> evidence")
+            continue
+        for item in evidence:
+            ref = item.get("source_id") if isinstance(item, dict) else None
+            if ref not in active_sources:
+                add(errors, "E-NO-TARGET", "knowledge/anchored-entries.jsonl", f"{entry.get('term')} -> {ref}")
 
     for sid, block in source_blocks.items():
         mapping = re.search(r"^\|\s*`claim_mapping`\s*\|\s*(.+?)\s*\|$", block, re.M)

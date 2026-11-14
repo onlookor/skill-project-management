@@ -15,7 +15,7 @@
 - **语义一致**（文本不同但含义相同）：`pass`，但记录差异供后续统一。
 - **语义不一致**（含义不同）：`fail`，按 `CONSTITUTION.md` 第 11.5 条处置。
 
-**S4（grounding_ref 一致）**：`GLOSSARY.md` 的 A 类条目的 `grounding_ref` 字段必须与 `anchored-entries.jsonl` 对应条目的 `grounding_ref` 字段一致（若有）。
+**S4（来源一致）**：`GLOSSARY.md` 的 A 类条目的 `grounding_ref` 所指向的来源 ID，必须出现在 `anchored-entries.jsonl` 对应条目 `evidence[].source_id` 中（若有）。知识条目的 `grounding_ref` 不承载来源，按 T-139 的拆分语义检查。
 
 **S5（provenance_note 存在性）**：`GLOSSARY.md` 的 A 类条目与 JSONL 对应条目都必须有 `provenance_note` 字段；缺失则 `fail`（`CONSTITUTION.md` 第 3.2 条要求形式化边界说明）。
 

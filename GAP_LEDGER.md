@@ -59,7 +59,7 @@
 
 | check_id | 规则 | 结论 | 复核里程碑 |
 |---|---|---|---|
-| `PROJECT_MINIMAL_EXISTENCE` | G-A1 | `G-002`、`G-007`、`G-008`、`G-009`、`G-014`、`G-016`、`G-017`、`G-018` | M1 |
+| `PROJECT_MINIMAL_EXISTENCE` | G-A1 | `G-002`、`G-007`、`G-008`、`G-009`、`G-014`、`G-016`、`G-017`、`G-018`、`G-019` | M1 |
 | `CONSTRAINT_ANCHOR_REQUIRED` | G-A2 | `G-001`、`G-007`、`G-009`、`G-010` | M1 |
 | `DUAL_DIMENSION_ANNOTATION` | G-B1 | `G-013`、`G-015` | M1 |
 | `DIMENSION_VALUE_CLOSED` | G-B2 | `G-013`、`G-015` | M1 |
@@ -77,7 +77,7 @@
 | `TAILORING_NON_TRIMMABLE_SET` | G-G2 | `G-009` | M1 |
 | `TAILORING_REASSESSMENT_CONDITION` | G-G3 | `G-009` | M1 |
 
-> 矩阵说明：缺口编号替代 `consistent` 表示该 `check_id` 截至 2026-11-14 的复核仍受该缺口影响，不得判为一致。G-008 是表示层合并条目，G-010/G-011/G-012 等为其拆分后的可执行项；G-014、G-016、G-017 为全局项，锚定在首行；G-018（`actors[].type` 枚举）影响全部含 `actors[]` 的 `check_id`，同样锚定在首行。
+> 矩阵说明：缺口编号替代 `consistent` 表示该 `check_id` 截至 2026-11-14 的复核仍受该缺口影响，不得判为一致。G-008 是表示层合并条目，G-010/G-011/G-012 等为其拆分后的可执行项；G-014、G-016、G-017 为全局项，锚定在首行；G-018（`actors[].type` 枚举）影响全部含 `actors[]` 的 `check_id`，同样锚定在首行。G-019 是仓库级原始资料检查器缺口，不归属单一 `check_id`，按同一惯例锚定首行。
 
 ## 缺口账
 
@@ -101,6 +101,7 @@
 | G-016 | closed | representation-defect | L2 | 附录 A.2、schema §3 | 否 | 架构负责人 | M1 | check-change | T-133 | A.2 子句表无“原因码”列；原因码与实际子句的映射未定义，`reason` 只能靠原型实现反向推断。 本次已修正：A.2 增加原因码列（41 条子句，不是 40 条），A 表原因码与子句原因码集合机械一致。 2026-11-14 更正：共用原因码组为 **6 组**（B1、C2、E2 两处、F2、G3），不是 7 组。 | 外部复核：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-4812/REPORT_48128a8.md；sha256：d0f8275f9931f36da93c640ad8a070c8af7200929d0a4a685e5309268356c4e7；基线：48128a8 |
 | G-017 | open | implementation-defect | L2 | `scripts/check_three_table.py`、M2 出口 1 | 否 | 架构负责人 | M1 |  | T-133 | 三表检查器只做存在性/集合一致/词级定义，不做语义短语检查：G-B1 判定列写“值在枚举内”与 A.2 划给 B2 的冲突仍报通过，绿字被误读为语义闭合。 本次已修正：三表检查器增加判定列叙述检测、B1/B2 条件归属、原因码定义与映射检查；仍不保证全文语义等价， 2026-11-14 非同源复核（基线 `d8bf413`）：判 partly。残留：三表检查器可抓判定列叙述、B1/B2 归属与原因码映射，但仍不保证规则正文与子句表的全文语义等价；该残留只能由非同源复核承接，维持 open。 2026-11-14 非同源复核（基线 `9519b82`，报告 §三 G-017 行）：三表与规格闸门均 0，仍无全文语义等价机器证明，维持 open。 |  |
 | G-018 | open | representation-defect | L1 | 全部含 `actors[]` 的 `check_id`；重点 G-A1、G-E1、G-E2 | 否 | 架构负责人 | M1 |  | T-137 | 2026-11-14 复核发现：`actors[].type=Bogus` 仍判 `pass`。`CHECKER_INPUT_SCHEMA.md` §2 已把 `actor_type` 声明为枚举，但 §1.11 的封闭枚举全局归一化未列 `actor_type`，原型 `enum_results()` 亦未校验。合法值应限 §2 枚举，非法值应判 `cannot_evaluate/undefined_enum_value`，不得 `pass`。建议处置出口 `check-change`（改 §1.11 与 `enum_results()`，加负例）。 |  |
+| G-019 | open | implementation-defect | L1 | `scripts/check_no_raw_material.py` 的 `RM-PROSEBLOCK`；`knowledge/anchored-entries.jsonl` 及任何 ≥15 条长记录的 JSONL | 否 | 架构负责人 | M1 |  | T-140 | 2026-11-14 试点发现：`RM-PROSEBLOCK` 把“连续 ≥15 行、每行 ≥100 字符、且不是 Markdown 表格行”判为文本层转储，未区分结构化 JSON/JSONL。该规则本意是拦截 PDF/OCR 转储，且已豁免 Markdown 表格行；JSONL 每条自写条目天然是长行，属过度匹配。触发条件明确：**连续 ≥15 行 × 每行 ≥100 字符 × 非表格行**。当前 `anchored-entries.jsonl` 为 10 条，扩到 15 条即会阻断 M3 按条目铺开。建议处置出口 `check-change`：按文件格式或记录结构豁免结构化 JSON/JSONL，保留对 PDF 转储的检测；负例须覆盖“15 条长 JSONL 不报”与“15 行长文本转储仍报”。 |  |
 
 **共同成因**：G-002、G-003、G-004、G-005、G-006 同属 **规则正文严于判定列** 这一大类——判定列只覆盖了规则正文的一部分条件，或把不同严重度的条件压在同一级别。它们不是彼此独立的偶发问题，而是同一口径缺陷的不同表现。对应的独立工作项 T-130、T-131、T-100、T-134、T-135 保留原编号，不合并。
 
@@ -127,6 +128,7 @@
 | 2026-11-14 | 批次 0041：四道绑定上线（同源） | 检查器哈希 + `basis`、规格区段指纹 + 同批复核记录、验收快照漂移检测、ADR-0014；快照漂移检测明确不是权限分离（本机无 CI，做不到真正分离）。不改判定语义；17 条缺口仍为 `open`，核查矩阵不变。 |
 | 2026-11-14 | 批次 0042：按非同源复核清单机械化（非同源复核基线 `d8bf413`） | 12 条按复核结论关闭（`关闭依据` 均为 `非同源复核：`，见各条）；5 条维持 `open` 并写明残留。机械化项：根检查器与 pre-commit 纳入哈希保护、`--basis` 必须是复核记录、`coverage.json`/A.1 纳入指纹、覆盖闸门改子句级取证、pre-commit 跑 60 条样例与关键扫描、嵌套缺键 53 项入口归一化、四类封闭枚举统一 `undefined_enum_value`、E2 终点限人类/法人、A.2 条数更正为 41。M2 出口改为“清单清零 + 非同源复核判实质收敛”，两项残余风险外置到真 CI/受保护分支。 |
 | 2026-11-14 | 批次 0046：非同源复核（基线 `9519b82`，产物 `/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g014/REPORT_9519b82.md`） | 关闭 G-014、G-001、G-003、G-007、G-008，依据均带 `报告章节`；G-006 证据措辞更正为“`constraint=null` → cannot/missing_input，非 fail”，按非 pass 口径仍关闭；G-017 维持 `open`（无全文语义等价机器证明）；新登记 G-018（`actors[].type=Bogus` 仍 `pass`）。台账 18 条：`open` 2（G-017、G-018）/ `closed` 16。 |
+| 2026-11-14 | 批次 0048：T-123 放宽与 T-139 拆分（用户裁定） | `PMBOK8-2025` 的 `allowed_uses` 放宽到概念层（仍禁成段摘录、原文替代定义、未核页批量引用、规则直接锚定）；10 条 `anchored-entries.jsonl` 的来源迁入 `evidence[]`，`grounding_ref` 只用于规则/本体到条目的绑定，试点 15 条同步对齐；F-07 定性为检查器过度匹配，新登记 G-019（`RM-PROSEBLOCK` 误伤 ≥15 条长 JSONL）。台账 19 条：`open` 3（G-017、G-018、G-019）/ `closed` 16。 |
 
 ## 临时性与撤除
 

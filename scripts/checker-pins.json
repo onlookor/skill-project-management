@@ -6,8 +6,8 @@
       "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
     },
     "scripts/check_anchors.py": {
-      "sha256": "02c514f00ca5bbf7cd4f0fb926aa83e625fc95beccb64565d8404f953b3021f6",
-      "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
+      "sha256": "6aa0caa82d38e7f0cfd43303a0f6f798c4291ecbf4ee553d617b954906f6a8a2",
+      "basis": "非同源复核：用户裁定（parent session 6af45947fead009e7bdd1e76，批次 0048），2026-11-14；区段：GRAMMAR.md；复核产物：validation/reviews/2026-11-14-t139-user-adjudication.md；复核基线：563c26c；结论：认可"
     },
     "scripts/check_checker_pins.py": {
       "sha256": "273b7d2200a67f3833223b1f06bcf80504924456040c4dc2dfc142de94941cb6",
