@@ -244,11 +244,7 @@ def aggregate(
 
 def failed_clauses(check_id: str, data: dict) -> list[str]:
     """返回该输入实际触发的子句 id（按 A.2 行序）。供覆盖闸门机械核对。"""
-    violation = enum_violation(data)
-    if violation and violation[1]:
-        # 枚举在入口拦截，子句归属仍可判定（node_type → G-A2#2，relation → G-B2#2）。
-        return [violation[1]]
-    results = CHECKS[check_id](data)
+    results = enum_results(check_id, data) + CHECKS[check_id](data)
     seen = []
     for item in results:
         clause = item[2] if len(item) > 2 else None
@@ -752,6 +748,11 @@ def check_dimension_value(data: dict) -> list[tuple]:
         if subject not in BASE_SUBJECT_GROUPS and subject not in extension:
             results.append(("fail", "dimension_value_out_of_enum", "G-B2#1"))
     for entry in data.get("subject_group_extension") or []:
+        relation = entry.get("relation")
+        if relation is not None and relation not in EXTENSION_RELATIONS:
+            # 非法 relation 由封闭枚举层报 cannot_evaluate/undefined_enum_value；
+            # 此处不再重复判 fail，否则会以 fail 覆盖 cannot_evaluate。
+            continue
         if not extension_valid(entry):
             results.append(("fail", "invalid_subject_group_extension", "G-B2#2"))
     return results
@@ -761,7 +762,15 @@ def check_assertion_mutual_exclusion(data: dict) -> list[tuple]:
     results = []
     seen: dict[tuple, set] = {}
     for assertion in data["assertions"]:
-        if assertion.get("state") != "active":
+        state = assertion.get("state")
+        if state is None:
+            # G-C2#2：只对 active 断言判定；state 缺失时无法判定该断言是否参与。
+            results.append(("cannot_evaluate", "missing_input", "G-C2#2"))
+            continue
+        if state not in ("active", "inactive"):
+            results.append(("cannot_evaluate", "undefined_enum_value", "G-C2#2"))
+            continue
+        if state != "active":
             continue
         key = (assertion.get("subject"), assertion.get("property"))
         seen.setdefault(key, set()).add(assertion.get("value"))
@@ -780,7 +789,11 @@ def check_all_improvement(data: dict) -> list[tuple]:
             assumption.get("verification_condition") if isinstance(assumption, dict) else None
         )
         if relations and all(item == "mitigates" for item in relations):
-            if not assumption or not (change.get("verification_condition") or assumption_condition):
+            # `{}` 是“声明了 assumption 但字段不全”，由 G-D2#3 判 missing_input；
+            # 只有完全没有 assumption 时才落到 G-D2#1。
+            if assumption is None or not (
+                change.get("verification_condition") or assumption_condition
+            ):
                 results.append(("fail", "all_improvement_without_verification", "G-D2#1"))
             elif status == "expired" or (
                 status == "pending" and not assumption.get("approved_by")
@@ -1064,39 +1077,67 @@ def nested_missing(data: dict) -> str | None:
     return None
 
 
-def enum_violation(data: dict) -> tuple[str, str | None] | None:
-    """封闭枚举全局强制：非法值一律 cannot_evaluate/undefined_enum_value。
+def enum_results(check_id: str, data: dict) -> list[tuple]:
+    """封闭枚举与 assumption 对象的归一化结果：不短路，参与 aggregate。
 
-    可归属到 A.2 子句的两项（node_type、subject_group.relation）带回 clause，
-    使覆盖闸门仍能按子句取证；适用性与 assumption.status 无独立 A.2 子句。
+    非法枚举 → cannot_evaluate/undefined_enum_value；assumption 缺 status 或
+    satisfied 缺 verified_at → cannot_evaluate/missing_input。可归属到本 check
+    子句的结果带 clause，其余带 None；fail 仍可按 fail > cannot_evaluate 胜出。
     """
+    found: list[tuple] = []
+
+    def add(reason: str, clause: str | None) -> None:
+        if clause and CLAUSE_CHECK.get(clause) != check_id:
+            clause = None
+        found.append(("cannot_evaluate", reason, clause))
+
     applicability = data.get("applicability")
     if isinstance(applicability, dict):
         state = applicability.get("state")
         if state is not None and state not in APPLICABILITY_STATES:
-            return "applicability.state", None
-    for collection in ("changes", "assertions"):
+            add("undefined_enum_value", None)
+    for collection, clause in (("changes", "G-D2#3"), ("assertions", "G-E2#3")):
         for item in data.get(collection) or []:
             if not isinstance(item, dict):
                 continue
             assumption = item.get("assumption")
-            if isinstance(assumption, dict) and assumption.get("status") is not None:
-                if assumption["status"] not in ASSUMPTION_STATUSES:
-                    return "assumption.status", None
+            if not isinstance(assumption, dict):
+                continue
+            if "status" not in assumption:
+                add("missing_input", clause)
+                continue
+            if assumption["status"] not in ASSUMPTION_STATUSES:
+                add("undefined_enum_value", clause)
+                continue
+            if assumption["status"] == "satisfied" and not assumption.get("verified_at"):
+                add("missing_input", clause)
+                continue
+            # 只给 `{status}` 不构成完整假设：验证条件必须写在 assumption 内
+            # 或父对象上，否则判 missing_input（不得静默 pass）。
+            if not assumption.get("verification_condition") and not item.get(
+                "verification_condition"
+            ):
+                add("missing_input", clause)
     for collection in ("commitments", "deliverables"):
         for item in data.get(collection) or []:
             if not isinstance(item, dict):
                 continue
             node_type = item.get("node_type")
             if node_type is not None and node_type not in MANAGEMENT_NODE_TYPES:
-                return "node_type", "G-A2#2"
+                add("undefined_enum_value", "G-A2#2")
+    for item in data.get("management_items") or []:
+        if not isinstance(item, dict):
+            continue
+        node_type = item.get("node_type")
+        if node_type is not None and node_type not in MANAGEMENT_NODE_TYPES:
+            add("undefined_enum_value", None)
     for entry in data.get("subject_group_extension") or []:
         if not isinstance(entry, dict):
             continue
         relation = entry.get("relation")
         if relation is not None and relation not in EXTENSION_RELATIONS:
-            return "subject_group.relation", "G-B2#2"
-    return None
+            add("undefined_enum_value", "G-B2#2")
+    return found
 
 
 def evaluate(check_id: str, data: dict) -> tuple[str, str | None, str]:
@@ -1116,11 +1157,8 @@ def evaluate(check_id: str, data: dict) -> tuple[str, str | None, str]:
         return "cannot_evaluate", "missing_input", severity
     if nested_missing(data) is not None:
         return "cannot_evaluate", "missing_input", severity
-    violation = enum_violation(data)
-    if violation:
-        return "cannot_evaluate", "undefined_enum_value", severity
     verdict, reason, severity = aggregate(
-        check_id, CHECKS[check_id](data), SPEC[check_id][1]
+        check_id, enum_results(check_id, data) + CHECKS[check_id](data), SPEC[check_id][1]
     )
     # 引用完整性全局生效：check 自身判 pass 时，再统一校验所有已知引用。
     if verdict == "pass":
@@ -1282,8 +1320,27 @@ def enum_sweep(quiet: bool = False) -> int:
         (
             "applicability.state",
             "PROJECT_MINIMAL_EXISTENCE",
-            {key: [] for key in REQUIRED_KEYS["PROJECT_MINIMAL_EXISTENCE"]}
-            | {"applicability": {"state": "unknown_state"}},
+            {
+                "project": {"id": "P-1"},
+                "actors": [{"id": "A-1", "type": "HumanActor"}],
+                "outcomes": [{"id": "O-1"}],
+                "commitments": [
+                    {
+                        "id": "C-1",
+                        "by": "A-1",
+                        "to": "O-1",
+                        "accountable_by": "A-1",
+                        "responsible_by": ["A-1"],
+                        "constrained_by": ["K-1"],
+                    }
+                ],
+                "constraints": [{"id": "K-1", "constrains": "O-1"}],
+                "deliverables": [],
+                "assertions": [],
+                "changes": [],
+                "management_items": [],
+                "applicability": {"state": "unknown_state"},
+            },
         ),
         (
             "assumption.status",
@@ -1291,11 +1348,19 @@ def enum_sweep(quiet: bool = False) -> int:
             {
                 "actors": [],
                 "outcomes": [],
-                "commitments": [],
-                "constraints": [],
+                "commitments": [{"id": "C-1"}],
+                "constraints": [{"id": "K-1"}],
                 "deliverables": [],
                 "assertions": [],
-                "changes": [{"id": "CH-1", "assumption": {"status": "unknown_status"}}],
+                "changes": [
+                    {
+                        "id": "CH-1",
+                        "constraint": "K-1",
+                        "relation": "mitigates",
+                        "target": {"type": "Commitment", "id": "C-1"},
+                        "assumption": {"status": "unknown_status"},
+                    }
+                ],
             },
         ),
         (
@@ -1303,8 +1368,10 @@ def enum_sweep(quiet: bool = False) -> int:
             "CONSTRAINT_ANCHOR_REQUIRED",
             {
                 "commitments": [],
-                "deliverables": [{"id": "D-1", "node_type": "MysteryNode"}],
-                "constraints": [],
+                "deliverables": [
+                    {"id": "D-1", "node_type": "MysteryNode", "constrained_by": ["K-1"]}
+                ],
+                "constraints": [{"id": "K-1"}],
             },
         ),
         (

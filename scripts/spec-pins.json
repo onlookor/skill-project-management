@@ -7,11 +7,11 @@
       "path": "GRAMMAR.md"
     },
     "spec/methods/deterministic-checker.md#A.2": {
-      "sha256": "2d63803057f0574eda36cb5597c427394a1b8a60f05279d3573c0003f9945936",
+      "sha256": "ecdc0064d22247a6fd6aba4dbc4ce57323064b9108495921ee68324f99f2e90f",
       "path": "spec/methods/deterministic-checker.md"
     },
     "spec/methods/deterministic-checker.md#A.1": {
-      "sha256": "fedf385d42b9062cbf4c0e3c945951fa291e9049ccc7aee9d51e132230c946a5",
+      "sha256": "dcffbff73fd989b76fecc9462e51600098fba1e2a05811bc3e143e36269ecd03",
       "path": "spec/methods/deterministic-checker.md"
     },
     "spec/CHECKER_INPUT_SCHEMA.md#2bis": {
@@ -27,7 +27,7 @@
       "path": "spec/CHECKER_INPUT_SCHEMA.md"
     },
     "validation/checker-prototype/coverage.json": {
-      "sha256": "517f0d88af135658293b99ef74c9287cd1c7b651ca3c2c6394c5ca530a7756bd",
+      "sha256": "168d0416312d3c82a13e3c8a14856e580327897932c961b05d9453bb765e560b",
       "path": "validation/checker-prototype/coverage.json"
     }
   }

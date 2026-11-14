@@ -6,6 +6,7 @@
 """
 
 import argparse
+import hashlib
 import re
 import subprocess
 import sys
@@ -25,7 +26,8 @@ CAUSES = {
 }
 STATUSES = {"open", "closed"}
 RESOLUTIONS = {"rule-change", "check-change", "doc-only", "accepted"}
-CLOSURE_PREFIXES = ("非同源复核：", "人工签收：")
+CLOSURE_PREFIXES = ("外部复核：",)
+EXTERNAL_RE = re.compile(r"^外部复核：([^；\s]+)；sha256：([0-9a-f]{64})(?:；|$)")
 SAME_SOURCE_MARKERS = (
     "同源自查",
     "同源运行",
@@ -50,6 +52,31 @@ def repo_root() -> Path:
         print("[错误] 当前目录不在 git 仓库中，无法核查缺口台账。")
         sys.exit(2)
     return Path(result.stdout.strip())
+
+
+def external_closure_errors(root: Path, closure: str) -> list[str]:
+    """核对关闭依据的外部产物：路径存在且 sha256 一致。
+
+    这是对“路径 + 哈希”的机械核对，不验证复核者身份，也不验证报告内容；
+    哈希由复核方下一轮复核。
+    """
+    match = EXTERNAL_RE.match(closure.strip())
+    if match is None:
+        return ["关闭依据必须写成 `外部复核：<路径>；sha256：<64位小写十六进制>`"]
+    path_text, expected = match.groups()
+    path = Path(path_text)
+    if not path.is_absolute():
+        path = root / path
+    if not path.exists():
+        return [f"外部复核路径不存在：{path_text}"]
+    if not path.is_file():
+        return [f"外部复核路径不是文件：{path_text}"]
+    actual = hashlib.sha256(path.read_bytes()).hexdigest()
+    if actual != expected:
+        return [
+            f"外部复核 sha256 不符：登记 {expected[:12]}…，实际 {actual[:12]}…"
+        ]
+    return []
 
 
 def split_row(line: str):
@@ -78,6 +105,8 @@ def parse_ledger(text: str):
         first = cells[0].strip("`")
         if first in ("编号", "check_id"):
             continue
+        if len(cells) == 13 and cells[-1] == "":
+            cells = cells[:12]
         if len(cells) == 12 and GAP_ID_RE.match(first):
             gaps[first] = {
                 "status": cells[1],
@@ -123,11 +152,81 @@ def milestone_number(value: str):
     return int(match.group(1)) if match else None
 
 
+def self_test() -> int:
+    """关闭依据字段的正负例：路径存在 + 哈希一致才通过。"""
+    import tempfile
+
+    with tempfile.TemporaryDirectory(prefix="pm-closure-") as tmp:
+        root = Path(tmp)
+        report = root / "report.md"
+        report.write_text("external review report\n", encoding="utf-8")
+        digest = hashlib.sha256(report.read_bytes()).hexdigest()
+        cases = [
+            (
+                "E01",
+                "路径存在、哈希一致",
+                f"外部复核：{report}；sha256：{digest}",
+                None,
+            ),
+            (
+                "E02",
+                "路径不存在",
+                f"外部复核：{root / 'missing.md'}；sha256：{digest}",
+                "路径不存在",
+            ),
+            (
+                "E03",
+                "哈希不符",
+                f"外部复核：{report}；sha256：{'0' * 64}",
+                "sha256 不符",
+            ),
+            (
+                "E04",
+                "伪造路径（不是文件）",
+                f"外部复核：{root}；sha256：{digest}",
+                "不是文件",
+            ),
+            (
+                "E05",
+                "缺少 sha256 字段",
+                f"外部复核：{report}",
+                "必须写成",
+            ),
+        ]
+        print("| 编号 | 场景 | 预期 | 实际 | 证据 |")
+        print("|---|---|---|---|---|")
+        failures = 0
+        for case_id, label, closure, expected in cases:
+            errors = external_closure_errors(root, closure)
+            if expected is None:
+                ok = not errors
+                actual = "通过" if ok else "报错"
+                evidence = "无问题" if ok else errors[0]
+            else:
+                ok = any(expected in error for error in errors)
+                actual = "报错" if errors else "未报错"
+                evidence = next(
+                    (error for error in errors if expected in error), "未命中预期"
+                )
+            failures += 0 if ok else 1
+            print(
+                f"| {case_id} | {label} | {'通过' if expected is None else '报错'} | "
+                f"{actual} | {evidence} |"
+            )
+    print()
+    print(f"关闭依据字段测试 {len(cases)} 条，符合预期 {len(cases) - failures} 条。")
+    return 0 if not failures else 1
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--staged", action="store_true", help="检查暂存区是否同步更新台账")
     parser.add_argument("--root", help="仓库根目录；默认由 git 推断")
+    parser.add_argument("--self-test", action="store_true", help="关闭依据字段正负例")
     args = parser.parse_args()
+
+    if args.self_test:
+        return self_test()
 
     root = Path(args.root).resolve() if args.root else repo_root()
     ledger_text = read(root / LEDGER)
@@ -185,17 +284,22 @@ def main() -> int:
                 errors.append(f"[错误] {gap_id} 选择 accepted 但说明未写“理由：”")
             if gap["resolution"] == "doc-only" and "不检查" not in gap["description"]:
                 errors.append(f"[错误] {gap_id} 选择 doc-only 但说明未注明“不检查”")
-            # 关闭依据必须是非同源复核或人工签收；同源自证一律拒绝。
+            # 关闭依据必须是外部产物路径 + sha256；转录件与同源自证一律拒绝。
             closure = gap["closure"]
             if not closure:
                 errors.append(
                     f"[错误] {gap_id} 已关闭但“关闭依据”为空；"
-                    "必须有非同源复核或人工签收（AGENTS.md 3.6.6）"
+                    "必须有 `外部复核：<路径>；sha256：<64hex>`（AGENTS.md 3.6.6）"
                 )
             elif not closure.startswith(CLOSURE_PREFIXES):
                 errors.append(
-                    f"[错误] {gap_id} 的关闭依据 `{closure}` 不是"
-                    "“非同源复核：”或“人工签收：”；同源运行结果不得关闭缺口"
+                    f"[错误] {gap_id} 的关闭依据 `{closure}` 不是外部复核记录；"
+                    "转录件、同源运行结果均不得关闭缺口"
+                )
+            else:
+                errors.extend(
+                    f"[错误] {gap_id} {problem}"
+                    for problem in external_closure_errors(root, closure)
                 )
             for marker in SAME_SOURCE_MARKERS:
                 if marker in closure or marker in gap["description"]:

@@ -14,12 +14,12 @@
       "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
     },
     "scripts/check_coverage_gate.py": {
-      "sha256": "99e62c2c7847dbe016b880b998d957c682ee3c8623dc27ddeacb98fc871425ee",
-      "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
+      "sha256": "3cf51704371cd0be6ee234b6193950adf7b8a0bba44be783a79729cbfc1e5f9d",
+      "basis": "非同源复核：外部复核基线 48128a8，产物 /tmp/verify-4812/REPORT_48128a8.md；复核产物：validation/reviews/2026-11-14-48128a8-external.md；复核基线：48128a8"
     },
     "scripts/check_gap_ledger.py": {
-      "sha256": "99ffae6de596819808efbe5a0271329b934d8c22bbed100f24268cbddcf8a4e2",
-      "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
+      "sha256": "58ddb3692d2d82bc31fe8cc1115d6e8a2e7684b0340a8536585d12b34f955e5c",
+      "basis": "非同源复核：外部复核基线 48128a8，产物 /tmp/verify-4812/REPORT_48128a8.md；复核产物：validation/reviews/2026-11-14-48128a8-external.md；复核基线：48128a8"
     },
     "scripts/check_glossary_usage.py": {
       "sha256": "af780d97cad10579ea946ca094ba69ba0871223671c5cc672bd44b21ddd4f6ac",
@@ -66,8 +66,8 @@
       "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
     },
     "validation/checker-prototype/checker.py": {
-      "sha256": "fa771dec9b38ddd4463959f19b0687860d6659a016b79feb2a032e0755f95deb",
-      "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
+      "sha256": "50c5d7b19b26076c9059575041c30a29fed7ba34b280728ec475b78710238574",
+      "basis": "非同源复核：外部复核基线 48128a8，产物 /tmp/verify-4812/REPORT_48128a8.md；复核产物：validation/reviews/2026-11-14-48128a8-external.md；复核基线：48128a8"
     }
   },
   "note": "受保护脚本的哈希登记：scripts/ 下检查器（含本脚本）、.githooks/pre-commit、validation/checker-prototype/checker.py。改动必须 --write --basis 并附非同源复核记录；本文件与快照检测都不提供权限分离。"

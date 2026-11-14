@@ -750,3 +750,39 @@
 - **复核状态**：`open` 5 / `closed` 12；核查矩阵 `0/17 consistent`。关闭依据均来自非同源复核转录件，**转录件本身不是身份验证**。
 - **关联 ADR**：ADR-0014（`proposed`，本次补入自证/钩子/A.1/coverage 绑定与残余风险外置）
 - **状态**：生效（机械化项上线；5 条缺口仍 `open`）
+
+---
+
+### 批次 0043 — 2026-11-14 — 六项实现修正、关闭依据外置、信任根止损、规划归档
+
+- **性质**：处理基线 `48128a8` 复核结论中“已批准但未执行”的六项实现修正；把缺口关闭依据从仓库内转录件改为外部产物路径 + sha256；新增 ADR-0015 记录“停止加门”；归档 `spec/M3_M4_PLAN.md`（单独提交 `ce5c19d`）。**不新增检查器**。
+- **涉及文件**：`GAP_LEDGER.md`、`AGENTS.md`（3.6.6、目录树）、`ROADMAP.md`（M2 出口 1/5/7、残余风险、状态）、`adr/0015-trust-root-external-infrastructure.md`（新增）、`spec/methods/deterministic-checker.md`（A.1.8-4、A.2 `G-C2#2` 原因码、A.2 签收行）、`spec/CHECKER_INPUT_SCHEMA.md`（§2bis.11）、`validation/checker-prototype/checker.py`、`validation/checker-prototype/coverage.json`、`validation/pinned/checker.py`、`validation/reviews/2026-11-14-d8bf413-review.md`（头注）、`validation/reviews/2026-11-14-48128a8-external.md`（新增，区段 basis）、`scripts/check_coverage_gate.py`、`scripts/check_gap_ledger.py`、`scripts/README.md`、`scripts/checker-pins.json`、`scripts/spec-pins.json`、`GLOSSARY.md`、`knowledge/glossary-usage.json`、`CHANGELOG.md`（本批次）
+
+- **六项修正与实测**：
+  1. **G-014 选“枚举非法值参与 `aggregate()`”**，不做入口短路。理由：A.2 的 `fail > cannot_evaluate > pass` 与顺序无关性是已签收语义；入口短路会让同一输入因“哪个检查先看到枚举”而结论不同。实测：A2 的 `undefined` + `unanchored` 两种顺序均 `fail/unanchored_management_item`；`node_type`/`assumption.status`/`relation` 非法值在无 `fail` 时仍 `cannot_evaluate/undefined_enum_value`。G-014 重开为 `open`。
+  2. **`management_items[].node_type = Bogus`**：B1/B2 从 `pass` 改为 `cannot_evaluate/undefined_enum_value`（实测两处均为该结论）。
+  3. **`assumption.status`**：`{}` → `cannot_evaluate/missing_input`；`{status: Bogus}` → `cannot_evaluate/undefined_enum_value`；`{status: pending}` 或 `{status: satisfied}`（只给 `{status}`）→ `cannot_evaluate/missing_input`；完整合法假设 → `pass`。D1/D2 两个 `check_id` 实测一致。
+  4. **E2 `assertion.assumption = {}`**：从 `pass` 改为 `cannot_evaluate/missing_input`（`G-E2#3`）。
+  5. **堵掉守卫豁免**：`check_coverage_gate.py` 对 `expected_failed_clauses: []` 直接报错；实测把 `G-F4#1` 负例改成空声明 → 退出 1，报“空声明不算负例”。`G-C2#2` 改为可触发子句（`state` 缺失 → `cannot_evaluate/missing_input`，新增 A.1.8-4），不再用空声明豁免。
+  6. **G-016 更正**：共用原因码组为 **6 组**（B1、C2、E2 两处、F2、G3），不是 7 组；已写入台账说明。
+
+- **关闭依据外置**：
+  - `GAP_LEDGER.md` 的 `关闭依据` 只接受 `外部复核：<路径>；sha256：<64hex>；基线：<提交号>`，可选 `；caveat：`。
+  - `scripts/check_gap_ledger.py` 机械核对路径存在、是文件、哈希一致；`--self-test` 的 E01–E05 实测 5/5（E02 路径不存在、E03 哈希不符、E04 指向目录、E05 缺 sha256）。
+  - `validation/reviews/` 转录件加头注“非权威、不构成关闭依据”；`AGENTS.md` 3.6.6 写明“复核结论不得由执行方转录为依据”。
+  - 11 条 `closed` 按新格式重述依据（`/tmp/verify-4812/REPORT_48128a8.md`，sha256 `d0f8275f…`，基线 `48128a8`）；G-010 保留 caveat `F1.charter.project→missing_charter；E2.assertions→assertion_incomplete`。
+
+- **ADR-0015（新）**：信任根（`checker-pins.json`、复核转录件、根检查器）无法在仓库内部自保，新增门只会成为新信任根；M2 关闭受阻于基础设施（真 CI、受保护分支、复核方独立工具链）；因此停止加门。`ROADMAP.md` 的 M2 出口 5 与状态改为“受阻于外部基础设施，暂不关闭”，出口 7 去掉旧签收措辞。
+
+- **规划归档**：`spec/M3_M4_PLAN.md` 头注“已暂停，未批准，不构成承诺”，状态 `archived`，单独提交 `ce5c19d`；未按该规划开工，未动 14 条待批决策。
+
+- **回归实测**：
+  - `checker.py`：61/61 样例，17/17 `check_id`；`--null-sweep` 227/227；`--missing-key-sweep` 43/43；`--nested-missing-sweep` 53/53；`--enum-sweep` 4/4；`--aggregation-order` 0 偏离。
+  - `check_three_table.py`：A.2 指纹 `55c96288c69f`，A 表已由 A.2 重建，签收同步。
+  - `check_coverage_gate.py`：子句 41、矩阵 41、正例 43、负例 42、样例 61、问题 0；空声明负例阻断 1 条。
+  - `test_check_table_mutations.py` 11/11 + S01/S02 2/2；`test_coverage_gate.py` N01–N04 4/4；`test_checker_pins.py` CP01–CP07 7/7；`test_spec_pins.py` SP01–SP05 5/5。
+  - 十个检查器退出 0；`check_checker_pins.py` 登记 17 / 工作区 17 / 快照一致；`check_spec_pins.py` 区段 7 / 已登记 7 / 问题 0。
+
+- **缺口状态**：**17 条（`open` 6 / `closed` 11）**。`open`：G-001、G-003、G-007、G-008、G-014、G-017；`closed`：G-002、G-004、G-005、G-006、G-009、G-010、G-011、G-012、G-013、G-015、G-016。核查矩阵 `0/17 consistent`；到期 0。
+- **关联 ADR**：ADR-0015（`proposed`，信任根与止损）；ADR-0014 的残余风险处置由本批次收敛为“外部基础设施未具备前不关闭 M2”。
+- **状态**：生效（六项修正上线；G-014 仍 `open`，待修后外部复核）

@@ -216,7 +216,8 @@
     "G-C2#1": {
       "check_id": "ASSERTION_MUTUAL_EXCLUSION",
       "positive": [
-        "A.1.8-2"
+        "A.1.8-2",
+        "A.1.8-3"
       ],
       "negative": [
         {
@@ -230,12 +231,14 @@
     "G-C2#2": {
       "check_id": "ASSERTION_MUTUAL_EXCLUSION",
       "positive": [
-        "A.1.8-2"
+        "A.1.8-3"
       ],
       "negative": [
         {
-          "sample": "A.1.8-3",
-          "expected_failed_clauses": []
+          "sample": "A.1.8-4",
+          "expected_failed_clauses": [
+            "G-C2#2"
+          ]
         }
       ]
     },

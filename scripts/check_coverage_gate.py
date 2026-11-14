@@ -132,7 +132,6 @@ def main() -> int:
     referenced: set[str] = set()
     positives = 0
     negatives = 0
-    guards = 0
     for clause, spec in clauses.items():
         entry = entries.get(clause)
         if entry is None:
@@ -186,15 +185,10 @@ def main() -> int:
                 continue
             actual = checker.failed_clauses(check_id, case["input"] or {})
             if not declared:
-                guards += 1
-                if sample["verdict"] != "pass":
-                    errors.append(
-                        f"{clause}：守卫负例 {sample_id} 期望 verdict={sample['verdict']}，不是 pass"
-                    )
-                if actual:
-                    errors.append(
-                        f"{clause}：守卫负例 {sample_id} 实际触发了 {actual}，并非守卫用例"
-                    )
+                errors.append(
+                    f"{clause}：负例 {sample_id} 的 expected_failed_clauses 为空；"
+                    "空声明不算负例，必须有实际触发的子句"
+                )
                 continue
             negatives += 1
             if sample["verdict"] == "pass":
@@ -222,7 +216,7 @@ def main() -> int:
         print(f"[错误] {error}")
     print(
         f"覆盖矩阵：子句 {len(clauses)}，矩阵条目 {len(entries)}，"
-        f"正例 {positives}，负例 {negatives}，守卫 {guards}，样例 {len(samples)}，问题 {len(errors)}"
+        f"正例 {positives}，负例 {negatives}，样例 {len(samples)}，问题 {len(errors)}"
     )
     return 0 if not errors else 1
 

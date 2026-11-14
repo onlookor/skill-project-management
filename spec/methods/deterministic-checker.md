@@ -294,7 +294,7 @@
 | `DUAL_DIMENSION_ANNOTATION` | G-B1 | `G-B1#1`–`G-B1#2` | `2cde52fd3961` | `management_items` | missing_dimension | active |
 | `DIMENSION_VALUE_CLOSED` | G-B2 | `G-B2#1`–`G-B2#2` | `b50cfc085765` | `management_items` | dimension_value_out_of_enum / invalid_subject_group_extension / undefined_enum_value | active |
 | `DELIVERABLE_ASSERTION_LINK` | G-C1 | `G-C1#1`–`G-C1#3` | `f2a5638c6328` | `deliverables`, `assertions` | deliverable_without_assertion / dangling_reference / assertion_without_content / assertion_about_mismatch | active |
-| `ASSERTION_MUTUAL_EXCLUSION` | G-C2 | `G-C2#1`–`G-C2#2` | `dad9a9f57643` | `assertions`, `deliverables` | mutually_exclusive_active_assertions | active |
+| `ASSERTION_MUTUAL_EXCLUSION` | G-C2 | `G-C2#1`–`G-C2#2` | `e099e1ee877a` | `assertions`, `deliverables` | mutually_exclusive_active_assertions / missing_input / undefined_enum_value | active |
 | `CHANGE_CONSTRAINT_LINK` | G-D1 | `G-D1#1`–`G-D1#3` | `3e473f8ea1e8` | `changes`, `constraints`, `commitments`, `deliverables` | missing_change_target / invalid_change_target / missing_constraint_link / invalid_change_relation | active |
 | `ALL_IMPROVEMENT_ASSUMPTION` | G-D2 | `G-D2#1`–`G-D2#3` | `c1573c1eb236` | `changes`, `actors` | all_improvement_without_verification / approval_basis_before_verification / assumption_unclosed | active |
 | `ROLE_MINIMAL_COMPLETENESS` | G-E1 | `G-E1#1`–`G-E1#3` | `a707061b238f` | `actors`, `commitments` | missing_accountable / multiple_accountable / unknown_accountable / accountable_not_human / missing_responsible / missing_role_merge_declaration | active |
@@ -311,7 +311,7 @@
 
 > 用途：解决“一规则一句导致子条件被压缩”（ADR-0013 的问题 P1）。每条规则正文的规范性条件拆为 clause id；A 表每个 `check_id` 的“判定（子句 id）”列只列它覆盖的 clause，**不再写叙述性短语**；条件的自然语言表述与原因码统一放在本表。一个 `check_id` 可承载多个子句，逐子句独立求值、聚合为单一 verdict（任一 `fail` → `fail`；否则任一 `cannot_evaluate` → `cannot_evaluate`；否则 `pass`）。未覆盖的子句必须标 `not-checked` 并写理由，`scripts/check_three_table.py` 机械核对覆盖完整性与“A 表不含叙述性短语”。
 >
-> 复核签收：非同源复核基线 `d8bf413`（本批次按复核清单第 3/6/7/8 项修改；产物 `validation/reviews/2026-11-14-d8bf413-review.md`） / 2026-11-14 / A.2 指纹 `df739d3d479c`
+> 复核签收：外部复核基线 `48128a8`（产物 `/tmp/verify-4812/REPORT_48128a8.md`，sha256 `d0f8275f9931f36da93c640ad8a070c8af7200929d0a4a685e5309268356c4e7`；本轮按其清单第 1–6 项修订，修订后版本待下一轮复核） / 2026-11-14 / A.2 指纹 `55c96288c69f`
 
 | clause | 规则 | 子句（判定条件） | 原因码 | 承接 check_id | 子句 severity | 覆盖状态 | 规则状态 |
 |---|---|---|---|---|---|---|---|
@@ -331,7 +331,7 @@
 | `G-C1#2` | G-C1 | 断言内容是“是什么/什么状态/满足什么条件”的明确陈述 | `assertion_without_content` | `DELIVERABLE_ASSERTION_LINK` | `block` | checked | active |
 | `G-C1#3` | G-C1 | 断言 `about` 指向该交付物 | `assertion_about_mismatch` | `DELIVERABLE_ASSERTION_LINK` | `block` | checked | active |
 | `G-C2#1` | G-C2 | 同一 `Subject` 同一属性不得有不相容值 | `mutually_exclusive_active_assertions` | `ASSERTION_MUTUAL_EXCLUSION` | `warn` | checked | active |
-| `G-C2#2` | G-C2 | 只对 `active` 断言判不相容 | `mutually_exclusive_active_assertions` | `ASSERTION_MUTUAL_EXCLUSION` | `warn` | checked | active |
+| `G-C2#2` | G-C2 | 只对 `active` 断言判不相容 | `mutually_exclusive_active_assertions` / `missing_input` / `undefined_enum_value` | `ASSERTION_MUTUAL_EXCLUSION` | `warn` | checked | active |
 | `G-D1#1` | G-D1 | 变更对象是 `Commitment` 或 `Deliverable` | `missing_change_target / invalid_change_target` | `CHANGE_CONSTRAINT_LINK` | `block` | checked | active |
 | `G-D1#2` | G-D1 | 变更提议至少一条边指向 `Constraint` | `missing_constraint_link` | `CHANGE_CONSTRAINT_LINK` | `block` | checked | active |
 | `G-D1#3` | G-D1 | 边类型 ∈ `relation` 枚举 | `invalid_change_relation` | `CHANGE_CONSTRAINT_LINK` | `block` | checked | active |
@@ -1041,6 +1041,26 @@ severity: warn
 rule_status: active
 verdict: pass
 reason: null
+```
+
+**样例 4（触发 `G-C2#2` → `cannot_evaluate`）**：断言缺少 `state`，无法判定是否参与互斥。
+
+```yaml
+deliverables: [{ id: "D-1" }]
+assertions:
+  - { id: "S-1", deliverable: "D-1", subject: "D-1", property: "status", value: "accepted", state: "active" }
+  - { id: "S-2", deliverable: "D-1", subject: "D-1", property: "status", value: "rejected" }
+```
+
+期望输出：
+
+```yaml
+check_id: ASSERTION_MUTUAL_EXCLUSION
+source_rule: G-C2
+severity: warn
+rule_status: active
+verdict: cannot_evaluate
+reason: missing_input
 ```
 
 #### A.1.9 `ALL_IMPROVEMENT_ASSUMPTION`（G-D2，`warn` / `active`）
