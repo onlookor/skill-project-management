@@ -39,13 +39,13 @@
 
 | check_id | 规则 | 结论 | 复核里程碑 |
 |---|---|---|---|
-| `PROJECT_MINIMAL_EXISTENCE` | G-A1 | `G-002` | M1 |
-| `CONSTRAINT_ANCHOR_REQUIRED` | G-A2 | `G-001` | M1 |
+| `PROJECT_MINIMAL_EXISTENCE` | G-A1 | `G-002`, `G-007` | M1 |
+| `CONSTRAINT_ANCHOR_REQUIRED` | G-A2 | `G-001`, `G-007` | M1 |
 | `DUAL_DIMENSION_ANNOTATION` | G-B1 | `consistent` | M1 |
 | `DIMENSION_VALUE_CLOSED` | G-B2 | `consistent` | M1 |
-| `DELIVERABLE_ASSERTION_LINK` | G-C1 | `consistent` | M1 |
+| `DELIVERABLE_ASSERTION_LINK` | G-C1 | `G-005`, `G-007` | M1 |
 | `ASSERTION_MUTUAL_EXCLUSION` | G-C2 | `consistent` | M1 |
-| `CHANGE_CONSTRAINT_LINK` | G-D1 | `consistent` | M1 |
+| `CHANGE_CONSTRAINT_LINK` | G-D1 | `G-006`, `G-007` | M1 |
 | `ALL_IMPROVEMENT_ASSUMPTION` | G-D2 | `G-001` | M1 |
 | `ROLE_MINIMAL_COMPLETENESS` | G-E1 | `G-001`, `G-004` | M1 |
 | `AI_AUTONOMY_DELEGATION_AUDITABLE` | G-E2 | `G-003` | M1 |
@@ -65,14 +65,20 @@
 | G-002 | open | rule-stricter | L2 | G-A1 | 是（全保真） | 架构负责人 | M1 |  | T-130 | G-A1 正文的“`Constraint` 作用于该 `Outcome` 或 `Commitment`”未进入 `PROJECT_MINIMAL_EXISTENCE` 判定列。 |
 | G-003 | open | rule-stricter | L2 | G-E2 | 是（全保真） | 架构负责人 | M1 |  | T-131 | G-E2 正文的“该 `Assertion` 以 `assumption` 形式存在并附带验证条件”未进入 `AI_AUTONOMY_DELEGATION_AUDITABLE` 判定列。 |
 | G-004 | open | severity-mismatch | L1 | G-E1 | 是 | 架构负责人 | M1 |  | T-100 | `ROLE_MINIMAL_COMPLETENESS` 把“角色合并声明缺失”与“问责结构根本性缺失”混为同一 severity，可能把合法产物判为失败。 |
+| G-005 | open | rule-stricter | L1 | G-C1 | 是 | 架构负责人 | M1 |  | T-134 | G-C1 正文要求“`Assertion` 的内容必须是关于该交付物‘是什么、处于什么状态、满足什么条件’的明确陈述”，判定列只检查 `asserted_by` 边存在，未检查断言内容，也未检查 `about` 是否指向该交付物。证据：样例 A.1.3-2 的断言只有 `id`、无任何内容，仍期望 `pass`；按正文应判 `fail`。 |
+| G-006 | open | rule-stricter | L1 | G-D1 | 是 | 架构负责人 | M1 |  | T-135 | G-D1 正文限定“对 `Commitment` 或 `Deliverable` 的变更提议”，判定列对任何变更提议生效，缺少 `target` 对象类型谓词。证据：变更带 `target: some_deliverable`（非 `Commitment`/`Deliverable`）时，原型与复核实现都判 `pass`。 |
+| G-007 | open | undefined-object | L1 | G-A1、G-A2、G-C1、G-D1 | 是 | 架构负责人 | M1 |  | T-136 | 判定列语义未定明（合并登记，避免五条同源条目重复占用裁定带宽）：(1) 端点量词——`Commitment` 的 `by`/`to` 是“每个”还是“存在一个”；(2) 空对象语义——`{}` 与缺键、空列表的区分；(3) 悬空引用的原因码——是 `fail` 还是 `cannot_evaluate`；(4) 多违规时 `reason` 的优先级；(5) `about` 反向引用是否构成 C1 的“出边”。复核已观察到两套实现在这些点上的分歧，按 L1 计（存在错判并阻断独立复核）。 |
 
-**共同成因**：G-002、G-003、G-004 同属 **规则正文严于判定列** 这一大类——判定列只覆盖了规则正文的一部分条件，或把不同严重度的条件压在同一级别。G-002、G-003 的成因记为 `rule-stricter`（漏判条件）；G-004 的成因记为 `severity-mismatch`（判定列未区分两种情形，导致合法产物可能被判失败），但三者不是彼此独立的偶发问题，而是同一口径缺陷的不同表现。对应的独立工作项 T-130、T-131、T-100 保留原编号，不合并。
+**共同成因**：G-002、G-003、G-004、G-005、G-006 同属 **规则正文严于判定列** 这一大类——判定列只覆盖了规则正文的一部分条件，或把不同严重度的条件压在同一级别。G-002、G-003、G-005、G-006 的成因记为 `rule-stricter`（漏判条件：G-002 漏“约束作用边”、G-003 漏“assumption 形式与验证条件”、G-005 漏“断言内容与 `about` 相关性”、G-006 漏“变更对象的类型谓词”）；G-004 的成因记为 `severity-mismatch`（判定列未区分两种情形，导致合法产物可能被判失败）。它们不是彼此独立的偶发问题，而是同一口径缺陷的不同表现。对应的独立工作项 T-130、T-131、T-100、T-134、T-135 保留原编号，不合并——每条有各自的规则条款与判定列行，可分别裁定。
+
+**与 G-007 的关系**：G-007 是另一类——不是“判定列漏了正文条件”，而是“判定列本身存在未定明的语义”，因此成因记为 `undefined-object`，并合并登记（取舍理由见该行说明）。
 
 ## 核查记录
 
 | 日期 | 事件 | 结论 |
 |---|---|---|
 | 2026-11-14 | T-107 最小原型跑通 34/34 个样例 | 核查矩阵不变；G-001–G-004 仍为 `open`，原型只在输出中声明“未覆盖规则正文”，不关闭任何缺口 |
+| 2026-11-14 | T-133 独立复核（非同源，只读验收包，覆盖 G-A1 / G-C1 / G-D1 共 3 个 `check_id`、6 个样例） | 6/6 判定与预期一致，但一致不等于一致于规则正文：复核指出 G-C1 漏“断言内容与 `about` 相关性”、G-D1 漏“变更对象类型谓词”，并报告 5 处判定列语义未定明。据此登记 G-005、G-006、G-007；核查矩阵由 12/17 降为 10/17 consistent。剩余 14 个 `check_id` 尚未复核，T-133 保持 `in-progress` |
 
 ## 临时性与撤除
 

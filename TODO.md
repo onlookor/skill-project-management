@@ -40,7 +40,10 @@
 |---|---|---|---|---|---|---|
 | T-080 | M2 | 验证套件 | 为 `CM-DET-CHECKER` 的 P1c（不扭曲）设计反例检验用例：每条规则至少一个“应通过”与一个“应失败”用例，含量词边界（空集/单元素/多元素）与例外触发用例 | 结果登记 | 无 | `in-progress`（`validation/test-cases/` 已落 3 个用例，其余见 T-101） |
 | T-101 | M2 | 反例用例补齐 | 补齐未落盘的 10 个反例检验用例正文：`TC-A1-01`、`TC-A1-03`、`TC-C1-01`、`TC-C1-02`、`TC-D1-01`、`TC-D1-02`、`TC-D1-03`、`TC-E1-01`、`TC-E1-02`、`TC-E1-03`；并补齐未覆盖规则（G-A2、G-C2、G-D2、G-E2、G-B1、G-B2、G-F1–F4、G-G1–G3）的用例 | 结果登记 | T-080 | `open` |
-| T-133 | M2 | 独立复核 | 对 T-107 原型做非同源复核：34/34 是样例与实现同源的自证，不构成独立证据。复核方按 `validation/independent-review-package.md` 对 `PROJECT_MINIMAL_EXISTENCE`（G-A1）、`DELIVERABLE_ASSERTION_LINK`（G-C1）、`CHANGE_CONSTRAINT_LINK`（G-D1）的 6 个样例做独立实现比对或人工逐条比对规则正文；**关闭条件**：由非同源实现或人工逐条比对规则正文得出独立结论并记录差异。不得用原型自身的运行结果作为关闭证据 | 结果登记 | T-107 | `open` |
+| T-133 | M2 | 独立复核 | 对 T-107 原型做非同源复核：34/34 是样例与实现同源的自证，不构成独立证据。复核方按 `validation/independent-review-package.md` 对 `PROJECT_MINIMAL_EXISTENCE`（G-A1）、`DELIVERABLE_ASSERTION_LINK`（G-C1）、`CHANGE_CONSTRAINT_LINK`（G-D1）的 6 个样例做独立实现比对或人工逐条比对规则正文；**关闭条件**：由非同源实现或人工逐条比对规则正文得出独立结论并记录差异。不得用原型自身的运行结果作为关闭证据 | 结果登记 | T-107 | `in-progress`（2026-11-14 部分完成：**已覆盖 3/17 个 `check_id`**——G-A1、G-C1、G-D1 的 6 个样例由非同源实现比对，6/6 判定一致；但复核同时发现 2 处“判定列漏正文条件”（G-005、G-006）与 5 处“判定列语义未定明”（G-007）。**剩余 14 个 `check_id` 尚未复核**：G-A2、G-B1、G-B2、G-C2、G-D2、G-E1、G-E2、G-F1–F4、G-G1–G3。**不因 3/17 的 6/6 一致而关闭**——剩余范围复核完成、且 G-005–G-007 有裁定结论后，方可按关闭条件评估） |
+| T-134 | M2 | 判定口径裁定 | 裁定 G-C1 的“`Assertion` 内容须是关于该交付物是什么、处于什么状态、满足什么条件的明确陈述”是否纳入 `DELIVERABLE_ASSERTION_LINK`：当前判定列只检查 `asserted_by` 边存在，未检查断言内容，也未检查 `about` 是否指向该交付物；样例 A.1.3-2 的空断言仍期望 `pass`。若纳入，属于改变已有 `check_id` 判定，需 ADR；缺口台账编号 G-005 | 结构性变更需 ADR | T-133 复核结论 | `open` |
+| T-135 | M2 | 判定口径裁定 | 裁定 G-D1 的“变更提议的对象限于 `Commitment` 或 `Deliverable`”是否纳入 `CHANGE_CONSTRAINT_LINK`：当前判定列对任何变更提议生效，缺少 `target` 对象类型谓词；若纳入，属于改变已有 `check_id` 判定，需 ADR；缺口台账编号 G-006 | 结构性变更需 ADR | T-133 复核结论 | `open` |
+| T-136 | M2 | 判定口径裁定 | 裁定判定列的五处语义口径并写回附录 A：端点量词（`Commitment` 的 `by`/`to` 是“每个”还是“存在一个”）、空对象语义（`{}` 与缺键/空列表的区分）、悬空引用的原因码（`fail` 还是 `cannot_evaluate`）、多违规时 `reason` 的优先级、`about` 反向引用是否构成 G-C1 的“出边”；裁定结果属判定列语义补全，改变已有 `check_id` 判定时需 ADR；缺口台账编号 G-007 | 结构性变更需 ADR | T-133 复核结论 | `open` |
 
 ### M3 本体定义
 

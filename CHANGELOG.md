@@ -412,3 +412,23 @@
 - **验证**：`python3 validation/checker-prototype/checker.py` 仍为 34/34（100.0%）；五个检查器均退出 0。验收包中的 6 个样例与附录 A.1.1 / A.1.3 / A.1.4 逐字一致。
 - **关联 ADR**：无
 - **状态**：生效
+
+---
+
+### 批次 0031 — 2026-11-14 — 独立复核缺口补登、T-133 部分完成与 `d3e2363` 更正
+
+- **涉及文件**：`GAP_LEDGER.md`（新增 G-005–G-007、核查矩阵、共同成因、核查记录）、`TODO.md`（T-133 状态、新增 T-134–T-136）、`ROADMAP.md`（M2 工作项、出口 4 改写与新增出口 5、映射表）、`ERRATA.md`（E-017）、`CHANGELOG.md`（本批次）
+- **变更摘要**：
+  1. **补登缺口 G-005**（`rule-stricter`，L1，影响 G-C1，关联 T-134）：G-C1 正文要求断言内容是关于交付物“是什么、处于什么状态、满足什么条件”的明确陈述，判定列只检查 `asserted_by` 边存在；样例 A.1.3-2 的空断言仍期望 `pass`。
+  2. **补登缺口 G-006**（`rule-stricter`，L1，影响 G-D1，关联 T-135）：G-D1 正文把变更提议限定为对 `Commitment` 或 `Deliverable` 的提议，判定列对任何变更提议生效，缺少 `target` 对象类型谓词。
+  3. **补登缺口 G-007**（`undefined-object`，L1，影响 G-A1/G-A2/G-C1/G-D1，关联 T-136）：复核方所报 5 处“判定列语义未定明”**合并为一条**登记——端点量词、空对象语义、悬空引用的原因码、多违规时 `reason` 优先级、`about` 反向引用是否构成 G-C1 的出边。合并理由：五者同属“判定列语义未定明”，既非单一规则条款与判定列的落差，也没有各自独立的处置路径；逐条登记只会让同源问题重复占用裁定带宽，合并后用说明列逐项列举，裁定与核查仍可逐点覆盖。
+  4. **到期口径**：G-005–G-007 均按 L1（停留 1 个里程碑）、登记 M1，到期 M2；`check_gap_ledger.py` 在 M1 下判定到期 0，可在 M2 内裁定，不构成必然到期。
+  5. **T-133 改为部分完成**：复核已覆盖 3/17 个 `check_id`（G-A1、G-C1、G-D1 的 6 个样例，6/6 一致），剩余 14 项未复核；状态保持 `in-progress`，不因 6/6 关闭。ROADMAP M2 出口 4 由“3 个 `check_id`”改写为“全部 17 个 `check_id`”，并新增出口 5 要求 G-005–G-007 在 M2 关闭前裁定或显式降级。
+  6. **`d3e2363` 矛盾更正**：见 `ERRATA.md` E-017。“文本输出补齐字段”准确；“未改动原型源码”若指该提交则不准确（实测只改 `checker.py`，+2 行），未改原型源码的是 `3defa84`。
+- **钩子绕过**：无。
+- **验证**：
+  - `python3 scripts/check_gap_ledger.py`：7 条（open 7 / closed 0）；L1 4 / L2 2 / L3 1；到期 0；核查矩阵 10/17 `consistent`；退出 0。
+  - `python3 validation/checker-prototype/checker.py`：34/34 样例通过（100.0%），17/17 个 `check_id` 全通过。
+  - 五个检查器（`check_no_raw_material.py`、`check_anchors.py`、`check_ledger_landings.py`、`check_gap_ledger.py --staged`、`check_state.py`）均退出 0。
+- **关联 ADR**：无（缺口登记与状态更新；G-005–G-007 的裁定若改变已有 `check_id` 判定，届时另立 ADR）
+- **状态**：生效

@@ -146,6 +146,15 @@
 - **波及文件**：`SOURCE_LEDGER.md`、`TODO.md`。
 - **状态**：`open`（待 T-119 复核；登记状态已如实降级）
 
+#### E-017 — 对 `d3e2363` 同时声称“补齐字段”与“未改动原型源码”
+
+- **原表述**：2026-11-14 的进度报告中，对提交 `d3e2363` 同时给出两句描述：该提交“文本输出补齐 `source_rule` / `severity` / `rule_status` 字段”，以及“未改动原型源码”。两句互相矛盾：补齐输出字段必然改到输出代码。
+- **问题**：`git show --stat d3e2363` 实测为 `validation/checker-prototype/checker.py | 2 ++`（1 file changed, 2 insertions）。因此“文本输出补齐字段”准确；**“未改动原型源码”若指 `d3e2363` 则不准确**——该提交恰恰只改了原型源码。未改动原型源码的是紧随其后的文档提交 `3defa84`（`AGENTS.md`、`CHANGELOG.md`、`ROADMAP.md`、`TODO.md`、`validation/independent-review-package.md`，共 5 个文件，未触及 `checker.py`）。
+- **发现方式**：用户要求复核该矛盾；执行 `git show --stat d3e2363` 与 `git show --stat 3defa84` 逐行核对改动清单。
+- **修正**：本条目如实记录两句原话与核实结论，不抹除、不改写历史提交信息。口径更正为：“`d3e2363` = 原型输出补齐字段（+2 行，只改 `checker.py`）；`3defa84` = 文档与验收包提交（未改原型源码）”。`CHECKER_INPUT_SCHEMA.md` 与附录 A 判定列未变，34/34 原型通过率不受影响。
+- **波及文件**：`ERRATA.md`（本条目）、`CHANGELOG.md`（批次 0031 引用本条）。
+- **状态**：`closed`（2026-11-14，核实结论见上）
+
 ### 3. 待核验的存疑表述
 
 以下表述已进入技能包，但尚未经外部来源核验。**它们不构成阻断，但在核验完成前不得作为“已接地”的依据**（`spec/GROUNDING_CRITERIA.md` G1 的 `assumption` 接受机制已覆盖）：
