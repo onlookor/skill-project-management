@@ -2,7 +2,7 @@
   "package": "project-management-grounding",
   "package_version": "0.5.1",
   "release_tag": "v0.5.1",
-  "release_state": "released",
+  "release_state": "development",
   "entrypoint": "README.md",
   "state_ledger": "STATE.md",
   "contract_schema": "contracts/schema/pm-slot-contract.schema.json",

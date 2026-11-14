@@ -85,6 +85,61 @@ def resolve(path: str, defaults: list[tuple[str, str]]):
 
 RELEASE_STATES = {"development", "released"}
 
+# 发布引导提交的绕过留痕（AGENTS.md 3.5.1）。git 不记录 --no-verify 标志，
+# 因此改为要求发布提交携带固定 trailer，由本脚本机械核查。
+BYPASS_TRAILER = "Hook-Bypass"
+BYPASS_REASON = "Hook-Bypass-Reason"
+BYPASS_VERIFIED = "Hook-Bypass-Verified"
+BYPASS_VALUE = "release-bootstrap"
+BYPASS_POLICY_SINCE = (0, 5, 2)  # v0.5.1 及以前为机制引入前的历史发布，不追溯
+
+
+def parse_tag_version(tag: str):
+    match = re.fullmatch(r"v(\d+)\.(\d+)\.(\d+)", tag)
+    return tuple(int(part) for part in match.groups()) if match else None
+
+
+def parse_bypass_trailers(message: str) -> dict[str, str]:
+    trailers: dict[str, str] = {}
+    for line in message.splitlines():
+        for key in (BYPASS_TRAILER, BYPASS_REASON, BYPASS_VERIFIED):
+            prefix = f"{key}:"
+            if line.startswith(prefix):
+                trailers[key] = line[len(prefix):].strip()
+    return trailers
+
+
+def check_bypass_trailer(root: Path, tag: str, release_state: str, head_is_tag: bool) -> list[str]:
+    """核对发布引导提交的绕过留痕；v0.5.1 及以前不追溯。"""
+    message = subprocess.run(
+        ["git", "log", "-1", "--format=%B"], cwd=root, capture_output=True, text=True
+    )
+    if message.returncode != 0:
+        return ["[错误] 无法读取 HEAD 提交信息，无法核对绕过留痕"]
+
+    trailers = parse_bypass_trailers(message.stdout)
+    version = parse_tag_version(tag)
+    policy_applies = version is None or version >= BYPASS_POLICY_SINCE
+    is_release_commit = release_state == "released" and head_is_tag
+
+    errors: list[str] = []
+    if is_release_commit and policy_applies:
+        if trailers.get(BYPASS_TRAILER) != BYPASS_VALUE:
+            errors.append(
+                f"[错误] 发布引导提交缺少 `{BYPASS_TRAILER}: {BYPASS_VALUE}` trailer；"
+                "该通道要求可机械核查的留痕（AGENTS.md 3.5.1）"
+            )
+        if not trailers.get(BYPASS_REASON):
+            errors.append(f"[错误] 发布引导提交缺少非空 `{BYPASS_REASON}:` trailer")
+        if not trailers.get(BYPASS_VERIFIED):
+            errors.append(f"[错误] 发布引导提交缺少非空 `{BYPASS_VERIFIED}:` trailer")
+    elif trailers:
+        errors.append(
+            "[错误] 非发布引导提交不得携带 Hook-Bypass trailer；该留痕只用于 "
+            "release_state=released 且 tag 指向 HEAD 的提交"
+        )
+    return errors
+
 
 def check_release(root: Path) -> tuple[list[str], list[str], str]:
     """核对 manifest.json 与最新 annotated tag。结构无法解析时以 2 退出。
@@ -149,6 +204,7 @@ def check_release(root: Path) -> tuple[list[str], list[str], str]:
     if head.returncode != 0 or tag_commit.returncode != 0:
         errors.append(f"[错误] 无法解析 HEAD 或 tag `{tag}` 的提交，无法确认发布点")
     elif head.stdout.strip() != tag_commit.stdout.strip():
+        errors.extend(check_bypass_trailer(root, tag, release_state, False))
         ancestor = subprocess.run(
             ["git", "merge-base", "--is-ancestor", tag_commit.stdout.strip(), "HEAD"],
             cwd=root,
@@ -175,6 +231,8 @@ def check_release(root: Path) -> tuple[list[str], list[str], str]:
                 f"[错误] annotated tag `{tag}` 未指向 HEAD（当前 {head.stdout.strip()[:12]}），"
                 "发布点与工作区不一致；开发中须显式声明 release_state=development"
             )
+    else:
+        errors.extend(check_bypass_trailer(root, tag, release_state, True))
     return errors, warnings, f"{version} ↔ {tag}（{release_state}）"
 
 

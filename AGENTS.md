@@ -79,6 +79,30 @@
 - 发布提交的引导顺序固定：tag 只能指向已存在的提交，因此“把 `release_state` 改为 `released` 并递增版本”的提交需以 `git commit --no-verify` 提交，随后立即打 annotated tag 并运行四个检查器。其他提交不得使用 `--no-verify`。
 - 发布点仍只有一个：以 annotated tag 声明（ADR-0003）；`development` 只说明 `HEAD` 领先于最近发布点，不产生第二个发布点。
 
+##### 3.5.1 绕过留痕（硬要求）
+
+`--no-verify` 的唯一合法用途是发布引导提交。git 不记录该标志（实测：提交对象只有 `tree` / `parent` / `author` / `committer` / `message`，没有任何钩子旁路标记），因此留痕改为固定 trailer，由 `check_state.py` 机械核查：
+
+```
+Hook-Bypass: release-bootstrap
+Hook-Bypass-Reason: <为什么 pre-commit 无法通过>
+Hook-Bypass-Verified: <tag 名；四个检查器的复跑结果>
+```
+
+- `v0.5.2` 及以后的发布提交必须齐备三项，且 `Hook-Bypass` 的值固定为 `release-bootstrap`；缺失任一项即错误。
+- 非发布提交（`release_state != released` 或 tag 未指向 `HEAD`）不得携带该 trailer，携带即错误。
+- `v0.5.1` 及以前为机制引入前的历史发布，不追溯、不回填。
+- trailer 是权威留痕；`CHANGELOG.md` 对应批次以 `**钩子绕过**` 字段引用同一 tag，供人阅读，检查器不解析 CHANGELOG。
+
+##### 3.5.2 撤出条件（可判定）
+
+通道不能永久存在。目标：发布引导提交本身能通过钩子，取消 `--no-verify`。
+
+- **方向**：发布点校验拆成两段。`check_state.py` 在 pre-commit 识别显式待发布声明——提交信息含 `Release-Target: <tag>`，且 manifest 为 `release_state=released` / `release_tag=<tag>`；目标 tag 尚不存在时只告警，不报错。`.githooks/pre-push` 运行严格检查：tag 必须存在、annotated、指向 `HEAD`，否则阻断推送。
+- **关闭时点**：不晚于 `v0.5.2` 的发布提交；若 `v0.5.2` 仍使用 `--no-verify`，通道在该发布后立即冻结，下一次发布前必须先完成撤出。
+- **关闭动作**：删除本条 `--no-verify` 例外（3.5 与 7bis 第 5 条）；新增 pre-push 钩子与待发布识别；移除 `Hook-Bypass` trailer 强制（历史提交保留）；`TODO.md` T-129 标 `done` 并记 CHANGELOG。
+- **次数上限**：机制生效后最多允许 1 次豁免（即 `v0.5.2`）；第 2 次豁免即违规，必须先完成撤出再发布。
+
 ### 4. 目录结构（唯一权威）
 
 本技能目录的完整结构如下。**本节是目录结构的唯一权威**；`README.md` 中的文件地图只是导航，与本节冲突时以本节为准。
@@ -266,7 +290,7 @@ project-management-grounding/
 2. **`resources/` 只在本地只读使用**。不复制、不打包、不 `git add`；`.gitignore` 已忽略 `resources/` 与文档类扩展名，但忽略规则不是许可。
 3. **引用外部文献只写可复核的定位与自己的话**。默认写法是“页码定位 + 自述摘要”；确需引证术语或条款措辞时，单条不超过一行或一句，并附来源 `id` 与页码（见 `CONSTITUTION.md` 第 13.2 条）。
 4. **提交前必须运行四个检查器**：`check_no_raw_material.py`、`check_anchors.py`、`check_ledger_landings.py`、`check_state.py`。本仓库已提供 `.githooks/pre-commit`，每个克隆需自行执行 `git config core.hooksPath .githooks` 启用；未启用钩子的部署必须在 `git add` 前手工逐个运行，等价命令见 `scripts/README.md`。
-5. **检查器命中即停止提交**，不得用 `--no-verify` 绕过。唯一例外是第 3.5 条规定的发布引导提交（`release_state` 改为 `released` 并递增版本），该提交必须紧接 annotated tag 与四个检查器的复跑。确需新增其他例外（例如将来要提交一张合法图片资产），走 ADR 并在检查器中登记路径豁免，而不是删除规则或放宽阈值。
+5. **检查器命中即停止提交**，不得用 `--no-verify` 绕过。唯一例外是第 3.5 条规定的发布引导提交（`release_state` 改为 `released` 并递增版本），该提交必须携带 3.5.1 的三项 `Hook-Bypass` trailer，并紧接 annotated tag 与四个检查器的复跑；该通道按 3.5.2 的撤出条件关闭（`TODO.md` T-129）。确需新增其他例外（例如将来要提交一张合法图片资产），走 ADR 并在检查器中登记路径豁免，而不是删除规则或放宽阈值。
 6. **发现已跟踪内容违规时**：先报告文件与位置，再改为“页码定位 + 自述摘要”或移出仓库，并在 `ERRATA.md` 登记；不静默删除他人的内容。
 7. **自建本体（`CONSTITUTION.md` 第 13.6 条）**：
    - 只放 `ontology/`；主格式为 Turtle（`.ttl`、`.shacl.ttl`），`.owl`/`.rdf`/`.nt`/`.n3`/`.jsonld` 仅作生成导出，仍受同一内容检查。
