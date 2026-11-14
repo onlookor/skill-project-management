@@ -1,16 +1,24 @@
 #!/usr/bin/env sh
-# 提交前检查：四个检查器全部通过才允许提交（AGENTS.md 3.5、7bis）
+# 提交前检查：五个检查器全部通过才允许提交（AGENTS.md 3.5、3.6、7bis）
 # 每个克隆需自行启用：git config core.hooksPath .githooks
 set -u
 root=$(git rev-parse --show-toplevel) || exit 1
 cd "$root" || exit 1
 
-for script in check_no_raw_material.py check_anchors.py check_ledger_landings.py check_state.py; do
-  echo "[pre-commit] 运行 scripts/$script"
-  if ! python3 "scripts/$script"; then
-    echo "[pre-commit] 阻断：scripts/$script 未通过，提交已取消。" >&2
+run_check() {
+  label=$1
+  shift
+  echo "[pre-commit] 运行 $label"
+  if ! "$@"; then
+    echo "[pre-commit] 阻断：$label 未通过，提交已取消。" >&2
     exit 1
   fi
-done
+}
 
-echo "[pre-commit] 四个检查器全部通过。"
+run_check "scripts/check_no_raw_material.py" python3 scripts/check_no_raw_material.py
+run_check "scripts/check_anchors.py" python3 scripts/check_anchors.py
+run_check "scripts/check_ledger_landings.py" python3 scripts/check_ledger_landings.py
+run_check "scripts/check_gap_ledger.py --staged" python3 scripts/check_gap_ledger.py --staged
+run_check "scripts/check_state.py" python3 scripts/check_state.py
+
+echo "[pre-commit] 五个检查器全部通过。"

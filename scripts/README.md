@@ -12,6 +12,7 @@
 | `anchor_baseline.json` | `check_anchors.py` 的指纹基线（`rule:*` 与 `source:*`），内容变更后重冻 | `spec/ANCHOR_SPEC.md` 第 5 节 | 数据文件 |
 | `check_glossary_sync` | 检查 `GLOSSARY.md` 的 A 类条目与 `knowledge/anchored-entries.jsonl` 的定义一致性 | `check_glossary_sync.md` | 未实现（T-090） |
 | `check_no_raw_material.py` | 阻断式检查：已跟踪文件中不得出现原始资料（PDF/EPUB/扫描件等）、文本层/OCR 转储与成段原文；允许受控的自建本体（`CONSTITUTION.md` 第 13.6 条） | `CONSTITUTION.md` 第 13 条 | 已实现 |
+| `check_gap_ledger.py` | 核查 `GAP_LEDGER.md`：字段枚举、核查矩阵与附录 A 全覆盖、缺口被引用、TODO 交叉引用、按里程碑计算到期；`--staged` 要求规则/判定文件与台账同批更新。到期未裁定退出 1 | `AGENTS.md` 3.6、`adr/0012-gap-ledger-and-adjudication.md` | 已实现 |
 | `validate_ontology.py` | 用 `rdflib` + `pyshacl` 校验 `ontology/` 本体与 24 条 SHACL 形状；`--matrix` 逐条运行违规 fixture，确认每条形状能判出违规 | 无独立规格（边界见 `CONSTITUTION.md` 第 13.6 条与 `ontology/README.md`） | 已实现（可选依赖） |
 
 ### 运行方式
@@ -21,8 +22,11 @@ python3 scripts/check_state.py
 python3 scripts/check_ledger_landings.py
 python3 scripts/check_anchors.py
 python3 scripts/check_no_raw_material.py
+python3 scripts/check_gap_ledger.py
 python3 scripts/validate_ontology.py --matrix
 ```
+
+`check_gap_ledger.py` 退出码：`0` 通过；`1` 结构非法或存在到期未裁定（含规则/判定文件与台账未同批暂存）；`2` 台账或方法注册表无法解析。输出首行给出总数、`open`/`closed`、按级与到期计数、核查矩阵 `consistent` 比例。`--staged` 用于 pre-commit；独立运行时省略该参数。
 
 `validate_ontology.py` 退出码：`0` 通过；`1` 出现非预期结果（本体不通过或某条形状未被 fixture 判出）；`2` 缺少 `rdflib`/`pyshacl` 或结构无法解析——此时必须报“无法评估”，不得视为通过。
 
@@ -53,16 +57,17 @@ python3 scripts/validate_ontology.py --matrix
 
 **本体的受控放行**（`CONSTITUTION.md` 第 13.6 条）：`.ttl`、`.shacl.ttl`、`.owl`、`.rdf`、`.nt`、`.n3`、`.jsonld` 允许入库，但**不豁免**体积、二进制、乱码、控制字符、点线、页码序列与长文本检查。本体文件的连续长注释行按 `RM-PROSEBLOCK` 处理（本体适用更严阈值：连续 12 行、每行 80 字符，以覆盖 PDF 换行后的段落形态）；头注释与 provenance 要求见 `ontology/README.md`。放行只针对“自写定义 + 标准术语标签”的本体，不针对原文转录。
 
-提交前接入：每个克隆需自行执行 `git config core.hooksPath .githooks`（只对当前克隆生效）。钩子依次运行四个检查器，任一失败即阻断提交：
+提交前接入：每个克隆需自行执行 `git config core.hooksPath .githooks`（只对当前克隆生效）。钩子依次运行五个检查器，任一失败即阻断提交：
 
 ```
 python3 scripts/check_no_raw_material.py
 python3 scripts/check_anchors.py
 python3 scripts/check_ledger_landings.py
+python3 scripts/check_gap_ledger.py --staged
 python3 scripts/check_state.py
 ```
 
-未启用钩子时，在 `git add` 前手工按上述顺序运行，效果等价。检查器命中时不得用 `--no-verify` 绕过；唯一例外是 `AGENTS.md` 第 3.5 条规定的发布引导提交（tag 只能指向已存在提交），该提交后必须立即打 tag 并复跑四个检查器。新增其他例外须走 ADR 并在脚本中登记路径豁免。
+未启用钩子时，在 `git add` 前手工按上述顺序运行，效果等价。检查器命中时不得用 `--no-verify` 绕过；唯一例外是 `AGENTS.md` 第 3.5 条规定的发布引导提交（tag 只能指向已存在提交），该提交后必须立即打 tag 并复跑五个检查器。新增其他例外须走 ADR 并在脚本中登记路径豁免。
 
 ### 脚本的定位
 

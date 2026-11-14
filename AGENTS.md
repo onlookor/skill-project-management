@@ -76,7 +76,7 @@
 
 - **不得自动推断**。缺省（字段缺失）按 `released` 严格处理；非法值按结构错误（退出码 2）处理。不得根据分支名、提交数量或人工口头说明推断状态。
 - 状态切换必须写入 `manifest.json` 并随提交生效，不得只改工作区。
-- 发布提交的引导顺序固定：tag 只能指向已存在的提交，因此“把 `release_state` 改为 `released` 并递增版本”的提交需以 `git commit --no-verify` 提交，随后立即打 annotated tag 并运行四个检查器。其他提交不得使用 `--no-verify`。
+- 发布提交的引导顺序固定：tag 只能指向已存在的提交，因此“把 `release_state` 改为 `released` 并递增版本”的提交需以 `git commit --no-verify` 提交，随后立即打 annotated tag 并运行五个检查器。其他提交不得使用 `--no-verify`。
 - 发布点仍只有一个：以 annotated tag 声明（ADR-0003）；`development` 只说明 `HEAD` 领先于最近发布点，不产生第二个发布点。
 
 ##### 3.5.1 绕过留痕（硬要求）
@@ -86,7 +86,7 @@
 ```
 Hook-Bypass: release-bootstrap
 Hook-Bypass-Reason: <为什么 pre-commit 无法通过>
-Hook-Bypass-Verified: <tag 名；四个检查器的复跑结果>
+Hook-Bypass-Verified: <tag 名；五个检查器的复跑结果>
 ```
 
 - `v0.5.2` 及以后的发布提交必须齐备三项，且 `Hook-Bypass` 的值固定为 `release-bootstrap`；缺失任一项即错误。
@@ -103,6 +103,58 @@ Hook-Bypass-Verified: <tag 名；四个检查器的复跑结果>
 - **关闭动作**：删除本条 `--no-verify` 例外（3.5 与 7bis 第 5 条）；新增 pre-push 钩子与待发布识别；移除 `Hook-Bypass` trailer 强制（历史提交保留）；`TODO.md` T-129 标 `done` 并记 CHANGELOG。
 - **次数上限**：机制生效后最多允许 1 次豁免（即 `v0.5.2`）；第 2 次豁免即违规，必须先完成撤除再发布。
 
+#### 3.6 缺口台账与裁定（临时机制）
+
+**依据**：`adr/0012-gap-ledger-and-adjudication.md`。台账为 `GAP_LEDGER.md`，本条的规则只约束台账的登记、分级、到期与核查，不改变任何规则语义；它本身是临时机制，撤除条件见 3.6.5。
+
+##### 3.6.1 入口：什么必须登记
+
+以下三类情形**任一成立即必须登记**，不得只留在讨论、提交信息或临时台账里。判定标准必须能机械套用：
+
+| 成因 | 机械判据 |
+|---|---|
+| `undefined-object` | 规则正文或判定列出现的节点类型、关系或字段名，在 `spec/INTERFACE_CONTRACT_SPEC.md` 与附录 A 的“输入”列中均无定义（取两处词表的并集，差集非空即登记） |
+| `rule-stricter` | 规则正文按“且 / 或 / 除非 / 附带 / 不得 / 必须”切分后，存在规范性子句在判定列中没有对应谓词或参数 |
+| `severity-mismatch` | 附录 A 的 `severity` 与 `validation/CHECKLIST.md` 同行不一致，或同一判定列同时容纳“声明缺失”与“结构缺失”两种应分级不同的失败情形 |
+
+登记字段固定为：`编号 / 状态 / 成因 / 等级 / 影响面 / 是否阻断 / 待裁定方 / 登记里程碑 / 处置出口 / 关联 T / 说明`。编号 `G-NNN` 连续分配，不复用；关联的独立工作项保留原 `T-NNN` 编号，不合并。
+
+**机械保证**：台账的核查矩阵必须逐行覆盖附录 A 全部 `check_id`，结论只能是 `consistent` 或缺口编号；任何对 `GRAMMAR.md` 或附录 A 判定列的改动，若未在同一提交更新 `GAP_LEDGER.md`，`scripts/check_gap_ledger.py --staged` 退出 1。人工判断仍负责“子句是否对应”，但“未复核”不再可能静默通过。
+
+##### 3.6.2 分级与停留上限
+
+| 等级 | 含义 | 最长停留 | 默认处置 |
+|---|---|---|---|
+| L1 | 阻断错判：合法产物被判失败或非法产物被判通过，且阻断工作 | 1 个里程碑 | `check-change` |
+| L2 | 漏判：规则正文的条件未进入判定列 | 2 个里程碑 | `check-change` |
+| L3 | 语义不可判定：规则引用未定义的判定对象，无法机械判定 | 2 个里程碑 | `doc-only` |
+
+到期里程碑 = 登记里程碑 + 最长停留。**不允许无限挂账**：缺口必须在当前里程碑跨过到期里程碑之前被裁定，或显式降级一次。显式降级＝改写等级并在说明中写“降级理由：”，同时记 `CHANGELOG.md`；每条缺口最多降级一次。
+
+##### 3.6.3 例行裁定点与到期后果
+
+- **裁定点绑定里程碑**：`GAP_LEDGER.md` 头部必须写 `**当前里程碑**：M#`；推进里程碑时同步更新该字段。
+- **到期未裁定**：`python3 scripts/check_gap_ledger.py` 退出 1；`check_state.py` 调用该检查器并把非零结果转为错误，从而阻断发布；pre-commit 同样阻断提交。
+- **裁定记录**：处置出口与说明写回台账，`status` 改为 `closed`；关闭证据写入 `CHANGELOG.md`。
+
+##### 3.6.4 处置出口
+
+每条缺口关闭时只能落到以下四种之一，不允许“沉默”：
+
+- `rule-change`：改规则正文，使其与判定列或输入 schema 一致。
+- `check-change`：改判定列，使其覆盖规则正文。
+- `doc-only`：降为文档约束，并在说明中明确写“不检查”。
+- `accepted`：接受现状，说明中必须写“理由：”并附批准依据。
+
+`check_gap_ledger.py` 对上述字段做枚举校验；`accepted` 缺“理由：”、`doc-only` 缺“不检查”、`open` 却填了处置出口均报错退出 1。
+
+##### 3.6.5 机械核查与临时性
+
+- **检查器**：`scripts/check_gap_ledger.py` 统计总数、按级计数、按到期计数，并输出核查矩阵的 `consistent` 比例；到期未裁定或结构非法时退出 1。`--staged` 额外要求规则/判定文件与台账同批暂存。检查器与其余四个脚本并列为第五个提交前检查器。
+- **撤除条件**（全部满足）：连续两个发布点 `open=0` 且核查矩阵 17/17 为 `consistent`；第二个发布周期无新增缺口；裁定方完成一次全量“规则正文 ↔ 判定列”对照，确认无 `rule-stricter` 遗留。
+- **硬约束**：不晚于 M3 关闭前评估撤除（`TODO.md` T-132）。M3 关闭时仍有 `open` 缺口则机制冻结：新增缺口须经 ADR，所有 `open` 缺口必须在 M4 前裁定。
+- **撤除动作**：删除 `GAP_LEDGER.md` 与 `scripts/check_gap_ledger.py`；移除本条、7bis 的钩子项与 `check_state.py` 的调用；T-132 标 `done` 并记 `CHANGELOG.md`。
+
 ### 4. 目录结构（唯一权威）
 
 本技能目录的完整结构如下。**本节是目录结构的唯一权威**；`README.md` 中的文件地图只是导航，与本节冲突时以本节为准。
@@ -117,6 +169,7 @@ project-management-grounding/
 ├── CHANGELOG.md                    # 变更历史唯一登记处（第 3.1 条）
 ├── TODO.md                         # 单点工作项台账（第 3.2 条）
 ├── ERRATA.md                       # 幻觉更正台账
+├── GAP_LEDGER.md                   # 缺口台账（临时机制，第 3.6 条）
 ├── STATE.md                        # 逐文件当前状态台账
 ├── manifest.json                   # 包版本与契约 schema 版本（供外部技能引用）
 ├── .gitignore                      # Git 忽略规则
@@ -174,7 +227,8 @@ project-management-grounding/
 │   ├── 0008-reanchor-dimension-rules.md
 │   ├── 0009-no-raw-material-in-git.md
 │   ├── 0010-self-authored-ontology-in-git.md
-│   └── 0011-schedule-layer-and-plan.md
+│   ├── 0011-schedule-layer-and-plan.md
+│   └── 0012-gap-ledger-and-adjudication.md
 │
 ├── .githooks/
 │   └── pre-commit                  # 阻断原始资料入库（CONSTITUTION 第 13 条）
@@ -186,6 +240,7 @@ project-management-grounding/
 │   ├── check_anchors.py            # 锚点解析与校验（可运行）
 │   ├── anchor_baseline.json        # 规则/来源文本块的指纹基线
 │   ├── check_no_raw_material.py    # 原始资料/OCR/成段原文的阻断式检查（可运行）
+│   ├── check_gap_ledger.py         # 缺口台账结构、覆盖、到期与暂存同步检查（可运行）
 │   ├── validate_ontology.py        # 本体与 SHACL 形状校验，含逐形状负例矩阵（可选依赖）
 │   └── check_state.py              # STATE 与 git 跟踪文件的对账脚本（可运行）
 │
@@ -289,8 +344,8 @@ project-management-grounding/
 1. **提取产物一律落在仓库外**。约定目录为 `/tmp/pm-extract-<source-id>-<date>/`，存放 `pdftotext` 文本层输出、`pdftoppm` 渲染图、Tesseract OCR 结果与任何逐页转储。**不得**落在仓库目录内，也不得放进 `resources/`。
 2. **`resources/` 只在本地只读使用**。不复制、不打包、不 `git add`；`.gitignore` 已忽略 `resources/` 与文档类扩展名，但忽略规则不是许可。
 3. **引用外部文献只写可复核的定位与自己的话**。默认写法是“页码定位 + 自述摘要”；确需引证术语或条款措辞时，单条不超过一行或一句，并附来源 `id` 与页码（见 `CONSTITUTION.md` 第 13.2 条）。
-4. **提交前必须运行四个检查器**：`check_no_raw_material.py`、`check_anchors.py`、`check_ledger_landings.py`、`check_state.py`。本仓库已提供 `.githooks/pre-commit`，每个克隆需自行执行 `git config core.hooksPath .githooks` 启用；未启用钩子的部署必须在 `git add` 前手工逐个运行，等价命令见 `scripts/README.md`。
-5. **检查器命中即停止提交**，不得用 `--no-verify` 绕过。唯一例外是第 3.5 条规定的发布引导提交（`release_state` 改为 `released` 并递增版本），该提交必须携带 3.5.1 的三项 `Hook-Bypass` trailer，并紧接 annotated tag 与四个检查器的复跑；该通道按 3.5.2 的撤除条件关闭（`TODO.md` T-129）。确需新增其他例外（例如将来要提交一张合法图片资产），走 ADR 并在检查器中登记路径豁免，而不是删除规则或放宽阈值。
+4. **提交前必须运行五个检查器**：`check_no_raw_material.py`、`check_anchors.py`、`check_ledger_landings.py`、`check_gap_ledger.py --staged`、`check_state.py`。本仓库已提供 `.githooks/pre-commit`，每个克隆需自行执行 `git config core.hooksPath .githooks` 启用；未启用钩子的部署必须在 `git add` 前手工逐个运行，等价命令见 `scripts/README.md`。
+5. **检查器命中即停止提交**，不得用 `--no-verify` 绕过。唯一例外是第 3.5 条规定的发布引导提交（`release_state` 改为 `released` 并递增版本），该提交必须携带 3.5.1 的三项 `Hook-Bypass` trailer，并紧接 annotated tag 与五个检查器的复跑；该通道按 3.5.2 的撤除条件关闭（`TODO.md` T-129）。确需新增其他例外（例如将来要提交一张合法图片资产），走 ADR 并在检查器中登记路径豁免，而不是删除规则或放宽阈值。
 6. **发现已跟踪内容违规时**：先报告文件与位置，再改为“页码定位 + 自述摘要”或移出仓库，并在 `ERRATA.md` 登记；不静默删除他人的内容。
 7. **自建本体（`CONSTITUTION.md` 第 13.6 条）**：
    - 只放 `ontology/`；主格式为 Turtle（`.ttl`、`.shacl.ttl`），`.owl`/`.rdf`/`.nt`/`.n3`/`.jsonld` 仅作生成导出，仍受同一内容检查。

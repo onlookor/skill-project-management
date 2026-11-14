@@ -19,7 +19,7 @@
 | D1 | 检查可执行 | 至少 5 个 `check_id` 有可运行实现，输出 `pass` / `fail` / `cannot_evaluate`，附输入快照标识与 `rule_status`；同一输入重复运行结论一致 |
 | D2 | 反例可判 | 每个 `active` 或 `block` 的 `check_id` 至少有 1 个应通过用例与 1 个应失败用例；用例矩阵按预期 100% 命中 |
 | D3 | 来源可追溯 | `SOURCE_LEDGER.md` 每个 active 条目的 `compilation_landing` 均真实存在；无悬空 `pending:T-xxx`；未取得正文的外部阻塞项有显式状态与处置规则 |
-| D4 | 调度一致 | `ROADMAP.md`、`TODO.md`、`STATE.md`、`CHANGELOG.md` 的权威划分写入 `AGENTS.md`；四个检查器通过；`manifest.json` 与最新 annotated tag 一致 |
+| D4 | 调度一致 | `ROADMAP.md`、`TODO.md`、`STATE.md`、`CHANGELOG.md` 的权威划分写入 `AGENTS.md`；五个检查器通过；`manifest.json` 与最新 annotated tag 一致 |
 | D5 | 可发布 | 打出至少一个发布点，其提交同时满足：全部检查器通过、`CHANGELOG.md` 有对应批次、`manifest.json` 与 tag 一致 |
 
 **v1.0.0 的额外门槛**：无 `pending_reanchor` 规则；无悬空来源落点；D2 的用例矩阵覆盖全部 17 个 `check_id`；治理四文档口径一致。
@@ -48,13 +48,14 @@
 ### M1 可执行校验器 v0
 
 - **目标**：把“检查清单是规格”推进到“检查可以运行”，并用少量 `check_id` 证明判定逻辑可被程序实现。
-- **工作项**：T-011、T-041、T-042、T-100、T-103、T-107、T-081。
+- **工作项**：T-011、T-041、T-042、T-100、T-103、T-107、T-081、T-130、T-131。
 - **出口条件**：
   1. 新增可执行检查器对不少于 5 个 `check_id` 输出三值结论；`cannot_evaluate` 只由缺失输入触发，不得被当作 `pass`。
   2. 输出包含 `check_id`、`rule_status`、`severity`、输入快照标识与失败位置。
   3. 同一输入快照连续运行两次，结论与证据一致；回放记录的存放位置与比对方法已定义（T-103）。
   4. `ROLE_MINIMAL_COMPLETENESS` 的 warn/block 拆分有 ADR，且用例分别覆盖“问责结构缺失”与“角色合并声明缺失”（T-100）。
   5. 退化路径（`runtime: deterministic-checker/human-fallback`）有运行记录，P1–P6 逐条给出满足或不可满足的结论（T-081）。
+  6. `python3 scripts/check_gap_ledger.py` 退出 0：核查矩阵覆盖 17/17 个 `check_id`（12 个 `consistent`，5 个指向已登记缺口）；L1 级缺口（G-004）在里程碑推进到 M2 前裁定或显式降级（`AGENTS.md` 3.6）。
 - **依赖**：M0（已关闭 2026-11-13）。**并行**：无（关键路径）。
 
 ### M2 反例库覆盖
@@ -70,12 +71,13 @@
 ### M3 本体定义
 
 - **目标**：把本体的“结构完整”推进到“定义可用”。
-- **工作项**：T-126。
+- **工作项**：T-126、T-132。
 - **出口条件**：
   1. 124 个工件与 185 个工具与技术中，完成自写定义的数量与显式 `pending` 清单同时给出；`pending` 必须写明原因，不得以原文改写填充。
   2. `python3 scripts/validate_ontology.py --matrix` 通过，24 条形状仍由对应 fixture 判出。
   3. “形状 ↔ 规则文本”的 P1c 对照由 T-125 完成，结论落 ADR；本里程碑只提供形状侧输入。
   4. 本体换版维护程序（触发条件、需重跑的命令、`STATE.md` 的处理方式）在 T-008 的换版结论后写入 `ontology/README.md`。
+  5. 无到期未裁定的缺口（`python3 scripts/check_gap_ledger.py` 退出 0）；T-132 的撤除评估完成，临时机制撤除或按台账规则冻结（`AGENTS.md` 3.6.5）。
 - **依赖**：出口 3 依赖 M4 的 T-125；出口 4 依赖 T-008。**并行**：T-126 可与 M1、M2、M4 同时进行。
 
 ### M4 来源收口
@@ -150,9 +152,9 @@ M0 ─→ M1 ─→ M2 ──────────────→ M7 ─→ v
 | 里程碑 | 工作项 | 出口关联 |
 |---|---|---|
 | M0 | T-111、T-116、T-127、T-128（T-110 已完成，批次 0021） | 出口 1–5 |
-| M1 | T-011、T-041、T-042、T-100、T-103、T-107、T-081 | 出口 1–5 |
+| M1 | T-011、T-041、T-042、T-100、T-103、T-107、T-081、T-130、T-131 | 出口 1–6 |
 | M2 | T-080、T-101 | 出口 1–3 |
-| M3 | T-126 | 出口 1–4 |
+| M3 | T-126、T-132 | 出口 1–5 |
 | M4 | T-001、T-002、T-003、T-004、T-005、T-006、T-007、T-008、T-052、T-094、T-106、T-112、T-115、T-119、T-121、T-123、T-125 | 出口 1–5 |
 | M5 | T-010、T-012、T-013、T-030、T-031、T-104、T-105、T-118 | 出口 1–5 |
 | M6 | T-020、T-021、T-022、T-023、T-024、T-025、T-026、T-027、T-028、T-029、T-040、T-050、T-060、T-061、T-062、T-063、T-071、T-072、T-090、T-091、T-092、T-093 | 出口 1–5 |
@@ -214,7 +216,7 @@ M0 ─→ M1 ─→ M2 ──────────────→ M7 ─→ v
 | `v0.8.0` | M6 出口 | 方法条目、术语同步与召回率阈值 |
 | `v1.0.0` | M7 出口 | 全部检查可执行、来源无悬空、治理口径一致 |
 
-每次发布必须同时满足：四个检查器为 0、`CHANGELOG.md` 有对应批次、`manifest.json` 的 `package_version` 与 `release_tag` 和 tag 一致（由 `scripts/check_state.py` 核对）。
+每次发布必须同时满足：五个检查器为 0、`CHANGELOG.md` 有对应批次、`manifest.json` 的 `package_version` 与 `release_tag` 和 tag 一致（由 `scripts/check_state.py` 核对）。缺口台账核查（`scripts/check_gap_ledger.py`）的到期未裁定项由 `check_state.py` 转为错误，因此发布前必然暴露。
 
 ## 8. 本文件的维护
 

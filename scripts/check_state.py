@@ -236,6 +236,31 @@ def check_release(root: Path) -> tuple[list[str], list[str], str]:
     return errors, warnings, f"{version} ↔ {tag}（{release_state}）"
 
 
+def check_gap_ledger(root: Path) -> list[str]:
+    """调用缺口台账检查器；到期未裁定或结构非法时阻断发布（AGENTS.md 3.6）。"""
+    script = root / "scripts" / "check_gap_ledger.py"
+    if not script.is_file():
+        return [
+            "[错误] 缺少缺口台账检查器 scripts/check_gap_ledger.py，"
+            "无法确认是否存在到期未裁定缺口（AGENTS.md 3.6）"
+        ]
+    result = subprocess.run(
+        [sys.executable, str(script), "--root", str(root)],
+        cwd=root,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode == 0:
+        return []
+    detail = [
+        line
+        for line in (result.stdout + result.stderr).splitlines()
+        if line.startswith("[错误]") or line.startswith("[失败]")
+    ]
+    reason = "；".join(detail) if detail else "无输出"
+    return [f"[错误] 缺口台账核查未通过（退出码 {result.returncode}）：{reason}"]
+
+
 def main() -> int:
     root = repo_root()
     state_path = root / STATE_FILE
@@ -278,6 +303,7 @@ def main() -> int:
 
     release_errors, release_warnings, release_summary = check_release(root)
     errors.extend(release_errors)
+    errors.extend(check_gap_ledger(root))
 
     print(
         f"STATE 对账：{len(files)} 个跟踪文件，"

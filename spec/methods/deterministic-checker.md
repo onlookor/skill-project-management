@@ -913,45 +913,46 @@ verdict: pass
 reason: null
 ```
 
-#### A.1.15 `TAILORING_DECISION_JUSTIFICATION`（G-G1，`advisory` / `assumption`）
+#### A.1.15 `TAILORING_RECORD_EXISTENCE`（G-G1，`advisory` / `assumption`）
 
-**判定依据**：A 表“每个 `TailoringRecord` 有至少一个候选方法比较，并写明与项目属性的关系”。
+**判定依据**：A 表“每次裁剪有 `TailoringRecord`，声明被裁剪规则、理由、适用范围、批准者”。
 
-**样例 1（触发 → `fail`）**：裁剪记录没有候选方法比较。
+**样例 1（触发 → `fail`）**：存在裁剪动作，但没有对应记录。
 
 ```yaml
-tailoring_records:
-  - id: "TR-1"
-    considered_methods: []
-    project_attribute: "受监管环境"
-    relation: "确定性检查器提供可审计证据"
+tailoring_actions:
+  - { id: "TA-1", record: null }
+tailoring_records: []
 ```
 
 期望输出：
 
 ```yaml
-check_id: TAILORING_DECISION_JUSTIFICATION
+check_id: TAILORING_RECORD_EXISTENCE
 source_rule: G-G1
 severity: advisory
 rule_status: assumption
 verdict: fail
-reason: missing_method_comparison
+reason: missing_tailoring_record
 ```
 
-**样例 2（不触发 → `pass`）**：列出两个候选方法并写明与项目属性的关系。
+**样例 2（不触发 → `pass`）**：裁剪动作有记录，且四项声明齐备。
 
 ```yaml
+tailoring_actions:
+  - { id: "TA-1", record: "TR-1" }
 tailoring_records:
   - id: "TR-1"
-    considered_methods: ["CM-DET-CHECKER", "CM-SKILL-CARD"]
-    project_attribute: "受监管环境"
-    relation: "CM-DET-CHECKER 提供可审计证据"
+    trimmed_rule: "G-B1"
+    rationale: "受监管环境需要双维标签"
+    scope: "本项目全部管理项"
+    approver: "A-1"
 ```
 
 期望输出：
 
 ```yaml
-check_id: TAILORING_DECISION_JUSTIFICATION
+check_id: TAILORING_RECORD_EXISTENCE
 source_rule: G-G1
 severity: advisory
 rule_status: assumption
@@ -959,41 +960,39 @@ verdict: pass
 reason: null
 ```
 
-#### A.1.16 `TAILORING_RATIONALE_ANCHOR`（G-G2，`advisory` / `assumption`）
+#### A.1.16 `TAILORING_NON_TRIMMABLE_SET`（G-G2，`advisory` / `assumption`）
 
-**判定依据**：A 表“每条裁剪理由至少关联一个断言或 `Constraint`”。
+**判定依据**：A 表“目标规则 ∉ {G-A1, G-A2, G-C1, G-D1, G-E1}”。
 
-**样例 1（触发 → `fail`）**：裁剪理由没有任何断言或约束锚定。
+**样例 1（触发 → `fail`）**：裁剪目标落在不可裁剪集合内。
 
 ```yaml
 tailoring_records:
-  - { id: "TR-1", rationale: "选择确定性检查器", anchors: [] }
+  - { id: "TR-1", trimmed_rule: "G-A1" }
 ```
 
 期望输出：
 
 ```yaml
-check_id: TAILORING_RATIONALE_ANCHOR
+check_id: TAILORING_NON_TRIMMABLE_SET
 source_rule: G-G2
 severity: advisory
 rule_status: assumption
 verdict: fail
-reason: unanchored_rationale
+reason: non_trimmable_rule
 ```
 
-**样例 2（不触发 → `pass`）**：裁剪理由关联一条断言。
+**样例 2（不触发 → `pass`）**：裁剪目标在不可裁剪集合之外。
 
 ```yaml
 tailoring_records:
-  - { id: "TR-1", rationale: "选择确定性检查器", anchors: ["S-1"] }
-assertions:
-  - { id: "S-1", statement: "监管审计要求可重复的检查证据" }
+  - { id: "TR-1", trimmed_rule: "G-B1" }
 ```
 
 期望输出：
 
 ```yaml
-check_id: TAILORING_RATIONALE_ANCHOR
+check_id: TAILORING_NON_TRIMMABLE_SET
 source_rule: G-G2
 severity: advisory
 rule_status: assumption
