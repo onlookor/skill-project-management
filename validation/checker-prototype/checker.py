@@ -684,6 +684,8 @@ def main() -> int:
             actual = case["actual"]
             print(
                 f"[{status}] {case['section']}-{case['case']} {case['check_id']} "
+                f"source_rule={actual['source_rule']} severity={actual['severity']} "
+                f"rule_status={actual['rule_status']} "
                 f"verdict={actual['verdict']} reason={actual['reason']}"
             )
             for mismatch in case["mismatches"]:
