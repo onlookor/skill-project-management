@@ -68,7 +68,7 @@
   2. 判定列子句覆盖 100%：A.2 每条子句有承接 `check_id` 或标 `not-checked` 并写理由（由出口 1 自动核对）。
   3. 表示规范在 schema 有载体：三态空值、量词、关系路径（含 `steps[].target_id`）、值域封闭（含 `subject_group` 17 项）、全局引用完整性、assumption 时效与批准资格、路径可达、适用性状态机、四值结论均有对应条款（由出口 1 的“判定列 → schema”与“正文 → schema”机械核对）。
   4. 原型对改动后的判定列重跑：`python3 validation/checker-prototype/checker.py` 输出 60/60 样例、17/17 `check_id`，`--null-sweep` 225/225、`--missing-key-sweep` 43/43、`--nested-missing-sweep` 53/53、`--enum-sweep` 4/4 全部 `cannot_evaluate` 且无崩溃，`--aggregation-order` 的 A2/E2 全部排列各收敛为 1 个结论；上述样例与快检在 pre-commit 中执行。
-  5. 清单清零：`python3 scripts/check_gap_ledger.py` 退出 0 且 `open=0`（17 条全部 `closed`，每条 `关闭依据` 为 `外部复核：<路径>；sha256：<64hex>`，由复核方下一轮核哈希）。**该出口受阻于外部基础设施，暂不关闭**：本机无法自证复核真实性，`open=0` 只说明台账字段齐备，不代表实质收敛。
+  5. 清单清零：`python3 scripts/check_gap_ledger.py` 退出 0 且 `open=0`（18 条全部 `closed`，每条 `关闭依据` 为 `外部复核：<路径>；sha256：<64hex>`，由复核方下一轮核哈希）。**该出口受阻于外部基础设施，暂不关闭**：本机无法自证复核真实性，`open=0` 只说明台账字段齐备，不代表实质收敛。
   6. 覆盖闸门绿：`python3 scripts/check_coverage_gate.py` 退出 0，A.2 的 41 个子句各有至少 1 个正例与 1 个负例，负例按**子句级**声明 `expected_failed_clauses` 并由原型实际求值核对（不再依赖共享 `reason` 码）；`scripts/test_coverage_gate.py` 的 N01–N04 全部阻断。
   7. 验证权绑定生效：`check_checker_pins.py`（检查器哈希，含根检查器自身与 `.githooks/pre-commit`）、`check_spec_pins.py`（`GRAMMAR.md` 全文、A.2、A.1、schema §2bis/§3/§4、`coverage.json` 指纹）、验收快照漂移检测。前三项在 pre-commit 中阻断；快照只做漂移检测。
 - **残余风险与外部控制**：即便上述出口全部满足，仍有两项风险**无法由本仓库内部机制消除**：(a) 连接收复核结论的转录件也可以伪造——机器只能核对路径与 sha256，不能验证复核是否真实发生；(b) 同一方拥有写权限——检查器、规格、样例、复核记录、`checker-pins.json` 都在同一工作区，同一方可以同改。两项均交由**外部控制**：真 CI 在受保护分支上执行验证、复核方独立持有工具链与提交权限。`checker-pins.json`、复核产物与根检查器本身就是新的信任根，仓库内无法自保。

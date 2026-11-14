@@ -811,3 +811,22 @@
 - **决策单结构**：按“不定就无法开工”的紧迫度分三组——A 组 5 条（D1、D2、D3、D4、D8）、B 组 5 条（D7、D6、D9、D10、D13）、C 组 4 条（D5、D11、D14、D12）。每条含问题、2–3 个选项、建议与理由、不定的卡点、影响面，控制在 150 字内。
 - **稳定性判断**：几乎不会改 5 条（D5、D8、D10、D12、D14）；大概率试点后推翻 8 条（D1、D2、D3、D4、D6、D7、D9、D13）；待观察 1 条（D11）。最危险组合 D1+D2+D4：均标“现在必须定”且大概率被推翻，返工面覆盖 309 条、103 个术语 ID 与全部锚点。
 - **状态**：生效（等待用户逐条拍板）
+
+---
+
+### 批次 0046 — 2026-11-14 — G-014/G-001/G-003/G-007/G-008 关闭、G-006 措辞更正、G-018 新登记、A 组决策落账
+
+- **性质**：按非同源复核（基线 `9519b82`，产物 `/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g014/REPORT_9519b82.md`）关闭 5 条缺口；更正 G-006 证据措辞；登记新缺口 G-018；记录 A 组决策与 D4 降级。**未开始试点内容写作。**
+- **缺口关闭**：G-014、G-001、G-003、G-007、G-008 → `closed`，`关闭依据` 均带 `报告章节：§一/§三（G-0xx）`；关闭依据分指：
+  - G-014：§一（枚举结果参与 `aggregate()`，四组场景全排列顺序无关、唯一收敛 `fail`；5 个无关子句正常）。
+  - G-001：§三（`node_type=Bogus` → cannot，`orthogonal_to` pass，`subject_group` 17/17）。
+  - G-003：§三（`assumption={}` → cannot；端点 AIActor → fail；flat grant → cannot/invalid_path）。
+  - G-007：§三（`status` 缺失、仅 `{status}`、`{}` 均 → cannot/missing_input）。
+  - G-008：§三（空 `expected_failed_clauses` 被覆盖闸门直接判错）。
+- **G-006 措辞更正**：原报告“缺 constraint 均 fail”不成立；`constraint=null` 实测 `cannot_evaluate/missing_input`，用 `48128a8` 旧基线复跑同样如此，属原报告写错。按“非 pass”口径 G-006 仍关闭，依据改指新报告 §二；不改写批次 0043 历史记录，来由记于台账说明与本批次。
+- **G-018 新登记**：`actors[].type=Bogus` 仍 `pass`；`CHECKER_INPUT_SCHEMA.md` §2 已声明枚举，但 §1.11 归一化未列 `actor_type`，原型未校验。等级 L1、成因 `representation-defect`、登记 M1、到期 M2、出口 `check-change`、关联 T-137。
+- **缺口状态**：18 条（`open` 2：G-017、G-018 / `closed` 16）。G-017 维持 `open`（无全文语义等价机器证明）。
+- **决策落账**：A 组 D1=c、D2=b、D3=a+映射表、D8=b；D4 从 A 组移至 B 组末尾，七条降级前提写入 `spec/M3_M4_DECISIONS.md`（草稿 ID `DRAFT-K-<CAT>-<NN>` + `authoritative: false`、禁止进入五个权威面、`pilot-id-map.json` 唯一映射面、ID 作不透明字符串、候选 IRI 覆盖统计、≥2 条无 IRI 回 A 组、进权威文件前必须定）。`spec/M3_M4_PLAN.md` 状态头同步为“A 组已定、试点未开工”。
+- **涉及文件**：`GAP_LEDGER.md`、`AGENTS.md`（3.6.6 增加 `报告章节` 字段）、`ROADMAP.md`（M2 出口 5 改为 18 条）、`TODO.md`（T-130/131/133/134/135/136 → `done`，新增 T-137）、`spec/M3_M4_DECISIONS.md`、`spec/M3_M4_PLAN.md`、`CHANGELOG.md`。
+- **未改动**：`STATE.md`（无新增/删除受管文件，目录默认状态未变）、`manifest.json`（版本与发布字段不受影响）。
+- **状态**：生效

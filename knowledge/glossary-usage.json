@@ -86,7 +86,7 @@
         },
         {
           "file": "TODO.md",
-          "line": 77,
+          "line": 78,
           "form": "code"
         },
         {
@@ -226,12 +226,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 74,
+          "line": 75,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 104,
+          "line": 105,
           "form": "code"
         },
         {
@@ -416,22 +416,22 @@
         },
         {
           "file": "TODO.md",
-          "line": 45,
-          "form": "code"
-        },
-        {
-          "file": "TODO.md",
           "line": 46,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 74,
+          "line": 47,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 77,
+          "line": 75,
+          "form": "code"
+        },
+        {
+          "file": "TODO.md",
+          "line": 78,
           "form": "code"
         },
         {
@@ -566,7 +566,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 404,
+          "line": 405,
           "form": "code"
         },
         {
@@ -666,12 +666,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 45,
+          "line": 46,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 77,
+          "line": 78,
           "form": "code"
         },
         {
@@ -741,7 +741,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 404,
+          "line": 405,
           "form": "code"
         },
         {
@@ -876,12 +876,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 74,
+          "line": 75,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 77,
+          "line": 78,
           "form": "code"
         },
         {
@@ -1146,7 +1146,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 404,
+          "line": 405,
           "form": "code"
         },
         {
@@ -1266,12 +1266,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 44,
+          "line": 45,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 77,
+          "line": 78,
           "form": "code"
         },
         {
@@ -1516,7 +1516,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 404,
+          "line": 405,
           "form": "code"
         },
         {
@@ -1566,12 +1566,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 104,
+          "line": 105,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 116,
+          "line": 117,
           "form": "code"
         },
         {
@@ -1611,12 +1611,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 104,
+          "line": 105,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 116,
+          "line": 117,
           "form": "code"
         },
         {
@@ -1645,6 +1645,11 @@
       "term": "AIActor",
       "locations": [
         {
+          "file": "GAP_LEDGER.md",
+          "line": 88,
+          "form": "code"
+        },
+        {
           "file": "GRAMMAR.md",
           "line": 128,
           "form": "code"
@@ -1661,12 +1666,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 104,
+          "line": 105,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 116,
+          "line": 117,
           "form": "code"
         },
         {
@@ -1716,12 +1721,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 105,
+          "line": 106,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 116,
+          "line": 117,
           "form": "code"
         },
         {
@@ -1751,12 +1756,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 105,
+          "line": 106,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 116,
+          "line": 117,
           "form": "code"
         },
         {
@@ -1811,12 +1816,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 105,
+          "line": 106,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 116,
+          "line": 117,
           "form": "code"
         },
         {
@@ -1841,17 +1846,17 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 362,
+          "line": 363,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 365,
+          "line": 366,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 408,
+          "line": 409,
           "form": "code"
         },
         {
@@ -1961,32 +1966,32 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 363,
+          "line": 364,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 365,
+          "line": 366,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 405,
+          "line": 406,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 408,
+          "line": 409,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 423,
+          "line": 424,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 425,
+          "line": 426,
           "form": "code"
         },
         {
@@ -2186,12 +2191,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 61,
+          "line": 62,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 62,
+          "line": 63,
           "form": "code"
         },
         {
@@ -2636,17 +2641,17 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 362,
+          "line": 363,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 442,
+          "line": 443,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 447,
+          "line": 448,
           "form": "code"
         },
         {
@@ -2856,17 +2861,17 @@
         },
         {
           "file": "TODO.md",
-          "line": 66,
+          "line": 67,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 69,
+          "line": 70,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 77,
+          "line": 78,
           "form": "code"
         },
         {
@@ -3002,6 +3007,21 @@
         {
           "file": "spec/M3_M4_DECISIONS.md",
           "line": 43,
+          "form": "code"
+        },
+        {
+          "file": "spec/M3_M4_DECISIONS.md",
+          "line": 45,
+          "form": "code"
+        },
+        {
+          "file": "spec/M3_M4_DECISIONS.md",
+          "line": 53,
+          "form": "code"
+        },
+        {
+          "file": "spec/M3_M4_DECISIONS.md",
+          "line": 70,
           "form": "code"
         },
         {
@@ -3352,7 +3372,12 @@
         },
         {
           "file": "GAP_LEDGER.md",
-          "line": 115,
+          "line": 103,
+          "form": "code"
+        },
+        {
+          "file": "GAP_LEDGER.md",
+          "line": 116,
           "form": "code"
         },
         {
@@ -3422,11 +3447,6 @@
         },
         {
           "file": "TODO.md",
-          "line": 43,
-          "form": "code"
-        },
-        {
-          "file": "TODO.md",
           "line": 44,
           "form": "code"
         },
@@ -3438,6 +3458,11 @@
         {
           "file": "TODO.md",
           "line": 46,
+          "form": "code"
+        },
+        {
+          "file": "TODO.md",
+          "line": 47,
           "form": "code"
         },
         {
@@ -3717,7 +3742,7 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 408,
+          "line": 409,
           "form": "code"
         },
         {
@@ -4109,12 +4134,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 60,
+          "line": 61,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 72,
+          "line": 73,
           "form": "code"
         },
         {
@@ -4184,7 +4209,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 387,
+          "line": 388,
           "form": "code"
         },
         {
@@ -4244,7 +4269,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 387,
+          "line": 388,
           "form": "code"
         },
         {
@@ -4312,7 +4337,7 @@
         },
         {
           "file": "TODO.md",
-          "line": 69,
+          "line": 70,
           "form": "code"
         }
       ]
@@ -4322,7 +4347,7 @@
       "locations": [
         {
           "file": "TODO.md",
-          "line": 69,
+          "line": 70,
           "form": "code"
         }
       ]
@@ -4484,7 +4509,7 @@
         },
         {
           "file": "GAP_LEDGER.md",
-          "line": 123,
+          "line": 124,
           "form": "code"
         },
         {
