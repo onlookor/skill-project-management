@@ -341,3 +341,19 @@
 - **验证**：四个检查器 0 错误（`check_anchors` 0 错误 0 警告；`check_ledger_landings` 1 条既有 `SPRINGER-PMBOK-2024` 警告）。
 - **关联 ADR**：无（执行层补丁；T-130 若改判定另走 ADR）
 - **状态**：生效
+
+---
+
+### 批次 0027 — 2026-11-14 — 补齐 17 个 check_id 的参考样例
+
+- **涉及文件**：
+  - 修改：`spec/methods/deterministic-checker.md`（附录 A.1.6–A.1.17）、`validation/CHECKLIST.md`（`source_commit` 推进）、`TODO.md`（T-011 关闭、T-131）
+- **变更摘要**：
+  1. 补齐剩余 12 个 `check_id` 的触发/不触发样例：G-B1、G-B2、G-C2、G-D2、G-E2、G-F1–F4、G-G1–G3，每个 2 例，共 24 个。
+  2. 连同批次 0026 的 5 个 `block` 级样例，附录 A 现已覆盖 17/17 个 `check_id`，合计 34 个样例；`warn` / `assumption` 级样例显式标注 `severity` 与 `rule_status`。
+  3. 样例只按注册表判定列编写，未新增谓词、未改判定；G-A1 约束作用边（T-130）与 G-E2 的 `assumption` 形式/验证条件（T-131）保持原判定，不在样例中固化歧义。
+  4. `validation/CHECKLIST.md` 的 `source_commit` 推进到样例提交 `a72caaa`（ADR-0004）；T-011 标 `done`。
+- **钩子绕过**：无。
+- **验证**：四个检查器 0 错误（`check_anchors` 0 错误 0 警告；`check_ledger_landings` 1 条既有 `SPRINGER-PMBOK-2024` 警告）。
+- **关联 ADR**：无（执行层补丁；T-130、T-131 若改判定另走 ADR）
+- **状态**：生效
