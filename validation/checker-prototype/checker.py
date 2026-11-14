@@ -52,9 +52,27 @@ PROCESS_GROUPS = {
     "closing",
     "post-project",
 }
-# 原型物化的基础主题组：只含样例出现的值。完整 17 项依赖来源正文，
-# 未物化的值可通过输入的 subject_group_extension 声明。
-BASE_SUBJECT_GROUPS = {"planning", "lessons-learned"}
+# ISO 21502:2020 第 7 章 7.2–7.18 的 17 项管理实践，按 schema §4 完整物化。
+# subject_group_extension 只用于领域特化，不再承担补全基础枚举的职责。
+BASE_SUBJECT_GROUPS = {
+    "planning",
+    "benefits-management",
+    "scope-management",
+    "resources-management",
+    "schedule-management",
+    "cost-management",
+    "risk-management",
+    "issues-management",
+    "change-control",
+    "quality-management",
+    "stakeholder-engagement",
+    "communication-management",
+    "organizational-and-societal-change",
+    "reporting",
+    "information-and-documentation-management",
+    "procurement",
+    "lessons-learned",
+}
 CHANGE_RELATIONS = {"mitigates", "exacerbates", "trades_off"}
 CHANGE_TARGET_TYPES = {"Commitment", "Deliverable"}
 STATEMENT_KINDS = {"what", "state", "condition"}
@@ -65,6 +83,157 @@ ACCEPTANCE_STATEMENTS = {"已验收", "已移交"}
 # ADR-0013 已把原 5 处“未覆盖规则正文”全部纳入判定列，本表保持为空是
 # 有意为之：原型不再存在“声明未覆盖但仍输出 pass”的暗区。
 COVERAGE_GAPS: dict[str, str] = {}
+
+# 每个 check 的必需顶层键。键存在但值为 null 与键缺失同等处理：
+# 返回 cannot_evaluate / missing_input，而不是进入迭代抛 TypeError。
+REQUIRED_KEYS: dict[str, tuple[str, ...]] = {
+    "PROJECT_MINIMAL_EXISTENCE": ("project", "actors", "outcomes", "commitments", "constraints"),
+    "CONSTRAINT_ANCHOR_REQUIRED": ("commitments", "deliverables", "constraints"),
+    "DELIVERABLE_ASSERTION_LINK": ("deliverables", "assertions"),
+    "CHANGE_CONSTRAINT_LINK": ("changes", "constraints"),
+    "ROLE_MINIMAL_COMPLETENESS": ("actors", "commitments"),
+    "DUAL_DIMENSION_ANNOTATION": ("management_items",),
+    "DIMENSION_VALUE_CLOSED": ("management_items",),
+    "ASSERTION_MUTUAL_EXCLUSION": ("assertions",),
+    "ALL_IMPROVEMENT_ASSUMPTION": ("changes",),
+    "AI_AUTONOMY_DELEGATION_AUDITABLE": ("actors", "autonomy_grants", "assertions"),
+    "PROJECT_CHARTER_EXISTENCE": ("projects", "charters"),
+    "CLOSURE_ACCEPTANCE_LINK": ("deliverables",),
+    "PROCUREMENT_CONTRACT_ANCHOR": ("commitments", "contracts"),
+    "SCHEDULE_EVIDENCE_LINK": ("commitments",),
+    "TAILORING_RECORD_EXISTENCE": ("tailoring_actions", "tailoring_records"),
+    "TAILORING_NON_TRIMMABLE_SET": ("tailoring_records",),
+    "TAILORING_REASSESSMENT_CONDITION": ("tailoring_records",),
+}
+
+
+def require_fields(data: dict, keys: tuple[str, ...]) -> tuple[str, str | None] | None:
+    """必需键缺失或取 null 时统一返回 cannot_evaluate。"""
+    if any(key not in data or data[key] is None for key in keys):
+        return "cannot_evaluate", "missing_input"
+    return None
+
+
+def ids(items) -> set:
+    return {item.get("id") for item in items if isinstance(item, dict)}
+
+
+def validate_references(data: dict) -> tuple[str, str | None] | None:
+    """全局引用完整性：所有已知跨对象引用必须解析到同快照中的 id。
+
+    返回 None 表示无问题；返回 (verdict, reason) 表示首个问题。
+    目标集合在快照中缺失时无法判定 → cannot_evaluate / missing_input；
+    目标 id 不存在 → fail / dangling_reference。该检查在 check 返回 pass
+    时统一执行，保证引用完整性不只作用于 G-C1。
+    """
+    actor_ids = ids(data.get("actors") or [])
+    outcome_ids = ids(data.get("outcomes") or [])
+    commitment_ids = ids(data.get("commitments") or [])
+    deliverable_ids = ids(data.get("deliverables") or [])
+    constraint_ids = ids(data.get("constraints") or [])
+    assertion_ids = ids(data.get("assertions") or [])
+    contract_ids = ids(data.get("contracts") or [])
+    project_ids = ids(data.get("projects") or [])
+    record_ids = ids(data.get("tailoring_records") or [])
+
+    checks: list[tuple[str, str, set | None, str | None]] = [
+        ("commitments", "by", actor_ids, "actors"),
+        ("commitments", "to", outcome_ids, "outcomes"),
+        ("commitments", "accountable_by", actor_ids, "actors"),
+        ("commitments", "responsible_by", actor_ids, "actors"),
+        ("commitments", "contract", contract_ids, "contracts"),
+        ("commitments", "constrained_by", constraint_ids, "constraints"),
+        ("constraints", "constrains", outcome_ids | commitment_ids, "outcomes"),
+        ("deliverables", "asserted_by", assertion_ids, "assertions"),
+        ("deliverables", "constrained_by", constraint_ids, "constraints"),
+        ("changes", "constraint", constraint_ids, "constraints"),
+        ("charters", "project", project_ids, "projects"),
+        ("charters", "accountable", actor_ids, "actors"),
+        ("charters", "authorizing_assertion", assertion_ids, "assertions"),
+        ("tailoring_actions", "record", record_ids, "tailoring_records"),
+        ("autonomy_grants", "actor", actor_ids, "actors"),
+        ("autonomy_grants", "assertions", assertion_ids, "assertions"),
+        ("contracts", "constrained_by", constraint_ids, "constraints"),
+        ("tailoring_records", "approver", actor_ids, "actors"),
+    ]
+    for collection, field, target_ids, target_collection in checks:
+        items = data.get(collection)
+        if items is None:
+            continue
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            ref = item.get(field)
+            if ref in (None, "", []):
+                continue
+            refs = ref if isinstance(ref, list) else [ref]
+            for ref_id in refs:
+                if not isinstance(ref_id, str):
+                    return "cannot_evaluate", "undefined_object_type"
+                if target_collection not in data or data[target_collection] is None:
+                    return "cannot_evaluate", "missing_input"
+                if ref_id not in target_ids:
+                    return "fail", "dangling_reference"
+
+    # 列表型引用：charters.outcomes / charters.constraints。
+    for charter in data.get("charters") or []:
+        if not isinstance(charter, dict):
+            continue
+        for field, target_ids, target_collection in (
+            ("outcomes", outcome_ids, "outcomes"),
+            ("constraints", constraint_ids, "constraints"),
+        ):
+            refs = charter.get(field) or []
+            for ref_id in refs:
+                if target_collection not in data or data[target_collection] is None:
+                    return "cannot_evaluate", "missing_input"
+                if ref_id not in target_ids:
+                    return "fail", "dangling_reference"
+
+    # changes.target：按 type 选择目标集合。
+    for change in data.get("changes") or []:
+        if not isinstance(change, dict):
+            continue
+        target = change.get("target")
+        if not isinstance(target, dict):
+            continue
+        target_type, target_id = target.get("type"), target.get("id")
+        if target_type == "Commitment" and target_id and target_id not in commitment_ids:
+            return "fail", "dangling_reference"
+        if target_type == "Deliverable" and target_id and target_id not in deliverable_ids:
+            return "fail", "dangling_reference"
+
+    # assertions 的 about/deliverable/subject 指向 Deliverable；内嵌断言同样适用。
+    def check_assertion_refs(assertions) -> tuple[str, str | None] | None:
+        for assertion in assertions or []:
+            if not isinstance(assertion, dict):
+                continue
+            for field in ("about", "deliverable", "subject"):
+                ref = assertion.get(field)
+                if not ref:
+                    continue
+                if "deliverables" not in data or data["deliverables"] is None:
+                    return "cannot_evaluate", "missing_input"
+                if ref not in deliverable_ids:
+                    return "fail", "dangling_reference"
+            confirmation = assertion.get("accountable_confirmation")
+            if confirmation:
+                if "actors" not in data or data["actors"] is None:
+                    return "cannot_evaluate", "missing_input"
+                if confirmation not in actor_ids:
+                    return "fail", "dangling_reference"
+        return None
+
+    issue = check_assertion_refs(data.get("assertions"))
+    if issue:
+        return issue
+    for deliverable in data.get("deliverables") or []:
+        if isinstance(deliverable, dict):
+            issue = check_assertion_refs(deliverable.get("assertions"))
+            if issue:
+                return issue
+    return None
+
 
 # ---------------------------------------------------------------- YAML 子集解析
 # 只覆盖 A.1 样例使用的构造：块映射、块序列、流映射/流序列、引号标量、
@@ -329,8 +498,9 @@ def load_yaml(text: str) -> object:
 
 
 def check_project_minimal_existence(data: dict) -> tuple[str, str | None]:
-    if any(key not in data for key in ("project", "actors", "outcomes", "commitments", "constraints")):
-        return "cannot_evaluate", "missing_input"
+    guard = require_fields(data, REQUIRED_KEYS["PROJECT_MINIMAL_EXISTENCE"])
+    if guard:
+        return guard
     actor_ids = {item.get("id") for item in data["actors"]}
     outcome_ids = {item.get("id") for item in data["outcomes"]}
     if not data["actors"]:
@@ -353,8 +523,9 @@ def check_project_minimal_existence(data: dict) -> tuple[str, str | None]:
 
 
 def check_constraint_anchor(data: dict) -> tuple[str, str | None]:
-    if any(key not in data for key in ("commitments", "deliverables", "constraints")):
-        return "cannot_evaluate", "missing_input"
+    guard = require_fields(data, REQUIRED_KEYS["CONSTRAINT_ANCHOR_REQUIRED"])
+    if guard:
+        return guard
     constraint_ids = {item.get("id") for item in data["constraints"]}
     for item in list(data["commitments"]) + list(data["deliverables"]):
         node_type = item.get("node_type")
@@ -367,8 +538,9 @@ def check_constraint_anchor(data: dict) -> tuple[str, str | None]:
 
 
 def check_deliverable_assertion(data: dict) -> tuple[str, str | None]:
-    if any(key not in data for key in ("deliverables", "assertions")):
-        return "cannot_evaluate", "missing_input"
+    guard = require_fields(data, REQUIRED_KEYS["DELIVERABLE_ASSERTION_LINK"])
+    if guard:
+        return guard
     assertion_by_id = {item.get("id"): item for item in data["assertions"]}
     for deliverable in data["deliverables"]:
         deliverable_id = deliverable.get("id")
@@ -388,8 +560,9 @@ def check_deliverable_assertion(data: dict) -> tuple[str, str | None]:
 
 
 def check_change_constraint(data: dict) -> tuple[str, str | None]:
-    if any(key not in data for key in ("changes", "constraints")):
-        return "cannot_evaluate", "missing_input"
+    guard = require_fields(data, REQUIRED_KEYS["CHANGE_CONSTRAINT_LINK"])
+    if guard:
+        return guard
     constraint_ids = {item.get("id") for item in data["constraints"]}
     commitment_ids = {item.get("id") for item in data.get("commitments") or []}
     deliverable_ids = {item.get("id") for item in data.get("deliverables") or []}
@@ -410,8 +583,9 @@ def check_change_constraint(data: dict) -> tuple[str, str | None]:
 
 
 def check_role_minimal(data: dict) -> tuple[str, str | None]:
-    if any(key not in data for key in ("actors", "commitments")):
-        return "cannot_evaluate", "missing_input"
+    guard = require_fields(data, REQUIRED_KEYS["ROLE_MINIMAL_COMPLETENESS"])
+    if guard:
+        return guard
     actors = {item.get("id"): item for item in data["actors"]}
     for commitment in data["commitments"]:
         accountable = commitment.get("accountable_by")
@@ -433,8 +607,9 @@ def check_role_minimal(data: dict) -> tuple[str, str | None]:
 
 
 def check_dual_dimension(data: dict) -> tuple[str, str | None]:
-    if "management_items" not in data:
-        return "cannot_evaluate", "missing_input"
+    guard = require_fields(data, REQUIRED_KEYS["DUAL_DIMENSION_ANNOTATION"])
+    if guard:
+        return guard
     for item in data["management_items"]:
         if not item.get("process_group") or not item.get("subject_group"):
             return "fail", "missing_dimension"
@@ -442,8 +617,9 @@ def check_dual_dimension(data: dict) -> tuple[str, str | None]:
 
 
 def check_dimension_value(data: dict) -> tuple[str, str | None]:
-    if "management_items" not in data:
-        return "cannot_evaluate", "missing_input"
+    guard = require_fields(data, REQUIRED_KEYS["DIMENSION_VALUE_CLOSED"])
+    if guard:
+        return guard
     extension = {entry.get("value") for entry in data.get("subject_group_extension") or []}
     for item in data["management_items"]:
         if item.get("process_group") not in PROCESS_GROUPS:
@@ -455,8 +631,9 @@ def check_dimension_value(data: dict) -> tuple[str, str | None]:
 
 
 def check_assertion_mutual_exclusion(data: dict) -> tuple[str, str | None]:
-    if "assertions" not in data:
-        return "cannot_evaluate", "missing_input"
+    guard = require_fields(data, REQUIRED_KEYS["ASSERTION_MUTUAL_EXCLUSION"])
+    if guard:
+        return guard
     seen: dict[tuple, set] = {}
     for assertion in data["assertions"]:
         if assertion.get("state") != "active":
@@ -469,16 +646,22 @@ def check_assertion_mutual_exclusion(data: dict) -> tuple[str, str | None]:
 
 
 def check_all_improvement(data: dict) -> tuple[str, str | None]:
-    if "changes" not in data:
-        return "cannot_evaluate", "missing_input"
+    guard = require_fields(data, REQUIRED_KEYS["ALL_IMPROVEMENT_ASSUMPTION"])
+    if guard:
+        return guard
     for change in data["changes"]:
         relations = change.get("relations") or []
         assumption = change.get("assumption")
         status = assumption.get("status") if isinstance(assumption, dict) else None
+        assumption_condition = (
+            assumption.get("verification_condition") if isinstance(assumption, dict) else None
+        )
         if relations and all(item == "mitigates" for item in relations):
-            if not assumption or not change.get("verification_condition"):
+            if not assumption or not (change.get("verification_condition") or assumption_condition):
                 return "fail", "all_improvement_without_verification"
-            if status == "expired":
+            if status == "expired" or (
+                status == "pending" and not assumption.get("approved_by")
+            ):
                 return "cannot_evaluate", "assumption_unclosed"
         if change.get("approval_basis") and status != "satisfied":
             return "fail", "approval_basis_before_verification"
@@ -486,24 +669,40 @@ def check_all_improvement(data: dict) -> tuple[str, str | None]:
 
 
 def check_ai_autonomy(data: dict) -> tuple[str, str | None]:
-    if any(key not in data for key in ("actors", "autonomy_grants", "assertions")):
-        return "cannot_evaluate", "missing_input"
+    guard = require_fields(data, REQUIRED_KEYS["AI_AUTONOMY_DELEGATION_AUDITABLE"])
+    if guard:
+        return guard
     actors = {item.get("id"): item for item in data["actors"]}
     assertions = {item.get("id"): item for item in data["assertions"]}
     for grant in data["autonomy_grants"]:
-        cursor = grant.get("delegated_from")
-        visited: set = set()
-        accountable = False
-        while cursor and cursor not in visited:
-            visited.add(cursor)
-            actor = actors.get(cursor)
-            if actor is None:
-                break
-            if actor.get("accountable") is True:
-                accountable = True
-                break
-            cursor = actor.get("delegated_from")
-        if not accountable:
+        actor_id = grant.get("actor")
+        if actor_id not in actors:
+            return "fail", "dangling_reference"
+        path = grant.get("delegated_from")
+        if not isinstance(path, dict):
+            return "cannot_evaluate", "invalid_path"
+        start = path.get("start") or actor_id
+        steps = path.get("steps")
+        reach = path.get("reach")
+        if start not in actors or not isinstance(steps, list) or not steps:
+            return "cannot_evaluate", "invalid_path"
+        cursor = start
+        for step in steps:
+            if not isinstance(step, dict):
+                return "cannot_evaluate", "invalid_path"
+            if step.get("relation") != "delegated_from" or step.get("direction") != "out":
+                return "cannot_evaluate", "invalid_path"
+            if step.get("target_type") != "Actor":
+                return "cannot_evaluate", "undefined_object_type"
+            target_id = step.get("target_id")
+            if not target_id:
+                return "cannot_evaluate", "invalid_path"
+            if target_id not in actors:
+                return "fail", "dangling_reference"
+            cursor = target_id
+        if reach != "accountable":
+            return "cannot_evaluate", "invalid_path"
+        if actors[cursor].get("accountable") is not True:
             return "fail", "delegation_chain_not_accountable"
         covers: set = set()
         for assertion_id in grant.get("assertions") or []:
@@ -516,7 +715,13 @@ def check_ai_autonomy(data: dict) -> tuple[str, str | None]:
             if assertion.get("kind") != "assumption" or not assertion.get("verification_condition"):
                 return "fail", "assertion_incomplete"
             assumption = assertion.get("assumption")
-            if isinstance(assumption, dict) and assumption.get("status") == "expired":
+            if isinstance(assumption, dict) and (
+                assumption.get("status") == "expired"
+                or (
+                    assumption.get("status") == "pending"
+                    and not assumption.get("approved_by")
+                )
+            ):
                 return "cannot_evaluate", "assumption_unclosed"
         if not {"scope", "boundary", "revocation"} <= covers:
             return "fail", "assertion_incomplete"
@@ -524,8 +729,9 @@ def check_ai_autonomy(data: dict) -> tuple[str, str | None]:
 
 
 def check_project_charter(data: dict) -> tuple[str, str | None]:
-    if any(key not in data for key in ("projects", "charters")):
-        return "cannot_evaluate", "missing_input"
+    guard = require_fields(data, REQUIRED_KEYS["PROJECT_CHARTER_EXISTENCE"])
+    if guard:
+        return guard
     charters = {item.get("project"): item for item in data["charters"]}
     for project in data["projects"]:
         if project.get("stage") != "executing":
@@ -540,8 +746,9 @@ def check_project_charter(data: dict) -> tuple[str, str | None]:
 
 
 def check_closure_acceptance(data: dict) -> tuple[str, str | None]:
-    if "deliverables" not in data:
-        return "cannot_evaluate", "missing_input"
+    guard = require_fields(data, REQUIRED_KEYS["CLOSURE_ACCEPTANCE_LINK"])
+    if guard:
+        return guard
     for deliverable in data["deliverables"]:
         accepted = any(
             item.get("statement") in ACCEPTANCE_STATEMENTS and item.get("accountable_confirmation")
@@ -553,8 +760,9 @@ def check_closure_acceptance(data: dict) -> tuple[str, str | None]:
 
 
 def check_procurement_contract(data: dict) -> tuple[str, str | None]:
-    if any(key not in data for key in ("commitments", "contracts")):
-        return "cannot_evaluate", "missing_input"
+    guard = require_fields(data, REQUIRED_KEYS["PROCUREMENT_CONTRACT_ANCHOR"])
+    if guard:
+        return guard
     contracts = {item.get("id"): item for item in data["contracts"]}
     for commitment in data["commitments"]:
         if commitment.get("procurement") != "external":
@@ -569,8 +777,9 @@ def check_procurement_contract(data: dict) -> tuple[str, str | None]:
 
 
 def check_schedule_evidence(data: dict) -> tuple[str, str | None]:
-    if "commitments" not in data:
-        return "cannot_evaluate", "missing_input"
+    guard = require_fields(data, REQUIRED_KEYS["SCHEDULE_EVIDENCE_LINK"])
+    if guard:
+        return guard
     for commitment in data["commitments"]:
         if not (commitment.get("deadline") or commitment.get("milestone")):
             continue
@@ -581,8 +790,9 @@ def check_schedule_evidence(data: dict) -> tuple[str, str | None]:
 
 
 def check_tailoring_record(data: dict) -> tuple[str, str | None]:
-    if any(key not in data for key in ("tailoring_actions", "tailoring_records")):
-        return "cannot_evaluate", "missing_input"
+    guard = require_fields(data, REQUIRED_KEYS["TAILORING_RECORD_EXISTENCE"])
+    if guard:
+        return guard
     records = {item.get("id"): item for item in data["tailoring_records"]}
     for action in data["tailoring_actions"]:
         record = records.get(action.get("record"))
@@ -594,8 +804,9 @@ def check_tailoring_record(data: dict) -> tuple[str, str | None]:
 
 
 def check_tailoring_non_trimmable(data: dict) -> tuple[str, str | None]:
-    if "tailoring_records" not in data:
-        return "cannot_evaluate", "missing_input"
+    guard = require_fields(data, REQUIRED_KEYS["TAILORING_NON_TRIMMABLE_SET"])
+    if guard:
+        return guard
     for record in data["tailoring_records"]:
         if record.get("trimmed_rule") in NON_TRIMMABLE:
             return "fail", "non_trimmable_rule"
@@ -603,8 +814,9 @@ def check_tailoring_non_trimmable(data: dict) -> tuple[str, str | None]:
 
 
 def check_tailoring_reassessment(data: dict) -> tuple[str, str | None]:
-    if "tailoring_records" not in data:
-        return "cannot_evaluate", "missing_input"
+    guard = require_fields(data, REQUIRED_KEYS["TAILORING_REASSESSMENT_CONDITION"])
+    if guard:
+        return guard
     for record in data["tailoring_records"]:
         if record.get("reassessment_condition"):
             continue
@@ -681,6 +893,11 @@ def run_case(case: dict) -> dict:
         verdict, reason = result[0], result[1]
         if len(result) > 2 and result[2]:
             severity = result[2]
+        # 引用完整性全局生效：check 自身判 pass 时，再统一校验所有已知引用。
+        if verdict == "pass":
+            reference_issue = validate_references(data)
+            if reference_issue:
+                verdict, reason = reference_issue
     actual = {
         "check_id": check_id,
         "source_rule": SPEC[check_id][0],
@@ -699,11 +916,41 @@ def run_case(case: dict) -> dict:
     return {**case, "actual": actual, "mismatches": mismatches}
 
 
+def null_sweep() -> int:
+    """负例实测：每个必需键单独取 null，必须返回 cannot_evaluate 而非崩溃。"""
+    failures: list[str] = []
+    total = 0
+    for check_id, keys in REQUIRED_KEYS.items():
+        for null_key in keys:
+            total += 1
+            data = {key: (None if key == null_key else []) for key in keys}
+            try:
+                result = CHECKS[check_id](data)
+            except Exception as exc:  # noqa: BLE001 - 负例就是要捕获崩溃
+                failures.append(f"{check_id}.{null_key}: 抛 {type(exc).__name__}: {exc}")
+                continue
+            verdict, reason = result[0], result[1]
+            if (verdict, reason) != ("cannot_evaluate", "missing_input"):
+                failures.append(
+                    f"{check_id}.{null_key}: 期望 cannot_evaluate/missing_input，"
+                    f"实际 {verdict}/{reason}"
+                )
+    for failure in failures:
+        print(f"[FAIL] {failure}")
+    print(f"null 负例：{total - len(failures)}/{total} 返回 cannot_evaluate，崩溃 {len(failures)} 处")
+    return 0 if not failures else 1
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="T-107 最小原型：执行 T-011 的 34 个样例")
     parser.add_argument("--root", default=str(Path(__file__).resolve().parents[2]))
     parser.add_argument("--json", action="store_true", help="输出 JSON 报告")
+    parser.add_argument(
+        "--null-sweep", action="store_true", help="负例：必需键取 null 时不得抛异常"
+    )
     args = parser.parse_args()
+    if args.null_sweep:
+        return null_sweep()
     root = Path(args.root)
     method = (root / METHOD).read_text(encoding="utf-8")
     cases = [run_case(case) for case in extract_cases(method)]

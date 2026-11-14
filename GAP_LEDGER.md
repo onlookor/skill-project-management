@@ -13,8 +13,28 @@
 - `undefined-object`：规则或判定列引用了输入 schema 未定义的节点类型、关系或字段。
 - `rule-stricter`：规则正文包含判定列未覆盖的规范性条件（例如“且”“附带”“不得”引出的条件）。
 - `severity-mismatch`：判定列的实际 severity 与 `validation/CHECKLIST.md` 不一致。
+- `representation-defect`：判定层的表示规范自身有缺陷（路径、枚举、格式、聚合、封闭性），不对应某一条规则的具体条款。
+- `implementation-defect`：原型或检查器的实现与其声明口径不一致（崩溃、漏检、只做结构不做语义）。
 
 **机械保证**：下方的核查矩阵必须逐行覆盖 A 表全部 `check_id`，结论只能是 `consistent` 或缺口编号；任何对 `GRAMMAR.md` 或 `spec/methods/deterministic-checker.md` 判定列的改动，必须在同一提交更新本文件，否则 `scripts/check_gap_ledger.py --staged` 退出 1。`rule-stricter` 与 `severity-mismatch` 的语义判断仍由人工复核，但“未复核”不再可能静默通过。
+
+## 关闭判据（硬要求，2026-11-14 起）
+
+**缺口不得以同源运行结果关闭。** 以下依据不构成关闭证据，`scripts/check_gap_ledger.py` 会直接报错：
+
+- 自家原型对自家样例全部通过；
+- 自家脚本退出 0（包括本台账的检查器、三表检查器、术语检查器）；
+- 在同一提交内同时修改样例与实现后，用修改后的样例自证；
+- 任何以“同源自查”“自家脚本通过”“退出 0”为唯一依据的说明。
+
+**合法关闭依据**只有两类，必须写入缺口行的“关闭依据”列：
+
+| 值 | 要求 |
+|---|---|
+| `非同源复核：<复核者/会话>，<日期>` | 复核方未参与被复核内容的实现；附复核范围、样例/条款清单与差异结论 |
+| `人工签收：<签收人>，<日期>` | 签收人按规则正文逐条比对判定列与实现，附比对清单与逐条结论 |
+
+关闭时 `status` 改为 `closed`，`处置出口` 只能取 `rule-change` / `check-change` / `doc-only` / `accepted`；`accepted` 仍须写“理由：”。检查器对“关闭依据缺失”“依据不是上述两类”“说明中出现同源自证措辞”均退出 1。
 
 ## 分级与停留上限
 
@@ -39,52 +59,65 @@
 
 | check_id | 规则 | 结论 | 复核里程碑 |
 |---|---|---|---|
-| `PROJECT_MINIMAL_EXISTENCE` | G-A1 | `consistent` | M1 |
-| `CONSTRAINT_ANCHOR_REQUIRED` | G-A2 | `consistent` | M1 |
-| `DUAL_DIMENSION_ANNOTATION` | G-B1 | `consistent` | M1 |
-| `DIMENSION_VALUE_CLOSED` | G-B2 | `consistent` | M1 |
-| `DELIVERABLE_ASSERTION_LINK` | G-C1 | `consistent` | M1 |
-| `ASSERTION_MUTUAL_EXCLUSION` | G-C2 | `consistent` | M1 |
-| `CHANGE_CONSTRAINT_LINK` | G-D1 | `consistent` | M1 |
-| `ALL_IMPROVEMENT_ASSUMPTION` | G-D2 | `consistent` | M1 |
-| `ROLE_MINIMAL_COMPLETENESS` | G-E1 | `consistent` | M1 |
-| `AI_AUTONOMY_DELEGATION_AUDITABLE` | G-E2 | `consistent` | M1 |
-| `PROJECT_CHARTER_EXISTENCE` | G-F1 | `consistent` | M1 |
-| `CLOSURE_ACCEPTANCE_LINK` | G-F2 | `consistent` | M1 |
-| `PROCUREMENT_CONTRACT_ANCHOR` | G-F3 | `consistent` | M1 |
-| `SCHEDULE_EVIDENCE_LINK` | G-F4 | `consistent` | M1 |
-| `TAILORING_RECORD_EXISTENCE` | G-G1 | `consistent` | M1 |
-| `TAILORING_NON_TRIMMABLE_SET` | G-G2 | `consistent` | M1 |
-| `TAILORING_REASSESSMENT_CONDITION` | G-G3 | `consistent` | M1 |
+| `PROJECT_MINIMAL_EXISTENCE` | G-A1 | `G-002`、`G-007`、`G-008`、`G-009`、`G-014`、`G-016`、`G-017` | M1 |
+| `CONSTRAINT_ANCHOR_REQUIRED` | G-A2 | `G-001`、`G-007`、`G-009`、`G-010` | M1 |
+| `DUAL_DIMENSION_ANNOTATION` | G-B1 | `G-013`、`G-015` | M1 |
+| `DIMENSION_VALUE_CLOSED` | G-B2 | `G-013`、`G-015` | M1 |
+| `DELIVERABLE_ASSERTION_LINK` | G-C1 | `G-005`、`G-009`、`G-010` | M1 |
+| `ASSERTION_MUTUAL_EXCLUSION` | G-C2 | `G-009`、`G-010` | M1 |
+| `CHANGE_CONSTRAINT_LINK` | G-D1 | `G-006`、`G-009`、`G-010` | M1 |
+| `ALL_IMPROVEMENT_ASSUMPTION` | G-D2 | `G-009`、`G-011` | M1 |
+| `ROLE_MINIMAL_COMPLETENESS` | G-E1 | `G-004`、`G-009`、`G-010` | M1 |
+| `AI_AUTONOMY_DELEGATION_AUDITABLE` | G-E2 | `G-003`、`G-010`、`G-011`、`G-012` | M1 |
+| `PROJECT_CHARTER_EXISTENCE` | G-F1 | `G-009`、`G-010` | M1 |
+| `CLOSURE_ACCEPTANCE_LINK` | G-F2 | `G-009`、`G-010` | M1 |
+| `PROCUREMENT_CONTRACT_ANCHOR` | G-F3 | `G-009`、`G-010` | M1 |
+| `SCHEDULE_EVIDENCE_LINK` | G-F4 | `G-009` | M1 |
+| `TAILORING_RECORD_EXISTENCE` | G-G1 | `G-009`、`G-010` | M1 |
+| `TAILORING_NON_TRIMMABLE_SET` | G-G2 | `G-009` | M1 |
+| `TAILORING_REASSESSMENT_CONDITION` | G-G3 | `G-009` | M1 |
+
+> 矩阵说明：缺口编号替代 `consistent` 表示该 `check_id` 截至 2026-11-14 的复核仍受该缺口影响，不得判为一致。G-008 是表示层合并条目，G-010/G-011/G-012 等为其拆分后的可执行项；G-014、G-016、G-017 为全局项，锚定在首行，但其影响覆盖全部 `check_id`。
 
 ## 缺口账
 
-| 编号 | 状态 | 成因 | 等级 | 影响面 | 是否阻断 | 待裁定方 | 登记里程碑 | 处置出口 | 关联 T | 说明 |
-|---|---|---|---|---|---|---|---|---|---|---|
-| G-001 | closed | undefined-object | L3 | G-A2、G-D2、G-E1 | 否 | 架构负责人 | M1 | check-change | — | ADR-0013 D0 / D2 / D5 / D9 已把原“未定义的判定对象”全部落为具名字段：G-A2 的管理活动/产物 = `management_items[].node_type`；G-D2 的批准依据 = `approval_basis`；G-E1 的决策类筛选 = `commitments[].decision_class`（输入已筛选，schema §1.4）。 |
-| G-002 | closed | rule-stricter | L2 | G-A1 | 否 | 架构负责人 | M1 | check-change | T-130 | ADR-0013 D9：G-A1 正文的“`Constraint` 作用于该 `Outcome` 或 `Commitment`”以追加子句 `G-A1#6` 纳入 `PROJECT_MINIMAL_EXISTENCE`，失败原因码 `constraint_not_applied`。 |
-| G-003 | closed | rule-stricter | L2 | G-E2 | 否 | 架构负责人 | M1 | check-change | T-131 | ADR-0013 D9 + P5：`G-E2#3` 要求 `assertion.kind = assumption` 且 `verification_condition` 非空；缺失分别报 `assertion_incomplete` / `assumption_unclosed`。 |
-| G-004 | closed | severity-mismatch | L1 | G-E1 | 否 | 架构负责人 | M1 | check-change | T-100 | ADR-0013 §2.2：改用 A.2 子句级 severity——`G-E1#3`（角色合并声明缺失）为 `warn`，其余 `G-E1` 子句保持 `block`；原型以三元组返回 `missing_role_merge_declaration` / `warn`。 |
-| G-005 | closed | rule-stricter | L1 | G-C1 | 否 | 架构负责人 | M1 | check-change | T-134 | ADR-0013 D6：`G-C1#2` 断言内容（`statement` + `statement_kind`）与 `G-C1#3` 的 `about` 反向边纳入判定；原样例 A.1.3-2 的空断言期望被推翻，改为 `fail / assertion_without_content`。 |
-| G-006 | closed | rule-stricter | L1 | G-D1 | 否 | 架构负责人 | M1 | check-change | T-135 | ADR-0013 D7：`G-D1` 增加 `target.type ∈ {Commitment, Deliverable}`；缺 `target` 报 `missing_change_target`，类型非法报 `invalid_change_target`。 |
-| G-007 | closed | undefined-object | L1 | G-A1、G-A2、G-C1、G-D1 | 否 | 架构负责人 | M1 | check-change | T-136 | ADR-0013 D1–D5 + P2–P7：端点量词（默认全称，引用“存在且全部解析”）、空值三态（缺键/`null` / `{}` / `[]`）、悬空引用 `fail` 与类型未定义 `cannot_evaluate`、`reason` 优先级 `cannot_evaluate > fail`、`about` 构成 C1 出边；并补齐表示规范（封闭枚举、关系路径、assumption 时效、路径可达、适用性状态机）。 |
-| G-008 | closed | undefined-object | L2 | 表示层（全局） | 否 | 架构负责人 | M1 | check-change | T-136 | 独立复核报出的八条上层设计问题的合并登记（P1–P8），ADR-0013 同批裁定：P1 子句被压缩 → A.2 子句表；P2 未封闭枚举/自然语言值 → schema §4；P3 跨对象全称/相关性 → schema §1.6–1.7 与 §3bis；P4 引用完整性分散 → schema §1.5 统一策略；P5 assumption 时效与批准资格 → schema §1.9 `assumption` 对象；P6 链/路径/可达性 → schema §1.10；P7 适用性状态机与 `not_applicable` → 方法 §4.4 与 schema §1.11；P8 三表无机械对照 → `scripts/check_three_table.py`。 |
+| 编号 | 状态 | 成因 | 等级 | 影响面 | 是否阻断 | 待裁定方 | 登记里程碑 | 处置出口 | 关联 T | 说明 | 关闭依据 |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| G-001 | open | undefined-object | L3 | G-A2、G-D2、G-E1 | 否 | 架构负责人 | M1 |  | — | 2026-11-14 复核重开：P2（封闭枚举）只部分解决——`subject_group` 仅物化 2/17 项，`management_node_type` 等枚举未覆盖判定列全部引用；原以 `check-change` 关闭的依据是同源重跑，不成立。剩余项由 G-013 承接。 |  |
+| G-002 | open | rule-stricter | L2 | G-A1 | 否 | 架构负责人 | M1 |  | T-130 | 2026-11-14 复核重开：P1（子句压缩）只部分解决——A 表判定列仍写叙述性短语，子句未完全下沉 A.2；原关闭依据是同源重跑，不成立。待 G-015/G-016 修正后由非同源复核关闭。 |  |
+| G-003 | open | rule-stricter | L2 | G-E2 | 否 | 架构负责人 | M1 |  | T-131 | 2026-11-14 复核重开：P1/P5 只部分解决——`assumption.pending` 分支未检查 `approved_by`，且路径仍与扁平字符串双轨；原关闭依据不成立。由 G-011/G-012 承接。 |  |
+| G-004 | open | severity-mismatch | L1 | G-E1 | 否 | 架构负责人 | M1 |  | T-100 | 2026-11-14 复核重开：severity 拆分本身已落地，但 P1 表示层只部分解决，且判定列格式与原因码映射未定义，不能维持 `check-change` 关闭。由 G-015/G-016 承接。 |  |
+| G-005 | open | rule-stricter | L1 | G-C1 | 否 | 架构负责人 | M1 |  | T-134 | 2026-11-14 复核重开：C1 内容与 `about` 已纳入，但引用完整性只在 C1 局部生效（P4 未全局化），原关闭依据不成立。由 G-010 承接。 |  |
+| G-006 | open | rule-stricter | L1 | G-D1 | 否 | 架构负责人 | M1 |  | T-135 | 2026-11-14 复核重开：`target.type` 已纳入，但引用完整性未全局生效，且 `reason` 与聚合优先级矛盾未定稿。由 G-010/G-014 承接。 |  |
+| G-007 | open | undefined-object | L1 | G-A1、G-A2、G-C1、G-D1 | 否 | 架构负责人 | M1 |  | T-136 | 2026-11-14 复核重开：P2/P3/P4/P5 只部分解决——引用完整性仅 C1、路径表示缺目标 id 且与扁平字符串双轨、`assumption.pending` 未校验批准者、17 处 `null` 崩溃。由 G-009–G-012 承接。 |  |
+| G-008 | open | representation-defect | L2 | 表示层（全局） | 否 | 架构负责人 | M1 |  | T-133 | 2026-11-14 复核重开：P1–P8 的合并条目中，P4（引用完整性）、P6（路径表示）未解决，P1/P2/P3/P5 只部分解决；上一轮以 `check-change` 全部关闭的裁定被非同源复核推翻。 |  |
+| G-009 | open | implementation-defect | L1 | 全部 17 个 `check_id` | 否 | 架构负责人 | M1 |  | T-133 | 原型对必需顶层键只判 `key not in data`；键存在但值为 `null` 时进入迭代并抛 `TypeError`（17 处 check 函数同一缺陷）。按 schema §1.2/§1.3 应输出 `cannot_evaluate` / `missing_input`。 本次已修正：17 个 check 函数统一 require_fields，`--null-sweep` 31/31 返回 cannot_evaluate、崩溃 0；待非同源复核关闭。 |  |
+| G-010 | open | representation-defect | L1 | 全部引用字段；重点 G-C1 之外 | 否 | 架构负责人 | M1 |  | T-133 | 引用完整性（P4）只在 `DELIVERABLE_ASSERTION_LINK` 与 `AI_AUTONOMY_DELEGATION_AUDITABLE` 局部实现；`commitments.by/to`、`constraints.constrains`、`changes.target.id`、`charters.project` 等悬空引用未统一报 `dangling_reference`。本次已把全局校验扩展到上述字段、`contracts.constrained_by/accountable_signature`、`tailoring_records.approver`、`assertions.about/deliverable/subject/accountable_confirmation`；A.1.11-2、A.1.12-2、A.1.13-2、A.1.15-2 的输入已按 schema §1.5 补齐，期望输出未变。待非同源复核关闭。 |  |
+| G-011 | open | representation-defect | L1 | G-D2、G-E2 | 否 | 架构负责人 | M1 |  | T-133 | `assumption` 的 `pending` 分支只检查 `expired`，未检查 `approved_by`；schema §1.9 要求 `pending` 且缺 `approved_by` → `cannot_evaluate` / `assumption_unclosed`。 本次已修正：D2/E2 的 pending 分支均检查 `approved_by`；待非同源复核关闭。 |  |
+| G-012 | open | representation-defect | L2 | G-E2、schema §1.10/§3bis | 否 | 架构负责人 | M1 |  | T-133 | 路径结构 `{start, steps, reach}` 的 `steps[]` 缺目标 `id`，无法定位下一节点；同时 schema 保留 `delegated_from` 扁平字符串写法，形成双轨。 本次已修正：路径对象补 `steps[].target_id`，扁平字符串返回 invalid_path；待非同源复核关闭。 |  |
+| G-013 | open | representation-defect | L1 | G-B1、G-B2 | 否 | 架构负责人 | M1 |  | T-133 | `subject_group` 只物化 `planning`、`lessons-learned` 两项；ISO 21502:2020 第 7 章的 17 项管理实践未完整物化，合法标签会被判 `dimension_value_out_of_enum`。 本次已修正：17 项完整物化，原型同步；待非同源复核关闭。 |  |
+| G-014 | open | representation-defect | L1 | 全部 `check_id` 的 verdict/reason 聚合 | 否 | 架构负责人 | M1 |  | T-133 | schema §1.14 规定 `reason` 优先级 `cannot_evaluate > fail`，A.2 又规定 verdict 聚合“任一 `fail` → `fail`，否则 `cannot_evaluate`”；两处对“同时存在 fail 与 cannot_evaluate”的结论相反。 本次已修正：§1.14 与 A.2 统一为 fail > cannot_evaluate > pass；待非同源复核关闭。 |  |
+| G-015 | open | representation-defect | L2 | 附录 A 判定列 | 否 | 架构负责人 | M1 |  | T-133 | A 表“判定”列仍写叙述性短语（如 G-B1 写“且值在枚举内”），子句 id 只在“子句”列；同一条件又划给 B2，造成 B1/B2 口径冲突。 本次已修正：A 表判定列只留子句 id，叙述下沉 A.2；B1/B2 条件归属已分离；待非同源复核关闭。 |  |
+| G-016 | open | representation-defect | L2 | 附录 A.2、schema §3 | 否 | 架构负责人 | M1 |  | T-133 | A.2 子句表无“原因码”列；原因码与实际子句的映射未定义，`reason` 只能靠原型实现反向推断。 本次已修正：A.2 增加原因码列（40 条子句），A 表原因码与子句原因码集合机械一致；待非同源复核关闭。 |  |
+| G-017 | open | implementation-defect | L2 | `scripts/check_three_table.py`、M2 出口 1 | 否 | 架构负责人 | M1 |  | T-133 | 三表检查器只做存在性/集合一致/词级定义，不做语义短语检查：G-B1 判定列写“值在枚举内”与 A.2 划给 B2 的冲突仍报通过，绿字被误读为语义闭合。 本次已修正：三表检查器增加判定列叙述检测、B1/B2 条件归属、原因码定义与映射检查；仍不保证全文语义等价，待非同源复核关闭。 |  |
 
-**共同成因**：G-002、G-003、G-004、G-005、G-006 同属 **规则正文严于判定列** 这一大类——判定列只覆盖了规则正文的一部分条件，或把不同严重度的条件压在同一级别。G-002、G-003、G-005、G-006 的成因记为 `rule-stricter`（漏判条件：G-002 漏“约束作用边”、G-003 漏“assumption 形式与验证条件”、G-005 漏“断言内容与 `about` 相关性”、G-006 漏“变更对象的类型谓词”）；G-004 的成因记为 `severity-mismatch`（判定列未区分两种情形，导致合法产物可能被判失败）。它们不是彼此独立的偶发问题，而是同一口径缺陷的不同表现。对应的独立工作项 T-130、T-131、T-100、T-134、T-135 保留原编号，不合并——每条有各自的规则条款与判定列行，可分别裁定。
+**共同成因**：G-002、G-003、G-004、G-005、G-006 同属 **规则正文严于判定列** 这一大类——判定列只覆盖了规则正文的一部分条件，或把不同严重度的条件压在同一级别。它们不是彼此独立的偶发问题，而是同一口径缺陷的不同表现。对应的独立工作项 T-130、T-131、T-100、T-134、T-135 保留原编号，不合并。
 
-**与 G-007 的关系**：G-007 是另一类——不是“判定列漏了正文条件”，而是“判定列本身存在未定明的语义”，因此成因记为 `undefined-object`，并合并登记（取舍理由见该行说明）。
+**与 G-007 的关系**：G-007 是另一类——不是“判定列漏了正文条件”，而是“判定列本身存在未定明的语义”，因此成因记为 `undefined-object`。2026-11-14 复核后，其剩余语义缺陷拆为 G-009–G-012 四个可执行项。
 
-**与 G-008 的关系**：G-008 登记的是独立复核报出的八条**表示层**问题（P1–P8），它们不指向某一条规则的具体条款，而是指向“判定层如何被表示”这一层；因此不进入核查矩阵的逐 `check_id` 行，单独成条。P1–P8 与已有关口的对应关系：P1（子句被压缩）与 P2（枚举未封闭）、P3（量词/相关性）、P4（引用完整性）、P5（assumption 时效）、P6（路径表示）、P7（适用性状态机）分别覆盖 G-001–G-007 的语义面；P8（三表无机械对照）是新增机制，由 `scripts/check_three_table.py` 承接。所有九条缺口在 ADR-0013 `accepted` 时以 `check-change` 一次性关闭。
+**与 G-008 的关系**：G-008 登记独立复核报出的八条**表示层**问题（P1–P8）。2026-11-14 复核重跑确认 P4（引用完整性不统一）与 P6（路径表示）未解决，P1/P2/P3/P5 只部分解决，故重开；拆分项为 G-009–G-017。
 
 ## 核查记录
 
 | 日期 | 事件 | 结论 |
 |---|---|---|
 | 2026-11-14 | T-107 最小原型跑通 34/34 个样例 | 核查矩阵不变；G-001–G-004 仍为 `open`，原型只在输出中声明“未覆盖规则正文”，不关闭任何缺口 |
-| 2026-11-14 | T-133 独立复核（非同源，只读验收包，覆盖 G-A1 / G-C1 / G-D1 共 3 个 `check_id`、6 个样例） | 6/6 判定与预期一致，但一致不等于一致于规则正文：复核指出 G-C1 漏“断言内容与 `about` 相关性”、G-D1 漏“变更对象类型谓词”，并报告 5 处判定列语义未定明。据此登记 G-005、G-006、G-007；核查矩阵由 12/17 降为 10/17 consistent。剩余 14 个 `check_id` 尚未复核，T-133 保持 `in-progress` |
-| 2026-11-14 | 起草 `adr/0013-unified-adjudication-of-check-semantics.md`（状态 `draft`） | G-001、G-002、G-003、G-005、G-006、G-007 并入同一次裁定范围；G-004（`severity-mismatch`）不并入，仍按 T-100 单独裁定。裁定门为 T-133 的 17/17 复核完成；裁定门达成前，台账条目的等级、到期与状态均不变 |
-| 2026-11-14 | ADR-0013 扩范围为“判定层表示规范”并一次性裁定（`accepted`） | D0–D9 与独立复核报出的 P1–P8 同批出结论：G-001–G-007 全部以 `check-change` 关闭；P1–P8 合并登记为 G-008 并关闭。核查矩阵 17/17 `consistent`，到期 0 |
-| 2026-11-14 | 裁定后单次重验（同源，非独立复核） | 原型对改动后的判定列/schema 重跑：34/34 样例、17/17 `check_id` 通过，`COVERAGE_GAPS` 为空；`check_three_table.py` 覆盖三对关系与子句/枚举闭合，退出 0。独立复核会话对同一版本的单次重跑仍待执行，其结论另记 |
+| 2026-11-14 | T-133 独立复核（非同源，只读验收包，覆盖 G-A1 / G-C1 / G-D1 共 3 个 `check_id`、6 个样例） | 6/6 判定与预期一致，但一致不等于一致于规则正文：复核指出 G-C1 漏“断言内容与 `about` 相关性”、G-D1 漏“变更对象类型谓词”，并报告 5 处判定列语义未定明。据此登记 G-005、G-006、G-007；核查矩阵由 12/17 降为 10/17 consistent。 |
+| 2026-11-14 | 起草 `adr/0013-unified-adjudication-of-check-semantics.md`（`draft`） | G-001、G-002、G-003、G-005、G-006、G-007 并入同一次裁定范围；G-004（`severity-mismatch`）不并入，仍按 T-100 单独裁定。 |
+| 2026-11-14 | ADR-0013 扩范围为“判定层表示规范”并一次性裁定（`accepted`） | D0–D9 与 P1–P8 同批出结论；G-001–G-007 全部以 `check-change` 关闭；P1–P8 合并登记为 G-008 并关闭。核查矩阵 17/17 `consistent`。**该裁定已于同日被非同源复核重跑推翻，见下一行。** |
+| 2026-11-14 | 裁定后单次重验（同源，非独立复核） | 原型 34/34、三表检查器退出 0。**按本文件“关闭判据”，同源重验不构成关闭证据**；上一轮把该结果当作关闭依据是错误。 |
+| 2026-11-14 | 独立复核重跑（非同源） | 推翻上一轮裁定：P4 引用完整性仍只在 C1 局部生效、P6 路径表示仍有扁平字符串双轨且缺目标 id；P1/P2/P3/P5 只部分解决；G-B1 判定列仍写“值在枚举内”、A.2 又划给 B2；原型 17 处 `null` 崩溃。据此重开 G-001–G-008，登记 G-009–G-017，ADR-0013 回到修订状态。 |
+| 2026-11-14 | 追溯性修正：A.1.11-2、A.1.12-2、A.1.13-2、A.1.15-2 的悬空引用 | 这四个样例自 T-107 起一直带悬空引用：A.1.11-2 的章程指向未提供的 Outcome/Constraint/Actor/Assertion；A.1.12-2 的验收确认指向未提供的 Actor；A.1.13-2 的契约约束与签署指向未提供的 Constraint/Actor；A.1.15-2 的裁剪批准者指向未提供的 Actor。此前多次“34/34 通过”中包含这 4 条**未被发现的无效验证**。本轮按 schema §1.5（所有引用必须解析到同一快照）补齐输入块，4 个样例的期望输出均未改动。这不是新缺陷，是对既有绿色数字的追溯性降级：此前的 34/34 不能按“全部有效”引用。 |
 
 ## 临时性与撤除
 

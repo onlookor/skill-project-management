@@ -13,7 +13,7 @@
 | `check_glossary_sync` | 检查 `GLOSSARY.md` 的 A 类条目与 `knowledge/anchored-entries.jsonl` 的定义一致性 | `check_glossary_sync.md` | 未实现（T-090） |
 | `check_no_raw_material.py` | 阻断式检查：已跟踪文件中不得出现原始资料（PDF/EPUB/扫描件等）、文本层/OCR 转储与成段原文；允许受控的自建本体（`CONSTITUTION.md` 第 13.6 条） | `CONSTITUTION.md` 第 13 条 | 已实现 |
 | `check_gap_ledger.py` | 核查 `GAP_LEDGER.md`：字段枚举、核查矩阵与附录 A 全覆盖、`open` 缺口被矩阵引用、TODO 交叉引用、按里程碑计算到期；`--staged` 要求规则/判定文件与台账同批更新。到期未裁定退出 1 | `AGENTS.md` 3.6、`adr/0012-gap-ledger-and-adjudication.md` | 已实现 |
-| `check_three_table.py` | 三表机械对照：正文（规则 → 条款与子句范围）、判定列（`check_id` → 子句与机制术语）、输入 schema（`check_id` → 输入域、具名枚举）。覆盖“正文 ↔ 判定列”“判定列 ↔ schema”“正文 ↔ schema”三对关系，并核对子句闭合与枚举封闭 | `adr/0013-unified-adjudication-of-check-semantics.md`、`spec/CHECKER_INPUT_SCHEMA.md` | 已实现 |
+| `check_three_table.py` | 三表机械对照：正文（规则 → 条款与子句范围）、判定列（`check_id` → 子句与原因码）、输入 schema（`check_id` → 输入域、具名枚举、原因码）。覆盖“正文 ↔ 判定列”“判定列 ↔ schema”“正文 ↔ schema”三对关系，核对子句闭合、枚举封闭、判定列不含叙述性短语、G-B1/G-B2 条件归属、原因码与子句映射。**深度边界**：它保证结构一致与已列举的语义短语规则，不保证规则正文与子句表的全文语义等价 | `adr/0013-unified-adjudication-of-check-semantics.md`、`spec/CHECKER_INPUT_SCHEMA.md` | 已实现 |
 | `check_glossary_usage.py` | 从 `git ls-files` 的 Markdown / JSONL 生成每条术语的使用位置基线 `knowledge/glossary-usage.json`，并在 `GLOSSARY.md` 第 4 节生成位置表；默认模式校验位置存在、行号有效、该行含术语、生成块未被手改、术语集合一致。`--write` 重生成 | `AGENTS.md` 5bis.1 | 已实现 |
 | `validate_ontology.py` | 用 `rdflib` + `pyshacl` 校验 `ontology/` 本体与 24 条 SHACL 形状；`--matrix` 逐条运行违规 fixture，确认每条形状能判出违规 | 无独立规格（边界见 `CONSTITUTION.md` 第 13.6 条与 `ontology/README.md`） | 已实现（可选依赖） |
 
@@ -32,7 +32,7 @@ python3 scripts/validate_ontology.py --matrix
 
 `check_gap_ledger.py` 退出码：`0` 通过；`1` 结构非法或存在到期未裁定（含规则/判定文件与台账未同批暂存）；`2` 台账或方法注册表无法解析。输出首行给出总数、`open`/`closed`、按级与到期计数、核查矩阵 `consistent` 比例。`--staged` 用于 pre-commit；独立运行时省略该参数。只有 `open` 缺口必须被核查矩阵引用——`closed` 缺口已记录处置出口，不再锚定矩阵，否则矩阵永远无法达到撤除条件要求的 17/17 `consistent`。
 
-`check_three_table.py` 退出码：`0` 通过；`1` 对照失败（规则未映射到 `check_id`、`check_id` 无判定行或无 schema 输入域、子句未被引用、机制术语未定义、判定列枚举不在 schema 具名枚举内）；`2` 三张表之一无法解析。输出首行给出规则数、`check_id` 数、子句数与 schema 输入域数；失败时逐条列出关系与对象。它是 ADR-0013 的交付物，pre-commit 与 `check_state.py` 双重调用，失败即阻断提交与发布。
+`check_three_table.py` 退出码：`0` 通过；`1` 对照失败（规则未映射到 `check_id`、`check_id` 无判定行或无 schema 输入域、子句未被引用、机制术语未定义、判定列含叙述性短语、G-B1 写了枚举条件、G-B2#1 未写枚举、原因码未在 schema 定义或与子句不一致）；`2` 三张表之一无法解析。输出首行给出规则数、`check_id` 数、子句数与 schema 输入域数；失败时逐条列出关系与对象。它是 ADR-0013 的交付物，pre-commit 与 `check_state.py` 双重调用，失败即阻断提交与发布。**它不保证语义闭合**：绿字只表示结构、枚举、子句归属与原因码映射一致；规则正文是否被子句忠实表达，仍须由非同源复核或人工逐条签收（`AGENTS.md` 3.6.6）。
 
 `check_glossary_usage.py` 退出码：`0` 通过（零使用术语只输出警告）；`1` 校验失败（基线中的位置不存在、行号越界、该行不含术语、生成块被手改、术语集合与 `GLOSSARY.md` 不一致）；`2` 无法解析 `GLOSSARY.md` 或基线。`--write` 重生成基线与生成块，位置按 `path:line` 排序且幂等。新增、删除、移动文件或改行后必须 `--write` 并与改动同批提交；该检查器与缺口台账不是平行机制——它只做引用完整性核对，不承担语义裁定。
 

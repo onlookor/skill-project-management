@@ -26,11 +26,11 @@
 7. **跨对象相关性（P3）**：判定列中的“该交付物”“其 `Outcome`”等指代必须落为关系路径，例如 `deliverables[].asserted_by[].about`。第 3bis 节列出各 `check_id` 使用的关系路径；新增路径先改本节。
 8. **值域封闭（P2）**：判定列中出现的枚举集合必须引用第 4 节的具名枚举；不得出现自然语言值（如“已验收或已移交”须写成枚举名 `acceptance_statement`）。
 9. **assumption 时效与批准资格（P5）**：`assumption` 表示为对象 `{verification_condition, status, verified_at, expires_at, approved_by, approval_basis}`；`status ∈ {pending, satisfied, expired}`。`expired`、或 `pending` 且缺 `approved_by` → `cannot_evaluate` / `assumption_unclosed`，不得判 `pass`。
-10. **路径与可达性（P6）**：链式条件表示为 `{start, steps: [{relation, direction, target_type}], reach}`；判定列写路径表达式，不得写“终至”“链上有”这类自然语言。
+10. **路径与可达性（P6）**：链式条件表示为 `{start, steps: [{relation, direction, target_type, target_id}], reach}`。`steps[]` 必须带 `target_id`，它是路径解析到下一节点的唯一依据；`direction` 当前只允许 `out`。判定列写路径表达式，不得写“终至”“链上有”这类自然语言，也不得再使用 `delegated_from: "<id>"` 的扁平字符串写法（该写法已删除）。
 11. **适用性（P7）**：输入可携带 `applicability: {state}`，`state ∈ {applicable, inapplicable, pending}`。`inapplicable` → `not_applicable`；`pending` → `cannot_evaluate` / `applicability_pending`；`applicable` 或未提供 → 正常判定。
 12. **结论与原因**：`verdict ∈ {pass, fail, cannot_evaluate, not_applicable}`；`reason` 为稳定原因码，`pass` / `not_applicable` 时为 `null`。原因码只用于样例断言，不是新的规范词汇。
 13. **severity / rule_status**：由附录 A 与 `validation/CHECKLIST.md` 决定，不由输入携带；`assumption` 组按 P6 输出 `advisory`。子句级 severity 覆盖见附录 A.2。
-14. **多违规优先级（D4）**：`reason` 单值，优先级 `cannot_evaluate` > `fail`；同一 verdict 内按附录 A.2 的子句行序取第一条命中。全部子句结果以 `violations[]` 输出，`reason` 只是首条。
+14. **多违规优先级（D4）**：`reason` 单值；聚合顺序为 **`fail` > `cannot_evaluate` > `pass`**——任一子句 `fail` 即判 `fail`，不存在 `fail` 时才由 `cannot_evaluate` 决定；同一 verdict 内按附录 A.2 的子句行序取第一条命中。全部子句结果以 `violations[]` 输出，`reason` 只是首条。旧表述“`cannot_evaluate` 优先于 `fail`”已废止。
 
 ## 2. 共享字段
 
@@ -45,7 +45,7 @@
 | `assertions[]` | `id`, `about`, `deliverable`, `subject`, `property`, `value`, `state`, `covers`, `basis`, `source`, `statement`, `statement_kind`, `kind`, `verification_condition`, `accountable_confirmation` | 见各 `check_id` | `state ∈ {active, ...}`；`covers` 为字符串列表；`statement_kind ∈ statement_kind`；`kind ∈ assertion_kind` |
 | `changes[]` | `id`, `constraint`, `relation`, `relations`, `target`, `assumption`, `verification_condition`, `approval_basis` | 见各 `check_id` | D1 用单数 `relation`；D2 用复数 `relations`；`target` 为 `{type, id}`；`approval_basis` 为被当作批准依据的产物 `id` 列表 |
 | `management_items[]` | `id`, `node_type`, `process_group`, `subject_group` | 字符串 | `node_type ∈ management_node_type` |
-| `autonomy_grants[]` | `id`, `actor`, `delegated_from`, `assertions` | 字符串 / 列表 | `delegated_from` 构成委托路径，终点须 `accountable: true` |
+| `autonomy_grants[]` | `id`, `actor`, `delegated_from`, `assertions` | 对象 / 列表 | `delegated_from` 为第 1.10 条路径对象；禁止扁平字符串。终点须 `accountable: true` |
 | `charters[]` | `id`, `project`, `outcomes`, `constraints`, `accountable`, `authorizing_assertion` | 见 F1 | |
 | `contracts[]` | `id`, `deliverable_form`, `acceptance_criteria`, `constrained_by`, `accountable_signature` | 见 F3 | |
 | `tailoring_actions[]` | `id`, `record` | 字符串 | `record` 指向 `tailoring_records[].id` |
@@ -62,9 +62,9 @@
 | `DELIVERABLE_ASSERTION_LINK` | `deliverables`, `assertions` | `asserted_by` / `about`、`statement`, `statement_kind` | `deliverable_without_assertion` / `assertion_without_content` / `assertion_about_mismatch` |
 | `ASSERTION_MUTUAL_EXCLUSION` | `assertions` | `subject`, `property`, `value`, `state` | `mutually_exclusive_active_assertions` |
 | `CHANGE_CONSTRAINT_LINK` | `changes`, `constraints`, `commitments`, `deliverables` | `constraint`, `relation`, `target.type/id` | `missing_constraint_link` / `invalid_change_relation` / `missing_change_target` / `invalid_change_target` |
-| `ALL_IMPROVEMENT_ASSUMPTION` | `changes` | `relations`, `assumption`, `verification_condition`, `approval_basis` | `all_improvement_without_verification` / `approval_basis_before_verification` |
+| `ALL_IMPROVEMENT_ASSUMPTION` | `changes` | `relations`, `assumption`, `verification_condition`, `approval_basis` | `all_improvement_without_verification` / `approval_basis_before_verification` / `assumption_unclosed` |
 | `ROLE_MINIMAL_COMPLETENESS` | `actors`, `commitments` | `accountable_by`, `responsible_by`, `role_merge_declaration` | `missing_accountable` / `multiple_accountable` / `unknown_accountable` / `accountable_not_human` / `missing_responsible` / `missing_role_merge_declaration` |
-| `AI_AUTONOMY_DELEGATION_AUDITABLE` | `actors`, `autonomy_grants`, `assertions` | `delegated_from`、`accountable`、`covers`, `kind`, `verification_condition` | `delegation_chain_not_accountable` / `assertion_incomplete` / `assumption_unclosed` |
+| `AI_AUTONOMY_DELEGATION_AUDITABLE` | `actors`, `autonomy_grants`, `assertions` | `delegated_from` 路径（第 1.10 条）、`accountable`、`covers`, `kind`, `verification_condition` | `delegation_chain_not_accountable` / `assertion_incomplete` / `assumption_unclosed` / `invalid_path` / `dangling_reference` |
 | `PROJECT_CHARTER_EXISTENCE` | `projects`, `charters` | `stage`, `project`, 四项声明 | `missing_charter` / `incomplete_charter` |
 | `CLOSURE_ACCEPTANCE_LINK` | `deliverables` | 内嵌 `assertions[].statement/accountable_confirmation` | `missing_acceptance_assertion` |
 | `PROCUREMENT_CONTRACT_ANCHOR` | `commitments`, `contracts` | `procurement`, `contract`, 四项声明 | `missing_contract` / `incomplete_contract` |
@@ -84,14 +84,14 @@
 | `DELIVERABLE_ASSERTION_LINK` | `deliverables[].asserted_by → assertions[].id` ∪ `assertions[].about → deliverables[].id` | 存在 | 正向边与反向 `about` 任一成立即可（D5） |
 | `DELIVERABLE_ASSERTION_LINK` | `assertions[].about → deliverables[].id` | 全称（每条被引用断言） | 断言内容的相关性锚点（D6） |
 | `CHANGE_CONSTRAINT_LINK` | `changes[].target.type ∈ {Commitment, Deliverable}` 且 `target.id` 解析到对应集合 | 全称 | 变更对象的类型谓词（D7） |
-| `AI_AUTONOMY_DELEGATION_AUDITABLE` | `autonomy_grants[].delegated_from` 路径，`reach: accountable` | 存在一条路径 | 路径表示见第 1.10 条 |
+| `AI_AUTONOMY_DELEGATION_AUDITABLE` | `autonomy_grants[].delegated_from` 路径（`start` → `steps[].target_id` → … → `reach: accountable`） | 存在一条路径 | 路径对象见第 1.10 条；每步 `target_id` 必须解析到 `actors[].id` |
 
 ## 4. 枚举
 
 | 枚举 | 值 |
 |---|---|
 | `process_group` | `pre-project`、`overseeing`、`directing`、`initiating`、`controlling`、`managing-delivery`、`closing`、`post-project` |
-| `subject_group` | ISO 21502:2020 第 7 章的 17 项管理实践；当前原型只物化样例用到的 `planning`、`lessons-learned`，其余值须在 `subject_group_extension[].value` 中声明 |
+| `subject_group` | `planning`（7.2）、`benefits-management`（7.3）、`scope-management`（7.4）、`resources-management`（7.5）、`schedule-management`（7.6）、`cost-management`（7.7）、`risk-management`（7.8）、`issues-management`（7.9）、`change-control`（7.10）、`quality-management`（7.11）、`stakeholder-engagement`（7.12）、`communication-management`（7.13）、`organizational-and-societal-change`（7.14）、`reporting`（7.15）、`information-and-documentation-management`（7.16）、`procurement`（7.17）、`lessons-learned`（7.18） |
 | `relation` | `mitigates`、`exacerbates`、`trades_off` |
 | `statement_kind` | `what`、`state`、`condition`（对应“是什么 / 处于什么状态 / 满足什么条件”） |
 | `assertion_kind` | `fact`、`assumption`、`decision` |
@@ -102,7 +102,7 @@
 | 不可裁剪规则 | `G-A1`、`G-A2`、`G-C1`、`G-D1`、`G-E1` |
 | 验收/移交陈述 | `acceptance_statement`：`已验收`、`已移交` |
 
-`subject_group` 的 17 项完整枚举依赖来源正文；原型只保证“样例值 + 契约扩展”两条路径，不宣称覆盖全部合法值。
+`subject_group` 的 17 项已完整物化，取值来源为 ISO 21502:2020 第 7 章 7.2–7.18（本地副本印刷页 26–45）。原型直接以这 17 项为封闭集；`subject_group_extension` 只用于领域特化（`specializes` / `cross_cuts`），不再是“补全基础枚举”的通道。
 
 ## 5. 表示层覆盖状态（ADR-0013 后）
 

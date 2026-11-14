@@ -1,7 +1,7 @@
 # ADR-0013: 判定层表示规范——以一次裁定收口语义、表达能力与三表对照
 
-- **状态**：`accepted`（2026-11-14 裁定；本文件的决定立即生效）
-- **日期**：2026-11-14（草案 2026-11-14，同一次裁定内扩范围并定稿）
+- **状态**：`proposed`（2026-11-14 修订中；上一轮 `accepted` 裁定已被非同源复核重跑推翻，见第 8 节）
+- **日期**：2026-11-14（草案 2026-11-14；同日首次裁定后因复核推翻回到修订）
 - **决策者**：架构负责人（按用户批准执行）；人类责任方已批准
 - **serves_charter**：C3（来源封闭、可追溯）、C6（可机械检查、可审计）的维护条件
 - **grounding_refs**：无（决策针对判定层表示，不依赖来源条目）
@@ -33,18 +33,18 @@
 |---|---|---|
 | P2 | 判定列只允许引用 schema 第 4 节的**具名枚举**；不得出现自然语言值。枚举集合由三表检查器校验闭合。 | `spec/CHECKER_INPUT_SCHEMA.md` 第 1.8、4 节；`scripts/check_three_table.py` 规则 5 |
 | P3 | 跨对象条件必须落为**关系路径**，量词显式：顶层域默认全称、引用必须全部解析、“存在一个”用集合非空表达。 | schema 第 1.6、1.7、3bis 节 |
-| P4 | 引用完整性采用**全局统一策略**：目标 `id` 不存在 → `fail` / `dangling_reference`；目标类型未在 schema 定义 → `cannot_evaluate` / `undefined_object_type`。所有 `check_id` 同一口径。 | schema 第 1.5 节；原型 `check_*` |
-| P5 | `assumption` 表示为对象 `{verification_condition, status, verified_at, expires_at, approved_by, approval_basis}`；`expired` 或待验证且缺批准者 → `cannot_evaluate` / `assumption_unclosed`；未满足验证条件的变更不得出现在 `approval_basis` 中。 | schema 第 1.9、2 节；`ALL_IMPROVEMENT_ASSUMPTION`、`AI_AUTONOMY_DELEGATION_AUDITABLE` |
-| P6 | 链式条件用路径表示 `{start, steps[], reach}`，判定列写路径表达式；不再使用“终至”“链上有”等自然语言。 | schema 第 1.10、3bis 节；G-E2 |
+| P4 | 引用完整性采用**全局统一策略**：目标 `id` 不存在 → `fail` / `dangling_reference`；目标类型未在 schema 定义 → `cannot_evaluate` / `undefined_object_type`。所有 `check_id` 同一口径，由原型在进入各 `check` 前统一执行，不再只在 G-C1/G-E2 局部实现。 | schema 第 1.5 节；原型 `validate_references()` |
+| P5 | `assumption` 表示为对象 `{verification_condition, status, verified_at, expires_at, approved_by, approval_basis}`；`expired`、或 `pending` 且缺 `approved_by` → `cannot_evaluate` / `assumption_unclosed`；未满足验证条件的变更不得出现在 `approval_basis` 中。 | schema 第 1.9、2 节；`ALL_IMPROVEMENT_ASSUMPTION`、`AI_AUTONOMY_DELEGATION_AUDITABLE` |
+| P6 | 链式条件用路径表示 `{start, steps: [{relation, direction, target_type, target_id}], reach}`，`steps[]` 必须带目标 `id` 才能定位下一节点；判定列写路径表达式，不再使用“终至”“链上有”等自然语言，也不再保留 `delegated_from` 扁平字符串写法。 | schema 第 1.10、3bis 节；G-E2 |
 | P7 | 结论枚举扩为 `{pass, fail, cannot_evaluate, not_applicable}`；适用性状态机 `applicable / inapplicable / pending` 固定映射，`pending` 不得静默转 `applicable`。 | 方法 §4.2、§4.4；原型 `run_case` |
 
 ### 2.2 结构与对照（P1、P8、D0）
 
 | 编号 | 决定 | 实现位置 |
 |---|---|---|
-| P1 | 规则正文的规范性条件拆为 **clause id**（`G-XX#n`），A 表声明每个 `check_id` 覆盖的子句；verdict 由子句聚合（任一 `fail` → `fail`；否则任一 `cannot_evaluate` → `cannot_evaluate`），`severity` 取失败子句最高级，`reason` 取首条失败子句。 | 方法 A.2（39 个子句）；A 表“子句”列 |
+| P1 | 规则正文的规范性条件拆为 **clause id**（`G-XX#n`），A 表“判定（子句 id）”列声明每个 `check_id` 覆盖的子句；verdict 由子句聚合（任一 `fail` → `fail`；否则任一 `cannot_evaluate` → `cannot_evaluate`），`severity` 取失败子句最高级，`reason` 取首条失败子句。 | 方法 A.2（40 个子句）；A 表“判定（子句 id）”列 |
 | D0 | 采纳“子句级覆盖声明”。未覆盖子句必须标 `not-checked` 并写理由，不得留空。 | `scripts/check_three_table.py` 规则 4 |
-| P8 | 三表机械对照作为**交付物**，由 `scripts/check_three_table.py` 承接，见第 3 节。 | 新增脚本 + pre-commit + `check_state.py` |
+| P8 | 三表机械对照作为**交付物**，由 `scripts/check_three_table.py` 承接，见第 3 节。检查深度限定为：结构一致（规则 ↔ `check_id` ↔ schema 输入域）、子句闭合、枚举封闭、判定列不含叙述性短语、G-B1/G-B2 条件归属、原因码定义与映射；**不保证规则正文与子句表的全文语义等价**。 | 新增脚本 + pre-commit + `check_state.py` |
 | G-004 | `G-E1#3`（角色重合声明缺失）子句 severity 为 `warn`，不再与问责结构缺失同按 `block` 判死。 | 方法 A.2；原型 `check_role_minimal` 返回 severity 覆盖 |
 
 ### 2.3 逐点待决项结论（D1–D9）
@@ -54,14 +54,14 @@
 | D1 | **全称 + 全解析**。顶层域每个元素都须满足；引用字段列出的每个目标都须解析；G-A1 的“至少一个 `Commitment`”由集合非空表达，不引入第二种量词写法。 | schema 1.6；G-A1 |
 | D2 | **三态**：缺键/`null` → `cannot_evaluate`；`{}` → 对象存在但字段缺失 → `fail`；`[]` → 空集合按量词（全称真、存在假）。 | schema 1.3 |
 | D3 | **悬空 = `fail`**（引用完整性违规）；**类型未定义 = `cannot_evaluate`**（缺表示能力，不是事实违规）。 | schema 1.5；原型 |
-| D4 | `reason` 保持**单值**，优先级 `cannot_evaluate > fail`，同 verdict 按 A.2 行序取首条；完整子句结果可另行输出 `violations[]`，但不改变 P4 证据七要素。 | schema 1.14；方法 A.2 |
+| D4 | `reason` 保持**单值**；聚合顺序定为 **`fail` > `cannot_evaluate` > `pass`**：任一子句 `fail` 即判 `fail`，不存在 `fail` 时才由 `cannot_evaluate` 决定；同一 verdict 内按 A.2 行序取首条。schema §1.14 与 A.2 统一为本条，删除“`cannot_evaluate` 优先于 `fail`”的旧表述。 | schema 1.14；方法 A.2 |
 | D5 | `about` **构成** G-C1 的出边：见证断言可由 `asserted_by` 正向或 `about` 反向满足；但被引用断言仍须满足内容与相关性。 | schema 3bis；`DELIVERABLE_ASSERTION_LINK` |
 | D6 | G-C1 **纳入**断言内容检查：`statement` 非空、`statement_kind ∈ {what, state, condition}`、`about` 指向该交付物。原样例 A.1.3-2 的“空断言仍 `pass`”期望被推翻。 | 方法 A 表、A.1.3、原型 |
 | D7 | G-D1 **纳入** `target.type ∈ {Commitment, Deliverable}` 且 `target.id` 解析；缺 `target` → `missing_change_target`，越界或解析失败 → `invalid_change_target`。 | schema 3bis、A.1.4、原型 |
 | D8 | G-001 三处未定义判定对象**在 schema 定义**：`management_node_type`（`ManagementActivity` / `ManagementArtifact`）、`approval_basis` 关系、`decision_class` 谓词；不再走 `doc-only`。 | schema 2、4 节 |
 | D9 | G-002、G-003 **纳入**判定列：`G-A1#6`（约束须作用于该 `Outcome` 或 `Commitment`）、`G-E2#3`（自治断言须为 `assumption` 且附验证条件）。 | 方法 A 表、A.1.1、A.1.10 |
 
-**缺口处置**：G-001–G-007 全部以 `check-change`（含 schema 补定义）关闭；G-004 的关闭依据是 A.2 子句 severity；没有一条走 `doc-only` 或 `accepted`。G-001 的三处对象定义属“补 schema 定义”，在同一出口下记录。
+**缺口处置**：上一轮曾把 G-001–G-007 全部以 `check-change` 关闭，并把 P1–P8 合并为 G-008 关闭。该关闭已于 2026-11-14 被非同源复核重跑推翻：**关闭状态全部撤回**，G-001–G-008 回到 `open`，剩余缺陷拆为 G-009–G-017（见 `GAP_LEDGER.md`）。本轮修订不再宣称任何缺口已关闭；关闭必须由非同源复核或人工逐条签收（`AGENTS.md` 3.6.6）。
 
 ## 3. 三表机械对照（P8 交付物）
 
@@ -101,7 +101,7 @@
 - 三表：17 规则 / 17 `check_id` / 39 子句 / 17 输入域一致，退出 0。
 - 原复核的 6 个样例：G-A1、G-C1、G-D1 的判定路径全部改变（新增约束作用边、断言内容与 `about`、`target` 类型），A.1.3-2 与 A.1.4-2 的输入/期望已按新判定更新。
 
-**复核结论是否仍然成立**：原结论中“6/6 与原型一致”在改动后不再有证明力——样例与判定列同批修改，一致性只说明实现跟上了新判定列，不说明判定列忠实于正文。**原报告的两条实质发现（C1 漏内容、D1 漏对象类型）与 8 条设计问题已被本 ADR 全部吸收**，因此“报告成立”的结论成立；但“实现正确”的结论必须由复核会话对新版本重跑后给出。本 ADR 不把同源重验当作独立证据。
+**复核结论是否仍然成立**：**不成立。** 上一轮把“原型 34/34”与“三表检查器退出 0”当作裁定成立的证据，但两者都是同源结果：样例与判定列同批修改，实现与样例互相证明；三表检查器只做结构级对照，不检查语义短语（G-B1 的“值在枚举内”与 A.2 划给 B2 的冲突仍报通过）。非同源复核重跑据此推翻了 `accepted` 状态。本 ADR 不再把任何同源重验当作证据；修订完成后只重跑一次非同源复核，其结论记入 `GAP_LEDGER.md`。
 
 ## 6. 替代方案
 
@@ -111,13 +111,14 @@
 4. **把三表对照留给人工**：拒绝。P8 要求机械承接；人工对照无法在每次提交上执行。
 5. **重划 17 个 `check_id` 的粒度**：拒绝。收益低于推翻 34 个样例与复核基线的成本；改用 clause 聚合。
 
+**三表检查器的深度边界**：`check_three_table.py` 只保证“结构 + 已列举的语义短语规则”一致。它能发现规则未映射、`check_id` 无判定行、子句未闭合、枚举值越界、判定列写叙述、G-B1 越权写枚举、原因码未定义或与子句不一致；它**不能**判断一条子句的自然语言条件是否忠实于规则正文的完整含义。因此绿字不等于语义闭合：语义闭合只能由非同源复核或人工逐条签收确认（`AGENTS.md` 3.6.6）。此前把该脚本退出 0 当作“语义闭合”的证据，正是首轮裁定失效的原因之一。
+
 ## 7. 后果
 
 ### 正面
 
-- 7 条缺口一次关闭，且没有一条靠“接受现状”或“不检查”蒙混。
 - 判定层有了可机械校验的表示规范：枚举封闭、量词显式、路径表示、统一引用完整性、assumption 时效、`not_applicable`。
-- 三表漂移从“只能人工发现”变为“每次提交可发现”。
+- 三表漂移从“只能人工发现”变为“每次提交可发现”（结构级）。
 - M2 的出口从“补齐 17 项”改为“表示层可判定条件”，不再依赖复核进度。
 
 ### 负面
@@ -129,6 +130,31 @@
 
 ### 跟进
 
-- T-133：复核会话对新判定列与 schema 重跑一次；结论写入 `GAP_LEDGER.md` 核查记录。
-- T-100：随 G-004 关闭；角色重合子情形的独立样例由 M2 出口 1 的样例补齐要求承接。
-- ADR-0012：台账机制保留；因 `open=0` 且矩阵 17/17 `consistent`，其撤除条件进入观察期（连续两个发布点）。
+- T-133：修订完成后由复核会话对新判定列与 schema 只重跑一次非同源复核；结论写入 `GAP_LEDGER.md` 核查记录，并作为 G-001–G-017 的关闭依据。
+- T-100：随 G-004 重开，待判定列格式与原因码修正后由非同源复核关闭。
+- ADR-0012：台账机制保留；撤除条件不满足（`open` 不为 0），观察期暂停。
+
+## 8. 修订记录（2026-11-14，非同源复核推翻首轮裁定）
+
+### 8.1 上一轮裁定为什么失效
+
+首轮 `accepted` 建立在两项同源证据上：原型对同批修改的样例通过 34/34；`check_three_table.py` 退出 0。二者都不能证明判定列忠实于规则正文：
+
+1. **样例与实现同源**：样例和判定列在同一提交内修改，原型再按修改后的样例求值，一致性只说明实现跟上了新判定列。
+2. **检查器只做结构对照**：`check_three_table.py` 检查存在性、集合一致与词级定义，不做语义短语检查；G-B1 判定列仍写“值在枚举内”、A.2 又划给 B2，检查器仍报通过。
+3. **P4/P6 未真正落地**：引用完整性只在 C1/E2 局部实现；路径结构缺目标 `id`，且保留 `delegated_from` 扁平字符串，形成双轨。
+4. **P1/P2/P3/P5 只部分解决**：A 表判定列仍有叙述性短语；`subject_group` 只物化 2/17；`assumption.pending` 分支未检查 `approved_by`；17 处 `null` 输入会抛 `TypeError`。
+
+### 8.2 本次修订范围
+
+按用户批准的固定顺序执行，**顺序不得颠倒**：
+
+1. **原型**：必需键取 `null` → `cannot_evaluate`；引用完整性全局生效；`assumption.pending` 检查 `approved_by`。
+2. **schema**：§1.10 路径补 `target_id` 并删除扁平字符串写法；`subject_group` 17 项完整物化；§1.14 与 A.2 的聚合优先级定为 `fail > cannot_evaluate > pass`。
+3. **判定列格式**：A 表“判定”列只留子句 id，叙述下沉 A.2；A.2 增加“原因码”列并定义原因码与子句的映射。
+
+### 8.3 状态与关闭
+
+- 本 ADR 回到 `proposed`；G-001–G-008 重开；新增 G-009–G-017 登记为 `open`。
+- 修订完成后只重跑一次非同源复核；复核结论未到之前，任何缺口不得关闭，也不得以“原型通过”“检查器退出 0”作为关闭依据（`AGENTS.md` 3.6.6）。
+

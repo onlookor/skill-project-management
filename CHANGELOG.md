@@ -473,3 +473,29 @@
   - **复核状态**：本批次只做同源重验（原型 + 三表检查器）；独立复核会话对改动后判定列/schema 的单次非同源重跑仍待执行，结论另记，不冒充已完成。
 - **关联 ADR**：ADR-0013（`accepted`）
 - **状态**：生效
+
+---
+
+### 批次 0034 — 2026-11-14 — 复核推翻后的账务修正、原型/schema/判定列修订与样例追溯性降级
+
+- **涉及文件**：`GAP_LEDGER.md`、`AGENTS.md`、`adr/0013-unified-adjudication-of-check-semantics.md`、`STATE.md`、`spec/CHECKER_INPUT_SCHEMA.md`、`spec/methods/deterministic-checker.md`、`validation/checker-prototype/checker.py`、`scripts/check_gap_ledger.py`、`scripts/check_three_table.py`、`scripts/README.md`、`ROADMAP.md`、`TODO.md`、`knowledge/glossary-usage.json`、`GLOSSARY.md`（生成块）、`CHANGELOG.md`（本批次）
+- **变更摘要**：
+  1. **账务回滚**：G-001–G-008 全部由 `closed` 回到 `open`，核查矩阵由 17/17 `consistent` 降为 0/17，逐行改指缺口编号；新增 G-009–G-017 九条（null 崩溃、引用完整性未全局、`assumption.pending` 缺批准者、路径缺 `target_id` 与扁平双轨、`subject_group` 17 项未物化、聚合优先级矛盾、A 表叙述性短语、A.2 缺原因码列、三表检查器只查结构）。当前 open 17 / closed 0，L1 9 / L2 7 / L3 1，到期 0。
+  2. **关闭判据**：`GAP_LEDGER.md` 新增“关闭判据（硬要求）”，`AGENTS.md` 新增 3.6.6。缺口不得以同源结果（自家原型通过、自家脚本退出 0、同批改样例后自证）关闭；`closed` 必须写“关闭依据”列，且只能取 `非同源复核：<复核者>，<日期>` 或 `人工签收：<签收人>，<日期>`。`check_gap_ledger.py` 校验依据缺失、前缀非法、说明/依据含同源自证措辞；`open` 填依据同样报错。
+  3. **原型**：17 个 check 函数的必需键守卫统一为 `require_fields()`，键缺失或值为 `null` 均返回 `cannot_evaluate/missing_input`；新增 `validate_references()`，在 check 返回 `pass` 时统一校验全局引用（含 `commitments.by/to`、`constraints.constrains`、`changes.target`、`charters.*`、`contracts.constrained_by/accountable_signature`、`tailoring_records.approver`、`assertions.about/deliverable/subject/accountable_confirmation`）；该调用在 pass 分支之后，只能把本应 pass 的结果改为 fail/cannot_evaluate，不推翻既有 fail。`assumption.pending` 分支补 `approved_by` 检查。`delegated_from` 改为路径对象，扁平字符串返回 `invalid_path`。
+  4. **schema**：§1.10 路径补 `steps[].target_id` 并删除扁平字符串写法；`subject_group` 17 项（ISO 21502:2020 7.2–7.18）完整物化；§1.14 与 A.2 统一为 `fail > cannot_evaluate > pass`；§3 补 `assumption_unclosed` / `invalid_path` 等原因码。
+  5. **判定列格式**：A 表改为 `check_id | 规则 | 判定（子句 id） | 输入 | 原因码 | 规则状态`，判定列只留子句 id，叙述下沉 A.2；A.2 增加原因码列（40 条子句），新增 `G-D2#3`（pending 须 `approved_by`）；A 表原因码集合与子句原因码集合机械一致；G-B1 不再写枚举条件。
+  6. **样例追溯性修正**：A.1.11-2、A.1.12-2、A.1.13-2、A.1.15-2 四个样例自 T-107 起一直带悬空引用（章程指向未提供的 Outcome/Constraint/Actor/Assertion；验收确认与契约签署指向未提供的 Actor；契约约束指向未提供的 Constraint；裁剪批准者指向未提供的 Actor）。**只改输入块，4 个样例的期望输出均未变**；依据 schema §1.5（所有引用必须解析到同一快照）。此前的多次“34/34 通过”包含这 4 条未被发现的无效验证，是对既有绿色数字的追溯性降级，不是新缺陷；已记入台账核查记录。`validate_references()` 只在 pass 分支调用、不能推翻既有 fail 是刻意取舍：已有 fail 的样例保留其特定原因码，避免全局校验淹没规则语义。
+  7. **三表检查器深度**：新增判定列叙述性短语检测、G-B1/G-B2 条件归属、原因码定义与 A 表/子句映射一致性检查。文档明确其边界：只保证结构与已列举的语义短语规则，不保证规则正文与子句表的全文语义等价；绿字不等于语义闭合。
+  8. **ADR 与计划**：ADR-0013 由 `accepted` 回到 `proposed`（修订中），新增第 8 节记录首轮裁定失效原因与修订范围；`STATE.md` 加回 `skeleton` 例外。M2 出口改为“结构/枚举/子句/原因码机械一致 + 原型重跑 + 非同源复核关闭缺口”，同源结果明确不构成出口。T-100、T-130、T-131、T-134–T-136 由 `done` 回到 `in-progress`，T-133 描述更新。
+- **钩子绕过**：无。
+- **验证**：
+  - `python3 validation/checker-prototype/checker.py`：34/34 样例通过，17/17 `check_id` 通过。
+  - `python3 validation/checker-prototype/checker.py --null-sweep`：31/31 键级用例返回 `cannot_evaluate`，崩溃 0（覆盖 17 个 check 函数）。
+  - 全局引用负例：G-F1 章程 `outcomes` 指向 `O-999` → `fail/dangling_reference`；改回 `O-1` → `pass`。路径负例：合法路径对象 → `pass`；扁平字符串 → `cannot_evaluate/invalid_path`；`target_id` 悬空 → `fail/dangling_reference`。`assumption.pending` 无批准者 → `cannot_evaluate/assumption_unclosed`，补 `approved_by` → `pass`。
+  - `python3 scripts/check_three_table.py`：正文 17 条规则、判定列 17 个 `check_id` / 40 个子句、schema 17 个输入域；退出 0。负例：G-B1 子句写“值在枚举内”、A 表判定列写叙述性短语、原因码改为未定义值，三种均退出 1。
+  - `python3 scripts/check_gap_ledger.py`：17 条（open 17 / closed 0），到期 0，矩阵 0/17；退出 0。负例：G-009 以“非同源复核：复核会话R，2026-11-14”关闭 → 退出 0；以“自家原型通过，退出 0”关闭 → 退出 1；`closed` 但关闭依据为空 → 退出 1。
+  - 七个检查器均退出 0（`check_state.py` 在开发态只对“HEAD 领先 tag”告警）。
+  - **复核状态**：本批次未执行非同源复核；G-001–G-017 全部保持 `open`，不以本轮同源结果关闭。待复核会话对修订后版本单次重跑，结论记入 `GAP_LEDGER.md` 后再行关闭。
+- **关联 ADR**：ADR-0013（`proposed`，修订中）
+- **状态**：生效（修订中；缺口未关闭）

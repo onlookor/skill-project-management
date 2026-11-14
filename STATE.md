@@ -37,4 +37,5 @@
 | 文件 | 状态 | 说明 |
 |---|---|---|
 | `adr/ADR-TEMPLATE.md` | `template` | 模板，不承载已接受的决策 |
+| `adr/0013-unified-adjudication-of-check-semantics.md` | `skeleton` | 文件内状态为 `proposed`（修订中），尚未重新接受 |
 | `knowledge/methods/registry-skeleton.md` | `skeleton` | 方法注册表骨架，条目待填充 |

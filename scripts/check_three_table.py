@@ -74,19 +74,21 @@ def parse_method(text: str):
         first = cells[0]
         check_match = CHECK_RE.match(first)
         rule_match = CLAUSE_RE.match(first)
-        if check_match and len(cells) >= 5 and re.fullmatch(r"G-[A-G]\d", cells[1]):
+        if check_match and len(cells) == 6 and re.fullmatch(r"G-[A-G]\d", cells[1]):
             checks[check_match.group(1)] = {
                 "rule": cells[1],
                 "clauses": cells[2],
-                "verdict": cells[4],
+                "reason": cells[4],
+                "status": cells[5],
             }
-        elif rule_match and len(cells) == 6:
+        elif rule_match and len(cells) == 7:
             clauses[rule_match.group(1)] = {
                 "rule": cells[1],
                 "clause": cells[2],
-                "check": cells[3].strip("`"),
-                "severity": cells[4],
-                "status": cells[5],
+                "reason": cells[3],
+                "check": cells[4].strip("`"),
+                "severity": cells[5],
+                "status": cells[6],
             }
     return checks, clauses
 
@@ -127,6 +129,22 @@ def parse_schema(text: str):
     return checks, vocab, enums
 
 
+def parse_reason_codes(text: str) -> set[str]:
+    """Schema 第 3 节“失败原因码”列 + 第 1.5/1.9/1.10 条定义的全局原因码。"""
+    reasons: set[str] = {
+        "dangling_reference",
+        "undefined_object_type",
+        "missing_input",
+        "assumption_unclosed",
+        "invalid_path",
+    }
+    for line in text.splitlines():
+        cells = split_row(line)
+        if cells and len(cells) >= 4 and CHECK_RE.match(cells[0]):
+            reasons |= set(re.findall(r"[a-z][a-z0-9_]+", cells[3]))
+    return reasons
+
+
 def parse_glossary(text: str) -> set[str]:
     """术语表中的机制术语也是合法判定对象（见 knowledge/anchored-entries.jsonl）。"""
     terms = set(re.findall(r"\*\*T-[A-F]-\d{3}\s+([^*]+?)\*\*", text))
@@ -151,6 +169,7 @@ def main() -> int:
     rules = parse_grammar(grammar_text)
     checks, clauses = parse_method(method_text)
     schema_checks, vocab, enums = parse_schema(schema_text)
+    reason_codes = parse_reason_codes(schema_text)
     vocab |= parse_glossary(glossary_text)
     if not rules or not checks or not clauses or not schema_checks:
         print("[错误] 三表解析结果为空，结构无法解析。")
@@ -177,34 +196,63 @@ def main() -> int:
             if term not in vocab:
                 errors.append(f"[错误] 规则 {rule} 使用机制术语 `{term}`，输入 schema 未定义")
 
-    # 4. 子句闭合
-    referenced: set[str] = set()
+    # 4. 子句闭合 + 判定列语义格式 + 原因码映射
+    referenced: dict[str, str] = {}
     for check_id, item in checks.items():
         declared = expand_clauses(item["clauses"])
         if not declared:
-            errors.append(f"[错误] {check_id} 的“子句”列没有 clause id")
+            errors.append(f"[错误] {check_id} 的“判定（子句 id）”列没有 clause id")
+        # 判定列只允许子句 id；出现任何叙述性文字即报错（G-B1 的“值在枚举内”属于此类）。
+        residual = CLAUSE_RANGE_RE.sub("", item["clauses"])
+        residual = CLAUSE_ID_RE.sub("", residual)
+        residual = re.sub(r"[`\s–\-—、,，]", "", residual)
+        if residual:
+            errors.append(
+                f"[错误] {check_id} 的判定列含叙述性短语 `{residual}`；"
+                "判定列只能写子句 id，叙述下沉 A.2"
+            )
+        listed_reasons = set(re.findall(r"[a-z][a-z0-9_]+", item["reason"]))
+        clause_reasons: set[str] = set()
         for clause in declared:
             if clause not in clauses:
                 errors.append(f"[错误] {check_id} 引用了 A.2 中不存在的子句 {clause}")
-            referenced.add(clause)
+                continue
+            if clauses[clause]["check"] != check_id:
+                errors.append(
+                    f"[错误] 子句 {clause} 的承接 check_id 为 "
+                    f"{clauses[clause]['check']}，但被 {check_id} 引用"
+                )
+            referenced.setdefault(clause, check_id)
+            clause_reason = set(re.findall(r"[a-z][a-z0-9_]+", clauses[clause]["reason"]))
+            if not clause_reason:
+                errors.append(f"[错误] 子句 {clause} 没有原因码")
+            for code in sorted(clause_reason):
+                if code not in reason_codes:
+                    errors.append(f"[错误] 子句 {clause} 的原因码 `{code}` 未在 schema 定义")
+            clause_reasons |= clause_reason
+        if listed_reasons != clause_reasons:
+            errors.append(
+                f"[错误] {check_id} 的 A 表原因码与其子句原因码不一致："
+                f"A 表 {sorted(listed_reasons)}，子句 {sorted(clause_reasons)}"
+            )
     for clause, item in clauses.items():
         if item["status"].startswith("not-checked"):
             if "理由" not in item["clause"] and len(item["clause"]) < 8:
                 errors.append(f"[错误] 子句 {clause} 标为 not-checked 但未写理由")
             continue
         if clause not in referenced:
-            errors.append(f"[错误] 子句 {clause} 未被任何 check_id 的“子句”列引用")
+            errors.append(f"[错误] 子句 {clause} 未被任何 check_id 的判定列引用")
+        # 语义短语检查：B1 只判标签存在，值是否在枚举内归 B2。
+        if item["rule"] == "G-B1" and "枚举" in item["clause"]:
+            errors.append(f"[错误] 子句 {clause}（G-B1）写了枚举条件；枚举归属 G-B2")
+        if clause == "G-B2#1" and "枚举" not in item["clause"]:
+            errors.append("[错误] G-B2#1 未写枚举条件；值闭合必须由 B2 承接")
 
-    # 5. 枚举封闭（只检查全小写集合；规则号集合跳过）
-    for check_id, item in checks.items():
-        for group in re.findall(r"\{([^{}]+)\}", item["verdict"]):
-            values = [value.strip().strip("`") for value in group.split(",")]
-            if all(re.fullmatch(r"[a-z][a-z0-9\-]*", value) for value in values):
-                for value in values:
-                    if value not in enums:
-                        errors.append(
-                            f"[错误] {check_id} 的判定列使用未封闭枚举值 `{value}`"
-                        )
+    # 5. 枚举封闭（A 表不再承载枚举值，跳过叙述性判定列；保留 schema §4 闭合核对）
+    if enums:
+        for check_id in checks:
+            if check_id not in schema_checks:
+                errors.append(f"[错误] {check_id} 在 schema 第 4 节没有枚举定义入口")
 
     print(
         f"三表对照：正文 {len(rules)} 条规则，判定列 {len(checks)} 个 check_id / "

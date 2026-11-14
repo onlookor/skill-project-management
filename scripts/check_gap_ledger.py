@@ -16,9 +16,26 @@ METHOD = "spec/methods/deterministic-checker.md"
 TODO = "TODO.md"
 
 LEVEL_MAX = {"L1": 1, "L2": 2, "L3": 2}
-CAUSES = {"undefined-object", "rule-stricter", "severity-mismatch"}
+CAUSES = {
+    "undefined-object",
+    "rule-stricter",
+    "severity-mismatch",
+    "representation-defect",
+    "implementation-defect",
+}
 STATUSES = {"open", "closed"}
 RESOLUTIONS = {"rule-change", "check-change", "doc-only", "accepted"}
+CLOSURE_PREFIXES = ("非同源复核：", "人工签收：")
+SAME_SOURCE_MARKERS = (
+    "同源自查",
+    "同源运行",
+    "自家原型",
+    "自家脚本",
+    "样例与实现同源",
+    "自查通过",
+    "退出 0 即",
+    "原型通过即",
+)
 
 MILESTONE_RE = re.compile(r"^M([0-7])$")
 GAP_ID_RE = re.compile(r"^G-\d{3}$")
@@ -61,7 +78,7 @@ def parse_ledger(text: str):
         first = cells[0].strip("`")
         if first in ("编号", "check_id"):
             continue
-        if len(cells) == 11 and GAP_ID_RE.match(first):
+        if len(cells) == 12 and GAP_ID_RE.match(first):
             gaps[first] = {
                 "status": cells[1],
                 "cause": cells[2],
@@ -73,6 +90,7 @@ def parse_ledger(text: str):
                 "resolution": cells[8],
                 "todo": cells[9],
                 "description": cells[10],
+                "closure": cells[11],
             }
         elif len(cells) == 4 and re.fullmatch(r"[A-Z_]+", first):
             audit[first] = {"conclusion": cells[2], "reviewed": cells[3]}
@@ -167,8 +185,28 @@ def main() -> int:
                 errors.append(f"[错误] {gap_id} 选择 accepted 但说明未写“理由：”")
             if gap["resolution"] == "doc-only" and "不检查" not in gap["description"]:
                 errors.append(f"[错误] {gap_id} 选择 doc-only 但说明未注明“不检查”")
+            # 关闭依据必须是非同源复核或人工签收；同源自证一律拒绝。
+            closure = gap["closure"]
+            if not closure:
+                errors.append(
+                    f"[错误] {gap_id} 已关闭但“关闭依据”为空；"
+                    "必须有非同源复核或人工签收（AGENTS.md 3.6.6）"
+                )
+            elif not closure.startswith(CLOSURE_PREFIXES):
+                errors.append(
+                    f"[错误] {gap_id} 的关闭依据 `{closure}` 不是"
+                    "“非同源复核：”或“人工签收：”；同源运行结果不得关闭缺口"
+                )
+            for marker in SAME_SOURCE_MARKERS:
+                if marker in closure or marker in gap["description"]:
+                    errors.append(
+                        f"[错误] {gap_id} 的关闭依据或说明出现同源自证措辞 `{marker}`；"
+                        "同源运行结果不得关闭缺口"
+                    )
         elif gap["resolution"]:
             errors.append(f"[错误] {gap_id} 仍为 open，但已填写处置出口")
+        elif gap["closure"]:
+            errors.append(f"[错误] {gap_id} 仍为 open，但已填写关闭依据")
 
         for token in re.findall(r"T-\d{3}", gap["todo"]):
             if not re.search(rf"\|\s*{token}\s*\|", todo_text):
