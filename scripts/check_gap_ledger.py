@@ -174,8 +174,10 @@ def main() -> int:
             if not re.search(rf"\|\s*{token}\s*\|", todo_text):
                 errors.append(f"[错误] {gap_id} 关联的 {token} 不存在于 TODO.md")
 
-    for gap_id in gaps:
-        if gap_id not in referenced:
+    for gap_id, gap in gaps.items():
+        # 只有 open 缺口必须被核查矩阵锚定；closed 缺口已记录处置出口，
+        # 再强制锚定会使其永远无法让矩阵达到 17/17 consistent（撤除条件）。
+        if gap["status"] == "open" and gap_id not in referenced:
             errors.append(f"[错误] {gap_id} 未被任何影响面或核查矩阵引用")
 
     tracked_todo = set()

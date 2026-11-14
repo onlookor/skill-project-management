@@ -448,3 +448,28 @@
 - **验证**：五个检查器均退出 0；`check_gap_ledger.py` 仍为 7 条 `open`、L1 4 / L2 2 / L3 1、到期 0、矩阵 10/17 `consistent`；原型仍 34/34（本轮未触碰冻结文件）。
 - **关联 ADR**：ADR-0013（本批次创建，状态 `draft`）
 - **状态**：生效（ADR 草案登记；裁定未生效，判定列与样例未改）
+
+---
+
+### 批次 0033 — 2026-11-14 — ADR-0013 最终裁定：判定层表示规范收口、三表机械对照与术语治理
+
+- **涉及文件**：`adr/0013-unified-adjudication-of-check-semantics.md`（`draft` → `accepted`）、`spec/CHECKER_INPUT_SCHEMA.md`（整篇重写）、`spec/methods/deterministic-checker.md`（A 表子句列、A.2 子句表、§4.2/§4.4、样例）、`validation/checker-prototype/checker.py`、新增 `scripts/check_three_table.py`、新增 `scripts/check_glossary_usage.py`、新增 `knowledge/glossary-usage.json`、`GLOSSARY.md`（新增第 4 节生成块）、`GAP_LEDGER.md`、`TODO.md`、`ROADMAP.md`、`AGENTS.md`、`STATE.md`、`.githooks/pre-commit`、`scripts/README.md`、`scripts/check_state.py`、`scripts/check_gap_ledger.py`、`CHANGELOG.md`（本批次）
+- **变更摘要**：
+  1. **ADR-0013 一次性裁定**：范围从“补判定列语义”扩为“判定层表示规范”，D0–D9 与独立复核报出的八条上层设计问题（P1–P8）在同一次裁定中出结论，不分批改冻结文件、不重复跑复核。
+  2. **八条问题的处置**：P1 子句被压缩 → A 表新增“子句”列 + A.2 子句表（39 条）；P2 未封闭枚举与自然语言值 → schema 第 4 节具名枚举；P3 跨对象全称/相关性 → schema §1.6–1.7 与 §3bis 关系路径；P4 引用完整性全局统一 → schema §1.5（悬空 `fail` / 类型未定义 `cannot_evaluate`）；P5 assumption 时效与批准资格 → schema §1.9 `assumption` 对象；P6 链/路径/可达性 → schema §1.10；P7 适用性状态机与 `not_applicable` → 方法 §4.4 + schema 第 4 节；P8 三表无机械对照 → `scripts/check_three_table.py`。
+  3. **三表机械对照作为交付物**：检查器覆盖“正文 ↔ 判定列”“判定列 ↔ schema”“正文 ↔ schema”三对关系，并核对子句闭合与枚举封闭；pre-commit 与 `check_state.py` 双重调用，退出 1 即阻断提交与发布。不接受“后续人工对照”。
+  4. **判定列与 schema 同步**：A.2 子句表给出子句级 severity（`G-E1#3` 为 `warn`，关闭 G-004）；样例 A.1.1 / A.1.3–A.1.5 / A.1.10 按新表示补齐 `about`、`statement_kind`、`target`、`kind`、`verification_condition`；原型实现相应子句并在 `COVERAGE_GAPS` 为空时输出“无（ADR-0013 已消解全部 5 项）”。
+  5. **缺口关闭**：G-001–G-007 全部以 `check-change` 关闭；八条设计问题合并登记为 G-008（`undefined-object`，L2，M1）并关闭。核查矩阵 17/17 `consistent`，到期 0。`check_gap_ledger.py` 的锚定规则修正为“只有 `open` 缺口必须被矩阵引用”——`closed` 缺口已记录处置出口，继续强制锚定会让矩阵永远无法达到撤除条件。
+  6. **M2 重定位为“表示层收口”**：17 项复核结论作为输入；出口改为三表对照通过、子句覆盖 100%、表示规范有载体、原型重跑通过、同源缺口零新增；“补齐 17 项”与“独立复核完成”从出口移除，T-133 的非同源重跑保留为验证输入而非关闭门。
+  7. **术语纳入治理**：`AGENTS.md` 新增 5bis.1，要求每次提交前扫描本次改动并判断术语新增/修改/废弃（新概念必须登记、改义必须同步、废弃标注而不删）。`check_glossary_usage.py` 以“生成 + 冻结基线 + 变更时校验”实现：扫描 `git ls-files` 的 Markdown / JSONL，匹配行内代码、`GLOSSARY.md#term_id` 与裸 `term_id`（裸术语正文不匹配），生成 `knowledge/glossary-usage.json` 与 `GLOSSARY.md` 第 4 节位置表；陈旧位置、行号越界、生成块手改、术语集合漂移均退出 1。与缺口台账分工明确：台账管“正文 ↔ 判定列”的语义裁定，本检查器管“术语条目 ↔ 仓库引用”的引用完整性。
+  8. **发布阻断接入**：pre-commit 由五个检查器扩为七个，`check_state.py` 调用三表对照与术语使用位置核查。
+- **钩子绕过**：无。
+- **验证**：
+  - `python3 validation/checker-prototype/checker.py`：34/34 样例通过（100.0%），17/17 个 `check_id` 全通过，`COVERAGE_GAPS` 为空。
+  - `python3 scripts/check_three_table.py`：正文 17 条规则、判定列 17 个 `check_id` / 39 个子句、schema 17 个输入域；退出 0。
+  - `python3 scripts/check_gap_ledger.py`：8 条（open 0 / closed 8）；L1 4 / L2 3 / L3 1；到期 0；矩阵 17/17 `consistent`；退出 0。
+  - `python3 scripts/check_glossary_usage.py`：82 条术语、800 余个使用位置、39 个零使用警告；退出 0。负例（基线行号改为越界值、手改生成块、删除位置）均退出 1，恢复后退出 0。
+  - 七个检查器均退出 0（`check_state.py` 在开发态只对“HEAD 领先 tag”告警）。
+  - **复核状态**：本批次只做同源重验（原型 + 三表检查器）；独立复核会话对改动后判定列/schema 的单次非同源重跑仍待执行，结论另记，不冒充已完成。
+- **关联 ADR**：ADR-0013（`accepted`）
+- **状态**：生效

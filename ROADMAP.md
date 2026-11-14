@@ -19,7 +19,7 @@
 | D1 | 检查可执行 | 至少 5 个 `check_id` 有可运行实现，输出 `pass` / `fail` / `cannot_evaluate`，附输入快照标识与 `rule_status`；同一输入重复运行结论一致 |
 | D2 | 反例可判 | 每个 `active` 或 `block` 的 `check_id` 至少有 1 个应通过用例与 1 个应失败用例；用例矩阵按预期 100% 命中 |
 | D3 | 来源可追溯 | `SOURCE_LEDGER.md` 每个 active 条目的 `compilation_landing` 均真实存在；无悬空 `pending:T-xxx`；未取得正文的外部阻塞项有显式状态与处置规则 |
-| D4 | 调度一致 | `ROADMAP.md`、`TODO.md`、`STATE.md`、`CHANGELOG.md` 的权威划分写入 `AGENTS.md`；五个检查器通过；`manifest.json` 与最新 annotated tag 一致 |
+| D4 | 调度一致 | `ROADMAP.md`、`TODO.md`、`STATE.md`、`CHANGELOG.md` 的权威划分写入 `AGENTS.md`；七个检查器通过；`manifest.json` 与最新 annotated tag 一致 |
 | D5 | 可发布 | 打出至少一个发布点，其提交同时满足：全部检查器通过、`CHANGELOG.md` 有对应批次、`manifest.json` 与 tag 一致 |
 
 **v1.0.0 的额外门槛**：无 `pending_reanchor` 规则；无悬空来源落点；D2 的用例矩阵覆盖全部 17 个 `check_id`；治理四文档口径一致。
@@ -55,19 +55,21 @@
   3. 同一输入快照连续运行两次，结论与证据一致；回放记录的存放位置与比对方法已定义（T-103）。
   4. `ROLE_MINIMAL_COMPLETENESS` 的 warn/block 拆分有 ADR，且用例分别覆盖“问责结构缺失”与“角色合并声明缺失”（T-100）。
   5. 退化路径（`runtime: deterministic-checker/human-fallback`）有运行记录，P1–P6 逐条给出满足或不可满足的结论（T-081）。
-  6. `python3 scripts/check_gap_ledger.py` 退出 0：核查矩阵覆盖 17/17 个 `check_id`（12 个 `consistent`，5 个指向已登记缺口）；L1 级缺口（G-004）在里程碑推进到 M2 前裁定或显式降级（`AGENTS.md` 3.6）。
+  6. `python3 scripts/check_gap_ledger.py` 退出 0：核查矩阵覆盖 17/17 个 `check_id`；L1 级缺口在里程碑推进到 M2 前裁定或显式降级（`AGENTS.md` 3.6）。ADR-0013 已把 L1 缺口全部裁定，M1 出口 6 的缺口侧条件已满足，M1 关闭仍取决于其余出口。
 - **依赖**：M0（已关闭 2026-11-13）。**并行**：无（关键路径）。
 
-### M2 反例库覆盖
+### M2 表示层收口
 
-- **目标**：让每条规则都有“应当通过”和“应当失败”的可执行证据。
-- **工作项**：T-080、T-101、T-133、T-134、T-135、T-136。
+- **目标**：把判定层从“一规则一句”的松散表述收口为**可机械对照的表示规范**——正文、判定列、输入 schema 三表同构；子句级覆盖、枚举封闭、量词与跨对象相关性、引用完整性、assumption 时效、路径可达、适用性状态机均有明确载体。
+- **输入**：独立复核 T-133 已完成的 3/17 比对结论（6/6 判定一致）、G-005–G-007，以及复核报出的八条表示层问题（P1–P8）；全部作为 ADR-0013 的裁定输入，不再逐条另走裁定。
+- **工作项**：T-080、T-101、T-133（T-134–T-136 已由 ADR-0013 关闭，见 `TODO.md`）。
 - **出口条件**：
-  1. 17 个 `check_id` 每个至少 1 个通过用例与 1 个失败用例；`cannot_evaluate` 另有缺失输入用例。
-  2. 用例矩阵逐条运行，预期命中率 100%；未覆盖规则清单为空。
-  3. 用例文件命名与 `validation/test-cases/` 的既有约定一致，且每份用例写明输入、预期结论、依据规则。
-  4. 独立复核完成（T-133）：由非同源实现或人工逐条比对规则正文，对全部 17 个 `check_id` 给出独立结论并记录差异；原型自证结果不得作为关闭证据。已覆盖 G-A1 / G-C1 / G-D1（3/17），剩余 14 项仍未复核，故本出口未满足。
-  5. “判定列语义与表达能力补全”类缺口由**一次** ADR-0013 裁定（范围：G-001、G-002、G-003、G-005、G-006、G-007，以及复核新增且命中三项判据的条目）；该 ADR 在 M2 关闭前由 `draft` 转 `accepted`，或对未纳入项显式降级，且 `python3 scripts/check_gap_ledger.py` 退出 0、无到期未裁定条目。ADR-0013 的裁定门是出口 4 全部完成。
+  1. `python3 scripts/check_three_table.py` 退出 0：覆盖“正文 ↔ 判定列”“判定列 ↔ schema”“正文 ↔ schema”三对关系，且子句闭合（A.2 每条子句有承接 `check_id` 或标 `not-checked` 并写理由）与枚举封闭（判定列枚举 ⊆ schema 第 4 节）同时成立。
+  2. 判定列子句覆盖 100%：A.2 子句表中不存在既无承接 `check_id` 又无 `not-checked` 理由的行（由出口 1 自动核对）。
+  3. 表示规范在 schema 有载体：三态空值、量词、关系路径、值域封闭、引用完整性、assumption 时效、路径可达、适用性状态机、四值结论均有对应条款（由出口 1 的“判定列 → schema”与“正文 → schema”机械核对）。
+  4. 原型对改动后的判定列重跑：`python3 validation/checker-prototype/checker.py` 输出 34/34 样例、17/17 `check_id`，`COVERAGE_GAPS` 为空。
+  5. 同源缺口零新增：`python3 scripts/check_gap_ledger.py` 退出 0（`open=0`、到期 0、核查矩阵 17/17 `consistent`），且自 ADR-0013 `accepted` 起没有新增 `rule-stricter` / `undefined-object` / `severity-mismatch` 缺口。
+- **不构成出口的项**：T-133 对改动后版本的独立重跑是验证输入，不是关闭门；其差异若成立，按出口 5 判定是否构成新缺口。
 - **依赖**：M1。**并行**：无（关键路径）。
 
 ### M3 本体定义
@@ -155,7 +157,7 @@ M0 ─→ M1 ─→ M2 ──────────────→ M7 ─→ v
 |---|---|---|
 | M0 | T-111、T-116、T-127、T-128（T-110 已完成，批次 0021） | 出口 1–5 |
 | M1 | T-011、T-041、T-042、T-100、T-103、T-107、T-081、T-130、T-131 | 出口 1–6 |
-| M2 | T-080、T-101、T-133、T-134、T-135、T-136 | 出口 1–5 |
+| M2 | T-080、T-101、T-133 | 出口 1–5 |
 | M3 | T-126、T-132 | 出口 1–5 |
 | M4 | T-001、T-002、T-003、T-004、T-005、T-006、T-007、T-008、T-052、T-094、T-106、T-112、T-115、T-119、T-121、T-123、T-125 | 出口 1–5 |
 | M5 | T-010、T-012、T-013、T-030、T-031、T-104、T-105、T-118 | 出口 1–5 |
@@ -213,12 +215,12 @@ M0 ─→ M1 ─→ M2 ──────────────→ M7 ─→ v
 |---|---|---|
 | `v0.5.0` | M0 出口 | 状态签注一致、`source_commit` 落地、发布一致性可核对 |
 | `v0.5.1` | M0 关闭 | 开发态豁免、pre-commit 四检查器、M0 收口（patch） |
-| `v0.6.0` | M2 出口 | 可执行检查器与 17 个检查项的正反用例 |
+| `v0.6.0` | M2 出口 | 判定层表示收口：三表机械对照、子句覆盖与同源缺口零新增 |
 | `v0.7.0` | M4 出口 | 来源收口与本体接地对照结论 |
 | `v0.8.0` | M6 出口 | 方法条目、术语同步与召回率阈值 |
 | `v1.0.0` | M7 出口 | 全部检查可执行、来源无悬空、治理口径一致 |
 
-每次发布必须同时满足：五个检查器为 0、`CHANGELOG.md` 有对应批次、`manifest.json` 的 `package_version` 与 `release_tag` 和 tag 一致（由 `scripts/check_state.py` 核对）。缺口台账核查（`scripts/check_gap_ledger.py`）的到期未裁定项由 `check_state.py` 转为错误，因此发布前必然暴露。
+每次发布必须同时满足：七个检查器为 0、`CHANGELOG.md` 有对应批次、`manifest.json` 的 `package_version` 与 `release_tag` 和 tag 一致（由 `scripts/check_state.py` 核对）。七个检查器中的三表对照（`check_three_table.py`）与术语使用位置（`check_glossary_usage.py`）同样由 `check_state.py` 调用，发布前必然暴露；缺口台账核查（`scripts/check_gap_ledger.py`）的到期未裁定项也由 `check_state.py` 转为错误。
 
 ## 8. 本文件的维护
 

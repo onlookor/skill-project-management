@@ -85,7 +85,7 @@
 
 - **可判定**：条件式的求值结果为 `true` / `false` / `unknown`（三值），由宿主的谓词求值器产出；
 - **执行者**：确定性校验器程序；
-- **退化形态**：无谓词求值能力时，检查清单由人类评审执行，结论为 `符合` / `不符合` / `不适用`（见第 4.2 节）。
+- **退化形态**：无谓词求值能力时，检查清单由人类评审执行，结论为 `符合` / `不符合` / `不适用` / `未触发`（见第 4.2 节）。
 
 ### 4.2 P3（结论封闭性）
 
@@ -93,18 +93,31 @@
 
 | 运行时形态 | 结论枚举 |
 |---|---|
-| 确定性校验器（主形态） | `{pass, fail, cannot_evaluate}` |
-| 退化形态（人类评审） | `{符合, 不符合, 不适用}` |
+| 确定性校验器（主形态） | `{pass, fail, cannot_evaluate, not_applicable}` |
+| 退化形态（人类评审） | `{符合, 不符合, 不适用, 未触发}` |
 
 **封闭性论证**：
 
-- `pass` / `fail` / `cannot_evaluate` 覆盖全部求值结果：条件式为真 → `pass`；为假 → `fail`；输入缺失或谓词不可求值 → `cannot_evaluate`。不存在第四种状态。
-- `cannot_evaluate` **不等于 `pass`**。宿主不得把缺失输入当作通过（META P3 + `ASSUMPTION_PROTOCOL.md` 第 5 节）。
-- 退化形态的三值同构：`符合` ↔ `pass`、`不符合` ↔ `fail`、`不适用` ↔ `cannot_evaluate`。退化形态的“不适用”必须附带缺失输入说明。
+- 四值覆盖全部求值结果：条件式为真 → `pass`；为假 → `fail`；输入缺失或谓词不可求值 → `cannot_evaluate`；规则的 `applicability` 判定为不适用 → `not_applicable`。不存在第五种状态。
+- `cannot_evaluate` **不等于** `pass`，也**不等于** `not_applicable`。前者是“缺输入”，后者是“规则明确不作用于该对象”。
+- `not_applicable` 必须由 `applicability.state = inapplicable` 触发（见 4.4），不得由检查器自行推断“看起来不适用”。
+- 退化形态的四值同构：`符合` ↔ `pass`、`不符合` ↔ `fail`、`不适用` ↔ `cannot_evaluate`、`未触发` ↔ `not_applicable`。退化形态的“不适用”必须附带缺失输入说明。
 
 **禁止的中间态**：`待定`、`基本通过`、`大致符合`、`部分满足` 均不在封闭枚举内，不得作为结论输出。
 
-### 4.3 severity 与规则状态的映射
+### 4.4 适用性状态机（ADR-0013 P7）
+
+规则的 `applicability` 求值由宿主提供（本方法不解释其语义），但求值结果的**状态迁移与结论映射**由本节固定：
+
+| 状态 | 含义 | 结论 |
+|---|---|---|
+| `applicable` | 适用条件成立 | 进入判定，输出 `pass` / `fail` / `cannot_evaluate` |
+| `inapplicable` | 适用条件明确不成立 | 输出 `not_applicable`，`reason` 为 `null` |
+| `pending` | 适用条件尚不可判定 | 输出 `cannot_evaluate`，`reason: applicability_pending` |
+
+**迁移约束**：`pending` 不得静默转为 `applicable`；状态只能由宿主根据适用条件的求值结果迁移，不得由生成模型或检查器推断。输入 schema 以 `applicability.state` 承载该状态（`spec/CHECKER_INPUT_SCHEMA.md` 第 4 节）。
+
+### 4.5 severity 与规则状态的映射
 
 本方法不改变 `GRAMMAR.md` 声明的 severity，只按规则状态做降级：
 
@@ -274,25 +287,73 @@
 
 ### A. check_id 注册表
 
-| check_id | 规则 | 输入 | 判定 | 规则状态 |
-|---|---|---|---|---|
-| `PROJECT_MINIMAL_EXISTENCE` | G-A1 | `Project`、`Actor`、`Outcome`、`Commitment`、`Constraint` 节点 | 四类节点均存在且 `Commitment` 的 `by` 指向 `Actor`、`to` 指向 `Outcome` | `active` |
-| `CONSTRAINT_ANCHOR_REQUIRED` | G-A2 | 管理活动/产物节点、`Constraint` 节点 | 每个管理活动/产物至少有一条 `constrained_by` 边指向已登记 `Constraint` | `active` |
-| `DUAL_DIMENSION_ANNOTATION` | G-B1 | 管理项节点 | 每个管理项携带 `process_group` 与 `subject_group` 两个标签且值在枚举内 | `active` |
-| `DIMENSION_VALUE_CLOSED` | G-B2 | 管理项的标签值 | 标签值 ∈ 所锚定标准的枚举 ∪ 契约声明的 `subject_group_extension` | `active` |
-| `DELIVERABLE_ASSERTION_LINK` | G-C1 | `Deliverable` 节点、`Assertion` 节点 | 每个 `Deliverable` 至少有一条 `asserted_by` 边指向 `Assertion` | `active` |
-| `ASSERTION_MUTUAL_EXCLUSION` | G-C2 | 同一 `Deliverable` 的多条 `Assertion` | 不存在两条 `active` 断言对同一 `Subject` 同一属性给出不相容值 | `active`（`warn`） |
-| `CHANGE_CONSTRAINT_LINK` | G-D1 | 变更提议节点、`Constraint` 节点 | 每个变更提议至少有一条边指向 `Constraint`，且边类型 ∈ {`mitigates`, `exacerbates`, `trades_off`} | `active` |
-| `ALL_IMPROVEMENT_ASSUMPTION` | G-D2 | 变更提议的关系类型集合 | 若全部关系为 `mitigates` 而无 `trades_off`/`exacerbates`，则变更被标记为 `assumption` 且携带验证条件 | `active`（`warn`） |
-| `ROLE_MINIMAL_COMPLETENESS` | G-E1 | `Commitment` 节点、`Accountable`/`Responsible` 关系 | 每个决策类 `Commitment` 有唯一 `accountable_by` 指向 `HumanActor`/`LegalEntity`，且至少一个 `responsible_by`；重合时有 `role_merge_declaration` | `active` |
-| `AI_AUTONOMY_DELEGATION_AUDITABLE` | G-E2 | `AIActor` 的自治权节点、`delegated_from` 链 | 自治权节点有 `delegated_from` 链终至 `Accountable`，且链上有 `Assertion` 声明范围/边界/撤销条件 | `active`（`warn`） |
-| `PROJECT_CHARTER_EXISTENCE` | G-F1 | `Project` 节点、`ProjectCharter` 节点 | 进入执行阶段的 `Project` 有 `ProjectCharter`，且关联 Outcome 陈述、Constraint、Accountable、启动授权 Assertion | `assumption` |
-| `CLOSURE_ACCEPTANCE_LINK` | G-F2 | 收尾阶段的 `Deliverable`、`Assertion` | 每个 `Deliverable` 有“已验收”或“已移交”断言且关联 `Accountable` 确认 | `assumption` |
-| `PROCUREMENT_CONTRACT_ANCHOR` | G-F3 | 外部采购类 `Commitment`、`Contract` 节点 | 每个外部采购承诺有 `Contract` 节点，声明交付物形态、验收判据、约束锚定、Accountable 签署 | `assumption` |
-| `SCHEDULE_EVIDENCE_LINK` | G-F4 | 带 `deadline`/`milestone` 的 `Commitment`、`Assertion` | 每个时间承诺至少关联一条依据断言（估算方法/历史数据/外部强加出处） | `assumption` |
-| `TAILORING_RECORD_EXISTENCE` | G-G1 | 裁剪动作、`TailoringRecord` | 每次裁剪有 `TailoringRecord`，声明被裁剪规则、理由、适用范围、批准者 | `assumption` |
-| `TAILORING_NON_TRIMMABLE_SET` | G-G2 | `TailoringRecord` 的目标规则 | 目标规则 ∉ {G-A1, G-A2, G-C1, G-D1, G-E1} | `assumption` |
-| `TAILORING_REASSESSMENT_CONDITION` | G-G3 | `TailoringRecord` | 每条记录关联至少一条重新评估条件断言，或显式声明“永久”并附理由 | `assumption` |
+| check_id | 规则 | 子句 | 输入 | 判定 | 规则状态 |
+|---|---|---|---|---|---|
+| `PROJECT_MINIMAL_EXISTENCE` | G-A1 | `G-A1#1`–`G-A1#6` | `Project`、`Actor`、`Outcome`、`Commitment`、`Constraint` 节点 | 四类节点均存在；`Commitment` 的 `by` → `Actor`、`to` → `Outcome`；`Constraint.constrains` → 本项目的 `Outcome` 或 `Commitment`（关系路径见 schema 3bis） | `active` |
+| `CONSTRAINT_ANCHOR_REQUIRED` | G-A2 | `G-A2#1`–`G-A2#2` | 管理活动/产物节点、`Constraint` 节点 | 每个管理活动/产物至少有一条 `constrained_by` 边指向已登记 `Constraint`；`node_type ∈ management_node_type` | `active` |
+| `DUAL_DIMENSION_ANNOTATION` | G-B1 | `G-B1#1`–`G-B1#2` | 管理项节点 | 每个管理项携带 `process_group` 与 `subject_group` 两个标签且值在枚举内 | `active` |
+| `DIMENSION_VALUE_CLOSED` | G-B2 | `G-B2#1` | 管理项的标签值 | 标签值 ∈ 所锚定标准的枚举 ∪ 契约声明的 `subject_group_extension` | `active` |
+| `DELIVERABLE_ASSERTION_LINK` | G-C1 | `G-C1#1`–`G-C1#3` | `Deliverable` 节点、`Assertion` 节点 | 每个 `Deliverable` 至少有一条 `asserted_by` 边，或存在 `about` 指向它的断言；被引用断言的 `statement` 非空且 `statement_kind ∈ statement_kind`；`about` 指向该交付物 | `active` |
+| `ASSERTION_MUTUAL_EXCLUSION` | G-C2 | `G-C2#1`–`G-C2#2` | 同一 `Deliverable` 的多条 `Assertion` | 不存在两条 `active` 断言对同一 `Subject` 同一属性给出不相容值 | `active`（`warn`） |
+| `CHANGE_CONSTRAINT_LINK` | G-D1 | `G-D1#1`–`G-D1#3` | 变更提议节点、`Constraint` 节点 | 变更的 `target.type ∈ change_target_type` 且 `target.id` 解析到对应集合；至少有一条边指向 `Constraint`，且边类型 ∈ `relation` | `active` |
+| `ALL_IMPROVEMENT_ASSUMPTION` | G-D2 | `G-D2#1`–`G-D2#2` | 变更提议的关系类型集合 | 若全部关系为 `mitigates` 而无 `trades_off`/`exacerbates`，则变更被标记为 `assumption` 且携带 `verification_condition`；`assumption.status ≠ satisfied` 时不得出现在任何 `approval_basis` 中 | `active`（`warn`） |
+| `ROLE_MINIMAL_COMPLETENESS` | G-E1 | `G-E1#1`–`G-E1#3` | `Commitment` 节点、`Accountable`/`Responsible` 关系 | 每个决策类 `Commitment` 有唯一 `accountable_by` 指向 `HumanActor`/`LegalEntity`（`block`），且至少一个 `responsible_by`（`block`）；重合时有 `role_merge_declaration`（`warn`，见 A.2） | `active` |
+| `AI_AUTONOMY_DELEGATION_AUDITABLE` | G-E2 | `G-E2#1`–`G-E2#3` | `AIActor` 的自治权节点、`delegated_from` 路径 | `delegated_from` 路径（schema 第 1.10 条）`reach: accountable`；路径上有 `Assertion` 的 `covers` 覆盖范围/边界/撤销条件；该断言 `kind = assumption` 且 `verification_condition` 非空 | `active`（`warn`） |
+| `PROJECT_CHARTER_EXISTENCE` | G-F1 | `G-F1#1`–`G-F1#2` | `Project` 节点、`ProjectCharter` 节点 | 进入执行阶段的 `Project` 有 `ProjectCharter`，且关联 Outcome 陈述、Constraint、Accountable、启动授权 Assertion | `assumption` |
+| `CLOSURE_ACCEPTANCE_LINK` | G-F2 | `G-F2#1`–`G-F2#2` | 收尾阶段的 `Deliverable`、`Assertion` | 每个 `Deliverable` 有 `acceptance_statement` 枚举内的断言且关联 `Accountable` 确认 | `assumption` |
+| `PROCUREMENT_CONTRACT_ANCHOR` | G-F3 | `G-F3#1`–`G-F3#2` | 外部采购类 `Commitment`、`Contract` 节点 | 每个外部采购承诺有 `Contract` 节点，声明交付物形态、验收判据、约束锚定、Accountable 签署 | `assumption` |
+| `SCHEDULE_EVIDENCE_LINK` | G-F4 | `G-F4#1` | 带 `deadline`/`milestone` 的 `Commitment`、`Assertion` | 每个时间承诺至少关联一条依据断言（估算方法/历史数据/外部强加出处） | `assumption` |
+| `TAILORING_RECORD_EXISTENCE` | G-G1 | `G-G1#1`–`G-G1#2` | 裁剪动作、`TailoringRecord` | 每次裁剪有 `TailoringRecord`，声明被裁剪规则、理由、适用范围、批准者 | `assumption` |
+| `TAILORING_NON_TRIMMABLE_SET` | G-G2 | `G-G2#1` | `TailoringRecord` 的目标规则 | 目标规则 ∉ {G-A1, G-A2, G-C1, G-D1, G-E1} | `assumption` |
+| `TAILORING_REASSESSMENT_CONDITION` | G-G3 | `G-G3#1`–`G-G3#2` | `TailoringRecord` | 每条记录关联至少一条重新评估条件断言，或显式声明“永久”并附理由 | `assumption` |
+
+### A.2 子句表（规则正文 → 判定列的逐子句覆盖）
+
+> 用途：解决“一规则一句导致子条件被压缩”（ADR-0013 的问题 P1）。每条规则正文的规范性条件拆为 clause id；A 表每个 `check_id` 在“子句”列声明它覆盖的 clause。一个 `check_id` 可承载多个子句，逐子句独立求值、聚合为单一 verdict（任一 `fail` → `fail`；否则任一 `cannot_evaluate` → `cannot_evaluate`；否则 `pass`）。未覆盖的子句必须标 `not-checked` 并写理由，`scripts/check_three_table.py` 机械核对覆盖完整性。
+
+| clause | 规则 | 子句 | 承接 check_id | 子句 severity | 覆盖状态 |
+|---|---|---|---|---|---|
+| `G-A1#1` | G-A1 | 至少一个 `Actor` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked |
+| `G-A1#2` | G-A1 | 至少一个 `Outcome` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked |
+| `G-A1#3` | G-A1 | 该 `Actor` 对 `Outcome` 的 `Commitment` 存在 | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked |
+| `G-A1#4` | G-A1 | 至少一个 `Constraint` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked |
+| `G-A1#5` | G-A1 | `Commitment` 的 `by`/`to` 指向已登记的 `Actor`/`Outcome` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked |
+| `G-A1#6` | G-A1 | `Constraint` 作用于该 `Outcome` 或 `Commitment` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked |
+| `G-A2#1` | G-A2 | 每个管理活动/产物至少一条 `constrained_by` 指向已登记 `Constraint` | `CONSTRAINT_ANCHOR_REQUIRED` | `block` | checked |
+| `G-A2#2` | G-A2 | “管理活动/产物”为已定义节点类型 | `CONSTRAINT_ANCHOR_REQUIRED` | `block` | checked（`management_node_type`） |
+| `G-B1#1` | G-B1 | 每个管理项有 `process_group` 标签 | `DUAL_DIMENSION_ANNOTATION` | `advisory` | checked |
+| `G-B1#2` | G-B1 | 每个管理项有 `subject_group` 标签 | `DUAL_DIMENSION_ANNOTATION` | `advisory` | checked |
+| `G-B2#1` | G-B2 | 标签值在锚定枚举或契约扩展内 | `DIMENSION_VALUE_CLOSED` | `advisory` | checked |
+| `G-C1#1` | G-C1 | 每个 `Deliverable` 至少一条见证断言（`asserted_by` 正向或 `about` 反向） | `DELIVERABLE_ASSERTION_LINK` | `block` | checked |
+| `G-C1#2` | G-C1 | 断言内容是“是什么/什么状态/满足什么条件”的明确陈述 | `DELIVERABLE_ASSERTION_LINK` | `block` | checked |
+| `G-C1#3` | G-C1 | 断言 `about` 指向该交付物 | `DELIVERABLE_ASSERTION_LINK` | `block` | checked |
+| `G-C2#1` | G-C2 | 同一 `Subject` 同一属性不得有不相容值 | `ASSERTION_MUTUAL_EXCLUSION` | `warn` | checked |
+| `G-C2#2` | G-C2 | 只对 `active` 断言判不相容 | `ASSERTION_MUTUAL_EXCLUSION` | `warn` | checked |
+| `G-D1#1` | G-D1 | 变更对象是 `Commitment` 或 `Deliverable` | `CHANGE_CONSTRAINT_LINK` | `block` | checked |
+| `G-D1#2` | G-D1 | 变更提议至少一条边指向 `Constraint` | `CHANGE_CONSTRAINT_LINK` | `block` | checked |
+| `G-D1#3` | G-D1 | 边类型 ∈ `relation` 枚举 | `CHANGE_CONSTRAINT_LINK` | `block` | checked |
+| `G-D2#1` | G-D2 | 全部为 `mitigates` 时标 `assumption` 并附验证条件 | `ALL_IMPROVEMENT_ASSUMPTION` | `warn` | checked |
+| `G-D2#2` | G-D2 | 验证条件满足前不得作为批准依据 | `ALL_IMPROVEMENT_ASSUMPTION` | `warn` | checked（`approval_basis`） |
+| `G-E1#1` | G-E1 | 唯一 `accountable_by` 且指向 `HumanActor`/`LegalEntity` | `ROLE_MINIMAL_COMPLETENESS` | `block` | checked |
+| `G-E1#2` | G-E1 | 至少一个 `responsible_by` | `ROLE_MINIMAL_COMPLETENESS` | `block` | checked |
+| `G-E1#3` | G-E1 | 角色重合时有 `role_merge_declaration` | `ROLE_MINIMAL_COMPLETENESS` | `warn` | checked |
+| `G-E2#1` | G-E2 | `delegated_from` 路径终至 `Accountable` | `AI_AUTONOMY_DELEGATION_AUDITABLE` | `warn` | checked |
+| `G-E2#2` | G-E2 | 路径上断言覆盖范围/边界/撤销条件 | `AI_AUTONOMY_DELEGATION_AUDITABLE` | `warn` | checked |
+| `G-E2#3` | G-E2 | 该断言以 `assumption` 形式存在并附验证条件 | `AI_AUTONOMY_DELEGATION_AUDITABLE` | `warn` | checked |
+| `G-F1#1` | G-F1 | 执行阶段 `Project` 有 `ProjectCharter` | `PROJECT_CHARTER_EXISTENCE` | `advisory` | checked |
+| `G-F1#2` | G-F1 | 章程关联 Outcome 陈述、Constraint、Accountable、启动授权 | `PROJECT_CHARTER_EXISTENCE` | `advisory` | checked |
+| `G-F2#1` | G-F2 | 每个 `Deliverable` 有验收/移交断言 | `CLOSURE_ACCEPTANCE_LINK` | `advisory` | checked |
+| `G-F2#2` | G-F2 | 断言关联 `Accountable` 确认 | `CLOSURE_ACCEPTANCE_LINK` | `advisory` | checked |
+| `G-F3#1` | G-F3 | 外部采购承诺有 `Contract` 节点 | `PROCUREMENT_CONTRACT_ANCHOR` | `advisory` | checked |
+| `G-F3#2` | G-F3 | 契约声明四项内容 | `PROCUREMENT_CONTRACT_ANCHOR` | `advisory` | checked |
+| `G-F4#1` | G-F4 | 时间承诺关联依据断言 | `SCHEDULE_EVIDENCE_LINK` | `advisory` | checked |
+| `G-G1#1` | G-G1 | 每次裁剪有 `TailoringRecord` | `TAILORING_RECORD_EXISTENCE` | `advisory` | checked |
+| `G-G1#2` | G-G1 | 记录声明四项内容 | `TAILORING_RECORD_EXISTENCE` | `advisory` | checked |
+| `G-G2#1` | G-G2 | 目标规则不在不可裁剪集 | `TAILORING_NON_TRIMMABLE_SET` | `advisory` | checked |
+| `G-G3#1` | G-G3 | 记录关联重新评估条件或声明“永久” | `TAILORING_REASSESSMENT_CONDITION` | `advisory` | checked |
+| `G-G3#2` | G-G3 | 声明“永久”时附理由 | `TAILORING_REASSESSMENT_CONDITION` | `advisory` | checked |
+
+**severity 聚合规则**：一个 `check_id` 的 verdict 由其全部子句聚合；`severity` 取失败子句中的最高级（`advisory` < `warn` < `block`），`pass` 时取 A 表声明的 severity。`reason` 取首条失败子句的原因码（优先级见 schema 第 1.14 条）。这解决了 G-004：`G-E1#3` 缺失只产生 `warn`，不再把合法产物按 `block` 判死。
 
 ### A.1 参考样例（T-011）
 
@@ -346,7 +407,7 @@ verdict: pass
 reason: null
 ```
 
-> 边界说明：G-A1 正文还要求 `Constraint` “作用于该 `Outcome` 或 `Commitment`”，A 表判定列只要求四类节点存在，未包含该边检查。上述样例不覆盖“`Constraint` 存在但未作用于任何 `Outcome`/`Commitment`”的情形；该子句是否纳入判定需另行裁定（T-130），本轮不改判定。
+> 边界说明：G-A1 正文要求 `Constraint` “作用于该 `Outcome` 或 `Commitment`”，该子句已由 `G-A1#6` 纳入判定（ADR-0013 / G-002）。样例 2 的 `constrains: "O-1"` 满足该子句；样例 1 在更早的“约束集为空”处即失败，故不改变本组预期。
 
 #### A.1.2 `CONSTRAINT_ANCHOR_REQUIRED`（G-A2，`block`）
 
@@ -413,7 +474,11 @@ deliverables: [
   { id: "D-1", asserted_by: ["S-1"] },
   { id: "D-2", asserted_by: ["S-2", "S-3"] }
 ]
-assertions: [{ id: "S-1" }, { id: "S-2" }, { id: "S-3" }]
+assertions: [
+  { id: "S-1", about: "D-1", statement_kind: "what", statement: "交付物为可执行的验收报告" },
+  { id: "S-2", about: "D-2", statement_kind: "state", statement: "交付物处于已审核状态" },
+  { id: "S-3", about: "D-2", statement_kind: "condition", statement: "交付物满足全部验收判据" }
+]
 ```
 
 期望输出：
@@ -425,15 +490,21 @@ verdict: pass
 reason: null
 ```
 
+> 边界说明（ADR-0013 / G-005）：原样例 2 的断言只有 `id`、无任何内容，仍期望 `pass`；该期望与 G-C1 正文不一致，已按裁定推翻。现在被引用断言必须满足 `G-C1#2`（`statement` 非空且 `statement_kind ∈ statement_kind`）与 `G-C1#3`（`about` 指向该交付物）。`G-C1#1` 的见证断言可由 `asserted_by` 正向边或 `about` 反向边任一成立（D5）。
+
 #### A.1.4 `CHANGE_CONSTRAINT_LINK`（G-D1，`block`）
 
-**判定依据**：A 表“每个变更提议至少有一条边指向 `Constraint`，且边类型 ∈ {`mitigates`, `exacerbates`, `trades_off`}”。
+**判定依据**：A 表“变更的 `target.type ∈ change_target_type` 且 `target.id` 解析到对应集合；至少有一条边指向 `Constraint`，且边类型 ∈ `relation`”。
 
 **样例 1（触发 → `fail`）**：变更使用了枚举外的关系类型。
 
 ```yaml
-changes: [{ id: "CH-1", constraint: "K-1", relation: "affects" }]
+changes: [
+  { id: "CH-1", target: { type: "Deliverable", id: "D-1" }, constraint: "K-1", relation: "affects" }
+]
 constraints: [{ id: "K-1" }]
+commitments: []
+deliverables: [{ id: "D-1" }]
 ```
 
 期望输出：
@@ -445,13 +516,15 @@ verdict: fail
 reason: invalid_change_relation
 ```
 
-**样例 2（不触发 → `pass`）**：每个变更都锚定约束且关系类型合法。
+**样例 2（不触发 → `pass`）**：每个变更都锚定约束、对象类型合法且关系类型合法。
 
 ```yaml
 changes: [
-  { id: "CH-1", constraint: "K-1", relation: "mitigates" },
-  { id: "CH-2", constraint: "K-2", relation: "trades_off" }
+  { id: "CH-1", target: { type: "Commitment", id: "C-1" }, constraint: "K-1", relation: "mitigates" },
+  { id: "CH-2", target: { type: "Deliverable", id: "D-1" }, constraint: "K-2", relation: "trades_off" }
 ]
+commitments: [{ id: "C-1" }]
+deliverables: [{ id: "D-1" }]
 constraints: [{ id: "K-1" }, { id: "K-2" }]
 ```
 
@@ -463,6 +536,8 @@ source_rule: G-D1
 verdict: pass
 reason: null
 ```
+
+> 边界说明（ADR-0013 / G-006）：G-D1 正文把变更提议限定为对 `Commitment` 或 `Deliverable` 的提议，原判定列缺少该对象类型谓词，任何变更提议都判 `pass`。现由 `G-D1#1` 承接：`target.type` 越界或 `target.id` 解析失败 → `invalid_change_target`；缺 `target` → `missing_change_target`。
 
 #### A.1.5 `ROLE_MINIMAL_COMPLETENESS`（G-E1，`block`）
 
@@ -510,7 +585,7 @@ verdict: pass
 reason: null
 ```
 
-> 边界说明：`Accountable` 与 `Responsible` 重合但缺 `role_merge_declaration` 的子情形不纳入本组 `block` 样例。该子情形的 warn/block 拆分已登记为 T-100（ERRATA E-004），在裁定前不改变判定。
+> 边界说明：`Accountable` 与 `Responsible` 重合但缺 `role_merge_declaration` 的子情形，按 A.2 的 `G-E1#3` 判 `warn`，不再与本组 `block` 样例混判（ADR-0013 / G-004）。该子情形样例待 T-100 关闭时补充；在此之前，本组两个样例的预期不变。
 
 #### A.1.6 `DUAL_DIMENSION_ANNOTATION`（G-B1，`advisory` / `active`）
 
@@ -721,7 +796,7 @@ actors:
 autonomy_grants:
   - { id: "AG-1", actor: "A-1", delegated_from: "A-2", assertions: ["S-1"] }
 assertions:
-  - { id: "S-1", covers: ["scope", "boundary", "revocation"] }
+  - { id: "S-1", covers: ["scope", "boundary", "revocation"], kind: "assumption", verification_condition: "季度审计确认委托边界未被突破" }
 ```
 
 期望输出：
@@ -734,6 +809,8 @@ rule_status: active
 verdict: pass
 reason: null
 ```
+
+> 边界说明（ADR-0013 / G-003）：G-E2 正文要求该 `Assertion` 以 `assumption` 形式存在并附验证条件。原判定列只检查 `covers`，样例 2 因此缺 `kind` 仍期望 `pass`；现由 `G-E2#3` 承接，样例 2 已补 `kind: assumption` 与 `verification_condition`。路径可达性由 `G-E2#1` 用 schema 第 1.10 条的路径表示承接，不再依赖“终至”的自然语言表述。
 
 #### A.1.11 `PROJECT_CHARTER_EXISTENCE`（G-F1，`advisory` / `assumption`）
 

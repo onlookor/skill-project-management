@@ -288,13 +288,13 @@
 - `status`：`active`
 
 **T-C-006 severity**
-- 定义：检查项的严重级别：`block`（违反即不合规，阻断）/ `warn`（违反需记录并说明）/ `advisory`（提示级，不阻断）。规则状态为 `pending_reanchor` 或 `assumption` 时，实际 severity 降级为 `advisory`。定义见 `spec/methods/deterministic-checker.md` 第 4.3 节。
+- 定义：检查项的严重级别：`block`（违反即不合规，阻断）/ `warn`（违反需记录并说明）/ `advisory`（提示级，不阻断）。规则状态为 `pending_reanchor` 或 `assumption` 时，实际 severity 降级为 `advisory`。定义见 `spec/methods/deterministic-checker.md` 第 4.5 节。
 - `first_used_in`：`GRAMMAR.md` 使用说明
 - `status`：`active`
 
 **T-C-007 规则状态携带（rule_status）**
 - 定义：编译产物中携带的字段，标识对应规则的状态（`active` / `pending_reanchor` / `assumption`）。宿主据此决定是否仅记录而不阻断（P6 的合规执行）。
-- `first_used_in`：`spec/methods/deterministic-checker.md` 第 4.3 节
+- `first_used_in`：`spec/methods/deterministic-checker.md` 第 4.5 节
 - `status`：`active`
 
 **T-C-008 忠实性（fidelity）**
@@ -531,3 +531,94 @@
 - 治理域：`proposed`、`accepted`、`retired`（ADR 状态与编译方法状态）
 - 接口契约：`merge: append`、`immutable` 标记
 - 行业缩写：`SLA`、`SLO`、`RPO`、`RTO`、`CI/CD`、`API`、`IDL`
+
+## 4. 术语使用位置（生成）
+
+本表由 `scripts/check_glossary_usage.py` 生成，勿手改。修改术语定义或引用后请运行 `python3 scripts/check_glossary_usage.py --write` 重新生成。
+
+<!-- BEGIN GLOSSARY USAGE -->
+| term_id | term | 使用位置 |
+|---|---|---|
+| T-A-001 | Project | [`CONSTITUTION.md`](CONSTITUTION.md)、[`ERRATA.md`](ERRATA.md)、[`GRAMMAR.md`](GRAMMAR.md)、[`README.en.md`](README.en.md)、[`README.md`](README.md)、[`SOURCE_LEDGER.md`](SOURCE_LEDGER.md)、[`TODO.md`](TODO.md)、[`adr/0007-anchor-discipline.md`](adr/0007-anchor-discipline.md)、[`spec/ANCHOR_SPEC.md`](spec/ANCHOR_SPEC.md)、[`spec/CHECKER_INPUT_SCHEMA.md`](spec/CHECKER_INPUT_SCHEMA.md)、[`spec/ONTOLOGY_FEASIBILITY.md`](spec/ONTOLOGY_FEASIBILITY.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md)、[`validation/independent-review-package.md`](validation/independent-review-package.md) |
+| T-A-002 | Actor | [`CHANGELOG.md`](CHANGELOG.md)、[`CHARTER.md`](CHARTER.md)、[`CONSTITUTION.md`](CONSTITUTION.md)、[`ERRATA.md`](ERRATA.md)、[`GRAMMAR.md`](GRAMMAR.md)、[`README.en.md`](README.en.md)、[`README.md`](README.md)、[`SOURCE_LEDGER.md`](SOURCE_LEDGER.md)、[`TODO.md`](TODO.md)、[`adr/0008-reanchor-dimension-rules.md`](adr/0008-reanchor-dimension-rules.md)、[`adr/0013-unified-adjudication-of-check-semantics.md`](adr/0013-unified-adjudication-of-check-semantics.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md)、[`validation/independent-review-package.md`](validation/independent-review-package.md) |
+| T-A-003 | Commitment | [`CHANGELOG.md`](CHANGELOG.md)、[`CHARTER.md`](CHARTER.md)、[`CONSTITUTION.md`](CONSTITUTION.md)、[`ERRATA.md`](ERRATA.md)、[`GAP_LEDGER.md`](GAP_LEDGER.md)、[`GRAMMAR.md`](GRAMMAR.md)、[`README.en.md`](README.en.md)、[`README.md`](README.md)、[`SOURCE_LEDGER.md`](SOURCE_LEDGER.md)、[`TODO.md`](TODO.md)、[`adr/0008-reanchor-dimension-rules.md`](adr/0008-reanchor-dimension-rules.md)、[`adr/0012-gap-ledger-and-adjudication.md`](adr/0012-gap-ledger-and-adjudication.md)、[`adr/0013-unified-adjudication-of-check-semantics.md`](adr/0013-unified-adjudication-of-check-semantics.md)、[`spec/CHECKER_INPUT_SCHEMA.md`](spec/CHECKER_INPUT_SCHEMA.md)、[`spec/INTERFACE_CONTRACT_SPEC.md`](spec/INTERFACE_CONTRACT_SPEC.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md)、[`validation/independent-review-package.md`](validation/independent-review-package.md) |
+| T-A-004 | Deliverable | [`AGENTS.md`](AGENTS.md)、[`CHANGELOG.md`](CHANGELOG.md)、[`CHARTER.md`](CHARTER.md)、[`CONSTITUTION.md`](CONSTITUTION.md)、[`ERRATA.md`](ERRATA.md)、[`GRAMMAR.md`](GRAMMAR.md)、[`README.en.md`](README.en.md)、[`README.md`](README.md)、[`SOURCE_LEDGER.md`](SOURCE_LEDGER.md)、[`TODO.md`](TODO.md)、[`spec/CHECKER_INPUT_SCHEMA.md`](spec/CHECKER_INPUT_SCHEMA.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md)、[`validation/independent-review-package.md`](validation/independent-review-package.md) |
+| T-A-005 | Constraint | [`AGENTS.md`](AGENTS.md)、[`CHANGELOG.md`](CHANGELOG.md)、[`CHARTER.md`](CHARTER.md)、[`CONSTITUTION.md`](CONSTITUTION.md)、[`ERRATA.md`](ERRATA.md)、[`GAP_LEDGER.md`](GAP_LEDGER.md)、[`GRAMMAR.md`](GRAMMAR.md)、[`README.en.md`](README.en.md)、[`README.md`](README.md)、[`SOURCE_LEDGER.md`](SOURCE_LEDGER.md)、[`TODO.md`](TODO.md)、[`adr/0008-reanchor-dimension-rules.md`](adr/0008-reanchor-dimension-rules.md)、[`spec/CHECKER_INPUT_SCHEMA.md`](spec/CHECKER_INPUT_SCHEMA.md)、[`spec/INTERFACE_CONTRACT_SPEC.md`](spec/INTERFACE_CONTRACT_SPEC.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md)、[`validation/independent-review-package.md`](validation/independent-review-package.md) |
+| T-A-006 | Outcome | [`CHANGELOG.md`](CHANGELOG.md)、[`CONSTITUTION.md`](CONSTITUTION.md)、[`ERRATA.md`](ERRATA.md)、[`GAP_LEDGER.md`](GAP_LEDGER.md)、[`GRAMMAR.md`](GRAMMAR.md)、[`README.en.md`](README.en.md)、[`README.md`](README.md)、[`SOURCE_LEDGER.md`](SOURCE_LEDGER.md)、[`TODO.md`](TODO.md)、[`adr/0013-unified-adjudication-of-check-semantics.md`](adr/0013-unified-adjudication-of-check-semantics.md)、[`spec/CHECKER_INPUT_SCHEMA.md`](spec/CHECKER_INPUT_SCHEMA.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md)、[`validation/independent-review-package.md`](validation/independent-review-package.md) |
+| T-A-007 | Assertion | [`AGENTS.md`](AGENTS.md)、[`CHARTER.md`](CHARTER.md)、[`CONSTITUTION.md`](CONSTITUTION.md)、[`GRAMMAR.md`](GRAMMAR.md)、[`QUICKSTART.md`](QUICKSTART.md)、[`README.en.md`](README.en.md)、[`README.md`](README.md)、[`SOURCE_LEDGER.md`](SOURCE_LEDGER.md)、[`TODO.md`](TODO.md)、[`spec/CHECKER_INPUT_SCHEMA.md`](spec/CHECKER_INPUT_SCHEMA.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md)、[`validation/independent-review-package.md`](validation/independent-review-package.md) |
+| T-A-008 | Accountable | [`CHARTER.md`](CHARTER.md)、[`GRAMMAR.md`](GRAMMAR.md)、[`SOURCE_LEDGER.md`](SOURCE_LEDGER.md)、[`spec/INTERFACE_CONTRACT_SPEC.md`](spec/INTERFACE_CONTRACT_SPEC.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md) |
+| T-A-009 | Responsible | [`CHARTER.md`](CHARTER.md)、[`GRAMMAR.md`](GRAMMAR.md)、[`SOURCE_LEDGER.md`](SOURCE_LEDGER.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md) |
+| T-A-010 | Subject | [`AGENTS.md`](AGENTS.md)、[`GRAMMAR.md`](GRAMMAR.md)、[`spec/INTERFACE_CONTRACT_SPEC.md`](spec/INTERFACE_CONTRACT_SPEC.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md) |
+| T-A-011 | HumanActor | [`GRAMMAR.md`](GRAMMAR.md)、[`TODO.md`](TODO.md)、[`spec/INTERFACE_CONTRACT_SPEC.md`](spec/INTERFACE_CONTRACT_SPEC.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md) |
+| T-A-012 | LegalEntity | [`GRAMMAR.md`](GRAMMAR.md)、[`TODO.md`](TODO.md)、[`spec/INTERFACE_CONTRACT_SPEC.md`](spec/INTERFACE_CONTRACT_SPEC.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md) |
+| T-A-013 | AIActor | [`GRAMMAR.md`](GRAMMAR.md)、[`TODO.md`](TODO.md)、[`contracts/resolver.md`](contracts/resolver.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md) |
+| T-A-014 | Contract | [`GRAMMAR.md`](GRAMMAR.md)、[`TODO.md`](TODO.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md) |
+| T-A-015 | ProjectCharter | [`GRAMMAR.md`](GRAMMAR.md)、[`TODO.md`](TODO.md)、[`adr/0013-unified-adjudication-of-check-semantics.md`](adr/0013-unified-adjudication-of-check-semantics.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md) |
+| T-A-016 | TailoringRecord | [`GRAMMAR.md`](GRAMMAR.md)、[`TODO.md`](TODO.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md) |
+| T-B-001 | grounded | [`AGENTS.md`](AGENTS.md)、[`CONSTITUTION.md`](CONSTITUTION.md)、[`QUICKSTART.md`](QUICKSTART.md)、[`spec/ASSUMPTION_PROTOCOL.md`](spec/ASSUMPTION_PROTOCOL.md)、[`spec/COMPILATION_META.md`](spec/COMPILATION_META.md)、[`spec/CONTEXT_ASSEMBLY.md`](spec/CONTEXT_ASSEMBLY.md)、[`spec/GROUNDING_CRITERIA.md`](spec/GROUNDING_CRITERIA.md)、[`spec/INTERFACE_CONTRACT_SPEC.md`](spec/INTERFACE_CONTRACT_SPEC.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md) |
+| T-B-002 | assumption | [`AGENTS.md`](AGENTS.md)、[`CHANGELOG.md`](CHANGELOG.md)、[`CHARTER.md`](CHARTER.md)、[`CONSTITUTION.md`](CONSTITUTION.md)、[`ERRATA.md`](ERRATA.md)、[`GAP_LEDGER.md`](GAP_LEDGER.md)、[`GRAMMAR.md`](GRAMMAR.md)、[`QUICKSTART.md`](QUICKSTART.md)、[`README.en.md`](README.en.md)、[`README.md`](README.md)、[`ROADMAP.md`](ROADMAP.md)、[`TODO.md`](TODO.md)、[`adr/0005-source-ledger-scope.md`](adr/0005-source-ledger-scope.md)、[`adr/0012-gap-ledger-and-adjudication.md`](adr/0012-gap-ledger-and-adjudication.md)、[`adr/0013-unified-adjudication-of-check-semantics.md`](adr/0013-unified-adjudication-of-check-semantics.md)、[`contracts/resolver.md`](contracts/resolver.md)、[`spec/ASSUMPTION_PROTOCOL.md`](spec/ASSUMPTION_PROTOCOL.md)、[`spec/CHECKER_INPUT_SCHEMA.md`](spec/CHECKER_INPUT_SCHEMA.md)、[`spec/COMPILATION_META.md`](spec/COMPILATION_META.md)、[`spec/COMPILATION_METHODS.md`](spec/COMPILATION_METHODS.md)、[`spec/CONTEXT_ASSEMBLY.md`](spec/CONTEXT_ASSEMBLY.md)、[`spec/GROUNDING_CRITERIA.md`](spec/GROUNDING_CRITERIA.md)、[`spec/INTERFACE_CONTRACT_SPEC.md`](spec/INTERFACE_CONTRACT_SPEC.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md)、[`validation/CHECKLIST.md`](validation/CHECKLIST.md) |
+| T-B-003 | grounding_ref | [`AGENTS.md`](AGENTS.md)、[`CHANGELOG.md`](CHANGELOG.md)、[`CONSTITUTION.md`](CONSTITUTION.md)、[`GRAMMAR.md`](GRAMMAR.md)、[`README.en.md`](README.en.md)、[`README.md`](README.md)、[`ROADMAP.md`](ROADMAP.md)、[`SOURCE_LEDGER.md`](SOURCE_LEDGER.md)、[`TODO.md`](TODO.md)、[`adr/0001-separate-grammar-from-governance.md`](adr/0001-separate-grammar-from-governance.md)、[`adr/0005-source-ledger-scope.md`](adr/0005-source-ledger-scope.md)、[`adr/0006-knowledge-sources-vs-normative-basis.md`](adr/0006-knowledge-sources-vs-normative-basis.md)、[`adr/0007-anchor-discipline.md`](adr/0007-anchor-discipline.md)、[`adr/0010-self-authored-ontology-in-git.md`](adr/0010-self-authored-ontology-in-git.md)、[`knowledge/methods/registry-skeleton.md`](knowledge/methods/registry-skeleton.md)、[`ontology/README.md`](ontology/README.md)、[`scripts/README.md`](scripts/README.md)、[`scripts/check_glossary_sync.md`](scripts/check_glossary_sync.md)、[`spec/ANCHOR_SPEC.md`](spec/ANCHOR_SPEC.md)、[`spec/ASSUMPTION_PROTOCOL.md`](spec/ASSUMPTION_PROTOCOL.md)、[`spec/COMPILATION_META.md`](spec/COMPILATION_META.md)、[`spec/GOVERNANCE_RESTRUCTURE.md`](spec/GOVERNANCE_RESTRUCTURE.md)、[`spec/INTERFACE_CONTRACT_SPEC.md`](spec/INTERFACE_CONTRACT_SPEC.md)、[`spec/ONTOLOGY_FEASIBILITY.md`](spec/ONTOLOGY_FEASIBILITY.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md) |
+| T-B-004 | 保守假设（conservative assumption） | （无） |
+| T-B-005 | 可推翻指标（refutable indicator） | （无） |
+| T-B-006 | 待对齐映射（alignment mapping） | [`CHANGELOG.md`](CHANGELOG.md) |
+| T-B-007 | 三值逻辑 | （无） |
+| T-B-008 | 槽位（slot） | （无） |
+| T-B-009 | 连接实例（connection instance） | （无） |
+| T-B-010 | 契约（contract） | （无） |
+| T-B-011 | 不可裁剪集（non-trimmable set） | （无） |
+| T-B-012 | 规则状态（rule status） | （无） |
+| T-B-013 | 出处门槛 | （无） |
+| T-B-014 | 自包含三级 | （无） |
+| T-B-015 | 论断级映射（claim_mapping） | （无） |
+| T-B-016 | 权威层级（authority_tier） | （无） |
+| T-B-017 | 核验状态（verification_method） | （无） |
+| T-B-018 | 来源状态 | （无） |
+| T-B-019 | 检查机械化 | （无） |
+| T-B-020 | 可选插件 | [`CHANGELOG.md`](CHANGELOG.md) |
+| T-C-001 | 编译元框架（compilation meta-framework） | （无） |
+| T-C-002 | 编译方法（compilation method） | （无） |
+| T-C-003 | P1–P6（编译产物必须满足的性质） | （无） |
+| T-C-004 | F-C1～F-C5（编译失败分类） | （无） |
+| T-C-005 | check_id | [`AGENTS.md`](AGENTS.md)、[`CHANGELOG.md`](CHANGELOG.md)、[`GAP_LEDGER.md`](GAP_LEDGER.md)、[`ROADMAP.md`](ROADMAP.md)、[`TODO.md`](TODO.md)、[`adr/0002-compilation-meta-vs-methods.md`](adr/0002-compilation-meta-vs-methods.md)、[`adr/0007-anchor-discipline.md`](adr/0007-anchor-discipline.md)、[`adr/0012-gap-ledger-and-adjudication.md`](adr/0012-gap-ledger-and-adjudication.md)、[`adr/0013-unified-adjudication-of-check-semantics.md`](adr/0013-unified-adjudication-of-check-semantics.md)、[`ontology/README.md`](ontology/README.md)、[`scripts/README.md`](scripts/README.md)、[`spec/ANCHOR_SPEC.md`](spec/ANCHOR_SPEC.md)、[`spec/CHECKER_INPUT_SCHEMA.md`](spec/CHECKER_INPUT_SCHEMA.md)、[`spec/CONTEXT_ASSEMBLY.md`](spec/CONTEXT_ASSEMBLY.md)、[`spec/ONTOLOGY_FEASIBILITY.md`](spec/ONTOLOGY_FEASIBILITY.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md) |
+| T-C-006 | severity | [`AGENTS.md`](AGENTS.md)、[`CHANGELOG.md`](CHANGELOG.md)、[`ERRATA.md`](ERRATA.md)、[`GRAMMAR.md`](GRAMMAR.md)、[`ROADMAP.md`](ROADMAP.md)、[`SOURCE_LEDGER.md`](SOURCE_LEDGER.md)、[`TODO.md`](TODO.md)、[`adr/0002-compilation-meta-vs-methods.md`](adr/0002-compilation-meta-vs-methods.md)、[`adr/0008-reanchor-dimension-rules.md`](adr/0008-reanchor-dimension-rules.md)、[`adr/0013-unified-adjudication-of-check-semantics.md`](adr/0013-unified-adjudication-of-check-semantics.md)、[`spec/CHECKER_INPUT_SCHEMA.md`](spec/CHECKER_INPUT_SCHEMA.md)、[`spec/COMPILATION_META.md`](spec/COMPILATION_META.md)、[`spec/COMPILATION_METHODS.md`](spec/COMPILATION_METHODS.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md)、[`validation/CHECKLIST.md`](validation/CHECKLIST.md) |
+| T-C-007 | 规则状态携带（rule_status） | （无） |
+| T-C-008 | 忠实性（fidelity） | （无） |
+| T-C-009 | 可判定性（decidability） | （无） |
+| T-C-010 | 结论封闭性 | （无） |
+| T-C-011 | 证据保全（evidence preservation） | （无） |
+| T-C-012 | 退化路径（degradation path） | [`CHANGELOG.md`](CHANGELOG.md) |
+| T-C-013 | 运行时目标（runtime target） | （无） |
+| T-C-014 | 不可映射项（unmappable item） | （无） |
+| T-C-015 | 编译产物版本对齐 | （无） |
+| T-D-001 | CHARTER | （无） |
+| T-D-002 | CONSTITUTION | [`CHANGELOG.md`](CHANGELOG.md) |
+| T-D-003 | GRAMMAR | （无） |
+| T-D-004 | SOURCE_LEDGER | [`spec/ONTOLOGY_FEASIBILITY.md`](spec/ONTOLOGY_FEASIBILITY.md) |
+| T-D-005 | ADR | [`CHANGELOG.md`](CHANGELOG.md) |
+| T-D-006 | CHANGELOG | [`CHANGELOG.md`](CHANGELOG.md) |
+| T-D-007 | TODO | [`CHANGELOG.md`](CHANGELOG.md) |
+| T-D-008 | 四层结构 | （无） |
+| T-D-009 | 三权分立 | （无） |
+| T-D-010 | 来源封闭性 | （无） |
+| T-D-011 | pending_reanchor | [`AGENTS.md`](AGENTS.md)、[`CHANGELOG.md`](CHANGELOG.md)、[`CHARTER.md`](CHARTER.md)、[`CONSTITUTION.md`](CONSTITUTION.md)、[`GRAMMAR.md`](GRAMMAR.md)、[`ROADMAP.md`](ROADMAP.md)、[`SOURCE_LEDGER.md`](SOURCE_LEDGER.md)、[`TODO.md`](TODO.md)、[`adr/0005-source-ledger-scope.md`](adr/0005-source-ledger-scope.md)、[`adr/0008-reanchor-dimension-rules.md`](adr/0008-reanchor-dimension-rules.md)、[`adr/0011-schedule-layer-and-plan.md`](adr/0011-schedule-layer-and-plan.md)、[`spec/COMPILATION_META.md`](spec/COMPILATION_META.md)、[`spec/GROUNDING_CRITERIA.md`](spec/GROUNDING_CRITERIA.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md)、[`validation/CHECKLIST.md`](validation/CHECKLIST.md) |
+| T-D-012 | deprecated | [`AGENTS.md`](AGENTS.md)、[`CHANGELOG.md`](CHANGELOG.md)、[`CONSTITUTION.md`](CONSTITUTION.md)、[`SOURCE_LEDGER.md`](SOURCE_LEDGER.md)、[`adr/0005-source-ledger-scope.md`](adr/0005-source-ledger-scope.md)、[`adr/README.md`](adr/README.md)、[`spec/COMPILATION_META.md`](spec/COMPILATION_META.md) |
+| T-D-013 | superseded | [`AGENTS.md`](AGENTS.md)、[`CONSTITUTION.md`](CONSTITUTION.md)、[`SOURCE_LEDGER.md`](SOURCE_LEDGER.md)、[`adr/README.md`](adr/README.md) |
+| T-E-001 | PMBOK | [`CHANGELOG.md`](CHANGELOG.md) |
+| T-E-002 | PRINCE2 | （无） |
+| T-E-003 | ISO 21502:2020 | [`CHANGELOG.md`](CHANGELOG.md) |
+| T-E-004 | GB/T 37507—2025 | （无） |
+| T-E-005 | WBS | [`CHANGELOG.md`](CHANGELOG.md)、[`TODO.md`](TODO.md) |
+| T-E-006 | PERT | [`TODO.md`](TODO.md) |
+| T-E-007 | EVM / EVA | [`CHANGELOG.md`](CHANGELOG.md) |
+| T-E-008 | RACI | （无） |
+| T-E-009 | SOW / RFQ / RFP | （无） |
+| T-E-010 | MTTR | （无） |
+| T-F-001 | subject_type | [`contracts/resolver.md`](contracts/resolver.md)、[`spec/INTERFACE_CONTRACT_SPEC.md`](spec/INTERFACE_CONTRACT_SPEC.md) |
+| T-F-002 | deliverable_forms | [`contracts/resolver.md`](contracts/resolver.md)、[`spec/INTERFACE_CONTRACT_SPEC.md`](spec/INTERFACE_CONTRACT_SPEC.md) |
+| T-F-003 | constraint_domains | [`contracts/resolver.md`](contracts/resolver.md)、[`spec/INTERFACE_CONTRACT_SPEC.md`](spec/INTERFACE_CONTRACT_SPEC.md) |
+| T-F-004 | assertion_vocabulary | [`contracts/resolver.md`](contracts/resolver.md)、[`spec/INTERFACE_CONTRACT_SPEC.md`](spec/INTERFACE_CONTRACT_SPEC.md) |
+| T-F-005 | actor_roles | [`contracts/resolver.md`](contracts/resolver.md)、[`spec/INTERFACE_CONTRACT_SPEC.md`](spec/INTERFACE_CONTRACT_SPEC.md) |
+| T-F-006 | subject_group_extension | [`GRAMMAR.md`](GRAMMAR.md)、[`adr/0008-reanchor-dimension-rules.md`](adr/0008-reanchor-dimension-rules.md)、[`contracts/resolver.md`](contracts/resolver.md)、[`spec/CHECKER_INPUT_SCHEMA.md`](spec/CHECKER_INPUT_SCHEMA.md)、[`spec/INTERFACE_CONTRACT_SPEC.md`](spec/INTERFACE_CONTRACT_SPEC.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md) |
+| T-F-007 | 扁平快照（flat snapshot） | （无） |
+| T-F-008 | 契约解析失败状态 | （无） |
+<!-- END GLOSSARY USAGE -->

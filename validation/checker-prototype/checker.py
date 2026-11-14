@@ -5,9 +5,9 @@
 YAML 谓词快照；输出 check_id / source_rule / severity / rule_status /
 verdict / reason，并与样例的“期望输出”逐项比对。
 
-判定依据只有附录 A 的“判定”列。规则正文严于判定列的三处（G-A1 约束
-作用边、G-E2 assumption 形式、G-E1 severity 拆分）不实现，并在
-COVERAGE_GAPS 中显式声明“未覆盖规则正文”。
+判定依据是附录 A 的“判定”列与 A.2 子句表。ADR-0013 已把原 5 处“未覆盖
+规则正文”全部纳入判定列，故 COVERAGE_GAPS 为空；G-004 通过 A.2 的子句
+severity（G-E1#3 为 warn）承接，不再把合法产物按 block 判死。
 """
 
 from __future__ import annotations
@@ -56,16 +56,15 @@ PROCESS_GROUPS = {
 # 未物化的值可通过输入的 subject_group_extension 声明。
 BASE_SUBJECT_GROUPS = {"planning", "lessons-learned"}
 CHANGE_RELATIONS = {"mitigates", "exacerbates", "trades_off"}
+CHANGE_TARGET_TYPES = {"Commitment", "Deliverable"}
+STATEMENT_KINDS = {"what", "state", "condition"}
+ASSERTION_KINDS = {"fact", "assumption", "decision"}
 NON_TRIMMABLE = {"G-A1", "G-A2", "G-C1", "G-D1", "G-E1"}
 ACCEPTANCE_STATEMENTS = {"已验收", "已移交"}
 
-COVERAGE_GAPS = {
-    "PROJECT_MINIMAL_EXISTENCE": "未覆盖规则正文：Constraint 须作用于该 Outcome/Commitment（T-130 / G-002）",
-    "CONSTRAINT_ANCHOR_REQUIRED": "未覆盖规则正文：管理活动/产物节点类型未在 schema 中枚举（G-001 / G-A2）",
-    "ROLE_MINIMAL_COMPLETENESS": "未覆盖规则正文：决策类 Commitment 筛选未定义、severity 未拆分（G-001 / G-E1、G-004 / T-100）",
-    "ALL_IMPROVEMENT_ASSUMPTION": "未覆盖规则正文：验证条件满足前不得作为批准依据的载体（G-001 / G-D2）",
-    "AI_AUTONOMY_DELEGATION_AUDITABLE": "未覆盖规则正文：Assertion 以 assumption 形式存在并附验证条件（T-131 / G-003）",
-}
+# ADR-0013 已把原 5 处“未覆盖规则正文”全部纳入判定列，本表保持为空是
+# 有意为之：原型不再存在“声明未覆盖但仍输出 pass”的暗区。
+COVERAGE_GAPS: dict[str, str] = {}
 
 # ---------------------------------------------------------------- YAML 子集解析
 # 只覆盖 A.1 样例使用的构造：块映射、块序列、流映射/流序列、引号标量、
@@ -345,6 +344,11 @@ def check_project_minimal_existence(data: dict) -> tuple[str, str | None]:
     for commitment in data["commitments"]:
         if commitment.get("by") not in actor_ids or commitment.get("to") not in outcome_ids:
             return "fail", "broken_commitment_endpoint"
+    commitment_ids = {item.get("id") for item in data["commitments"]}
+    for constraint in data["constraints"]:
+        target = constraint.get("constrains")
+        if not target or target not in (outcome_ids | commitment_ids):
+            return "fail", "constraint_not_applied"
     return "pass", None
 
 
@@ -353,6 +357,9 @@ def check_constraint_anchor(data: dict) -> tuple[str, str | None]:
         return "cannot_evaluate", "missing_input"
     constraint_ids = {item.get("id") for item in data["constraints"]}
     for item in list(data["commitments"]) + list(data["deliverables"]):
+        node_type = item.get("node_type")
+        if node_type is not None and node_type not in ("ManagementActivity", "ManagementArtifact"):
+            return "cannot_evaluate", "undefined_object_type"
         refs = item.get("constrained_by") or []
         if not refs or any(ref not in constraint_ids for ref in refs):
             return "fail", "unanchored_management_item"
@@ -362,11 +369,21 @@ def check_constraint_anchor(data: dict) -> tuple[str, str | None]:
 def check_deliverable_assertion(data: dict) -> tuple[str, str | None]:
     if any(key not in data for key in ("deliverables", "assertions")):
         return "cannot_evaluate", "missing_input"
-    assertion_ids = {item.get("id") for item in data["assertions"]}
+    assertion_by_id = {item.get("id"): item for item in data["assertions"]}
     for deliverable in data["deliverables"]:
+        deliverable_id = deliverable.get("id")
         refs = deliverable.get("asserted_by") or []
-        if not refs or any(ref not in assertion_ids for ref in refs):
+        if any(ref not in assertion_by_id for ref in refs):
+            return "fail", "dangling_reference"
+        about_ids = [aid for aid, item in assertion_by_id.items() if item.get("about") == deliverable_id]
+        if not refs and not about_ids:
             return "fail", "deliverable_without_assertion"
+        for assertion_id in list(dict.fromkeys(list(refs) + sorted(about_ids))):
+            assertion = assertion_by_id[assertion_id]
+            if not assertion.get("statement") or assertion.get("statement_kind") not in STATEMENT_KINDS:
+                return "fail", "assertion_without_content"
+            if assertion.get("about") != deliverable_id:
+                return "fail", "assertion_about_mismatch"
     return "pass", None
 
 
@@ -374,11 +391,21 @@ def check_change_constraint(data: dict) -> tuple[str, str | None]:
     if any(key not in data for key in ("changes", "constraints")):
         return "cannot_evaluate", "missing_input"
     constraint_ids = {item.get("id") for item in data["constraints"]}
+    commitment_ids = {item.get("id") for item in data.get("commitments") or []}
+    deliverable_ids = {item.get("id") for item in data.get("deliverables") or []}
     for change in data["changes"]:
         if change.get("constraint") not in constraint_ids:
             return "fail", "missing_constraint_link"
         if change.get("relation") not in CHANGE_RELATIONS:
             return "fail", "invalid_change_relation"
+        target = change.get("target")
+        if not isinstance(target, dict) or not target.get("type") or not target.get("id"):
+            return "fail", "missing_change_target"
+        if target["type"] not in CHANGE_TARGET_TYPES:
+            return "fail", "invalid_change_target"
+        known = commitment_ids if target["type"] == "Commitment" else deliverable_ids
+        if target["id"] not in known:
+            return "fail", "invalid_change_target"
     return "pass", None
 
 
@@ -401,7 +428,7 @@ def check_role_minimal(data: dict) -> tuple[str, str | None]:
         if not responsible:
             return "fail", "missing_responsible"
         if accountable in responsible and not commitment.get("role_merge_declaration"):
-            return "fail", "missing_role_merge_declaration"
+            return "fail", "missing_role_merge_declaration", "warn"
     return "pass", None
 
 
@@ -446,9 +473,15 @@ def check_all_improvement(data: dict) -> tuple[str, str | None]:
         return "cannot_evaluate", "missing_input"
     for change in data["changes"]:
         relations = change.get("relations") or []
+        assumption = change.get("assumption")
+        status = assumption.get("status") if isinstance(assumption, dict) else None
         if relations and all(item == "mitigates" for item in relations):
-            if not change.get("assumption") or not change.get("verification_condition"):
+            if not assumption or not change.get("verification_condition"):
                 return "fail", "all_improvement_without_verification"
+            if status == "expired":
+                return "cannot_evaluate", "assumption_unclosed"
+        if change.get("approval_basis") and status != "satisfied":
+            return "fail", "approval_basis_before_verification"
     return "pass", None
 
 
@@ -474,8 +507,17 @@ def check_ai_autonomy(data: dict) -> tuple[str, str | None]:
             return "fail", "delegation_chain_not_accountable"
         covers: set = set()
         for assertion_id in grant.get("assertions") or []:
-            assertion = assertions.get(assertion_id) or {}
+            assertion = assertions.get(assertion_id)
+            if assertion is None:
+                return "fail", "dangling_reference"
             covers.update(assertion.get("covers") or [])
+            if assertion.get("kind") not in ASSERTION_KINDS:
+                return "cannot_evaluate", "undefined_object_type"
+            if assertion.get("kind") != "assumption" or not assertion.get("verification_condition"):
+                return "fail", "assertion_incomplete"
+            assumption = assertion.get("assumption")
+            if isinstance(assumption, dict) and assumption.get("status") == "expired":
+                return "cannot_evaluate", "assumption_unclosed"
         if not {"scope", "boundary", "revocation"} <= covers:
             return "fail", "assertion_incomplete"
     return "pass", None
@@ -627,7 +669,18 @@ def run_case(case: dict) -> dict:
     check_id = case["check_id"]
     expected = case["expected"] or {}
     severity, rule_status = SPEC[check_id][1], SPEC[check_id][2]
-    verdict, reason = CHECKS[check_id](case["input"] or {})
+    data = case["input"] or {}
+    applicability = data.get("applicability") or {}
+    state = applicability.get("state") if isinstance(applicability, dict) else None
+    if state == "inapplicable":
+        verdict, reason = "not_applicable", None
+    elif state == "pending":
+        verdict, reason = "cannot_evaluate", "applicability_pending"
+    else:
+        result = CHECKS[check_id](data)
+        verdict, reason = result[0], result[1]
+        if len(result) > 2 and result[2]:
+            severity = result[2]
     actual = {
         "check_id": check_id,
         "source_rule": SPEC[check_id][0],
@@ -694,6 +747,8 @@ def main() -> int:
         print(f"样例通过：{summary['passed']}/{summary['total']}（{summary['rate'] * 100:.1f}%）")
         print(f"按 check_id：{summary['checks_passed']}/{summary['checks_total']} 全通过")
         print("未覆盖规则正文（原型只执行附录 A 判定列）：")
+        if not COVERAGE_GAPS:
+            print("  - 无（ADR-0013 已消解全部 5 项）")
         for check_id, note in COVERAGE_GAPS.items():
             print(f"  - {check_id}：{note}")
     return 0 if len(passed) == len(cases) else 1

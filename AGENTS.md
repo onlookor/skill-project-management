@@ -76,7 +76,7 @@
 
 - **不得自动推断**。缺省（字段缺失）按 `released` 严格处理；非法值按结构错误（退出码 2）处理。不得根据分支名、提交数量或人工口头说明推断状态。
 - 状态切换必须写入 `manifest.json` 并随提交生效，不得只改工作区。
-- 发布提交的引导顺序固定：tag 只能指向已存在的提交，因此“把 `release_state` 改为 `released` 并递增版本”的提交需以 `git commit --no-verify` 提交，随后立即打 annotated tag 并运行五个检查器。其他提交不得使用 `--no-verify`。
+- 发布提交的引导顺序固定：tag 只能指向已存在的提交，因此“把 `release_state` 改为 `released` 并递增版本”的提交需以 `git commit --no-verify` 提交，随后立即打 annotated tag 并运行七个检查器。其他提交不得使用 `--no-verify`。
 - 发布点仍只有一个：以 annotated tag 声明（ADR-0003）；`development` 只说明 `HEAD` 领先于最近发布点，不产生第二个发布点。
 
 ##### 3.5.1 绕过留痕（硬要求）
@@ -86,7 +86,7 @@
 ```
 Hook-Bypass: release-bootstrap
 Hook-Bypass-Reason: <为什么 pre-commit 无法通过>
-Hook-Bypass-Verified: <tag 名；五个检查器的复跑结果>
+Hook-Bypass-Verified: <tag 名；七个检查器的复跑结果>
 ```
 
 - `v0.5.2` 及以后的发布提交必须齐备三项，且 `Hook-Bypass` 的值固定为 `release-bootstrap`；缺失任一项即错误。
@@ -150,7 +150,7 @@ Hook-Bypass-Verified: <tag 名；五个检查器的复跑结果>
 
 ##### 3.6.5 机械核查与临时性
 
-- **检查器**：`scripts/check_gap_ledger.py` 统计总数、按级计数、按到期计数，并输出核查矩阵的 `consistent` 比例；到期未裁定或结构非法时退出 1。`--staged` 额外要求规则/判定文件与台账同批暂存。检查器与其余四个脚本并列为第五个提交前检查器。
+- **检查器**：`scripts/check_gap_ledger.py` 统计总数、按级计数、按到期计数，并输出核查矩阵的 `consistent` 比例；到期未裁定或结构非法时退出 1。`--staged` 额外要求规则/判定文件与台账同批暂存。检查器与其余六个脚本共同构成七个提交前检查器。
 - **撤除条件**（全部满足）：连续两个发布点 `open=0` 且核查矩阵 17/17 为 `consistent`；第二个发布周期无新增缺口；裁定方完成一次全量“规则正文 ↔ 判定列”对照，确认无 `rule-stricter` 遗留。
 - **硬约束**：不晚于 M3 关闭前评估撤除（`TODO.md` T-132）。M3 关闭时仍有 `open` 缺口则机制冻结：新增缺口须经 ADR，所有 `open` 缺口必须在 M4 前裁定。
 - **撤除动作**：删除 `GAP_LEDGER.md` 与 `scripts/check_gap_ledger.py`；移除本条、7bis 的钩子项与 `check_state.py` 的调用；T-132 标 `done` 并记 `CHANGELOG.md`。
@@ -203,6 +203,7 @@ project-management-grounding/
 │
 ├── knowledge/
 │   ├── anchored-entries.jsonl      # 本体条目（term/definition/relations/grounding_ref）
+│   ├── glossary-usage.json         # 术语使用位置基线（check_glossary_usage.py 生成）
 │   └── methods/
 │       └── registry-skeleton.md    # 方法注册表（估算、WBS、风险、挣值、采购；首批 5 条）
 │
@@ -243,6 +244,8 @@ project-management-grounding/
 │   ├── anchor_baseline.json        # 规则/来源文本块的指纹基线
 │   ├── check_no_raw_material.py    # 原始资料/OCR/成段原文的阻断式检查（可运行）
 │   ├── check_gap_ledger.py         # 缺口台账结构、覆盖、到期与暂存同步检查（可运行）
+│   ├── check_three_table.py        # 正文 ↔ 判定列 ↔ 输入 schema 三表机械对照（可运行）
+│   ├── check_glossary_usage.py     # 术语使用位置生成与陈旧引用校验（可运行）
 │   ├── validate_ontology.py        # 本体与 SHACL 形状校验，含逐形状负例矩阵（可选依赖）
 │   └── check_state.py              # STATE 与 git 跟踪文件的对账脚本（可运行）
 │
@@ -275,7 +278,7 @@ project-management-grounding/
 | `CONSTITUTION.md` | 人类责任方 | 治理规则调整（需 ADR，见第 5 条） | ADR `accepted` |
 | `GRAMMAR.md` | 人类责任方 | 规则增删改（需 ADR + `SOURCE_LEDGER.md` 支撑） | ADR `accepted` |
 | `SOURCE_LEDGER.md` | 人类责任方 | 来源新增/弃用/状态变更（需 ADR） | ADR `accepted` |
-| **`GLOSSARY.md`** | **人类责任方** | **术语增删改（A 类需 ADR + JSONL 同步；B/C/D 类需 ADR；E/F 类需 CHANGELOG）** | **ADR `accepted`（A/B/C/D 类）；CHANGELOG（E/F 类）** |
+| **`GLOSSARY.md`** | **人类责任方** | **术语增删改（A 类需 ADR + JSONL 同步；B/C/D 类需 ADR；E/F 类需 CHANGELOG）；第 4 节使用位置由脚本生成，不得手改** | **ADR `accepted`（A/B/C/D 类）；CHANGELOG（E/F 类）；生成块随 `check_glossary_usage.py --write` 重建** |
 | **`spec/COMPILATION_META.md`** | **人类责任方** | **编译元框架调整（需 ADR，且 ADR 须论证具体编译失败）** | **ADR `accepted`** |
 | **`spec/COMPILATION_METHODS.md`** | **人类责任方** | **方法的启用/淘汰/替换（需 ADR）；格式调整（需 CHANGELOG）** | **ADR `accepted`（启用/淘汰/替换）；CHANGELOG（格式）** |
 | **`spec/methods/{method-id}.md`** | **交付方** | **方法声明调整** | **CHANGELOG；改变已有规则编译结果时升级为结构性变更（需 ADR）** |
@@ -290,7 +293,7 @@ project-management-grounding/
 | `adr/` | 任何执行者 | 治理决策发生 | 状态 `proposed` 即时登记，`accepted` 需人类责任方 |
 | `validation/` | 交付方 | 规则变化时由 `spec/COMPILATION_META.md` + 启用的方法声明重建 | 随规则演进 |
 | `validation/test-cases/` | 交付方 | 用例新增/修正 | 随用例更新 |
-| `scripts/` | 交付方 | 脚本规格变化 | 随规格更新 |
+| `scripts/` | 交付方 | 脚本规格变化；新增/修改检查器须同步接入 `.githooks/pre-commit`、`scripts/README.md` 与 `check_state.py` | 随规格更新 |
 
 **为什么目录结构的权威放在本文件而非 README**：目录结构不是“给新读者的介绍”，而是“对执行者的约束”——它规定了哪些文件可以被修改、由谁修改、更新频率如何。这些属于执行约定，与第 1 条的资料获取纪律、第 2 条的检查机械化同层。`README.md` 的职责是**让读者尽快找到入口**，它保留一份导航表即可；两份文档的职责边界因此清晰：**README 回答“我该读什么”，AGENTS 回答“这个仓库怎么运转”**。
 
@@ -314,6 +317,28 @@ project-management-grounding/
 5. **术语定义缺失时**：阻断并报告缺失项，**不得自行推断或编造定义**（与槽位填充的纪律一致）。
 
 **违反术语引用纪律的输出**：不构成成文法违规，但构成执行层缺陷，记录并修正。若某术语的定义在 `GLOSSARY.md` 中缺失而输出中使用了该术语，视为 `GLOSSARY.md` 的缺口，登记于 `TODO.md`。
+
+##### 5bis.1 提交前术语扫描（硬要求）
+
+**术语表不是只读文档，必须进入治理循环。** 每次提交前扫描**本次改动与新增的内容**（`git diff --cached` 与新增文件），逐条判断是否需要对 `GLOSSARY.md` 做新增、修改或删除；不要求全仓库重扫，但要求“本次引入或改变的概念”都有结论。
+
+| 触发情形 | 必须动作 |
+|---|---|
+| 出现新概念：新的节点类型、关系、枚举值、判定对象、治理角色、机制名 | 在 `GLOSSARY.md` 新增条目并分配 `term_id`；A/B/C/D 类走 ADR，E/F 类走 CHANGELOG（`CONSTITUTION.md` 第 11 条） |
+| 已有术语的含义、适用范围或判别口径发生变化 | 同步修改该条目定义；不得只改使用处、不改定义 |
+| 术语被替代、废弃或合并 | 条目标 `deprecated` / `superseded` 并写明替代者或合并去向，**保留 term_id，不得删除** |
+| 只改术语的使用位置，未改含义 | 不改定义；必须重生成使用位置清单并与改动同批提交 |
+
+**机械核查（生成 + 冻结基线 + 变更时校验）**：
+
+- `scripts/check_glossary_usage.py` 从 `git ls-files` 的 Markdown / JSONL 中扫描每条术语的使用位置，写入基线 `knowledge/glossary-usage.json`，并在 `GLOSSARY.md` 第 4 节的标记块内生成“使用位置”表。
+- 默认模式逐项校验：基线中的位置存在、行号有效、该行确实包含该术语、`GLOSSARY.md` 生成块未被手改、术语集合与 `GLOSSARY.md` 一致。陈旧位置或手改 → 退出 1，pre-commit 阻断。
+- `--write` 重生成，位置按 `path:line` 排序，幂等；同一仓库状态重复生成必得同一基线。新增、删除、移动文件或改行后，必须 `--write` 并与改动同批提交。
+- 匹配只认三种形式：行内代码 `` `术语` ``、`GLOSSARY.md#term_id`、裸 `term_id`。**裸术语正文不作匹配依据**，以抑制同名异义与普通词语误命中；零使用术语输出警告，由作者判断是“尚未使用”还是“应废弃”。
+
+**为什么选生成而不是手工清单**：`GLOSSARY.md` 现有 82 条术语、800 余处使用位置，手工维护必然在数次提交内陈旧，且无法机械核查“链接是否仍有效”。生成方式可重复、可核对，并能把未预期的漂移转成显式差异；代价是误匹配风险，已用上述三种匹配形式与“裸词不匹配”控制。
+
+**与缺口台账、既有检查器的关系**：这不是一套平行机制。缺口台账记录“规则正文 ↔ 判定列”的语义不一致（入口见 3.6）；术语使用位置检查记录“术语条目 ↔ 仓库实际引用”的引用完整性。前者需要人工裁定，后者完全机械，两者都由 `check_state.py` 在发布前调用，并与其余检查器一起遵守“改动同批更新、命中即阻断”的同一条纪律。
 
 ### 6. 标准工作流（一次项目管理活动）
 
@@ -349,8 +374,8 @@ project-management-grounding/
 1. **提取产物一律落在仓库外**。约定目录为 `/tmp/pm-extract-<source-id>-<date>/`，存放 `pdftotext` 文本层输出、`pdftoppm` 渲染图、Tesseract OCR 结果与任何逐页转储。**不得**落在仓库目录内，也不得放进 `resources/`。
 2. **`resources/` 只在本地只读使用**。不复制、不打包、不 `git add`；`.gitignore` 已忽略 `resources/` 与文档类扩展名，但忽略规则不是许可。
 3. **引用外部文献只写可复核的定位与自己的话**。默认写法是“页码定位 + 自述摘要”；确需引证术语或条款措辞时，单条不超过一行或一句，并附来源 `id` 与页码（见 `CONSTITUTION.md` 第 13.2 条）。
-4. **提交前必须运行五个检查器**：`check_no_raw_material.py`、`check_anchors.py`、`check_ledger_landings.py`、`check_gap_ledger.py --staged`、`check_state.py`。本仓库已提供 `.githooks/pre-commit`，每个克隆需自行执行 `git config core.hooksPath .githooks` 启用；未启用钩子的部署必须在 `git add` 前手工逐个运行，等价命令见 `scripts/README.md`。
-5. **检查器命中即停止提交**，不得用 `--no-verify` 绕过。唯一例外是第 3.5 条规定的发布引导提交（`release_state` 改为 `released` 并递增版本），该提交必须携带 3.5.1 的三项 `Hook-Bypass` trailer，并紧接 annotated tag 与五个检查器的复跑；该通道按 3.5.2 的撤除条件关闭（`TODO.md` T-129）。确需新增其他例外（例如将来要提交一张合法图片资产），走 ADR 并在检查器中登记路径豁免，而不是删除规则或放宽阈值。
+4. **提交前必须运行七个检查器**：`check_no_raw_material.py`、`check_anchors.py`、`check_ledger_landings.py`、`check_gap_ledger.py --staged`、`check_three_table.py`、`check_glossary_usage.py`、`check_state.py`。本仓库已提供 `.githooks/pre-commit`，每个克隆需自行执行 `git config core.hooksPath .githooks` 启用；未启用钩子的部署必须在 `git add` 前手工逐个运行，等价命令见 `scripts/README.md`。
+5. **检查器命中即停止提交**，不得用 `--no-verify` 绕过。唯一例外是第 3.5 条规定的发布引导提交（`release_state` 改为 `released` 并递增版本），该提交必须携带 3.5.1 的三项 `Hook-Bypass` trailer，并紧接 annotated tag 与七个检查器的复跑；该通道按 3.5.2 的撤除条件关闭（`TODO.md` T-129）。确需新增其他例外（例如将来要提交一张合法图片资产），走 ADR 并在检查器中登记路径豁免，而不是删除规则或放宽阈值。
 6. **发现已跟踪内容违规时**：先报告文件与位置，再改为“页码定位 + 自述摘要”或移出仓库，并在 `ERRATA.md` 登记；不静默删除他人的内容。
 7. **自建本体（`CONSTITUTION.md` 第 13.6 条）**：
    - 只放 `ontology/`；主格式为 Turtle（`.ttl`、`.shacl.ttl`），`.owl`/`.rdf`/`.nt`/`.n3`/`.jsonld` 仅作生成导出，仍受同一内容检查。
