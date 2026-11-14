@@ -119,7 +119,7 @@
 | T-109 | M7 | 产物版本链重构 | `spec/COMPILATION_META.md` 第 10 条与 `spec/methods/deterministic-checker.md` 第 9 节以“文件头版本”为输入定义产物版本与对齐检查；文件层去版本后该链失效，需裁定替代口径 | ADR（改变已有规则的编译结果） | 用户裁定 | `done`（ADR-0004；CHANGELOG 批次 0007） |
 | T-117 | M7 | 引用登记 | 为 `SKILL.md`、`validation/test-cases/TC-*.md` 等尚未创建的引用建立计划项登记，避免长期以“示例/计划”身份存在 | 执行层补丁 | 无 | `open` |
 | T-120 | M7 | 治理 | 若确需从已发布历史中移除误提交的原始资料，制定独立 ADR：明确影响范围、协作者同步方式与是否重写历史；ADR-0009 只约束新提交 | 治理（ADR） | 实际发生历史违规 | `open` |
-| T-129 | M7 | 流程撤出 | 撤出发布引导的 `--no-verify` 通道：`check_state.py` 识别 `Release-Target: <tag>` 待发布声明，`.githooks/pre-push` 严格校验 tag 存在、annotated、指向 HEAD；关闭后删除 `AGENTS.md` 3.5/7bis 的例外与 trailer 强制 | 执行层补丁 + 钩子 | 无；硬约束：不晚于 `v0.5.2` 发布，机制生效后最多 1 次豁免 | `open` |
+| T-129 | M7 | 流程撤除 | 撤除发布引导的 `--no-verify` 通道：`check_state.py` 识别 `Release-Target: <tag>` 待发布声明，`.githooks/pre-push` 严格校验 tag 存在、annotated、指向 HEAD；关闭后删除 `AGENTS.md` 3.5/7bis 的例外与 trailer 强制 | 执行层补丁 + 钩子 | 无；硬约束：不晚于 `v0.5.2` 发布，机制生效后最多 1 次豁免 | `open` |
 
 #### 附录：T-121 邮件正文（英文）
 

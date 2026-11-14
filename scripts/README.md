@@ -28,7 +28,7 @@ python3 scripts/validate_ontology.py --matrix
 
 `check_state.py` 退出码：`0` 通过（开发态下“HEAD 领先于 tag”只输出警告）；`1` 存在错误（逐条列出）；`2` `STATE.md` 或 `manifest.json` 结构无法解析、缺少字段、`release_state` 非法，或不在 git 仓库中。`release_state` 缺失按 `released` 严格处理；`development` 不豁免 tag 名、版本号、annotated 与祖先关系判断。
 
-发布引导提交的留痕：git 不记录 `--no-verify`，因此 `check_state.py` 改为核查 commit message 中的 `Hook-Bypass: release-bootstrap`、`Hook-Bypass-Reason:`、`Hook-Bypass-Verified:` 三项 trailer。`v0.5.2` 及以后的发布提交缺任一项即错误；非发布提交携带即错误。规则见 `AGENTS.md` 3.5.1，撤出条件见 3.5.2 与 `TODO.md` T-129。
+发布引导提交的留痕：git 不记录 `--no-verify`，因此 `check_state.py` 改为核查 commit message 中的 `Hook-Bypass: release-bootstrap`、`Hook-Bypass-Reason:`、`Hook-Bypass-Verified:` 三项 trailer。`v0.5.2` 及以后的发布提交缺任一项即错误；非发布提交携带即错误。规则见 `AGENTS.md` 3.5.1，撤除条件见 3.5.2 与 `TODO.md` T-129。
 
 `check_ledger_landings.py` 退出码：`0` 通过（可有待落点警告）；`1` 存在错误；`2` 登记表结构无法解析。
 

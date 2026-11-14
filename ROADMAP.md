@@ -124,7 +124,7 @@
   3. 历史清理有决策 ADR（即使结论是不重写历史），影响范围与协作者同步方式写明。
   4. T-051 有结论并落 ADR。
   5. 第 1 节的 D1–D5 与 v1.0.0 门槛全部满足；打 annotated tag `v1.0.0`，`manifest.json` 同步。
-  6. T-129 撤出 `--no-verify` 通道：pre-commit 识别 `Release-Target: <tag>` 待发布声明，`.githooks/pre-push` 严格校验 tag 存在、annotated、指向 HEAD；不得晚于 `v0.5.2` 发布，机制生效后最多 1 次豁免（细则见 `AGENTS.md` 3.5.2）。
+  6. T-129 撤除 `--no-verify` 通道：pre-commit 识别 `Release-Target: <tag>` 待发布声明，`.githooks/pre-push` 严格校验 tag 存在、annotated、指向 HEAD；不得晚于 `v0.5.2` 发布，机制生效后最多 1 次豁免（细则见 `AGENTS.md` 3.5.2）。
 - **依赖**：M2、M4、M6 的出口。**并行**：无（收口）。
 
 ## 3. 关键路径与并行

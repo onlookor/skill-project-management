@@ -312,14 +312,14 @@
 
 ---
 
-### 批次 0025 — 2026-11-14 — 绕过通道留痕与撤出条件
+### 批次 0025 — 2026-11-14 — 绕过通道留痕与撤除条件
 
 - **涉及文件**：
   - 修改：`scripts/check_state.py`、`AGENTS.md`（3.5.1、3.5.2、7bis 第 5 条）、`ROADMAP.md`（M7 工作项与出口 6、发布表、当前基线）、`TODO.md`（T-129）、`manifest.json`（`release_state=development`）、`scripts/README.md`、`CHANGELOG.md`（本批次）
 - **变更摘要**：
   1. 实测 git 不记录 `--no-verify`：发布提交对象只有 `tree` / `parent` / `author` / `committer` / `message`，没有旁路标记；因此改用固定 trailer 留痕：`Hook-Bypass: release-bootstrap`、`Hook-Bypass-Reason:`、`Hook-Bypass-Verified:`。
   2. `check_state.py` 对 `v0.5.2` 及以后的发布提交强制三项 trailer，缺失即错误；非发布提交携带即错误；`v0.5.1` 及以前不追溯。
-  3. 撤出方向定为两段校验：pre-commit 识别 `Release-Target: <tag>` 显式待发布声明，pre-push 严格校验 tag 存在、annotated、指向 `HEAD`；登记 T-129（M7），硬约束为不晚于 `v0.5.2` 发布、机制生效后最多 1 次豁免。
+  3. 撤除方向定为两段校验：pre-commit 识别 `Release-Target: <tag>` 显式待发布声明，pre-push 严格校验 tag 存在、annotated、指向 `HEAD`；登记 T-129（M7），硬约束为不晚于 `v0.5.2` 发布、机制生效后最多 1 次豁免。
   4. `manifest.json` 切回 `development`（`v0.5.1` 之后的开发态）。
 - **钩子绕过**：本批次不是发布提交，未使用 `--no-verify`。
 - **验证**：负例（`v9.9.9` 发布提交无 trailer）退出 1；正例（`v9.9.8` 携带三项 trailer）退出 0；主工作区四个检查器 0 错误，`check_state.py` 输出开发态警告。
