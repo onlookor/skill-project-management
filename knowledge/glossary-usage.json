@@ -121,7 +121,7 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 865,
+          "line": 1235,
           "form": "code"
         },
         {
@@ -257,6 +257,11 @@
         {
           "file": "spec/methods/deterministic-checker.md",
           "line": 403,
+          "form": "code"
+        },
+        {
+          "file": "spec/methods/deterministic-checker.md",
+          "line": 445,
           "form": "code"
         },
         {
@@ -511,12 +516,22 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 573,
+          "line": 483,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 577,
+          "line": 521,
+          "form": "code"
+        },
+        {
+          "file": "spec/methods/deterministic-checker.md",
+          "line": 719,
+          "form": "code"
+        },
+        {
+          "file": "spec/methods/deterministic-checker.md",
+          "line": 761,
           "form": "code"
         },
         {
@@ -686,17 +701,17 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 485,
+          "line": 597,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 573,
+          "line": 719,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 925,
+          "line": 1323,
           "form": "code"
         },
         {
@@ -911,17 +926,27 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 447,
+          "line": 521,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 530,
+          "line": 542,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 865,
+          "line": 676,
+          "form": "code"
+        },
+        {
+          "file": "spec/methods/deterministic-checker.md",
+          "line": 739,
+          "form": "code"
+        },
+        {
+          "file": "spec/methods/deterministic-checker.md",
+          "line": 1235,
           "form": "code"
         },
         {
@@ -1077,6 +1102,21 @@
         {
           "file": "spec/methods/deterministic-checker.md",
           "line": 443,
+          "form": "code"
+        },
+        {
+          "file": "spec/methods/deterministic-checker.md",
+          "line": 464,
+          "form": "code"
+        },
+        {
+          "file": "spec/methods/deterministic-checker.md",
+          "line": 502,
+          "form": "code"
+        },
+        {
+          "file": "spec/methods/deterministic-checker.md",
+          "line": 521,
           "form": "code"
         },
         {
@@ -1236,22 +1276,22 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 485,
+          "line": 597,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 799,
+          "line": 1105,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 861,
+          "line": 1167,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 865,
+          "line": 1235,
           "form": "code"
         },
         {
@@ -1356,52 +1396,62 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 579,
+          "line": 763,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 600,
+          "line": 784,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 621,
+          "line": 805,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 799,
+          "line": 823,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 801,
+          "line": 1105,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 831,
+          "line": 1107,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 865,
+          "line": 1137,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 925,
+          "line": 1235,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 946,
+          "line": 1323,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 970,
+          "line": 1344,
+          "form": "code"
+        },
+        {
+          "file": "spec/methods/deterministic-checker.md",
+          "line": 1366,
+          "form": "code"
+        },
+        {
+          "file": "spec/methods/deterministic-checker.md",
+          "line": 1390,
           "form": "code"
         }
       ]
@@ -1436,12 +1486,22 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 600,
+          "line": 784,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 621,
+          "line": 805,
+          "form": "code"
+        },
+        {
+          "file": "spec/methods/deterministic-checker.md",
+          "line": 807,
+          "form": "code"
+        },
+        {
+          "file": "spec/methods/deterministic-checker.md",
+          "line": 823,
           "form": "code"
         }
       ]
@@ -1476,7 +1536,7 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 708,
+          "line": 964,
           "form": "code"
         }
       ]
@@ -1511,7 +1571,7 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 577,
+          "line": 761,
           "form": "code"
         }
       ]
@@ -1546,7 +1606,7 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 577,
+          "line": 761,
           "form": "code"
         }
       ]
@@ -1586,12 +1646,12 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 579,
+          "line": 763,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 801,
+          "line": 1107,
           "form": "code"
         }
       ]
@@ -1626,7 +1686,7 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 970,
+          "line": 1390,
           "form": "code"
         }
       ]
@@ -1666,12 +1726,12 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 865,
+          "line": 1235,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 867,
+          "line": 1237,
           "form": "code"
         }
       ]
@@ -1716,7 +1776,7 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 1066,
+          "line": 1510,
           "form": "code"
         }
       ]
@@ -2406,62 +2466,62 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 752,
+          "line": 1008,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 775,
+          "line": 1031,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 861,
+          "line": 1167,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 863,
+          "line": 1233,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 865,
+          "line": 1235,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 923,
+          "line": 1321,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 968,
+          "line": 1388,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 1021,
+          "line": 1465,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 1064,
+          "line": 1508,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 1114,
+          "line": 1581,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 1154,
+          "line": 1621,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 1208,
+          "line": 1693,
           "form": "code"
         },
         {
@@ -3143,6 +3203,11 @@
         {
           "file": "CHANGELOG.md",
           "line": 626,
+          "form": "code"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 639,
           "form": "code"
         },
         {
@@ -4314,7 +4379,12 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 667,
+          "line": 903,
+          "form": "code"
+        },
+        {
+          "file": "spec/methods/deterministic-checker.md",
+          "line": 942,
           "form": "code"
         }
       ]

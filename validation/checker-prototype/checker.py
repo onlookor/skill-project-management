@@ -168,9 +168,10 @@ REFERENCE_RULES = parse_reference_rules(_SCHEMA_TEXT)
 _METHOD_TEXT = (ROOT / METHOD).read_text(encoding="utf-8")
 
 
-def parse_reason_order(text: str) -> dict[str, list[str]]:
-    """按 A.2 行序生成每个 check_id 的原因码优先级，用于顺序无关的 reason 选择。"""
+def parse_reason_order(text: str) -> tuple[dict[str, list[str]], dict[str, str]]:
+    """按 A.2 行序生成原因码优先级，并登记每个原因码所属子句的 severity。"""
     order: dict[str, list[str]] = {}
+    severity: dict[str, str] = {}
     for line in text.splitlines():
         cells = split_row(line)
         if not cells or len(cells) < 8:
@@ -178,14 +179,16 @@ def parse_reason_order(text: str) -> dict[str, list[str]]:
         if not (cells[0].startswith("`G-") and cells[0].endswith("`")):
             continue
         check_id = cells[4].strip("`")
+        clause_severity = cells[5].strip("`")
         slot = order.setdefault(check_id, [])
         for reason in re.findall(r"[a-z][a-z0-9_]+", cells[3]):
             if reason not in slot:
                 slot.append(reason)
-    return order
+            severity.setdefault(reason, clause_severity)
+    return order, severity
 
 
-REASON_ORDER = parse_reason_order(_METHOD_TEXT)
+REASON_ORDER, REASON_SEVERITY = parse_reason_order(_METHOD_TEXT)
 
 VERDICT_RANK = {"pass": 0, "cannot_evaluate": 1, "fail": 2}
 SEVERITY_RANK = {"advisory": 0, "warn": 1, "block": 2}
@@ -205,10 +208,17 @@ def aggregate(
     verdict = max((item[0] for item in results), key=lambda value: VERDICT_RANK[value])
     winners = [item for item in results if item[0] == verdict]
     reasons = [item[1] for item in winners if len(item) > 1 and item[1]]
-    severity = default_severity
+    severities = []
     for item in winners:
-        if len(item) > 2 and item[2] and SEVERITY_RANK[item[2]] > SEVERITY_RANK[severity]:
-            severity = item[2]
+        reason = item[1] if len(item) > 1 else None
+        clause_severity = item[2] if len(item) > 2 and item[2] else REASON_SEVERITY.get(reason)
+        if clause_severity:
+            severities.append(clause_severity)
+    severity = (
+        max(severities, key=lambda value: SEVERITY_RANK[value])
+        if severities
+        else default_severity
+    )
     if not reasons:
         return verdict, None, severity
     for candidate in REASON_ORDER.get(check_id, []):
@@ -943,13 +953,13 @@ def extract_cases(method_text: str) -> list[dict]:
         end = headings[order + 1].start() if order + 1 < len(headings) else len(method_text)
         chunk = method_text[start:end]
         blocks = re.findall(r"```yaml\n(.*?)```", chunk, re.S)
-        if len(blocks) != 4:
-            raise SystemExit(f"[失败] {section} 应有 4 个 YAML 块，实际 {len(blocks)} 个")
-        for index in (0, 2):
+        if len(blocks) < 4 or len(blocks) % 2:
+            raise SystemExit(f"[失败] {section} 的 YAML 块应为 4 的倍数，实际 {len(blocks)} 个")
+        for index in range(0, len(blocks), 2):
             cases.append(
                 {
                     "section": section,
-                    "case": 1 if index == 0 else 2,
+                    "case": index // 2 + 1,
                     "check_id": check_id,
                     "source_rule": rule,
                     "input": load_yaml(blocks[index]),

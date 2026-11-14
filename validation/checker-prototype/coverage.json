@@ -1,0 +1,375 @@
+{
+  "version": 1,
+  "note": "A.2 每个子句至少 1 正例 + 1 负例；样例编号形如 A.1.5-3。正例期望 verdict=pass；负例期望 verdict≠pass 且 reason 属于该子句原因码。由 scripts/check_coverage_gate.py 机械核对。",
+  "clauses": {
+    "G-A1#1": {
+      "check_id": "PROJECT_MINIMAL_EXISTENCE",
+      "positive": [
+        "A.1.1-2"
+      ],
+      "negative": [
+        "A.1.1-3"
+      ]
+    },
+    "G-A1#2": {
+      "check_id": "PROJECT_MINIMAL_EXISTENCE",
+      "positive": [
+        "A.1.1-2"
+      ],
+      "negative": [
+        "A.1.1-4"
+      ]
+    },
+    "G-A1#3": {
+      "check_id": "PROJECT_MINIMAL_EXISTENCE",
+      "positive": [
+        "A.1.1-2"
+      ],
+      "negative": [
+        "A.1.1-5"
+      ]
+    },
+    "G-A1#4": {
+      "check_id": "PROJECT_MINIMAL_EXISTENCE",
+      "positive": [
+        "A.1.1-2"
+      ],
+      "negative": [
+        "A.1.1-1"
+      ]
+    },
+    "G-A1#5": {
+      "check_id": "PROJECT_MINIMAL_EXISTENCE",
+      "positive": [
+        "A.1.1-2"
+      ],
+      "negative": [
+        "A.1.1-6"
+      ]
+    },
+    "G-A1#6": {
+      "check_id": "PROJECT_MINIMAL_EXISTENCE",
+      "positive": [
+        "A.1.1-2"
+      ],
+      "negative": [
+        "A.1.1-7"
+      ]
+    },
+    "G-A2#1": {
+      "check_id": "CONSTRAINT_ANCHOR_REQUIRED",
+      "positive": [
+        "A.1.2-2"
+      ],
+      "negative": [
+        "A.1.2-1"
+      ]
+    },
+    "G-A2#2": {
+      "check_id": "CONSTRAINT_ANCHOR_REQUIRED",
+      "positive": [
+        "A.1.2-2"
+      ],
+      "negative": [
+        "A.1.2-3"
+      ]
+    },
+    "G-B1#1": {
+      "check_id": "DUAL_DIMENSION_ANNOTATION",
+      "positive": [
+        "A.1.6-2"
+      ],
+      "negative": [
+        "A.1.6-3"
+      ]
+    },
+    "G-B1#2": {
+      "check_id": "DUAL_DIMENSION_ANNOTATION",
+      "positive": [
+        "A.1.6-2"
+      ],
+      "negative": [
+        "A.1.6-1"
+      ]
+    },
+    "G-B2#1": {
+      "check_id": "DIMENSION_VALUE_CLOSED",
+      "positive": [
+        "A.1.7-2"
+      ],
+      "negative": [
+        "A.1.7-1"
+      ]
+    },
+    "G-B2#2": {
+      "check_id": "DIMENSION_VALUE_CLOSED",
+      "positive": [
+        "A.1.7-2"
+      ],
+      "negative": [
+        "A.1.7-3"
+      ]
+    },
+    "G-C1#1": {
+      "check_id": "DELIVERABLE_ASSERTION_LINK",
+      "positive": [
+        "A.1.3-2"
+      ],
+      "negative": [
+        "A.1.3-1"
+      ]
+    },
+    "G-C1#2": {
+      "check_id": "DELIVERABLE_ASSERTION_LINK",
+      "positive": [
+        "A.1.3-2"
+      ],
+      "negative": [
+        "A.1.3-3"
+      ]
+    },
+    "G-C1#3": {
+      "check_id": "DELIVERABLE_ASSERTION_LINK",
+      "positive": [
+        "A.1.3-2"
+      ],
+      "negative": [
+        "A.1.3-4"
+      ]
+    },
+    "G-C2#1": {
+      "check_id": "ASSERTION_MUTUAL_EXCLUSION",
+      "positive": [
+        "A.1.8-2"
+      ],
+      "negative": [
+        "A.1.8-1"
+      ]
+    },
+    "G-C2#2": {
+      "check_id": "ASSERTION_MUTUAL_EXCLUSION",
+      "positive": [
+        "A.1.8-2"
+      ],
+      "negative": [
+        "A.1.8-1"
+      ]
+    },
+    "G-D1#1": {
+      "check_id": "CHANGE_CONSTRAINT_LINK",
+      "positive": [
+        "A.1.4-2"
+      ],
+      "negative": [
+        "A.1.4-3"
+      ]
+    },
+    "G-D1#2": {
+      "check_id": "CHANGE_CONSTRAINT_LINK",
+      "positive": [
+        "A.1.4-2"
+      ],
+      "negative": [
+        "A.1.4-4"
+      ]
+    },
+    "G-D1#3": {
+      "check_id": "CHANGE_CONSTRAINT_LINK",
+      "positive": [
+        "A.1.4-2"
+      ],
+      "negative": [
+        "A.1.4-1"
+      ]
+    },
+    "G-D2#1": {
+      "check_id": "ALL_IMPROVEMENT_ASSUMPTION",
+      "positive": [
+        "A.1.9-2"
+      ],
+      "negative": [
+        "A.1.9-1"
+      ]
+    },
+    "G-D2#2": {
+      "check_id": "ALL_IMPROVEMENT_ASSUMPTION",
+      "positive": [
+        "A.1.9-2"
+      ],
+      "negative": [
+        "A.1.9-3"
+      ]
+    },
+    "G-D2#3": {
+      "check_id": "ALL_IMPROVEMENT_ASSUMPTION",
+      "positive": [
+        "A.1.9-2"
+      ],
+      "negative": [
+        "A.1.9-4"
+      ]
+    },
+    "G-E1#1": {
+      "check_id": "ROLE_MINIMAL_COMPLETENESS",
+      "positive": [
+        "A.1.5-2"
+      ],
+      "negative": [
+        "A.1.5-1"
+      ]
+    },
+    "G-E1#2": {
+      "check_id": "ROLE_MINIMAL_COMPLETENESS",
+      "positive": [
+        "A.1.5-2"
+      ],
+      "negative": [
+        "A.1.5-3"
+      ]
+    },
+    "G-E1#3": {
+      "check_id": "ROLE_MINIMAL_COMPLETENESS",
+      "positive": [
+        "A.1.5-2"
+      ],
+      "negative": [
+        "A.1.5-4"
+      ]
+    },
+    "G-E2#1": {
+      "check_id": "AI_AUTONOMY_DELEGATION_AUDITABLE",
+      "positive": [
+        "A.1.10-2"
+      ],
+      "negative": [
+        "A.1.10-1"
+      ]
+    },
+    "G-E2#2": {
+      "check_id": "AI_AUTONOMY_DELEGATION_AUDITABLE",
+      "positive": [
+        "A.1.10-2"
+      ],
+      "negative": [
+        "A.1.10-3"
+      ]
+    },
+    "G-E2#3": {
+      "check_id": "AI_AUTONOMY_DELEGATION_AUDITABLE",
+      "positive": [
+        "A.1.10-2"
+      ],
+      "negative": [
+        "A.1.10-4"
+      ]
+    },
+    "G-F1#1": {
+      "check_id": "PROJECT_CHARTER_EXISTENCE",
+      "positive": [
+        "A.1.11-2"
+      ],
+      "negative": [
+        "A.1.11-1"
+      ]
+    },
+    "G-F1#2": {
+      "check_id": "PROJECT_CHARTER_EXISTENCE",
+      "positive": [
+        "A.1.11-2"
+      ],
+      "negative": [
+        "A.1.11-3"
+      ]
+    },
+    "G-F2#1": {
+      "check_id": "CLOSURE_ACCEPTANCE_LINK",
+      "positive": [
+        "A.1.12-2"
+      ],
+      "negative": [
+        "A.1.12-1"
+      ]
+    },
+    "G-F2#2": {
+      "check_id": "CLOSURE_ACCEPTANCE_LINK",
+      "positive": [
+        "A.1.12-2"
+      ],
+      "negative": [
+        "A.1.12-3"
+      ]
+    },
+    "G-F3#1": {
+      "check_id": "PROCUREMENT_CONTRACT_ANCHOR",
+      "positive": [
+        "A.1.13-2"
+      ],
+      "negative": [
+        "A.1.13-1"
+      ]
+    },
+    "G-F3#2": {
+      "check_id": "PROCUREMENT_CONTRACT_ANCHOR",
+      "positive": [
+        "A.1.13-2"
+      ],
+      "negative": [
+        "A.1.13-3"
+      ]
+    },
+    "G-F4#1": {
+      "check_id": "SCHEDULE_EVIDENCE_LINK",
+      "positive": [
+        "A.1.14-2"
+      ],
+      "negative": [
+        "A.1.14-1"
+      ]
+    },
+    "G-G1#1": {
+      "check_id": "TAILORING_RECORD_EXISTENCE",
+      "positive": [
+        "A.1.15-2"
+      ],
+      "negative": [
+        "A.1.15-1"
+      ]
+    },
+    "G-G1#2": {
+      "check_id": "TAILORING_RECORD_EXISTENCE",
+      "positive": [
+        "A.1.15-2"
+      ],
+      "negative": [
+        "A.1.15-3"
+      ]
+    },
+    "G-G2#1": {
+      "check_id": "TAILORING_NON_TRIMMABLE_SET",
+      "positive": [
+        "A.1.16-2"
+      ],
+      "negative": [
+        "A.1.16-1"
+      ]
+    },
+    "G-G3#1": {
+      "check_id": "TAILORING_REASSESSMENT_CONDITION",
+      "positive": [
+        "A.1.17-2"
+      ],
+      "negative": [
+        "A.1.17-1"
+      ]
+    },
+    "G-G3#2": {
+      "check_id": "TAILORING_REASSESSMENT_CONDITION",
+      "positive": [
+        "A.1.17-2"
+      ],
+      "negative": [
+        "A.1.17-3"
+      ]
+    }
+  }
+}

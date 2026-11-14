@@ -629,3 +629,20 @@
   - **复核状态**：G-001–G-017 仍为 `open`（17/17）。G-009 与 G-014 待非同源复核关闭，其余 15 条不动。
 - **关联 ADR**：ADR-0013（`proposed`，§2.1 P7、§2.3 D4）
 - **状态**：生效（缺陷修复；缺口未关闭）
+
+---
+
+### 批次 0040 — 2026-11-14 — 第二段：覆盖闸门
+
+- **性质**：新增机械闸门，不关闭缺口；17 条缺口仍为 `open`。
+- **涉及文件**：`spec/methods/deterministic-checker.md`（A.1 新增 23 个负例，34 → 57；样例基线注记）、`validation/checker-prototype/coverage.json`（新增覆盖矩阵）、`scripts/check_coverage_gate.py`（新增）、`scripts/test_coverage_gate.py`（新增）、`validation/checker-prototype/checker.py`（样例解析支持多例；severity 按 A.2 子句取值）、`.githooks/pre-commit`（第七 → 第八个检查器）、`GLOSSARY.md`、`knowledge/glossary-usage.json`（位置重建）、`CHANGELOG.md`（本批次）
+- **覆盖矩阵**：A.2 的 41 个子句逐条登记 `check_id + positive[] + negative[]`；正例必须存在、`check_id` 一致且期望 `verdict=pass`；负例必须存在、`check_id` 一致、期望 `verdict≠pass` 且 `reason` 属于该子句原因码；未被任何子句引用的样例同样阻断。
+- **样例补齐**：新增 23 个负例，覆盖此前无专属负例的子句（G-A1#1/#2/#3/#5/#6、G-A2#2、G-C1#2/#3、G-D1#1/#2、G-E1#2/#3、G-B1#1、G-B2#2、G-D2#2/#3、G-E2#2/#3、G-F1#2、G-F2#2、G-F3#2、G-G1#2、G-G3#2）。既有 34 例输入与期望输出零改动。
+- **负例实测**：
+  - `check_coverage_gate.py`：子句 41、矩阵 41、正例 41、负例 41、样例 57、问题 0。
+  - N01 删除 `G-F4#1` 唯一负例登记 → 退出 1，`[错误] G-F4#1：缺少负例`。
+  - N02 把 `A.1.14-1` 期望 `verdict` 改成 `pass` → 退出 1，`负例被改成正例`。
+  - N03 删除 `A.1.14-1` 样例块 → 退出 1，位置重编号后原正例落入负例位置，同样被识别为“负例被改成正例”。
+- **回归**：原型 57/57、17/17；null-sweep 138/138；missing-key-sweep 43/43；aggregation-order 6×2 各 1 种结论；三表检查器 17/17/41/17；变异 11/11；A.2 签收正负例 2/2；八个检查器全部退出 0。
+- **样例基线**：批次 0034 的 `1a42b8b`（34 例）→ 本批次 57 例；新提交号在批次 0041 补记。
+- **状态**：生效（闸门上线；缺口未关闭）

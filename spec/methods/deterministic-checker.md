@@ -386,7 +386,7 @@
 >
 > **输入 schema**：字段名与量化域由 `spec/CHECKER_INPUT_SCHEMA.md` 固定。本组样例是该 schema 的首批实例；此后新增或修改的样例必须遵循该文件，不得自行引入新字段。
 
-**样例基线（跨轮横比锚点）**：本轮样例基线为提交 `1a42b8b`（批次 0034《复核推翻后重开缺口并修订判定层》），共 34 个样例。此后报告的“34/34”一律相对该基线；换基线必须在此登记新提交号与全部输入改动。相对基线的输入块改动如下，**期望输出零改动**：
+**样例基线（跨轮横比锚点）**：本轮样例基线为提交 `1a42b8b`（批次 0034《复核推翻后重开缺口并修订判定层》），共 34 个样例。批次 0040 为覆盖闸门增补 23 个负例，样例数 34 → 57；既有 34 例的输入与期望输出均未改动。此后报告的“57/57”相对批次 0040 的新基线，换基线必须在此登记新提交号与全部输入改动。相对 `1a42b8b` 的输入块改动如下，**期望输出零改动**：
 
 | 样例 | 输入块改动 | 原因 |
 |---|---|---|
@@ -442,6 +442,101 @@ reason: null
 
 > 边界说明：G-A1 正文要求 `Constraint` “作用于该 `Outcome` 或 `Commitment`”，该子句已由 `G-A1#6` 纳入判定（ADR-0013 / G-002）。样例 2 的 `constrains: "O-1"` 满足该子句；样例 1 在更早的“约束集为空”处即失败，故不改变本组预期。
 
+**样例 3（触发 `G-A1#1` → `fail`）**：`Actor` 集为空。
+
+```yaml
+project: { id: "P-3" }
+actors: []
+outcomes: [{ id: "O-1" }]
+commitments: []
+constraints: [{ id: "K-1", constrains: "O-1" }]
+```
+
+期望输出：
+
+```yaml
+check_id: PROJECT_MINIMAL_EXISTENCE
+source_rule: G-A1
+verdict: fail
+reason: missing_actor
+```
+
+**样例 4（触发 `G-A1#2` → `fail`）**：`Outcome` 集为空。
+
+```yaml
+project: { id: "P-4" }
+actors: [{ id: "A-1", type: "HumanActor" }]
+outcomes: []
+commitments: []
+constraints: []
+```
+
+期望输出：
+
+```yaml
+check_id: PROJECT_MINIMAL_EXISTENCE
+source_rule: G-A1
+verdict: fail
+reason: missing_outcome
+```
+
+**样例 5（触发 `G-A1#3` → `fail`）**：三类节点齐备但没有任何 `Commitment`。
+
+```yaml
+project: { id: "P-5" }
+actors: [{ id: "A-1", type: "HumanActor" }]
+outcomes: [{ id: "O-1" }]
+commitments: []
+constraints: [{ id: "K-1", constrains: "O-1" }]
+```
+
+期望输出：
+
+```yaml
+check_id: PROJECT_MINIMAL_EXISTENCE
+source_rule: G-A1
+verdict: fail
+reason: missing_commitment
+```
+
+**样例 6（触发 `G-A1#5` → `fail`）**：`Commitment.to` 指向未登记的 `Outcome`。
+
+```yaml
+project: { id: "P-6" }
+actors: [{ id: "A-1", type: "HumanActor" }]
+outcomes: [{ id: "O-1" }]
+commitments: [{ id: "C-1", by: "A-1", to: "O-9" }]
+constraints: [{ id: "K-1", constrains: "C-1" }]
+```
+
+期望输出：
+
+```yaml
+check_id: PROJECT_MINIMAL_EXISTENCE
+source_rule: G-A1
+verdict: fail
+reason: broken_commitment_endpoint
+```
+
+**样例 7（触发 `G-A1#6` → `fail`）**：`Constraint` 未作用于任何已登记的 `Outcome`/`Commitment`。
+
+```yaml
+project: { id: "P-7" }
+actors: [{ id: "A-1", type: "HumanActor" }]
+outcomes: [{ id: "O-1" }]
+commitments: [{ id: "C-1", by: "A-1", to: "O-1" }]
+constraints: [{ id: "K-1", constrains: "C-9" }]
+```
+
+期望输出：
+
+```yaml
+check_id: PROJECT_MINIMAL_EXISTENCE
+source_rule: G-A1
+verdict: fail
+reason: constraint_not_applied
+```
+
 #### A.1.2 `CONSTRAINT_ANCHOR_REQUIRED`（G-A2，`block`）
 
 **判定依据**：A 表“每个管理活动/产物至少有一条 `constrained_by` 边指向已登记 `Constraint`”。
@@ -478,6 +573,23 @@ check_id: CONSTRAINT_ANCHOR_REQUIRED
 source_rule: G-A2
 verdict: pass
 reason: null
+```
+
+**样例 3（触发 `G-A2#2` → `cannot_evaluate`）**：管理产物声明了未定义的节点类型。
+
+```yaml
+commitments: [{ id: "C-1", constrained_by: ["K-1"] }]
+deliverables: [{ id: "D-1", node_type: "MysteryNode", constrained_by: ["K-1"] }]
+constraints: [{ id: "K-1" }]
+```
+
+期望输出：
+
+```yaml
+check_id: CONSTRAINT_ANCHOR_REQUIRED
+source_rule: G-A2
+verdict: cannot_evaluate
+reason: undefined_object_type
 ```
 
 #### A.1.3 `DELIVERABLE_ASSERTION_LINK`（G-C1，`block`）
@@ -525,6 +637,40 @@ reason: null
 
 > 边界说明（ADR-0013 / G-005）：原样例 2 的断言只有 `id`、无任何内容，仍期望 `pass`；该期望与 G-C1 正文不一致，已按裁定推翻。现在被引用断言必须满足 `G-C1#2`（`statement` 非空且 `statement_kind ∈ statement_kind`）与 `G-C1#3`（`about` 指向该交付物）。`G-C1#1` 的见证断言可由 `asserted_by` 正向边或 `about` 反向边任一成立（D5）。
 
+**样例 3（触发 `G-C1#2` → `fail`）**：被引用的断言没有任何内容。
+
+```yaml
+deliverables: [{ id: "D-1", asserted_by: ["S-1"] }]
+assertions: [{ id: "S-1", about: "D-1" }]
+```
+
+期望输出：
+
+```yaml
+check_id: DELIVERABLE_ASSERTION_LINK
+source_rule: G-C1
+verdict: fail
+reason: assertion_without_content
+```
+
+**样例 4（触发 `G-C1#3` → `fail`）**：断言的内容指向另一交付物。
+
+```yaml
+deliverables: [{ id: "D-1", asserted_by: ["S-1"] }]
+assertions: [
+  { id: "S-1", about: "D-2", statement_kind: "what", statement: "交付物为可执行的验收报告" }
+]
+```
+
+期望输出：
+
+```yaml
+check_id: DELIVERABLE_ASSERTION_LINK
+source_rule: G-C1
+verdict: fail
+reason: assertion_about_mismatch
+```
+
 #### A.1.4 `CHANGE_CONSTRAINT_LINK`（G-D1，`block`）
 
 **判定依据**：A 表“变更的 `target.type ∈ change_target_type` 且 `target.id` 解析到对应集合；至少有一条边指向 `Constraint`，且边类型 ∈ `relation`”。
@@ -571,6 +717,44 @@ reason: null
 ```
 
 > 边界说明（ADR-0013 / G-006）：G-D1 正文把变更提议限定为对 `Commitment` 或 `Deliverable` 的提议，原判定列缺少该对象类型谓词，任何变更提议都判 `pass`。现由 `G-D1#1` 承接：`target.type` 越界或 `target.id` 解析失败 → `invalid_change_target`；缺 `target` → `missing_change_target`。
+
+**样例 3（触发 `G-D1#1` → `fail`）**：变更没有 `target`。
+
+```yaml
+changes: [{ id: "CH-1", constraint: "K-1", relation: "mitigates" }]
+commitments: []
+deliverables: []
+constraints: [{ id: "K-1" }]
+```
+
+期望输出：
+
+```yaml
+check_id: CHANGE_CONSTRAINT_LINK
+source_rule: G-D1
+verdict: fail
+reason: missing_change_target
+```
+
+**样例 4（触发 `G-D1#2` → `fail`）**：变更没有指向任何已登记 `Constraint` 的边。
+
+```yaml
+changes: [
+  { id: "CH-1", target: { type: "Deliverable", id: "D-1" }, constraint: "K-9", relation: "mitigates" }
+]
+commitments: []
+deliverables: [{ id: "D-1" }]
+constraints: [{ id: "K-1" }]
+```
+
+期望输出：
+
+```yaml
+check_id: CHANGE_CONSTRAINT_LINK
+source_rule: G-D1
+verdict: fail
+reason: missing_constraint_link
+```
 
 #### A.1.5 `ROLE_MINIMAL_COMPLETENESS`（G-E1，`block`）
 
@@ -620,6 +804,39 @@ reason: null
 
 > 边界说明：`Accountable` 与 `Responsible` 重合但缺 `role_merge_declaration` 的子情形，按 A.2 的 `G-E1#3` 判 `warn`，不再与本组 `block` 样例混判（ADR-0013 / G-004）。该子情形样例待 T-100 关闭时补充；在此之前，本组两个样例的预期不变。
 
+**样例 3（触发 `G-E1#2` → `fail`）**：承诺没有 `Responsible`。
+
+```yaml
+actors: [{ id: "A-1", type: "HumanActor" }]
+commitments: [{ id: "C-1", accountable_by: "A-1", responsible_by: [] }]
+```
+
+期望输出：
+
+```yaml
+check_id: ROLE_MINIMAL_COMPLETENESS
+source_rule: G-E1
+verdict: fail
+reason: missing_responsible
+```
+
+**样例 4（触发 `G-E1#3` → `fail`，`warn`）**：`Accountable` 与 `Responsible` 重合且未声明。
+
+```yaml
+actors: [{ id: "A-1", type: "HumanActor" }]
+commitments: [{ id: "C-1", accountable_by: "A-1", responsible_by: ["A-1"] }]
+```
+
+期望输出：
+
+```yaml
+check_id: ROLE_MINIMAL_COMPLETENESS
+source_rule: G-E1
+severity: warn
+verdict: fail
+reason: missing_role_merge_declaration
+```
+
 #### A.1.6 `DUAL_DIMENSION_ANNOTATION`（G-B1，`advisory` / `active`）
 
 **判定依据**：A 表“每个管理项携带 `process_group` 与 `subject_group` 两个标签且值在枚举内”。本组样例只针对**标签缺失**这一触发条件；值集违法由 A.1.7（G-B2）覆盖，避免两组样例重复同一条件，两项的判定列均不改动。
@@ -662,6 +879,25 @@ verdict: pass
 reason: null
 ```
 
+**样例 3（触发 `G-B1#1` → `fail`）**：第二个管理项缺 `process_group`。
+
+```yaml
+management_items:
+  - { id: "M-1", process_group: "managing-delivery", subject_group: "planning" }
+  - { id: "M-2", subject_group: "lessons-learned" }
+```
+
+期望输出：
+
+```yaml
+check_id: DUAL_DIMENSION_ANNOTATION
+source_rule: G-B1
+severity: advisory
+rule_status: active
+verdict: fail
+reason: missing_dimension
+```
+
 #### A.1.7 `DIMENSION_VALUE_CLOSED`（G-B2，`advisory` / `active`）
 
 **判定依据**：A 表“标签值 ∈ 所锚定标准的枚举 ∪ 契约声明的 `subject_group_extension`”。本组样例覆盖“基础枚举内 / 枚举外”两种；`subject_group_extension` 分支依赖接口契约的槽位声明，不在此二例中固化。
@@ -701,6 +937,26 @@ severity: advisory
 rule_status: active
 verdict: pass
 reason: null
+```
+
+**样例 3（触发 `G-B2#2` → `fail`）**：`subject_group_extension` 缺少合法的 `base` 归属。
+
+```yaml
+management_items:
+  - { id: "M-1", process_group: "initiating", subject_group: "planning" }
+subject_group_extension:
+  - { value: "innovation", relation: "specializes" }
+```
+
+期望输出：
+
+```yaml
+check_id: DIMENSION_VALUE_CLOSED
+source_rule: G-B2
+severity: advisory
+rule_status: active
+verdict: fail
+reason: invalid_subject_group_extension
 ```
 
 #### A.1.8 `ASSERTION_MUTUAL_EXCLUSION`（G-C2，`warn` / `active`）
@@ -794,6 +1050,56 @@ verdict: pass
 reason: null
 ```
 
+**样例 3（触发 `G-D2#2` → `fail`）**：验证未完成即把该变更写入批准依据。
+
+```yaml
+changes:
+  - id: "CH-1"
+    relations: ["mitigates"]
+    assumption:
+      status: "pending"
+      approved_by: "A-1"
+      verification_condition: "独立复核显示没有约束被恶化"
+    verification_condition: "独立复核显示没有约束被恶化"
+    approval_basis: "以该变更作为批准依据"
+actors: [{ id: "A-1", type: "HumanActor" }]
+```
+
+期望输出：
+
+```yaml
+check_id: ALL_IMPROVEMENT_ASSUMPTION
+source_rule: G-D2
+severity: warn
+rule_status: active
+verdict: fail
+reason: approval_basis_before_verification
+```
+
+**样例 4（触发 `G-D2#3` → `cannot_evaluate`）**：assumption 已过期。
+
+```yaml
+changes:
+  - id: "CH-1"
+    relations: ["mitigates"]
+    assumption:
+      status: "expired"
+      verification_condition: "独立复核显示没有约束被恶化"
+    verification_condition: "独立复核显示没有约束被恶化"
+actors: []
+```
+
+期望输出：
+
+```yaml
+check_id: ALL_IMPROVEMENT_ASSUMPTION
+source_rule: G-D2
+severity: warn
+rule_status: active
+verdict: cannot_evaluate
+reason: assumption_unclosed
+```
+
 #### A.1.10 `AI_AUTONOMY_DELEGATION_AUDITABLE`（G-E2，`warn` / `active`）
 
 **判定依据**：A 表“自治权节点有 `delegated_from` 路径终至 `Accountable`，且链上有 `Assertion` 声明范围/边界/撤销条件”。路径用 schema 第 1.10 条的对象表示，`steps[].target_id` 指向下一节点；单跳链是 `steps` 长度为 1 的合法情形。不再接受扁平字符串写法。
@@ -860,6 +1166,70 @@ reason: null
 
 > 边界说明（ADR-0013 / G-003）：G-E2 正文要求该 `Assertion` 以 `assumption` 形式存在并附验证条件。原判定列只检查 `covers`，样例 2 因此缺 `kind` 仍期望 `pass`；现由 `G-E2#3` 承接，样例 2 已补 `kind: assumption` 与 `verification_condition`。路径可达性由 `G-E2#1` 用 schema 第 1.10 条的路径表示承接，不再依赖“终至”的自然语言表述。
 
+**样例 3（触发 `G-E2#2` → `fail`）**：断言只覆盖范围与边界，缺撤销条件。
+
+```yaml
+actors:
+  - { id: "A-1", type: "AIActor" }
+  - { id: "A-2", type: "HumanActor", accountable: true }
+autonomy_grants:
+  - id: "AG-1"
+    actor: "A-1"
+    delegated_from:
+      start: "A-1"
+      steps:
+        - { relation: "delegated_from", direction: "out", target_type: "Actor", target_id: "A-2" }
+      reach: "accountable"
+    assertions: ["S-1"]
+assertions:
+  - { id: "S-1", covers: ["scope", "boundary"], kind: "assumption", verification_condition: "季度审计确认委托边界未被突破" }
+```
+
+期望输出：
+
+```yaml
+check_id: AI_AUTONOMY_DELEGATION_AUDITABLE
+source_rule: G-E2
+severity: warn
+rule_status: active
+verdict: fail
+reason: assertion_incomplete
+```
+
+**样例 4（触发 `G-E2#3` → `cannot_evaluate`）**：断言所依赖的 assumption 已过期。
+
+```yaml
+actors:
+  - { id: "A-1", type: "AIActor" }
+  - { id: "A-2", type: "HumanActor", accountable: true }
+autonomy_grants:
+  - id: "AG-1"
+    actor: "A-1"
+    delegated_from:
+      start: "A-1"
+      steps:
+        - { relation: "delegated_from", direction: "out", target_type: "Actor", target_id: "A-2" }
+      reach: "accountable"
+    assertions: ["S-1"]
+assertions:
+  - id: "S-1"
+    covers: ["scope", "boundary", "revocation"]
+    kind: "assumption"
+    verification_condition: "季度审计确认委托边界未被突破"
+    assumption: { status: "expired" }
+```
+
+期望输出：
+
+```yaml
+check_id: AI_AUTONOMY_DELEGATION_AUDITABLE
+source_rule: G-E2
+severity: warn
+rule_status: active
+verdict: cannot_evaluate
+reason: assumption_unclosed
+```
+
 #### A.1.11 `PROJECT_CHARTER_EXISTENCE`（G-F1，`advisory` / `assumption`）
 
 **判定依据**：A 表“进入执行阶段的 `Project` 有 `ProjectCharter`，且关联 Outcome 陈述、`Constraint`、`Accountable`、启动授权 `Assertion`”。样例假定输入只含已进入执行阶段的项目；`assumption` 期间输出 `advisory`。
@@ -920,6 +1290,34 @@ verdict: pass
 reason: null
 ```
 
+**样例 3（触发 `G-F1#2` → `fail`）**：章程缺少启动授权断言。
+
+```yaml
+projects:
+  - { id: "P-1", stage: "executing" }
+charters:
+  - id: "PC-1"
+    project: "P-1"
+    outcomes: ["O-1"]
+    constraints: ["K-1"]
+    accountable: "A-1"
+outcomes: [{ id: "O-1" }]
+constraints: [{ id: "K-1" }]
+actors: [{ id: "A-1", type: "HumanActor" }]
+assertions: []
+```
+
+期望输出：
+
+```yaml
+check_id: PROJECT_CHARTER_EXISTENCE
+source_rule: G-F1
+severity: advisory
+rule_status: assumption
+verdict: fail
+reason: incomplete_charter
+```
+
 #### A.1.12 `CLOSURE_ACCEPTANCE_LINK`（G-F2，`advisory` / `assumption`）
 
 **判定依据**：A 表“每个 `Deliverable` 有‘已验收’或‘已移交’断言且关联 `Accountable` 确认”。样例假定输入只含进入收尾阶段的项目产物；确认记录用断言上的 `accountable_confirmation` 表示。
@@ -963,6 +1361,28 @@ severity: advisory
 rule_status: assumption
 verdict: pass
 reason: null
+```
+
+**样例 3（触发 `G-F2#2` → `fail`）**：存在“已验收”断言，但没有 `Accountable` 确认。
+
+```yaml
+deliverables:
+  - id: "D-1"
+    assertions:
+      - { id: "S-1", statement: "已验收" }
+actors:
+  - { id: "A-1", type: "HumanActor" }
+```
+
+期望输出：
+
+```yaml
+check_id: CLOSURE_ACCEPTANCE_LINK
+source_rule: G-F2
+severity: advisory
+rule_status: assumption
+verdict: fail
+reason: missing_acceptance_assertion
 ```
 
 #### A.1.13 `PROCUREMENT_CONTRACT_ANCHOR`（G-F3，`advisory` / `assumption`）
@@ -1016,6 +1436,30 @@ severity: advisory
 rule_status: assumption
 verdict: pass
 reason: null
+```
+
+**样例 3（触发 `G-F3#2` → `fail`）**：合同存在但缺少约束锚定与签署。
+
+```yaml
+commitments:
+  - { id: "C-1", procurement: "external", contract: "CT-1" }
+contracts:
+  - id: "CT-1"
+    deliverable_form: "硬件交付"
+    acceptance_criteria: "验收测试通过"
+constraints: []
+actors: []
+```
+
+期望输出：
+
+```yaml
+check_id: PROCUREMENT_CONTRACT_ANCHOR
+source_rule: G-F3
+severity: advisory
+rule_status: assumption
+verdict: fail
+reason: incomplete_contract
 ```
 
 #### A.1.14 `SCHEDULE_EVIDENCE_LINK`（G-F4，`advisory` / `assumption`）
@@ -1111,6 +1555,29 @@ verdict: pass
 reason: null
 ```
 
+**样例 3（触发 `G-G1#2` → `fail`）**：裁剪记录存在但缺少适用范围与批准者。
+
+```yaml
+tailoring_actions:
+  - { id: "TA-1", record: "TR-1" }
+tailoring_records:
+  - id: "TR-1"
+    trimmed_rule: "G-B1"
+    rationale: "受监管环境需要双维标签"
+actors: []
+```
+
+期望输出：
+
+```yaml
+check_id: TAILORING_RECORD_EXISTENCE
+source_rule: G-G1
+severity: advisory
+rule_status: assumption
+verdict: fail
+reason: incomplete_tailoring_record
+```
+
 #### A.1.16 `TAILORING_NON_TRIMMABLE_SET`（G-G2，`advisory` / `assumption`）
 
 **判定依据**：A 表“目标规则 ∉ {G-A1, G-A2, G-C1, G-D1, G-E1}”。
@@ -1189,6 +1656,24 @@ severity: advisory
 rule_status: assumption
 verdict: pass
 reason: null
+```
+
+**样例 3（触发 `G-G3#2` → `fail`）**：声明“永久”但没有附理由。
+
+```yaml
+tailoring_records:
+  - { id: "TR-1", permanent: true }
+```
+
+期望输出：
+
+```yaml
+check_id: TAILORING_REASSESSMENT_CONDITION
+source_rule: G-G3
+severity: advisory
+rule_status: assumption
+verdict: fail
+reason: missing_reassessment_condition
 ```
 
 ### B. 翻译规范（方法有关）
