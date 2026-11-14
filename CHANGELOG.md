@@ -786,3 +786,18 @@
 - **缺口状态**：**17 条（`open` 6 / `closed` 11）**。`open`：G-001、G-003、G-007、G-008、G-014、G-017；`closed`：G-002、G-004、G-005、G-006、G-009、G-010、G-011、G-012、G-013、G-015、G-016。核查矩阵 `0/17 consistent`；到期 0。
 - **关联 ADR**：ADR-0015（`proposed`，信任根与止损）；ADR-0014 的残余风险处置由本批次收敛为“外部基础设施未具备前不关闭 M2”。
 - **状态**：生效（六项修正上线；G-014 仍 `open`，待修后外部复核）
+
+---
+
+### 批次 0044 — 2026-11-14 — 复核产物迁出 `/tmp`，11 条关闭依据改为持久路径
+
+- **性质**：`/tmp` 会被清理，批次 0043 登记的 11 条关闭依据若继续指向 `/tmp/verify-4812/REPORT_48128a8.md` 将集体失效。把两份复核报告与探针/攻击脚本、原始结果复制到仓库外持久目录，重述依据路径并复算哈希。**未新增检查器**。
+- **持久目录**：`/home/wgz/projects/skills/2026-11-14/pm-governance-review/`（在 `project-management` 仓库之外，不受 git 管理）
+  - `verify-4812/`：`REPORT_48128a8.md`、`attacks.py`、`attacks2.py`、`attacks.json`、`attacks2.json`、`probes/`、`probes2/`
+  - `verify-d8/`：`REPORT_d8bf413.md`、`attacks.py`、`attacks2.py`、`attacks3.py`、`attacks*.json`、`probes/`
+- **哈希**：
+  - `verify-4812/REPORT_48128a8.md` → `d0f8275f9931f36da93c640ad8a070c8af7200929d0a4a685e5309268356c4e7`（与迁出前一致，字节级复制）
+  - `verify-d8/REPORT_d8bf413.md` → `658a7f4e725a879583d85a78ba146a89002786960fb98f2ebf9d8ded3fa6cf5e`
+- **涉及文件**：`GAP_LEDGER.md`（11 条 `closed` 的路径改为持久路径，哈希不变；G-010 caveat 保留）、`AGENTS.md`（3.6.6 新增“外部复核产物必须位于仓库外持久位置，`/tmp` 不得作为关闭依据”）、`CHANGELOG.md`（本批次）
+- **复核**：`python3 scripts/check_gap_ledger.py` 退出 0、`--staged` 退出 0；17 条（`open` 6 / `closed` 11）、到期 0。复用现有台账校验，未加 `/tmp` 前缀的新判定。
+- **状态**：生效
