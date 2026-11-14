@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "scripts": {
+    "check_anchors.py": {
+      "sha256": "02c514f00ca5bbf7cd4f0fb926aa83e625fc95beccb64565d8404f953b3021f6",
+      "basis": "批次 0041：四道绑定初始登记（检查器哈希 + 验收快照漂移检测）"
+    },
+    "check_coverage_gate.py": {
+      "sha256": "690b7afe9a64b58d877a88f3a69f1f109c73b8714d3d43cf016d8b565e17bee6",
+      "basis": "批次 0041：四道绑定初始登记（检查器哈希 + 验收快照漂移检测）"
+    },
+    "check_gap_ledger.py": {
+      "sha256": "99ffae6de596819808efbe5a0271329b934d8c22bbed100f24268cbddcf8a4e2",
+      "basis": "批次 0041：四道绑定初始登记（检查器哈希 + 验收快照漂移检测）"
+    },
+    "check_glossary_usage.py": {
+      "sha256": "af780d97cad10579ea946ca094ba69ba0871223671c5cc672bd44b21ddd4f6ac",
+      "basis": "批次 0041：四道绑定初始登记（检查器哈希 + 验收快照漂移检测）"
+    },
+    "check_ledger_landings.py": {
+      "sha256": "f860acc16f6ecf722e2f6e484166eb0a5699a0c752db40ecc871d1dadb08adcf",
+      "basis": "批次 0041：四道绑定初始登记（检查器哈希 + 验收快照漂移检测）"
+    },
+    "check_no_raw_material.py": {
+      "sha256": "333d43ffe8ab3d60eac9b873e10e3c27089dd26c2c53f9927d0352a9b5dcead1",
+      "basis": "批次 0041：四道绑定初始登记（检查器哈希 + 验收快照漂移检测）"
+    },
+    "check_state.py": {
+      "sha256": "f0e636ec254a5b435932e3f0755ec0b215ad1be5a3bbe93067dc2009c1793098",
+      "basis": "批次 0041：四道绑定初始登记（检查器哈希 + 验收快照漂移检测）"
+    },
+    "check_three_table.py": {
+      "sha256": "7381d82673a074784ff42d60969ba95c9dd7d4ccef76a2f8a4ad53b41f11ce2c",
+      "basis": "批次 0041：四道绑定初始登记（检查器哈希 + 验收快照漂移检测）"
+    },
+    "test_check_table_mutations.py": {
+      "sha256": "8492412e9d18bfac5c1b896a60a5394dbb0477bf053a0f40bd0b4f4d90e23e5d",
+      "basis": "批次 0041：四道绑定初始登记（检查器哈希 + 验收快照漂移检测）"
+    },
+    "test_coverage_gate.py": {
+      "sha256": "2cbd8a73fc93319a8d47c459117653d038b3e76c3ec581f810a9ece1746662bf",
+      "basis": "批次 0041：四道绑定初始登记（检查器哈希 + 验收快照漂移检测）"
+    },
+    "validate_ontology.py": {
+      "sha256": "132e579e6b411eb781db8230895bdaec1bbdd547f2a74188031fbfe1d7dcd92f",
+      "basis": "批次 0041：四道绑定初始登记（检查器哈希 + 验收快照漂移检测）"
+    },
+    "check_spec_pins.py": {
+      "sha256": "d66d6f1f5316465a979ef563eb1c28930d605a890039e0a23f61b29869e59f0b",
+      "basis": "批次 0041：四道绑定初始登记（检查器哈希 + 验收快照漂移检测）"
+    },
+    "test_checker_pins.py": {
+      "sha256": "b294f98645685077e72d308c39d4623c683d7ca3e9b917317a104cdc979d62ba",
+      "basis": "批次 0041：四道绑定初始登记（检查器哈希 + 验收快照漂移检测）"
+    },
+    "test_spec_pins.py": {
+      "sha256": "bee62d65c25ea015ec47faa73cbeb5bac414f4221b41ee58d070ea20e388e7c2",
+      "basis": "批次 0041：四道绑定初始登记（检查器哈希 + 验收快照漂移检测）"
+    }
+  },
+  "note": "scripts/ 下检查器脚本的哈希登记。改动脚本必须 --write --basis 更新，使“改检查器”显式留痕；本文件不提供权限分离。"
+}

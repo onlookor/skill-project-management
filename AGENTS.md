@@ -76,7 +76,7 @@
 
 - **不得自动推断**。缺省（字段缺失）按 `released` 严格处理；非法值按结构错误（退出码 2）处理。不得根据分支名、提交数量或人工口头说明推断状态。
 - 状态切换必须写入 `manifest.json` 并随提交生效，不得只改工作区。
-- 发布提交的引导顺序固定：tag 只能指向已存在的提交，因此“把 `release_state` 改为 `released` 并递增版本”的提交需以 `git commit --no-verify` 提交，随后立即打 annotated tag 并运行七个检查器。其他提交不得使用 `--no-verify`。
+- 发布提交的引导顺序固定：tag 只能指向已存在的提交，因此“把 `release_state` 改为 `released` 并递增版本”的提交需以 `git commit --no-verify` 提交，随后立即打 annotated tag 并运行十个检查器。其他提交不得使用 `--no-verify`。
 - 发布点仍只有一个：以 annotated tag 声明（ADR-0003）；`development` 只说明 `HEAD` 领先于最近发布点，不产生第二个发布点。
 
 ##### 3.5.1 绕过留痕（硬要求）
@@ -86,7 +86,7 @@
 ```
 Hook-Bypass: release-bootstrap
 Hook-Bypass-Reason: <为什么 pre-commit 无法通过>
-Hook-Bypass-Verified: <tag 名；七个检查器的复跑结果>
+Hook-Bypass-Verified: <tag 名；十个检查器的复跑结果>
 ```
 
 - `v0.5.2` 及以后的发布提交必须齐备三项，且 `Hook-Bypass` 的值固定为 `release-bootstrap`；缺失任一项即错误。
@@ -152,7 +152,7 @@ Hook-Bypass-Verified: <tag 名；七个检查器的复跑结果>
 
 ##### 3.6.5 机械核查与临时性
 
-- **检查器**：`scripts/check_gap_ledger.py` 统计总数、按级计数、按到期计数，并输出核查矩阵的 `consistent` 比例；到期未裁定或结构非法时退出 1。`--staged` 额外要求规则/判定文件与台账同批暂存。检查器与其余六个脚本共同构成七个提交前检查器。
+- **检查器**：`scripts/check_gap_ledger.py` 统计总数、按级计数、按到期计数，并输出核查矩阵的 `consistent` 比例；到期未裁定或结构非法时退出 1。`--staged` 额外要求规则/判定文件与台账同批暂存。检查器与其余九个脚本共同构成十个提交前检查器。
 - **撤除条件**（全部满足）：连续两个发布点 `open=0` 且核查矩阵 17/17 为 `consistent`；第二个发布周期无新增缺口；裁定方完成一次全量“规则正文 ↔ 判定列”对照，确认无 `rule-stricter` 遗留。
 - **硬约束**：不晚于 M3 关闭前评估撤除（`TODO.md` T-132）。M3 关闭时仍有 `open` 缺口则机制冻结：新增缺口须经 ADR，所有 `open` 缺口必须在 M4 前裁定。
 - **撤除动作**：删除 `GAP_LEDGER.md` 与 `scripts/check_gap_ledger.py`；移除本条、7bis 的钩子项与 `check_state.py` 的调用；T-132 标 `done` 并记 `CHANGELOG.md`。
@@ -181,6 +181,16 @@ Hook-Bypass-Verified: <tag 名；七个检查器的复跑结果>
 - **机械阻断**：`scripts/check_three_table.py` 规则 8 比对签收行指纹与当前 A.2 指纹。只改 A.2、不更新签收行 → 退出 1（即使已跑 `--write`）；改 A.2 并更新签收行与指纹 → 通过。`scripts/test_check_table_mutations.py` 的 S01/S02 是固定正负例。
 - **边界**：检查器只能验证“签收记录与 A.2 同步”，不能验证签收人是否真的非同源；后者由提交评审与 3.6.6 的关闭证据共同约束。
 - **基线例外**：本纪律引入的提交允许签收行标注“纪律基线（同源修订；非同源复核待提交后执行）”，仅此一次；此后不得使用该标注。
+
+##### 3.6.8 验证权绑定（检查器、规格区段、验收快照）
+
+验证链不能自证：检查器、规格与样例都在同一工作区，同一方可以同时改“判定”和“被判定”。本条把可机械化的部分做成显式留痕，把不能机械化的部分写清边界（完整论证见 ADR-0014）。
+
+- **检查器绑定**：`scripts/checker-pins.json` 登记 `scripts/` 下检查器脚本的 sha256 与 `basis`。工作区哈希与登记不一致 → `scripts/check_checker_pins.py` 退出 1。改动检查器必须 `--write --basis "<裁定依据>"`，把静默修改变成显式修改。
+- **规格区段绑定**：`scripts/spec-pins.json` 分别登记 `GRAMMAR.md` 全文、方法文件 A.2、schema §2bis/§3/§4 的区段指纹。区段相对 HEAD 有改动时，同一提交必须附 `validation/reviews/*.md` 复核记录，含 `非同源复核：`、`区段：<key>`、`复核产物：<文件名>` 与结论词（实质收敛/认可/通过），否则 `scripts/check_spec_pins.py` 退出 1。
+- **验收快照**：`validation/pinned/checker.py` 是工作区 `validation/checker-prototype/checker.py` 的只读快照；`check_checker_pins.py` 检测两者是否漂移。**这是漂移检测，不是权限分离**：两份文件仍在同一工作区，同一方可以同改；真正的分离需要 CI/受保护分支，本机无 CI 时做不到，ADR-0014 已记录该限制与残余风险。
+- **不可机械化部分**：签收人身份、签收人与改动人是否同源、复核记录是否真实执行，机器都无法验证；只能靠 3.6.6/3.6.7 的评审流程与提交评审约束。
+- **正负例**：`scripts/test_checker_pins.py`（CP01–CP04）与 `scripts/test_spec_pins.py`（SP01–SP04）固定验证阻断与放行。
 
 ### 4. 目录结构（唯一权威）
 
@@ -258,7 +268,8 @@ project-management-grounding/
 │   ├── 0010-self-authored-ontology-in-git.md
 │   ├── 0011-schedule-layer-and-plan.md
 │   ├── 0012-gap-ledger-and-adjudication.md
-│   └── 0013-unified-adjudication-of-check-semantics.md
+│   ├── 0013-unified-adjudication-of-check-semantics.md
+│   └── 0014-validation-chain-self-attestation.md
 │
 ├── .githooks/
 │   └── pre-commit                  # 阻断原始资料入库（CONSTITUTION 第 13 条）
@@ -272,6 +283,15 @@ project-management-grounding/
 │   ├── check_no_raw_material.py    # 原始资料/OCR/成段原文的阻断式检查（可运行）
 │   ├── check_gap_ledger.py         # 缺口台账结构、覆盖、到期与暂存同步检查（可运行）
 │   ├── check_three_table.py        # 正文 ↔ 判定列 ↔ 输入 schema 三表机械对照（可运行）
+│   ├── check_coverage_gate.py      # A.2 每子句 1 正 1 负的覆盖矩阵闸门（可运行）
+│   ├── check_checker_pins.py       # 检查器哈希登记与验收快照漂移检测（可运行）
+│   ├── check_spec_pins.py          # GRAMMAR/A.2/schema 区段指纹与复核记录绑定（可运行）
+│   ├── checker-pins.json           # 检查器脚本 sha256 与 basis 登记
+│   ├── spec-pins.json              # 规格区段指纹登记
+│   ├── test_check_table_mutations.py   # A.2 固定变异集 + 签收正负例（可运行）
+│   ├── test_coverage_gate.py       # 覆盖闸门三条负例（可运行）
+│   ├── test_checker_pins.py        # 检查器绑定四条正负例（可运行）
+│   ├── test_spec_pins.py           # 规格区段绑定四条正负例（可运行）
 │   ├── check_glossary_usage.py     # 术语使用位置生成与陈旧引用校验（可运行）
 │   ├── validate_ontology.py        # 本体与 SHACL 形状校验，含逐形状负例矩阵（可选依赖）
 │   └── check_state.py              # STATE 与 git 跟踪文件的对账脚本（可运行）
@@ -280,7 +300,10 @@ project-management-grounding/
     ├── CHECKLIST.md                # CM-DET-CHECKER 的产物：检查清单（生成依据见正文）
     ├── independent-review-package.md  # T-133 只读验收包（不含原型源码）
     ├── checker-prototype/
-    │   └── checker.py              # T-107 最小原型：执行附录 A 的 34 个样例（纯标准库）
+    │   ├── checker.py              # T-107 最小原型：执行附录 A 的 57 个样例（纯标准库）
+    │   └── coverage.json           # 41 子句 × 正负例的覆盖矩阵（check_coverage_gate.py 核对）
+    ├── pinned/
+    │   └── checker.py              # 验收检查器的只读快照（漂移检测，不等于权限分离）
     └── test-cases/
         ├── README.md               # 反例检验用例库说明
         ├── TC-A1-02.md
@@ -401,8 +424,8 @@ project-management-grounding/
 1. **提取产物一律落在仓库外**。约定目录为 `/tmp/pm-extract-<source-id>-<date>/`，存放 `pdftotext` 文本层输出、`pdftoppm` 渲染图、Tesseract OCR 结果与任何逐页转储。**不得**落在仓库目录内，也不得放进 `resources/`。
 2. **`resources/` 只在本地只读使用**。不复制、不打包、不 `git add`；`.gitignore` 已忽略 `resources/` 与文档类扩展名，但忽略规则不是许可。
 3. **引用外部文献只写可复核的定位与自己的话**。默认写法是“页码定位 + 自述摘要”；确需引证术语或条款措辞时，单条不超过一行或一句，并附来源 `id` 与页码（见 `CONSTITUTION.md` 第 13.2 条）。
-4. **提交前必须运行七个检查器**：`check_no_raw_material.py`、`check_anchors.py`、`check_ledger_landings.py`、`check_gap_ledger.py --staged`、`check_three_table.py`、`check_glossary_usage.py`、`check_state.py`。本仓库已提供 `.githooks/pre-commit`，每个克隆需自行执行 `git config core.hooksPath .githooks` 启用；未启用钩子的部署必须在 `git add` 前手工逐个运行，等价命令见 `scripts/README.md`。
-5. **检查器命中即停止提交**，不得用 `--no-verify` 绕过。唯一例外是第 3.5 条规定的发布引导提交（`release_state` 改为 `released` 并递增版本），该提交必须携带 3.5.1 的三项 `Hook-Bypass` trailer，并紧接 annotated tag 与七个检查器的复跑；该通道按 3.5.2 的撤除条件关闭（`TODO.md` T-129）。确需新增其他例外（例如将来要提交一张合法图片资产），走 ADR 并在检查器中登记路径豁免，而不是删除规则或放宽阈值。
+4. **提交前必须运行十个检查器**：`check_no_raw_material.py`、`check_anchors.py`、`check_ledger_landings.py`、`check_gap_ledger.py --staged`、`check_three_table.py`、`check_coverage_gate.py`、`check_checker_pins.py`、`check_spec_pins.py`、`check_glossary_usage.py`、`check_state.py`。本仓库已提供 `.githooks/pre-commit`，每个克隆需自行执行 `git config core.hooksPath .githooks` 启用；未启用钩子的部署必须在 `git add` 前手工逐个运行，等价命令见 `scripts/README.md`。
+5. **检查器命中即停止提交**，不得用 `--no-verify` 绕过。唯一例外是第 3.5 条规定的发布引导提交（`release_state` 改为 `released` 并递增版本），该提交必须携带 3.5.1 的三项 `Hook-Bypass` trailer，并紧接 annotated tag 与十个检查器的复跑；该通道按 3.5.2 的撤除条件关闭（`TODO.md` T-129）。确需新增其他例外（例如将来要提交一张合法图片资产），走 ADR 并在检查器中登记路径豁免，而不是删除规则或放宽阈值。
 6. **发现已跟踪内容违规时**：先报告文件与位置，再改为“页码定位 + 自述摘要”或移出仓库，并在 `ERRATA.md` 登记；不静默删除他人的内容。
 7. **自建本体（`CONSTITUTION.md` 第 13.6 条）**：
    - 只放 `ontology/`；主格式为 Turtle（`.ttl`、`.shacl.ttl`），`.owl`/`.rdf`/`.nt`/`.n3`/`.jsonld` 仅作生成导出，仍受同一内容检查。

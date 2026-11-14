@@ -561,7 +561,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 373,
+          "line": 396,
           "form": "code"
         },
         {
@@ -736,7 +736,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 373,
+          "line": 396,
           "form": "code"
         },
         {
@@ -1141,7 +1141,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 373,
+          "line": 396,
           "form": "code"
         },
         {
@@ -1511,7 +1511,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 373,
+          "line": 396,
           "form": "code"
         },
         {
@@ -1791,17 +1791,17 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 331,
+          "line": 354,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 334,
+          "line": 357,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 377,
+          "line": 400,
           "form": "code"
         },
         {
@@ -1911,32 +1911,32 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 332,
+          "line": 355,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 334,
+          "line": 357,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 374,
+          "line": 397,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 377,
+          "line": 400,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 392,
+          "line": 415,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 394,
+          "line": 417,
           "form": "code"
         },
         {
@@ -2581,17 +2581,17 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 331,
+          "line": 354,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 411,
+          "line": 434,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 416,
+          "line": 439,
           "form": "code"
         },
         {
@@ -2771,12 +2771,12 @@
         },
         {
           "file": "ROADMAP.md",
-          "line": 116,
+          "line": 118,
           "form": "code"
         },
         {
           "file": "ROADMAP.md",
-          "line": 236,
+          "line": 238,
           "form": "code"
         },
         {
@@ -3211,6 +3211,11 @@
           "form": "code"
         },
         {
+          "file": "CHANGELOG.md",
+          "line": 680,
+          "form": "code"
+        },
+        {
           "file": "GAP_LEDGER.md",
           "line": 3,
           "form": "code"
@@ -3287,7 +3292,7 @@
         },
         {
           "file": "ROADMAP.md",
-          "line": 235,
+          "line": 237,
           "form": "code"
         },
         {
@@ -3422,7 +3427,12 @@
         },
         {
           "file": "scripts/README.md",
-          "line": 35,
+          "line": 17,
+          "form": "code"
+        },
+        {
+          "file": "scripts/README.md",
+          "line": 41,
           "form": "code"
         },
         {
@@ -3577,7 +3587,7 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 377,
+          "line": 400,
           "form": "code"
         },
         {
@@ -4034,7 +4044,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 356,
+          "line": 379,
           "form": "code"
         },
         {
@@ -4094,7 +4104,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 356,
+          "line": 379,
           "form": "code"
         },
         {

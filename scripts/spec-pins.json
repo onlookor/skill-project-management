@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "note": "规格区段指纹。区段改动必须 --write 并同批附非同源复核记录；指纹只证明内容一致，不证明签收人身份。",
+  "sections": {
+    "GRAMMAR.md": {
+      "sha256": "ae408851f5c0ddef3bd46d3107e1aa5c123b865feb86de43af103321743d0929",
+      "path": "GRAMMAR.md"
+    },
+    "spec/methods/deterministic-checker.md#A.2": {
+      "sha256": "a3924c3de39b9997e31d0fe5b47831b804e5b605bd52fd001a8541fe44199ee0",
+      "path": "spec/methods/deterministic-checker.md"
+    },
+    "spec/CHECKER_INPUT_SCHEMA.md#2bis": {
+      "sha256": "e90cb2c848011040523e9c910a00df94d55dff06b3301ad9f10eb101d78a89cc",
+      "path": "spec/CHECKER_INPUT_SCHEMA.md"
+    },
+    "spec/CHECKER_INPUT_SCHEMA.md#3": {
+      "sha256": "bf27719b5d25a7f1d9de3cbf4e39600d17dddbe07e005ad04282373daf8d03a6",
+      "path": "spec/CHECKER_INPUT_SCHEMA.md"
+    },
+    "spec/CHECKER_INPUT_SCHEMA.md#4": {
+      "sha256": "2784bcd5ab8a2f7e786a23e1f2f4ca425fb2bc37593d3c0885518d801f94c312",
+      "path": "spec/CHECKER_INPUT_SCHEMA.md"
+    }
+  }
+}

@@ -646,3 +646,46 @@
 - **回归**：原型 57/57、17/17；null-sweep 138/138；missing-key-sweep 43/43；aggregation-order 6×2 各 1 种结论；三表检查器 17/17/41/17；变异 11/11；A.2 签收正负例 2/2；八个检查器全部退出 0。
 - **样例基线**：批次 0034 的 `1a42b8b`（34 例）→ 本批次 57 例；新提交号在批次 0041 补记。
 - **状态**：生效（闸门上线；缺口未关闭）
+
+---
+
+### 批次 0041 — 2026-11-14 — 第三段：验证权绑定（检查器 / 规格 / 快照）
+
+- **性质**：新增四道绑定与一份 ADR，把“静默改检查器或规格”变成“显式改且留痕”。不改变判定语义，不关闭缺口；17 条缺口仍为 `open`。
+- **涉及文件**：`scripts/check_checker_pins.py`、`scripts/checker-pins.json`、`scripts/test_checker_pins.py`、`scripts/check_spec_pins.py`、`scripts/spec-pins.json`、`scripts/test_spec_pins.py`、`validation/pinned/checker.py`（新增）；`adr/0014-validation-chain-self-attestation.md`（新增）；`.githooks/pre-commit`、`AGENTS.md`（3.6.8、十个检查器、目录树）、`ROADMAP.md`（M2 出口 4/6/7）、`scripts/README.md`、`GLOSSARY.md`、`knowledge/glossary-usage.json`、`GAP_LEDGER.md`（核查记录）、`CHANGELOG.md`（本批次）
+- **变更摘要**：
+  1. **检查器绑定**：`scripts/checker-pins.json` 登记 `scripts/` 下 14 个检查器脚本的 sha256 与 `basis`；`check_checker_pins.py` 在 pre-commit 比对工作区哈希，不一致退出 1。改动检查器必须 `--write --basis "<裁定依据>"`；无 `basis` 的 `--write` 退出 2。
+  2. **规格区段绑定**：`scripts/spec-pins.json` 分别登记 `GRAMMAR.md` 全文、方法 A.2、`spec/CHECKER_INPUT_SCHEMA.md` §2bis/§3/§4 共 5 个区段指纹。区段相对 `HEAD` 变化时，同一提交必须附含 `非同源复核：`、`区段：<key>`、`复核产物：<文件名>` 与结论词（实质收敛/认可/通过）的复核记录，否则退出 1。`--write` 只重建指纹，不生成复核记录。
+  3. **验收检查器与工作区副本**：`validation/pinned/checker.py` 为只读快照，`check_checker_pins.py` 校验它与 `validation/checker-prototype/checker.py` 字节一致。**这条做不到真正的版本分离**：两份文件同处一个工作区、同一写权限，同一方可以同时修改并重跑 `--write`，漂移检测会保持“一致”。真正的分离需要提交者写不到的位置（CI 受保护分支检出、签名发布物、只读挂载）与复核者独立读取；本机无 CI、无受保护分支，因此本条**只做漂移检测与变更留痕，不冒充权限分离**。残余风险见 ADR-0014 第 5 节（签收人身份不可验证、检查器与登记/快照可被同一方同改、复核记录可伪造、`--no-verify` 可绕过、覆盖 ≠ 充分、指纹绑定文本不绑定意图）。
+  4. **ADR-0014**：独立记录“验证链自证”问题的信任边界、四层机械化能力与残余风险；M2 出口改为“两个实现缺陷关闭 + 覆盖闸门绿 + 四道绑定生效 + 非同源复核判‘实质收敛’”。
+- **正负例（`scripts/test_checker_pins.py`）**：
+
+| 编号 | 场景 | 预期 | 实际 | 退出码 | 证据 |
+|---|---|---|---|---|---|
+| CP01 | 改检查器不更新登记 | 阻断 | 阻断 | 1 | `check_sample.py：哈希不一致（登记 660bc902a1cf，工作区 606690d5617c）` |
+| CP02 | 更新登记但不给裁定依据 | 拒绝 | 拒绝 | 2 | `检查器有改动但未提供 --basis 裁定依据` |
+| CP03 | 更新登记并给出裁定依据 | 通过 | 通过 | 0 | `登记与工作区一致` |
+| CP04 | 验收检查器与快照不一致 | 阻断 | 阻断 | 1 | `验收检查器与 validation/pinned/checker.py 快照不一致`（附“漂移检测不等于权限分离”） |
+
+- **正负例（`scripts/test_spec_pins.py`）**：
+
+| 编号 | 场景 | 预期 | 实际 | 退出码 | 证据 |
+|---|---|---|---|---|---|
+| SP01 | 改 A.2 不更新指纹 | 阻断 | 阻断 | 1 | `#A.2：指纹未更新（当前 41075a8d699f，登记 a3924c3de39b）` |
+| SP02 | 更新指纹但不附复核记录 | 阻断 | 阻断 | 1 | `区段已改动但同一提交缺少合格的非同源复核记录` |
+| SP03 | 更新指纹并附合格复核记录 | 通过 | 通过 | 0 | 无问题 |
+| SP04 | 复核记录结论词不合格 | 阻断 | 阻断 | 1 | 同 SP02 的错误信息 |
+
+- **回归实测**：
+  - `python3 validation/checker-prototype/checker.py`：57/57 样例，17/17 `check_id`，退出 0。
+  - `--null-sweep`：214/214 返回 `cannot_evaluate`，崩溃 0（顶层必需键 43、数组元素 159 / 56 条唯一路径、嵌套对象键 12）。
+  - `--missing-key-sweep`：43/43 返回 `cannot_evaluate/missing_input`，偏离 0；对照 `{}` 直入 check 函数仍 17/17 抛 `KeyError`。
+  - `--aggregation-order`：A2 与 E2 各 6 种排列，各收敛为 1 个结论，偏离 0；`--input-domain`：0 处缺口。
+  - `check_coverage_gate.py`：子句 41、矩阵 41、正例 41、负例 41、样例 57、问题 0；`test_coverage_gate.py` N01–N03 阻断 3/3。
+  - `test_check_table_mutations.py`：变异 11/11 抓到，A.2 签收正负例 2/2，退出 0。
+  - 十个检查器全部退出 0（`check_checker_pins.py` 登记 14、工作区 14、快照一致；`check_spec_pins.py` 区段 5、已登记 5、问题 0）。
+- **样例基线补记**：批次 0040 的 57 例基线提交为 `87ccf13`；既有 34 例输入与期望输出未改动，新增 23 例为负例。
+- **更正（不改写批次 0040）**：批次 0040 记录的 `--null-sweep 138/138` 是 34 例时的计数；样例增至 57 后同一扫描为 214/214。两数均为实测，差异只来自样例数增加，不涉及判定行为变化。
+- **复核状态**：G-001–G-017 仍为 `open`（17/17），核查矩阵 `0/17 consistent`（全部缺口未关闭，故无 `consistent` 行）。G-009 与 G-014 待非同源复核判“实质收敛”后关闭，其余 15 条不动。
+- **关联 ADR**：ADR-0014（`proposed`）
+- **状态**：生效（绑定上线；缺口未关闭）
