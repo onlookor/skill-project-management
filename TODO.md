@@ -53,6 +53,8 @@
 | T-122 | M3 | 本体构建 | 按 `spec/ONTOLOGY_FEASIBILITY.md` 第 3 节构建全量本体：`pmbok8-vocab.ttl`（92 类 / 35 对象属性 / 7 数据类型属性）、`pmbok8-processes.ttl`（7 域 + 5 焦点区 + 40 过程 + I/O）、`pmbok8-artifacts.ttl`（124 工件）、`pmbok8-tools.ttl`（185 工具与技术）、`pmbok8-shapes.ttl`（24 条形状）、24 个违规 fixture + 1 个通过 fixture、`scripts/validate_ontology.py` | CHANGELOG（内容与格式）；不新增编译方法 | 无（校验需 `rdflib`、`pyshacl`） | `done`（2026-11-13：24 条形状全部由对应 fixture 判出违规，本体全图 `conforms: true`） |
 | T-126 | M3 | 本体补全 | 为 124 个工件与 185 个工具与技术补齐自写定义（当前为 `taxonomy-only`，只保留术语名、类别与页码）；写不出自述定义者保持 `pending`，不得用原文改写凑数 | 执行层补丁（CHANGELOG） | 无 | `open` |
 | T-132 | M3 | 流程撤除 | 评估并撤除缺口台账临时机制（`GAP_LEDGER.md` 与 `scripts/check_gap_ledger.py`）：按 `AGENTS.md` 3.6.5 的三项撤除条件核对连续两个发布点的 `open=0`、核查矩阵 17/17 `consistent` 与全量“规则正文 ↔ 判定列”对照；满足则删除台账与检查器、移除钩子与 `check_state.py` 调用，未满足则按台账规则冻结 | 执行层补丁 + 钩子 | 硬约束：不晚于 M3 关闭 | `open` |
+| T-138 | M3 | 试点执行 | 按 `spec/M3_M4_PLAN.md` 第 3 节执行 15 条草稿试点：6 工件 + 6 工具 + 1 过程 + 1 焦点区 + 1 绩效域；产出草稿条目、`pilot-id-map`、1 份契约、1 份产物样例与 3 组冲突样例，并逐项判定 7 条判据与 6 条止损 | CHANGELOG + 试点报告 | D1/D2/D3/D8 已定；D4 降级 | `done`（2026-11-14：15 条落盘，14 条有候选 IRI、1 条 `null` 且有稳定自然键，止损未命中；外部抽样 blocked-external；批次 0047） |
+| T-139 | M3 | 字段语义统一 | 统一 `grounding_ref` 语义：D3 选定指向 `knowledge:<term>`，但现有 10 条 `knowledge/anchored-entries.jsonl` 指向来源 ID；放量前需在“修订 D3 表述”与“新增独立 `source_ref` 并迁移现有条目”之间二选一。试点按 D3 写入、来源移入 `evidence`，两套语义暂时并存 | 结构性变更需 ADR | T-138 试点发现；D4 同批 | `open` |
 
 ### M4 来源收口
 
@@ -74,7 +76,7 @@
 | T-115 | M4 | 来源核验 | 复核 `SPRINGER-PMBOK-2024` 的 `pending:T-112` 状态；正文长期不可得时，决定是保留为待落点条目还是移出登记表 | 来源治理（ADR） | T-112 | `blocked-external`（解锁条件：T-112 取得全文或确认不可得） |
 | T-119 | M4 | 来源核验 | 取得 ProjectCO 论文外部附录（`bit.ly/ProjectCO_Appendices`）与本体文件，核对 `Actor`、`Commitment`、`Constraint` 是否有原文依据；若确无，则改写 `knowledge/anchored-entries.jsonl` 中三个条目的来源表述并复核 G-A1、G-D1、G-E1 的锚定 | 来源治理（ADR） | 附录与本体文件可获取 | `blocked-external`（解锁条件：附录与本体文件可获得） |
 | T-121 | M4 | 治理 | 由用户经网页端手动发送请求全文的邮件：收件人 `silega@sfedu.ru`，发信人 `wgzhi@hotmail.com`，署名 Gengzhi Wei。正文见下方附录。SMTP 客户端通道因服务器停用基础认证（`535 5.7.139`）不可用，本项**未发送**；不得记为已发送 | 无（人工操作） | 用户手动发送 | `blocked-external`（解锁条件：用户完成手动发送并回填发送结果） |
-| T-123 | M4 | 来源治理 | 评估是否修订 `SOURCE_LEDGER.md` 中 `PMBOK8-2025` 的 `allowed_uses` 与 `claim_mapping`，使其可作为概念层（而非仅原则层交叉验证）依据；修订需 ADR，并说明对 P1a 与 `check_ledger_landings.py` 的影响 | 来源治理（ADR） | T-122 | `open` |
+| T-123 | M4 | 来源治理 | 评估是否修订 `SOURCE_LEDGER.md` 中 `PMBOK8-2025` 的 `allowed_uses` 与 `claim_mapping`，使其可作为概念层（而非仅原则层交叉验证）依据；修订需 ADR，并说明对 P1a 与 `check_ledger_landings.py` 的影响。**试点证据（T-138）**：15 条草稿的来源证据全部指向该来源，`allowed_uses` 未放开前，放量条目会集体处于“有 grounding_ref 但无概念层使用授权”的状态 | 来源治理（ADR） | T-122 | `open` |
 | T-125 | M4 | 接入建议 | 若将来把本体接成 `grounding_ref`：优先评估 G-A1（项目最小存在）、G-A2（断言主体）、G-C1（可交付物与断言）、G-D1（承诺链）、G-E1（约束锚定）与对应知识条目 `Project`、`Assertion`、`Deliverable`、`Commitment`、`Constraint`；先做“形状 ↔ 规则文本”逐条对照（P1c），再决定是否改来源用途 | 规范层（ADR） | T-123、P1c 对照 | `open` |
 
 ### M5 接口、契约与跨技能

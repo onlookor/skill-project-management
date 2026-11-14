@@ -23,6 +23,7 @@
 | `./` | `active` |
 | `.githooks/` | `active` |
 | `spec/` | `active` |
+| `spec/pilot/` | `example` |
 | `contracts/` | `active` |
 | `contracts/examples/` | `example` |
 | `knowledge/` | `active` |

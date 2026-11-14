@@ -236,7 +236,15 @@ project-management-grounding/
 │   ├── methods/
 │   │   └── deterministic-checker.md  # CM-DET-CHECKER 方法声明（含 check_id 注册表、翻译规范）
 │   ├── ASSUMPTION_PROTOCOL.md      # assumption 协议（方法无关）
-│   └── INTERFACE_CONTRACT_SPEC.md  # 槽位定义、v1 单层解析、技能间信息流（方法无关）
+│   ├── INTERFACE_CONTRACT_SPEC.md  # 槽位定义、v1 单层解析、技能间信息流（方法无关）
+│   └── pilot/                      # M3/M4 试点（example，authoritative: false）
+│       ├── pilot-entries.json      # 15 条草稿条目（JSON 数组，字段同现有条目）
+│       ├── pilot-id-map.json       # 草稿 ID → 候选 IRI → 正式 ID 占位；规则双向索引
+│       ├── pilot-contract.yaml     # 试点领域契约（复用既有槽位）
+│       ├── pilot-artifact.json     # 试点产物样例（机器可读源）
+│       ├── pilot-artifact.md       # 试点产物样例（人类可读投影）
+│       ├── pilot-conflicts.jsonl   # 3 组冲突样例
+│       └── M3_M4_PILOT_REPORT.md   # 试点报告：7 判据 + 6 止损逐项判定
 │
 ├── contracts/
 │   ├── schema/

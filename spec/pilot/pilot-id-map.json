@@ -1,0 +1,287 @@
+{
+  "authoritative": false,
+  "purpose": "M3/M4 试点唯一的草稿 ID 映射面：草稿 ID → 候选本体 IRI → 正式 ID 占位；同时承载规则 ↔ 条目的双向解析索引（D3）。",
+  "batch": "0047",
+  "generated": "2026-11-14",
+  "d4_status": "undecided",
+  "formal_id_status": "pending-D4",
+  "notes": [
+    "D4 未定，本表所有 formal_id 均为 null，不得把草稿 ID 或候选 IRI 当作正式 ID 使用。",
+    "候选 IRI 只表示本体中语义最接近的个体，不等于可接受的等同映射；未解析项见 candidate_iri_reason。",
+    "草稿 ID 仅存在于 spec/pilot/ 内，不得进入 GLOSSARY.md、knowledge/anchored-entries.jsonl、TTL 的 skos:prefLabel、GRAMMAR.md 的 grounding_ref、SOURCE_LEDGER.claim_mapping。"
+  ],
+  "entries": [
+    {
+      "draft_id": "DRAFT-K-ART-01",
+      "knowledge_ref": "knowledge:DRAFT-K-ART-01",
+      "entry_type": "artifact",
+      "term": "ProjectCharter",
+      "candidate_iri": "pm:art_ProjectCharter",
+      "candidate_iri_status": "resolved",
+      "candidate_iri_reason": null,
+      "natural_key": "project-charter",
+      "formal_id": null,
+      "formal_id_status": "pending-D4"
+    },
+    {
+      "draft_id": "DRAFT-K-ART-02",
+      "knowledge_ref": "knowledge:DRAFT-K-ART-02",
+      "entry_type": "artifact",
+      "term": "BusinessCase",
+      "candidate_iri": "pm:art_BusinessCase",
+      "candidate_iri_status": "resolved",
+      "candidate_iri_reason": null,
+      "natural_key": "business-case",
+      "formal_id": null,
+      "formal_id_status": "pending-D4"
+    },
+    {
+      "draft_id": "DRAFT-K-ART-03",
+      "knowledge_ref": "knowledge:DRAFT-K-ART-03",
+      "entry_type": "artifact",
+      "term": "BenefitsManagementPlan",
+      "candidate_iri": "pm:art_BenefitsManagementPlan",
+      "candidate_iri_status": "resolved",
+      "candidate_iri_reason": null,
+      "natural_key": "benefits-management-plan",
+      "formal_id": null,
+      "formal_id_status": "pending-D4"
+    },
+    {
+      "draft_id": "DRAFT-K-ART-04",
+      "knowledge_ref": "knowledge:DRAFT-K-ART-04",
+      "entry_type": "artifact",
+      "term": "IssueLog",
+      "candidate_iri": "pm:art_IssueLog",
+      "candidate_iri_status": "resolved",
+      "candidate_iri_reason": null,
+      "natural_key": "issue-log",
+      "formal_id": null,
+      "formal_id_status": "pending-D4"
+    },
+    {
+      "draft_id": "DRAFT-K-ART-05",
+      "knowledge_ref": "knowledge:DRAFT-K-ART-05",
+      "entry_type": "artifact",
+      "term": "RiskRegister",
+      "candidate_iri": "pm:art_RiskRegister",
+      "candidate_iri_status": "resolved",
+      "candidate_iri_reason": null,
+      "natural_key": "risk-register",
+      "formal_id": null,
+      "formal_id_status": "pending-D4"
+    },
+    {
+      "draft_id": "DRAFT-K-ART-06",
+      "knowledge_ref": "knowledge:DRAFT-K-ART-06",
+      "entry_type": "artifact",
+      "term": "QualityReports",
+      "candidate_iri": "pm:art_QualityReports",
+      "candidate_iri_status": "resolved",
+      "candidate_iri_reason": null,
+      "natural_key": "quality-reports",
+      "formal_id": null,
+      "formal_id_status": "pending-D4"
+    },
+    {
+      "draft_id": "DRAFT-K-TOOL-01",
+      "knowledge_ref": "knowledge:DRAFT-K-TOOL-01",
+      "entry_type": "tool",
+      "term": "AlternativeAnalysis",
+      "candidate_iri": "pm:tt_AlternativeAnalysis",
+      "candidate_iri_status": "resolved",
+      "candidate_iri_reason": null,
+      "natural_key": "alternative-analysis",
+      "formal_id": null,
+      "formal_id_status": "pending-D4"
+    },
+    {
+      "draft_id": "DRAFT-K-TOOL-02",
+      "knowledge_ref": "knowledge:DRAFT-K-TOOL-02",
+      "entry_type": "tool",
+      "term": "CostBenefitAnalysis",
+      "candidate_iri": "pm:tt_CostBenefitAnalysis",
+      "candidate_iri_status": "resolved",
+      "candidate_iri_reason": null,
+      "natural_key": "cost-benefit-analysis",
+      "formal_id": null,
+      "formal_id_status": "pending-D4"
+    },
+    {
+      "draft_id": "DRAFT-K-TOOL-03",
+      "knowledge_ref": "knowledge:DRAFT-K-TOOL-03",
+      "entry_type": "tool",
+      "term": "DecisionTreeAnalysis",
+      "candidate_iri": "pm:tt_DecisionTreeAnalysis",
+      "candidate_iri_status": "resolved",
+      "candidate_iri_reason": null,
+      "natural_key": "decision-tree-analysis",
+      "formal_id": null,
+      "formal_id_status": "pending-D4"
+    },
+    {
+      "draft_id": "DRAFT-K-TOOL-04",
+      "knowledge_ref": "knowledge:DRAFT-K-TOOL-04",
+      "entry_type": "tool",
+      "term": "MonteCarloSimulation",
+      "candidate_iri": null,
+      "candidate_iri_status": "unresolved",
+      "candidate_iri_reason": "本体无 Monte Carlo 个体；最近邻 pm:tt_Simulation 语义更宽，不能当作同一概念，故置 null。",
+      "natural_key": "monte-carlo-simulation",
+      "formal_id": null,
+      "formal_id_status": "pending-D4"
+    },
+    {
+      "draft_id": "DRAFT-K-TOOL-05",
+      "knowledge_ref": "knowledge:DRAFT-K-TOOL-05",
+      "entry_type": "tool",
+      "term": "EarnedValueAnalysis",
+      "candidate_iri": "pm:tt_EarnedValueAnalysis",
+      "candidate_iri_status": "resolved",
+      "candidate_iri_reason": null,
+      "natural_key": "earned-value-analysis",
+      "formal_id": null,
+      "formal_id_status": "pending-D4"
+    },
+    {
+      "draft_id": "DRAFT-K-TOOL-06",
+      "knowledge_ref": "knowledge:DRAFT-K-TOOL-06",
+      "entry_type": "tool",
+      "term": "RootCauseAnalysis",
+      "candidate_iri": "pm:tt_RootCauseAnalysis",
+      "candidate_iri_status": "resolved",
+      "candidate_iri_reason": null,
+      "natural_key": "root-cause-analysis",
+      "formal_id": null,
+      "formal_id_status": "pending-D4"
+    },
+    {
+      "draft_id": "DRAFT-K-PROC-01",
+      "knowledge_ref": "knowledge:DRAFT-K-PROC-01",
+      "entry_type": "process",
+      "term": "InitiateProjectOrPhase",
+      "candidate_iri": "pm:proc_InitiateProjectOrPhase",
+      "candidate_iri_status": "resolved",
+      "candidate_iri_reason": null,
+      "natural_key": "initiate-project-or-phase",
+      "formal_id": null,
+      "formal_id_status": "pending-D4"
+    },
+    {
+      "draft_id": "DRAFT-K-FA-01",
+      "knowledge_ref": "knowledge:DRAFT-K-FA-01",
+      "entry_type": "focus_area",
+      "term": "Initiating",
+      "candidate_iri": "pm:fa_Initiating",
+      "candidate_iri_status": "resolved",
+      "candidate_iri_reason": null,
+      "natural_key": "initiating-focus-area",
+      "formal_id": null,
+      "formal_id_status": "pending-D4"
+    },
+    {
+      "draft_id": "DRAFT-K-DOM-01",
+      "knowledge_ref": "knowledge:DRAFT-K-DOM-01",
+      "entry_type": "performance_domain",
+      "term": "Governance",
+      "candidate_iri": "pm:dom_Governance",
+      "candidate_iri_status": "resolved",
+      "candidate_iri_reason": null,
+      "natural_key": "governance-performance-domain",
+      "formal_id": null,
+      "formal_id_status": "pending-D4"
+    }
+  ],
+  "reverse_index": {
+    "pm:art_ProjectCharter": "DRAFT-K-ART-01",
+    "pm:art_BusinessCase": "DRAFT-K-ART-02",
+    "pm:art_BenefitsManagementPlan": "DRAFT-K-ART-03",
+    "pm:art_IssueLog": "DRAFT-K-ART-04",
+    "pm:art_RiskRegister": "DRAFT-K-ART-05",
+    "pm:art_QualityReports": "DRAFT-K-ART-06",
+    "pm:tt_AlternativeAnalysis": "DRAFT-K-TOOL-01",
+    "pm:tt_CostBenefitAnalysis": "DRAFT-K-TOOL-02",
+    "pm:tt_DecisionTreeAnalysis": "DRAFT-K-TOOL-03",
+    "pm:tt_EarnedValueAnalysis": "DRAFT-K-TOOL-05",
+    "pm:tt_RootCauseAnalysis": "DRAFT-K-TOOL-06",
+    "pm:proc_InitiateProjectOrPhase": "DRAFT-K-PROC-01",
+    "pm:fa_Initiating": "DRAFT-K-FA-01",
+    "pm:dom_Governance": "DRAFT-K-DOM-01"
+  },
+  "rule_bindings": {
+    "G-A1": {
+      "entries": [
+        "knowledge:Project",
+        "DRAFT-K-ART-01"
+      ],
+      "direction": "bidirectional",
+      "status": "resolved",
+      "note": "Project 是规则主体；ProjectCharter 是项目存在的证据产物。"
+    },
+    "G-A2": {
+      "entries": [
+        "knowledge:Constraint"
+      ],
+      "direction": "bidirectional",
+      "status": "resolved",
+      "note": "约束锚定直接指向 Constraint 条目。"
+    },
+    "G-C1": {
+      "entries": [
+        "knowledge:Deliverable",
+        "DRAFT-K-ART-06"
+      ],
+      "direction": "bidirectional",
+      "status": "resolved",
+      "note": "Deliverable 为规则主体；QualityReports 是交付物/断言关系的候选载体。"
+    },
+    "G-D1": {
+      "entries": [
+        "knowledge:Commitment"
+      ],
+      "direction": "bidirectional",
+      "status": "resolved",
+      "note": "变更提议的对象限于 Commitment 或 Deliverable，直接绑定 Commitment。"
+    },
+    "G-E1": {
+      "entries": [
+        "knowledge:Accountable"
+      ],
+      "direction": "bidirectional",
+      "status": "resolved",
+      "note": "角色最小完整性以 Accountable 为主线。"
+    }
+  },
+  "reverse_rule_index": {
+    "knowledge:Project": [
+      "G-A1"
+    ],
+    "DRAFT-K-ART-01": [
+      "G-A1"
+    ],
+    "knowledge:Constraint": [
+      "G-A2"
+    ],
+    "knowledge:Deliverable": [
+      "G-C1"
+    ],
+    "DRAFT-K-ART-06": [
+      "G-C1"
+    ],
+    "knowledge:Commitment": [
+      "G-D1"
+    ],
+    "knowledge:Accountable": [
+      "G-E1"
+    ]
+  },
+  "statistics": {
+    "total": 15,
+    "candidate_iri_resolved": 14,
+    "candidate_iri_null": 1,
+    "stable_natural_key": 15,
+    "null_iri_and_no_natural_key": 0,
+    "rule_bindings": 5,
+    "rule_bindings_with_entry": 5
+  }
+}

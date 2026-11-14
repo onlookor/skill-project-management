@@ -86,7 +86,7 @@
         },
         {
           "file": "TODO.md",
-          "line": 78,
+          "line": 80,
           "form": "code"
         },
         {
@@ -226,12 +226,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 75,
+          "line": 77,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 105,
+          "line": 107,
           "form": "code"
         },
         {
@@ -426,12 +426,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 75,
+          "line": 77,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 78,
+          "line": 80,
           "form": "code"
         },
         {
@@ -566,7 +566,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 405,
+          "line": 413,
           "form": "code"
         },
         {
@@ -671,7 +671,7 @@
         },
         {
           "file": "TODO.md",
-          "line": 78,
+          "line": 80,
           "form": "code"
         },
         {
@@ -741,7 +741,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 405,
+          "line": 413,
           "form": "code"
         },
         {
@@ -876,12 +876,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 75,
+          "line": 77,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 78,
+          "line": 80,
           "form": "code"
         },
         {
@@ -1146,7 +1146,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 405,
+          "line": 413,
           "form": "code"
         },
         {
@@ -1271,7 +1271,7 @@
         },
         {
           "file": "TODO.md",
-          "line": 78,
+          "line": 80,
           "form": "code"
         },
         {
@@ -1516,7 +1516,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 405,
+          "line": 413,
           "form": "code"
         },
         {
@@ -1566,12 +1566,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 105,
+          "line": 107,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 117,
+          "line": 119,
           "form": "code"
         },
         {
@@ -1611,12 +1611,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 105,
+          "line": 107,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 117,
+          "line": 119,
           "form": "code"
         },
         {
@@ -1666,12 +1666,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 105,
+          "line": 107,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 117,
+          "line": 119,
           "form": "code"
         },
         {
@@ -1721,12 +1721,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 106,
+          "line": 108,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 117,
+          "line": 119,
           "form": "code"
         },
         {
@@ -1756,12 +1756,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 106,
+          "line": 108,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 117,
+          "line": 119,
           "form": "code"
         },
         {
@@ -1816,12 +1816,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 106,
+          "line": 108,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 117,
+          "line": 119,
           "form": "code"
         },
         {
@@ -1846,17 +1846,17 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 363,
+          "line": 371,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 366,
+          "line": 374,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 409,
+          "line": 417,
           "form": "code"
         },
         {
@@ -1966,32 +1966,32 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 364,
+          "line": 372,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 366,
+          "line": 374,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 406,
+          "line": 414,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 409,
+          "line": 417,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 424,
+          "line": 432,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 426,
+          "line": 434,
           "form": "code"
         },
         {
@@ -2191,12 +2191,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 62,
+          "line": 64,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 63,
+          "line": 65,
           "form": "code"
         },
         {
@@ -2585,6 +2585,11 @@
           "form": "code"
         },
         {
+          "file": "spec/pilot/pilot-artifact.md",
+          "line": 23,
+          "form": "code"
+        },
+        {
           "file": "validation/CHECKLIST.md",
           "line": 46,
           "form": "code"
@@ -2641,17 +2646,17 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 363,
+          "line": 371,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 443,
+          "line": 451,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 448,
+          "line": 456,
           "form": "code"
         },
         {
@@ -2672,6 +2677,16 @@
         {
           "file": "CHANGELOG.md",
           "line": 230,
+          "form": "code"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 844,
+          "form": "code"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 846,
           "form": "code"
         },
         {
@@ -2861,17 +2876,22 @@
         },
         {
           "file": "TODO.md",
-          "line": 67,
+          "line": 57,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 70,
+          "line": 69,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 78,
+          "line": 72,
+          "form": "code"
+        },
+        {
+          "file": "TODO.md",
+          "line": 80,
           "form": "code"
         },
         {
@@ -3087,6 +3107,36 @@
         {
           "file": "spec/methods/deterministic-checker.md",
           "line": 171,
+          "form": "code"
+        },
+        {
+          "file": "spec/pilot/M3_M4_PILOT_REPORT.md",
+          "line": 31,
+          "form": "code"
+        },
+        {
+          "file": "spec/pilot/M3_M4_PILOT_REPORT.md",
+          "line": 33,
+          "form": "code"
+        },
+        {
+          "file": "spec/pilot/M3_M4_PILOT_REPORT.md",
+          "line": 34,
+          "form": "code"
+        },
+        {
+          "file": "spec/pilot/M3_M4_PILOT_REPORT.md",
+          "line": 54,
+          "form": "code"
+        },
+        {
+          "file": "spec/pilot/M3_M4_PILOT_REPORT.md",
+          "line": 70,
+          "form": "code"
+        },
+        {
+          "file": "spec/pilot/M3_M4_PILOT_REPORT.md",
+          "line": 71,
           "form": "code"
         }
       ]
@@ -3742,7 +3792,7 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 409,
+          "line": 417,
           "form": "code"
         },
         {
@@ -4134,12 +4184,12 @@
         },
         {
           "file": "TODO.md",
-          "line": 61,
+          "line": 63,
           "form": "code"
         },
         {
           "file": "TODO.md",
-          "line": 73,
+          "line": 75,
           "form": "code"
         },
         {
@@ -4209,7 +4259,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 388,
+          "line": 396,
           "form": "code"
         },
         {
@@ -4269,7 +4319,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 388,
+          "line": 396,
           "form": "code"
         },
         {
@@ -4337,7 +4387,7 @@
         },
         {
           "file": "TODO.md",
-          "line": 70,
+          "line": 72,
           "form": "code"
         }
       ]
@@ -4347,7 +4397,7 @@
       "locations": [
         {
           "file": "TODO.md",
-          "line": 70,
+          "line": 72,
           "form": "code"
         }
       ]

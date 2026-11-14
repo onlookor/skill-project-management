@@ -1,0 +1,22 @@
+{
+  "artifact_id": "pilot-checklist-excerpt",
+  "artifact_type": "checklist-projection",
+  "authoritative": false,
+  "generated": "2026-11-14",
+  "source_commit": "cc0cd2a882df66f87d381ca855f4590b11570763",
+  "checklist_source_commit": "0669a4b031f02dc6045c6b2696c5c9f3eb427a4b",
+  "not_execution_result": true,
+  "clauses": [
+    {"check_id": "PROJECT_MINIMAL_EXISTENCE", "rule": "G-A1", "severity": "block", "rule_status": "active", "clause": "G-A1#1", "verdict": "pass", "reason": "all_required_nodes_present"},
+    {"check_id": "CONSTRAINT_ANCHOR_REQUIRED", "rule": "G-A2", "severity": "block", "rule_status": "active", "clause": "G-A2#1", "verdict": "cannot_evaluate", "reason": "missing_input"},
+    {"check_id": "DELIVERABLE_ASSERTION_LINK", "rule": "G-C1", "severity": "block", "rule_status": "active", "clause": "G-C1#1", "verdict": "fail", "reason": "assertion_missing"},
+    {"check_id": "CHANGE_CONSTRAINT_LINK", "rule": "G-D1", "severity": "advisory", "rule_status": "active", "clause": "G-D1#1", "verdict": "not_applicable", "reason": "no_change_proposal"},
+    {"check_id": "ROLE_MINIMAL_COMPLETENESS", "rule": "G-E1", "severity": "block", "rule_status": "active", "clause": "G-E1#1", "verdict": "pass", "reason": "accountable_present"},
+    {"check_id": "PROJECT_CHARTER_EXISTENCE", "rule": "G-F1", "severity": "advisory", "rule_status": "assumption", "clause": "G-F1#1", "verdict": "cannot_evaluate", "reason": "source_not_available"}
+  ],
+  "aggregate": {
+    "verdict": "fail",
+    "order_independent": true,
+    "precedence": ["fail", "cannot_evaluate", "pass", "not_applicable"]
+  }
+}

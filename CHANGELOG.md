@@ -830,3 +830,18 @@
 - **涉及文件**：`GAP_LEDGER.md`、`AGENTS.md`（3.6.6 增加 `报告章节` 字段）、`ROADMAP.md`（M2 出口 5 改为 18 条）、`TODO.md`（T-130/131/133/134/135/136 → `done`，新增 T-137）、`spec/M3_M4_DECISIONS.md`、`spec/M3_M4_PLAN.md`、`CHANGELOG.md`。
 - **未改动**：`STATE.md`（无新增/删除受管文件，目录默认状态未变）、`manifest.json`（版本与发布字段不受影响）。
 - **状态**：生效
+
+---
+
+### 批次 0047 — 2026-11-14 — M3/M4 试点执行（15 条草稿）
+
+- **性质**：按 `spec/M3_M4_PLAN.md` 第 3 节执行试点，产出 15 条草稿、ID 映射、契约、产物样例与冲突样例；逐项判定 7 条判据与 6 条止损。**D4 未定，未放量，未写任何权威条目。**
+- **执行口径**：D1=c（按概念类型混合，`entry_type` 区分）；D2=b（五字段扩 `entry_type`/`status`/`relations`/`evidence`，不另立 schema）；D3=a + `pilot-id-map.json` 反向索引；D8=b（`definitionStatus` 含 `disputed`/`blocked-external`）；D4 全程 `DRAFT-K-<CAT>-<NN>` 且 `authoritative: false`。
+- **产出**：`spec/pilot/pilot-entries.json`（6 工件 + 6 工具 + 1 过程 + 1 焦点区 + 1 绩效域）、`spec/pilot/pilot-id-map.json`、`spec/pilot/pilot-contract.yaml`、`spec/pilot/pilot-artifact.json`、`spec/pilot/pilot-artifact.md`、`spec/pilot/pilot-conflicts.jsonl`、`spec/pilot/M3_M4_PILOT_REPORT.md`。
+- **统计**：15 条全部 `defined`；候选 IRI 有 14、无 1（Monte Carlo；本体最近邻 `pm:tt_Simulation` 语义更宽，置 `null` 并写原因）；稳定自然键 15；既无 IRI 又无稳定自然键 0，用户指定止损未命中。
+- **判据**：1 结构通过但受 T-123 来源授权限制；2 通过；3 通过（映射层，未接入 `GRAMMAR.md`）；4 部分通过（草稿层零冲突，权威层未检验）；5 通过；6 通过；7 `blocked-external`（无非执行方抽样）。
+- **止损**：五条明确未触发；外部抽样一条无法判定；未新增检查器、指纹区段或自证机制。
+- **放量门**：D4 拍板、T-123 来源使用授权、T-139 `grounding_ref` 语义统一、外部抽样 5 条。本批未开始放量。
+- **涉及文件**：`spec/pilot/` 下 7 个新文件、`spec/M3_M4_PLAN.md`（状态头）、`spec/M3_M4_DECISIONS.md`（状态头）、`TODO.md`（T-138 `done`、T-139 `open`、T-123 补试点证据）、`STATE.md`（`spec/pilot/` 默认 `example`）、`AGENTS.md`（目录结构）、`CHANGELOG.md`。
+- **未改动**：`GLOSSARY.md`、`knowledge/anchored-entries.jsonl`、TTL 的 `skos:prefLabel`、`GRAMMAR.md` 的 `grounding_ref`、`SOURCE_LEDGER.md` 的 `claim_mapping`、`manifest.json`。
+- **状态**：生效（试点完成，放量未开始）

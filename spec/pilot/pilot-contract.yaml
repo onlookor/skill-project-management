@@ -1,0 +1,38 @@
+# M3/M4 试点契约（示例，非规范；authoritative: false）
+# 用途：验证一份领域契约能否只靠既有槽位消费试点条目，不新增字段。
+skill_id: pilot-domain
+pm_contract_version: "0.1"
+authoritative: false
+
+slots:
+  subject_type: "Project"
+
+  deliverable_forms:
+    - "ProjectCharter"
+    - "BenefitsManagementPlan"
+    - "QualityReports"
+
+  constraint_domains:
+    - name: "business_justification"
+      relation_to_generic: "specializes"
+      generic_class: "goal"
+      grounding_ref: "knowledge:DRAFT-K-ART-02"
+    - name: "benefit_realization"
+      relation_to_generic: "specializes"
+      generic_class: "goal"
+      grounding_ref: "knowledge:DRAFT-K-ART-03"
+
+  assertion_vocabulary:
+    - name: "authorized"
+      maps_to: "what_state"
+      grounding_ref: "knowledge:DRAFT-K-ART-01"
+    - name: "open"
+      maps_to: "what_state"
+      grounding_ref: "knowledge:DRAFT-K-ART-04"
+    - name: "closed"
+      maps_to: "what_state"
+      grounding_ref: "knowledge:DRAFT-K-ART-04"
+
+  evidence_forms:
+    - "RiskRegister"
+    - "IssueLog"
