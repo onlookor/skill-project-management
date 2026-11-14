@@ -187,6 +187,7 @@ project-management-grounding/
 │   ├── GROUNDING_CRITERIA.md       # 接地完成判据：六条判据、状态语义、判据记录
 │   ├── ANCHOR_SPEC.md              # 锚点与引用规范：稳定 ID、标题路径、指纹、失效语义
 │   ├── ONTOLOGY_FEASIBILITY.md     # 自建本体的可行性评估与方案对比（评估报告，非规范）
+│   ├── CHECKER_INPUT_SCHEMA.md      # 确定性校验器的谓词快照输入 schema（T-107 起的新样例必须遵循）
 │   ├── methods/
 │   │   └── deterministic-checker.md  # CM-DET-CHECKER 方法声明（含 check_id 注册表、翻译规范）
 │   ├── ASSUMPTION_PROTOCOL.md      # assumption 协议（方法无关）
@@ -246,6 +247,8 @@ project-management-grounding/
 │
 └── validation/
     ├── CHECKLIST.md                # CM-DET-CHECKER 的产物：检查清单（生成依据见正文）
+    ├── checker-prototype/
+    │   └── checker.py              # T-107 最小原型：执行附录 A 的 34 个样例（纯标准库）
     └── test-cases/
         ├── README.md               # 反例检验用例库说明
         ├── TC-A1-02.md

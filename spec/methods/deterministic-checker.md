@@ -301,6 +301,8 @@
 > **范围**：A 表全部 17 个 `check_id`，按 severity 分批补齐。`block` 级样例省略 `severity` / `rule_status`（原型按 `block` / `active` 校验）；`warn` 级与 `assumption` 级样例在期望输出中显式给出 `severity` 与 `rule_status`，实际 severity 以 `validation/CHECKLIST.md` 为准。
 >
 > **输入约定**：`commitments`、`deliverables` 等键即该 `check_id` 的量化域；样例假定输入已按规则适用范围筛选（例如 G-E1 的快照只含决策类 `Commitment`，G-A2 的快照只含管理活动/产物），检查本身不再做类型筛选。输入缺键或键不可求值时，原型应输出 `cannot_evaluate`，不得当作 `pass`。
+>
+> **输入 schema**：字段名与量化域由 `spec/CHECKER_INPUT_SCHEMA.md` 固定。本组样例是该 schema 的首批实例；此后新增或修改的样例必须遵循该文件，不得自行引入新字段。
 
 #### A.1.1 `PROJECT_MINIMAL_EXISTENCE`（G-A1，`block`）
 
