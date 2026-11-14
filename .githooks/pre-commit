@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# 提交前检查：十个检查器全部通过才允许提交（AGENTS.md 3.5、3.6、5bis.1、7bis）
+# 提交前检查：十个检查器 + 原型样例与关键扫描全部通过才允许提交（AGENTS.md 3.5、3.6、5bis.1、7bis）
 # 每个克隆需自行启用：git config core.hooksPath .githooks
 set -u
 root=$(git rev-parse --show-toplevel) || exit 1
@@ -21,9 +21,15 @@ run_check "scripts/check_ledger_landings.py" python3 scripts/check_ledger_landin
 run_check "scripts/check_gap_ledger.py --staged" python3 scripts/check_gap_ledger.py --staged
 run_check "scripts/check_three_table.py" python3 scripts/check_three_table.py
 run_check "scripts/check_coverage_gate.py" python3 scripts/check_coverage_gate.py
+run_check "原型样例 A.1（60 条）" python3 validation/checker-prototype/checker.py --quiet
+run_check "原型聚合顺序无关性" python3 validation/checker-prototype/checker.py --aggregation-order
+run_check "原型缺键快检（43 键）" python3 validation/checker-prototype/checker.py --missing-key-sweep --quiet
+run_check "原型 null 快检子集" python3 validation/checker-prototype/checker.py --null-sweep --quick
+run_check "原型嵌套缺键快检（53 项）" python3 validation/checker-prototype/checker.py --nested-missing-sweep --quiet
+run_check "原型封闭枚举快检（4 项）" python3 validation/checker-prototype/checker.py --enum-sweep --quiet
 run_check "scripts/check_checker_pins.py" python3 scripts/check_checker_pins.py
 run_check "scripts/check_spec_pins.py" python3 scripts/check_spec_pins.py
 run_check "scripts/check_glossary_usage.py" python3 scripts/check_glossary_usage.py
 run_check "scripts/check_state.py" python3 scripts/check_state.py
 
-echo "[pre-commit] 十个检查器全部通过。"
+echo "[pre-commit] 十个检查器与原型样例/关键扫描全部通过。"

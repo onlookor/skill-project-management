@@ -290,15 +290,15 @@
 | check_id | 规则 | 判定（子句 id） | 子句指纹 | 输入 | 原因码 | 规则状态 |
 |---|---|---|---|---|---|---|
 | `PROJECT_MINIMAL_EXISTENCE` | G-A1 | `G-A1#1`–`G-A1#6` | `6a4f8c0ad633` | `project`, `actors`, `outcomes`, `commitments`, `constraints` | missing_actor / missing_outcome / missing_commitment / missing_constraint / broken_commitment_endpoint / constraint_not_applied | active |
-| `CONSTRAINT_ANCHOR_REQUIRED` | G-A2 | `G-A2#1`–`G-A2#2` | `e662fd68fb27` | `commitments`, `deliverables`, `constraints` | unanchored_management_item / undefined_object_type | active |
+| `CONSTRAINT_ANCHOR_REQUIRED` | G-A2 | `G-A2#1`–`G-A2#2` | `92b655760009` | `commitments`, `deliverables`, `constraints` | unanchored_management_item / undefined_enum_value | active |
 | `DUAL_DIMENSION_ANNOTATION` | G-B1 | `G-B1#1`–`G-B1#2` | `2cde52fd3961` | `management_items` | missing_dimension | active |
-| `DIMENSION_VALUE_CLOSED` | G-B2 | `G-B2#1`–`G-B2#2` | `f1ffbb599458` | `management_items` | dimension_value_out_of_enum / invalid_subject_group_extension | active |
+| `DIMENSION_VALUE_CLOSED` | G-B2 | `G-B2#1`–`G-B2#2` | `b50cfc085765` | `management_items` | dimension_value_out_of_enum / invalid_subject_group_extension / undefined_enum_value | active |
 | `DELIVERABLE_ASSERTION_LINK` | G-C1 | `G-C1#1`–`G-C1#3` | `f2a5638c6328` | `deliverables`, `assertions` | deliverable_without_assertion / dangling_reference / assertion_without_content / assertion_about_mismatch | active |
 | `ASSERTION_MUTUAL_EXCLUSION` | G-C2 | `G-C2#1`–`G-C2#2` | `dad9a9f57643` | `assertions`, `deliverables` | mutually_exclusive_active_assertions | active |
 | `CHANGE_CONSTRAINT_LINK` | G-D1 | `G-D1#1`–`G-D1#3` | `3e473f8ea1e8` | `changes`, `constraints`, `commitments`, `deliverables` | missing_change_target / invalid_change_target / missing_constraint_link / invalid_change_relation | active |
 | `ALL_IMPROVEMENT_ASSUMPTION` | G-D2 | `G-D2#1`–`G-D2#3` | `c1573c1eb236` | `changes`, `actors` | all_improvement_without_verification / approval_basis_before_verification / assumption_unclosed | active |
 | `ROLE_MINIMAL_COMPLETENESS` | G-E1 | `G-E1#1`–`G-E1#3` | `a707061b238f` | `actors`, `commitments` | missing_accountable / multiple_accountable / unknown_accountable / accountable_not_human / missing_responsible / missing_role_merge_declaration | active |
-| `AI_AUTONOMY_DELEGATION_AUDITABLE` | G-E2 | `G-E2#1`–`G-E2#3` | `305ff2b257b0` | `actors`, `autonomy_grants`, `assertions` | delegation_chain_not_accountable / invalid_path / dangling_reference / assertion_incomplete / assumption_unclosed | active |
+| `AI_AUTONOMY_DELEGATION_AUDITABLE` | G-E2 | `G-E2#1`–`G-E2#3` | `0b227c8dc644` | `actors`, `autonomy_grants`, `assertions` | delegation_chain_not_accountable / accountable_not_human / invalid_path / dangling_reference / assertion_incomplete / assumption_unclosed | active |
 | `PROJECT_CHARTER_EXISTENCE` | G-F1 | `G-F1#1`–`G-F1#2` | `a40c88e331b9` | `projects`, `charters`, `outcomes`, `constraints`, `actors`, `assertions` | missing_charter / incomplete_charter | assumption |
 | `CLOSURE_ACCEPTANCE_LINK` | G-F2 | `G-F2#1`–`G-F2#2` | `1c157ebdf8ff` | `deliverables`, `actors` | missing_acceptance_assertion | assumption |
 | `PROCUREMENT_CONTRACT_ANCHOR` | G-F3 | `G-F3#1`–`G-F3#2` | `3b6f71eed103` | `commitments`, `contracts`, `constraints`, `actors` | missing_contract / incomplete_contract | assumption |
@@ -311,7 +311,7 @@
 
 > 用途：解决“一规则一句导致子条件被压缩”（ADR-0013 的问题 P1）。每条规则正文的规范性条件拆为 clause id；A 表每个 `check_id` 的“判定（子句 id）”列只列它覆盖的 clause，**不再写叙述性短语**；条件的自然语言表述与原因码统一放在本表。一个 `check_id` 可承载多个子句，逐子句独立求值、聚合为单一 verdict（任一 `fail` → `fail`；否则任一 `cannot_evaluate` → `cannot_evaluate`；否则 `pass`）。未覆盖的子句必须标 `not-checked` 并写理由，`scripts/check_three_table.py` 机械核对覆盖完整性与“A 表不含叙述性短语”。
 >
-> 复核签收：纪律基线（同源修订；非同源复核待提交后执行） / 2026-11-14 / A.2 指纹 `a7e02bdfd23f`
+> 复核签收：非同源复核基线 `d8bf413`（本批次按复核清单第 3/6/7/8 项修改；产物 `validation/reviews/2026-11-14-d8bf413-review.md`） / 2026-11-14 / A.2 指纹 `df739d3d479c`
 
 | clause | 规则 | 子句（判定条件） | 原因码 | 承接 check_id | 子句 severity | 覆盖状态 | 规则状态 |
 |---|---|---|---|---|---|---|---|
@@ -322,11 +322,11 @@
 | `G-A1#5` | G-A1 | `Commitment` 的 `by`/`to` 指向已登记的 `Actor`/`Outcome` | `broken_commitment_endpoint` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked | active |
 | `G-A1#6` | G-A1 | `Constraint` 作用于该 `Outcome` 或 `Commitment` | `constraint_not_applied` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked | active |
 | `G-A2#1` | G-A2 | 每个管理活动/产物至少一条 `constrained_by` 指向已登记 `Constraint` | `unanchored_management_item` | `CONSTRAINT_ANCHOR_REQUIRED` | `block` | checked | active |
-| `G-A2#2` | G-A2 | “管理活动/产物”为已定义节点类型 | `undefined_object_type` | `CONSTRAINT_ANCHOR_REQUIRED` | `block` | checked（`node_type` 可选；提供时须 ∈ `management_node_type`） | active |
+| `G-A2#2` | G-A2 | “管理活动/产物”为已定义节点类型 | `undefined_enum_value` | `CONSTRAINT_ANCHOR_REQUIRED` | `block` | checked（`node_type` 可选；提供时须 ∈ `management_node_type`） | active |
 | `G-B1#1` | G-B1 | 每个管理项有 `process_group` 标签 | `missing_dimension` | `DUAL_DIMENSION_ANNOTATION` | `advisory` | checked | active |
 | `G-B1#2` | G-B1 | 每个管理项有 `subject_group` 标签 | `missing_dimension` | `DUAL_DIMENSION_ANNOTATION` | `advisory` | checked | active |
 | `G-B2#1` | G-B2 | 标签值在锚定枚举或契约扩展内 | `dimension_value_out_of_enum` | `DIMENSION_VALUE_CLOSED` | `advisory` | checked | active |
-| `G-B2#2` | G-B2 | 扩展项声明 `relation ∈ subject_group_extension_relation`、`base` ∈ 17 项基础枚举，且 `value` 不与基础枚举重名 | `invalid_subject_group_extension` | `DIMENSION_VALUE_CLOSED` | `advisory` | checked | active |
+| `G-B2#2` | G-B2 | 扩展项声明 `relation ∈ subject_group_extension_relation`；`specializes`/`cross_cuts` 的 `base` ∈ 17 项基础枚举，`orthogonal_to` 可不声明 `base`；`value` 不与基础枚举重名 | `invalid_subject_group_extension / undefined_enum_value` | `DIMENSION_VALUE_CLOSED` | `advisory` | checked | active |
 | `G-C1#1` | G-C1 | 每个 `Deliverable` 至少一条见证断言（`asserted_by` 正向或 `about` 反向） | `deliverable_without_assertion / dangling_reference` | `DELIVERABLE_ASSERTION_LINK` | `block` | checked | active |
 | `G-C1#2` | G-C1 | 断言内容是“是什么/什么状态/满足什么条件”的明确陈述 | `assertion_without_content` | `DELIVERABLE_ASSERTION_LINK` | `block` | checked | active |
 | `G-C1#3` | G-C1 | 断言 `about` 指向该交付物 | `assertion_about_mismatch` | `DELIVERABLE_ASSERTION_LINK` | `block` | checked | active |
@@ -341,7 +341,7 @@
 | `G-E1#1` | G-E1 | 唯一 `accountable_by` 且指向 `HumanActor`/`LegalEntity` | `missing_accountable / multiple_accountable / unknown_accountable / accountable_not_human` | `ROLE_MINIMAL_COMPLETENESS` | `block` | checked | active |
 | `G-E1#2` | G-E1 | 至少一个 `responsible_by` | `missing_responsible` | `ROLE_MINIMAL_COMPLETENESS` | `block` | checked | active |
 | `G-E1#3` | G-E1 | 角色重合时有 `role_merge_declaration` | `missing_role_merge_declaration` | `ROLE_MINIMAL_COMPLETENESS` | `warn` | checked | active |
-| `G-E2#1` | G-E2 | `delegated_from` 路径终至 `Accountable` | `delegation_chain_not_accountable / invalid_path / dangling_reference` | `AI_AUTONOMY_DELEGATION_AUDITABLE` | `warn` | checked | active |
+| `G-E2#1` | G-E2 | `delegated_from` 路径终至 `Accountable`，且终点类型为 `HumanActor`/`LegalEntity` | `delegation_chain_not_accountable / accountable_not_human / invalid_path / dangling_reference` | `AI_AUTONOMY_DELEGATION_AUDITABLE` | `warn` | checked | active |
 | `G-E2#2` | G-E2 | 路径上断言覆盖范围/边界/撤销条件 | `assertion_incomplete` | `AI_AUTONOMY_DELEGATION_AUDITABLE` | `warn` | checked | active |
 | `G-E2#3` | G-E2 | 该断言以 `assumption` 形式存在并附验证条件 | `assertion_incomplete / assumption_unclosed / dangling_reference` | `AI_AUTONOMY_DELEGATION_AUDITABLE` | `warn` | checked | active |
 | `G-F1#1` | G-F1 | 执行阶段 `Project` 有 `ProjectCharter` | `missing_charter` | `PROJECT_CHARTER_EXISTENCE` | `advisory` | checked | assumption |
@@ -386,7 +386,7 @@
 >
 > **输入 schema**：字段名与量化域由 `spec/CHECKER_INPUT_SCHEMA.md` 固定。本组样例是该 schema 的首批实例；此后新增或修改的样例必须遵循该文件，不得自行引入新字段。
 
-**样例基线（跨轮横比锚点）**：本轮样例基线为提交 `1a42b8b`（批次 0034《复核推翻后重开缺口并修订判定层》），共 34 个样例。批次 0040 为覆盖闸门增补 23 个负例，样例数 34 → 57；既有 34 例的输入与期望输出均未改动。此后报告的“57/57”相对批次 0040 的新基线，换基线必须在此登记新提交号与全部输入改动。相对 `1a42b8b` 的输入块改动如下，**期望输出零改动**：
+**样例基线（跨轮横比锚点）**：本轮样例基线为提交 `1a42b8b`（批次 0034《复核推翻后重开缺口并修订判定层》），共 34 个样例。批次 0040 为覆盖闸门增补 23 个负例，样例数 34 → 57；批次 0042 为复核清单第 2/3/5/7 项增补 3 个样例（A.1.7-4、A.1.8-3、A.1.10-5），样例数 57 → 60。既有 34 例的输入与期望输出均未改动。此后报告的“60/60”相对批次 0042 的新基线（提交号见该批次），换基线必须在此登记新提交号与全部输入改动。相对 `1a42b8b` 的输入块改动如下，**期望输出零改动**：
 
 | 样例 | 输入块改动 | 原因 |
 |---|---|---|
@@ -589,7 +589,7 @@ constraints: [{ id: "K-1" }]
 check_id: CONSTRAINT_ANCHOR_REQUIRED
 source_rule: G-A2
 verdict: cannot_evaluate
-reason: undefined_object_type
+reason: undefined_enum_value
 ```
 
 #### A.1.3 `DELIVERABLE_ASSERTION_LINK`（G-C1，`block`）
@@ -959,6 +959,26 @@ verdict: fail
 reason: invalid_subject_group_extension
 ```
 
+**样例 4（`orthogonal_to` 合法 → `pass`）**：正交扩展不要求 `base` 归属，且 `value` 不与基础枚举重名。
+
+```yaml
+management_items:
+  - { id: "M-1", process_group: "initiating", subject_group: "innovation" }
+subject_group_extension:
+  - { value: "innovation", relation: "orthogonal_to" }
+```
+
+期望输出：
+
+```yaml
+check_id: DIMENSION_VALUE_CLOSED
+source_rule: G-B2
+severity: advisory
+rule_status: active
+verdict: pass
+reason: null
+```
+
 #### A.1.8 `ASSERTION_MUTUAL_EXCLUSION`（G-C2，`warn` / `active`）
 
 **判定依据**：A 表“不存在两条 `active` 断言对同一 `Subject` 同一属性给出不相容值”；G-C2 要求冲突时同时呈现两条断言，不得静默择一。
@@ -990,6 +1010,26 @@ deliverables: [{ id: "D-1" }]
 assertions:
   - { id: "S-1", deliverable: "D-1", subject: "D-1", property: "status", value: "accepted", state: "active" }
   - { id: "S-2", deliverable: "D-1", subject: "D-1", property: "acceptance_date", value: "2026-11-14", state: "active" }
+```
+
+期望输出：
+
+```yaml
+check_id: ASSERTION_MUTUAL_EXCLUSION
+source_rule: G-C2
+severity: warn
+rule_status: active
+verdict: pass
+reason: null
+```
+
+**样例 3（`G-C2#2` 守卫 → `pass`）**：同 `Subject` 同属性取值冲突，但其中一条断言为 `inactive`，不参与互斥判定。
+
+```yaml
+deliverables: [{ id: "D-1" }]
+assertions:
+  - { id: "S-1", deliverable: "D-1", subject: "D-1", property: "status", value: "accepted", state: "active" }
+  - { id: "S-2", deliverable: "D-1", subject: "D-1", property: "status", value: "rejected", state: "inactive" }
 ```
 
 期望输出：
@@ -1228,6 +1268,39 @@ severity: warn
 rule_status: active
 verdict: cannot_evaluate
 reason: assumption_unclosed
+```
+
+**样例 5（触发 `G-E2#1` → `fail`）**：委托链终点是 `AIActor`，即使标注 `accountable: true` 也不能承担问责。
+
+```yaml
+actors:
+  - { id: "A-1", type: "AIActor" }
+  - { id: "A-2", type: "AIActor", accountable: true }
+autonomy_grants:
+  - id: "AG-1"
+    actor: "A-1"
+    delegated_from:
+      start: "A-1"
+      steps:
+        - { relation: "delegated_from", direction: "out", target_type: "Actor", target_id: "A-2" }
+      reach: "accountable"
+    assertions: ["S-1"]
+assertions:
+  - id: "S-1"
+    covers: ["scope", "boundary", "revocation"]
+    kind: "assumption"
+    verification_condition: "季度审计确认委托边界未被突破"
+```
+
+期望输出：
+
+```yaml
+check_id: AI_AUTONOMY_DELEGATION_AUDITABLE
+source_rule: G-E2
+severity: warn
+rule_status: active
+verdict: fail
+reason: accountable_not_human
 ```
 
 #### A.1.11 `PROJECT_CHARTER_EXISTENCE`（G-F1，`advisory` / `assumption`）

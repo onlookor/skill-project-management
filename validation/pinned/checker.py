@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""T-107 最小原型：按附录 A 判定列执行 T-011 的 34 个样例。
+"""T-107 最小原型：按附录 A 判定列执行 A.1 的 60 个样例。
 
 只使用标准库。输入为 spec/methods/deterministic-checker.md 中 A.1 的
 YAML 谓词快照；输出 check_id / source_rule / severity / rule_status /
@@ -78,7 +78,7 @@ BASE_SUBJECT_GROUPS = {
     "lessons-learned",
 }
 CHANGE_RELATIONS = {"mitigates", "exacerbates", "trades_off"}
-EXTENSION_RELATIONS = {"specializes", "cross_cuts"}
+EXTENSION_RELATIONS = {"specializes", "cross_cuts", "orthogonal_to"}
 CHANGE_TARGET_TYPES = {"Commitment", "Deliverable"}
 STATEMENT_KINDS = {"what", "state", "condition"}
 ASSERTION_KINDS = {"fact", "assumption", "decision"}
@@ -168,27 +168,44 @@ REFERENCE_RULES = parse_reference_rules(_SCHEMA_TEXT)
 _METHOD_TEXT = (ROOT / METHOD).read_text(encoding="utf-8")
 
 
-def parse_reason_order(text: str) -> tuple[dict[str, list[str]], dict[str, str]]:
-    """按 A.2 行序生成原因码优先级，并登记每个原因码所属子句的 severity。"""
-    order: dict[str, list[str]] = {}
+def parse_clauses(text: str) -> tuple[dict, dict, dict, dict]:
+    """按 A.2 行序登记子句：索引、所属 check_id、severity、原因码。
+
+    子句级结果是判定与覆盖闸门的共同依据：每条结果带 clause id，
+    覆盖闸门据此判定“这条负例确实触发了声明的子句”，不再依赖共享 reason。
+    """
+    index: dict[str, int] = {}
+    check_of: dict[str, str] = {}
     severity: dict[str, str] = {}
+    reasons: dict[str, list[str]] = {}
     for line in text.splitlines():
         cells = split_row(line)
         if not cells or len(cells) < 8:
             continue
         if not (cells[0].startswith("`G-") and cells[0].endswith("`")):
             continue
-        check_id = cells[4].strip("`")
-        clause_severity = cells[5].strip("`")
-        slot = order.setdefault(check_id, [])
-        for reason in re.findall(r"[a-z][a-z0-9_]+", cells[3]):
-            if reason not in slot:
-                slot.append(reason)
-            severity.setdefault(reason, clause_severity)
-    return order, severity
+        clause = cells[0].strip("`")
+        index[clause] = len(index)
+        check_of[clause] = cells[4].strip("`")
+        severity[clause] = cells[5].strip("`")
+        reasons[clause] = re.findall(r"[a-z][a-z0-9_]+", cells[3])
+    return index, check_of, severity, reasons
 
 
-REASON_ORDER, REASON_SEVERITY = parse_reason_order(_METHOD_TEXT)
+CLAUSE_INDEX, CLAUSE_CHECK, CLAUSE_SEVERITY, CLAUSE_REASONS = parse_clauses(_METHOD_TEXT)
+
+
+def clause_of(check_id: str, reason: str | None) -> str | None:
+    """唯一可判定的原因码回退到子句；多子句共享原因码时返回 None（须显式带 clause）。"""
+    if not reason:
+        return None
+    matches = [
+        clause
+        for clause, reasons in CLAUSE_REASONS.items()
+        if CLAUSE_CHECK[clause] == check_id and reason in reasons
+    ]
+    return matches[0] if len(matches) == 1 else None
+
 
 VERDICT_RANK = {"pass": 0, "cannot_evaluate": 1, "fail": 2}
 SEVERITY_RANK = {"advisory": 0, "warn": 1, "block": 2}
@@ -201,30 +218,45 @@ def aggregate(
 
     - verdict 取所有子句结论的最高级，与子句求值顺序无关；
     - reason 只在胜出 verdict 的子句里按 A.2 行序取首条，与输入顺序无关；
-    - severity 取胜出 verdict 的子句 severity 最高级，缺省用 check 的默认 severity。
+    - severity 取胜出子句在 A.2 登记的 severity 最高级，缺省用 check 的默认 severity。
     """
     if not results:
         return "pass", None, default_severity
     verdict = max((item[0] for item in results), key=lambda value: VERDICT_RANK[value])
     winners = [item for item in results if item[0] == verdict]
-    reasons = [item[1] for item in winners if len(item) > 1 and item[1]]
-    severities = []
+    enriched = []
     for item in winners:
-        reason = item[1] if len(item) > 1 else None
-        clause_severity = item[2] if len(item) > 2 and item[2] else REASON_SEVERITY.get(reason)
-        if clause_severity:
-            severities.append(clause_severity)
+        reason = item[1]
+        clause = item[2] if len(item) > 2 else None
+        clause = clause or clause_of(check_id, reason)
+        order = CLAUSE_INDEX.get(clause, 10**6)
+        enriched.append((order, reason, clause))
+    enriched.sort(key=lambda item: (item[0], item[1] or ""))
+    _, reason, clause = enriched[0]
+    severities = [CLAUSE_SEVERITY[item[2]] for item in enriched if item[2]]
     severity = (
         max(severities, key=lambda value: SEVERITY_RANK[value])
         if severities
         else default_severity
     )
-    if not reasons:
-        return verdict, None, severity
-    for candidate in REASON_ORDER.get(check_id, []):
-        if candidate in reasons:
-            return verdict, candidate, severity
-    return verdict, sorted(reasons)[0], severity
+    return verdict, reason, severity
+
+
+def failed_clauses(check_id: str, data: dict) -> list[str]:
+    """返回该输入实际触发的子句 id（按 A.2 行序）。供覆盖闸门机械核对。"""
+    violation = enum_violation(data)
+    if violation and violation[1]:
+        # 枚举在入口拦截，子句归属仍可判定（node_type → G-A2#2，relation → G-B2#2）。
+        return [violation[1]]
+    results = CHECKS[check_id](data)
+    seen = []
+    for item in results:
+        clause = item[2] if len(item) > 2 else None
+        clause = clause or clause_of(check_id, item[1])
+        if clause and clause not in seen:
+            seen.append(clause)
+    seen.sort(key=lambda clause: CLAUSE_INDEX.get(clause, 10**6))
+    return seen
 
 
 
@@ -585,21 +617,21 @@ def check_project_minimal_existence(data: dict) -> list[tuple]:
     actor_ids = {item.get("id") for item in data["actors"]}
     outcome_ids = {item.get("id") for item in data["outcomes"]}
     if not data["actors"]:
-        results.append(("fail", "missing_actor"))
+        results.append(("fail", "missing_actor", "G-A1#1"))
     if not data["outcomes"]:
-        results.append(("fail", "missing_outcome"))
+        results.append(("fail", "missing_outcome", "G-A1#2"))
     if not data["commitments"]:
-        results.append(("fail", "missing_commitment"))
+        results.append(("fail", "missing_commitment", "G-A1#3"))
     if not data["constraints"]:
-        results.append(("fail", "missing_constraint"))
+        results.append(("fail", "missing_constraint", "G-A1#4"))
     commitment_ids = {item.get("id") for item in data["commitments"]}
     for commitment in data["commitments"]:
         if commitment.get("by") not in actor_ids or commitment.get("to") not in outcome_ids:
-            results.append(("fail", "broken_commitment_endpoint"))
+            results.append(("fail", "broken_commitment_endpoint", "G-A1#5"))
     for constraint in data["constraints"]:
         target = constraint.get("constrains")
         if not target or target not in (outcome_ids | commitment_ids):
-            results.append(("fail", "constraint_not_applied"))
+            results.append(("fail", "constraint_not_applied", "G-A1#6"))
     return results
 
 
@@ -607,12 +639,10 @@ def check_constraint_anchor(data: dict) -> list[tuple]:
     results = []
     constraint_ids = {item.get("id") for item in data["constraints"]}
     for item in list(data["commitments"]) + list(data["deliverables"]):
-        node_type = item.get("node_type")
-        if node_type is not None and node_type not in ("ManagementActivity", "ManagementArtifact"):
-            results.append(("cannot_evaluate", "undefined_object_type"))
+        # 非法 node_type 由入口的全局枚举归一化（undefined_enum_value / G-A2#2）拦截。
         refs = item.get("constrained_by") or []
         if not refs or any(ref not in constraint_ids for ref in refs):
-            results.append(("fail", "unanchored_management_item"))
+            results.append(("fail", "unanchored_management_item", "G-A2#1"))
     return results
 
 
@@ -623,18 +653,18 @@ def check_deliverable_assertion(data: dict) -> list[tuple]:
         deliverable_id = deliverable.get("id")
         refs = deliverable.get("asserted_by") or []
         if any(ref not in assertion_by_id for ref in refs):
-            results.append(("fail", "dangling_reference"))
+            results.append(("fail", "dangling_reference", "G-C1#1"))
         about_ids = [aid for aid, item in assertion_by_id.items() if item.get("about") == deliverable_id]
         if not refs and not about_ids:
-            results.append(("fail", "deliverable_without_assertion"))
+            results.append(("fail", "deliverable_without_assertion", "G-C1#1"))
         for assertion_id in list(dict.fromkeys(list(refs) + sorted(about_ids))):
             assertion = assertion_by_id.get(assertion_id)
             if assertion is None:
                 continue
             if not assertion.get("statement") or assertion.get("statement_kind") not in STATEMENT_KINDS:
-                results.append(("fail", "assertion_without_content"))
+                results.append(("fail", "assertion_without_content", "G-C1#2"))
             if assertion.get("about") != deliverable_id:
-                results.append(("fail", "assertion_about_mismatch"))
+                results.append(("fail", "assertion_about_mismatch", "G-C1#3"))
     return results
 
 
@@ -645,19 +675,19 @@ def check_change_constraint(data: dict) -> list[tuple]:
     deliverable_ids = {item.get("id") for item in data.get("deliverables") or []}
     for change in data["changes"]:
         if change.get("constraint") not in constraint_ids:
-            results.append(("fail", "missing_constraint_link"))
+            results.append(("fail", "missing_constraint_link", "G-D1#2"))
         if change.get("relation") not in CHANGE_RELATIONS:
-            results.append(("fail", "invalid_change_relation"))
+            results.append(("fail", "invalid_change_relation", "G-D1#3"))
         target = change.get("target")
         if not isinstance(target, dict) or not target.get("type") or not target.get("id"):
-            results.append(("fail", "missing_change_target"))
+            results.append(("fail", "missing_change_target", "G-D1#1"))
             continue
         if target["type"] not in CHANGE_TARGET_TYPES:
-            results.append(("fail", "invalid_change_target"))
+            results.append(("fail", "invalid_change_target", "G-D1#1"))
             continue
         known = commitment_ids if target["type"] == "Commitment" else deliverable_ids
         if target["id"] not in known:
-            results.append(("fail", "invalid_change_target"))
+            results.append(("fail", "invalid_change_target", "G-D1#1"))
     return results
 
 
@@ -667,58 +697,63 @@ def check_role_minimal(data: dict) -> list[tuple]:
     for commitment in data["commitments"]:
         accountable = commitment.get("accountable_by")
         if not accountable:
-            results.append(("fail", "missing_accountable"))
+            results.append(("fail", "missing_accountable", "G-E1#1"))
         elif isinstance(accountable, list):
-            results.append(("fail", "multiple_accountable"))
+            results.append(("fail", "multiple_accountable", "G-E1#1"))
         else:
             actor = actors.get(accountable)
             if actor is None:
-                results.append(("fail", "unknown_accountable"))
+                results.append(("fail", "unknown_accountable", "G-E1#1"))
             elif actor.get("type") not in ("HumanActor", "LegalEntity"):
-                results.append(("fail", "accountable_not_human"))
+                results.append(("fail", "accountable_not_human", "G-E1#1"))
         responsible = commitment.get("responsible_by") or []
         if not responsible:
-            results.append(("fail", "missing_responsible"))
+            results.append(("fail", "missing_responsible", "G-E1#2"))
         if accountable and accountable in responsible and not commitment.get("role_merge_declaration"):
-            results.append(("fail", "missing_role_merge_declaration", "warn"))
+            results.append(("fail", "missing_role_merge_declaration", "G-E1#3"))
     return results
 
 
 def check_dual_dimension(data: dict) -> list[tuple]:
     results = []
     for item in data["management_items"]:
-        if not item.get("process_group") or not item.get("subject_group"):
-            results.append(("fail", "missing_dimension"))
+        # 两个维度分属 G-B1#1/#2；共享 missing_dimension 不能作为子句证据。
+        if not item.get("process_group"):
+            results.append(("fail", "missing_dimension", "G-B1#1"))
+        if not item.get("subject_group"):
+            results.append(("fail", "missing_dimension", "G-B1#2"))
     return results
+
+
+def extension_valid(entry: dict) -> bool:
+    """G-B2#2：relation 封闭；非 orthogonal_to 必须有基础归属，orthogonal_to 可不声明。"""
+    value = entry.get("value")
+    relation = entry.get("relation")
+    if not isinstance(value, str) or relation not in EXTENSION_RELATIONS:
+        return False
+    if value in BASE_SUBJECT_GROUPS:
+        return False
+    if relation == "orthogonal_to":
+        base = entry.get("base")
+        return base is None or base in BASE_SUBJECT_GROUPS
+    return entry.get("base") in BASE_SUBJECT_GROUPS
 
 
 def check_dimension_value(data: dict) -> list[tuple]:
     results = []
     extension: set[str] = set()
     for entry in data.get("subject_group_extension") or []:
-        value = entry.get("value")
-        if (
-            isinstance(value, str)
-            and entry.get("relation") in EXTENSION_RELATIONS
-            and entry.get("base") in BASE_SUBJECT_GROUPS
-            and value not in BASE_SUBJECT_GROUPS
-        ):
-            extension.add(value)
+        if extension_valid(entry):
+            extension.add(entry["value"])
     for item in data["management_items"]:
         if item.get("process_group") not in PROCESS_GROUPS:
-            results.append(("fail", "dimension_value_out_of_enum"))
+            results.append(("fail", "dimension_value_out_of_enum", "G-B2#1"))
         subject = item.get("subject_group")
         if subject not in BASE_SUBJECT_GROUPS and subject not in extension:
-            results.append(("fail", "dimension_value_out_of_enum"))
+            results.append(("fail", "dimension_value_out_of_enum", "G-B2#1"))
     for entry in data.get("subject_group_extension") or []:
-        value = entry.get("value")
-        if (
-            not isinstance(value, str)
-            or entry.get("relation") not in EXTENSION_RELATIONS
-            or entry.get("base") not in BASE_SUBJECT_GROUPS
-            or value in BASE_SUBJECT_GROUPS
-        ):
-            results.append(("fail", "invalid_subject_group_extension"))
+        if not extension_valid(entry):
+            results.append(("fail", "invalid_subject_group_extension", "G-B2#2"))
     return results
 
 
@@ -731,7 +766,7 @@ def check_assertion_mutual_exclusion(data: dict) -> list[tuple]:
         key = (assertion.get("subject"), assertion.get("property"))
         seen.setdefault(key, set()).add(assertion.get("value"))
     if any(len(values) > 1 for values in seen.values()):
-        results.append(("fail", "mutually_exclusive_active_assertions"))
+        results.append(("fail", "mutually_exclusive_active_assertions", "G-C2#1"))
     return results
 
 
@@ -746,13 +781,13 @@ def check_all_improvement(data: dict) -> list[tuple]:
         )
         if relations and all(item == "mitigates" for item in relations):
             if not assumption or not (change.get("verification_condition") or assumption_condition):
-                results.append(("fail", "all_improvement_without_verification"))
+                results.append(("fail", "all_improvement_without_verification", "G-D2#1"))
             elif status == "expired" or (
                 status == "pending" and not assumption.get("approved_by")
             ):
-                results.append(("cannot_evaluate", "assumption_unclosed"))
+                results.append(("cannot_evaluate", "assumption_unclosed", "G-D2#3"))
         if change.get("approval_basis") and status != "satisfied":
-            results.append(("fail", "approval_basis_before_verification"))
+            results.append(("fail", "approval_basis_before_verification", "G-D2#2"))
     return results
 
 
@@ -764,59 +799,64 @@ def check_ai_autonomy(data: dict) -> list[tuple]:
     for grant in data["autonomy_grants"]:
         actor_id = grant.get("actor")
         if actor_id not in actors:
-            results.append(("fail", "dangling_reference"))
+            results.append(("fail", "dangling_reference", "G-E2#1"))
         path = grant.get("delegated_from")
         if not isinstance(path, dict):
-            results.append(("cannot_evaluate", "invalid_path"))
+            results.append(("cannot_evaluate", "invalid_path", "G-E2#1"))
         else:
             start = path.get("start") or actor_id
             steps = path.get("steps")
             reach = path.get("reach")
             if start not in actors or not isinstance(steps, list) or not steps:
-                results.append(("cannot_evaluate", "invalid_path"))
+                results.append(("cannot_evaluate", "invalid_path", "G-E2#1"))
             else:
                 cursor = start
                 path_ok = True
                 for step in steps:
                     if not isinstance(step, dict):
-                        results.append(("cannot_evaluate", "invalid_path"))
+                        results.append(("cannot_evaluate", "invalid_path", "G-E2#1"))
                         path_ok = False
                         break
                     if step.get("relation") != "delegated_from" or step.get("direction") != "out":
-                        results.append(("cannot_evaluate", "invalid_path"))
+                        results.append(("cannot_evaluate", "invalid_path", "G-E2#1"))
                         path_ok = False
                         break
                     if step.get("target_type") != "Actor":
-                        results.append(("cannot_evaluate", "undefined_object_type"))
+                        results.append(("cannot_evaluate", "undefined_object_type", "G-E2#1"))
                         path_ok = False
                         break
                     target_id = step.get("target_id")
                     if not target_id:
-                        results.append(("cannot_evaluate", "invalid_path"))
+                        results.append(("cannot_evaluate", "invalid_path", "G-E2#1"))
                         path_ok = False
                         break
                     if target_id not in actors:
-                        results.append(("fail", "dangling_reference"))
+                        results.append(("fail", "dangling_reference", "G-E2#1"))
                         path_ok = False
                         break
                     cursor = target_id
                 if path_ok and reach != "accountable":
-                    results.append(("cannot_evaluate", "invalid_path"))
+                    results.append(("cannot_evaluate", "invalid_path", "G-E2#1"))
                     path_ok = False
-                if path_ok and actors[cursor].get("accountable") is not True:
-                    results.append(("fail", "delegation_chain_not_accountable"))
+                if path_ok:
+                    terminal = actors[cursor]
+                    if terminal.get("accountable") is not True:
+                        results.append(("fail", "delegation_chain_not_accountable", "G-E2#1"))
+                    elif terminal.get("type") not in ("HumanActor", "LegalEntity"):
+                        # 链终点必须能承担问责：AI 节点即使标 accountable 也不能作为终点。
+                        results.append(("fail", "accountable_not_human", "G-E2#1"))
         covers: set = set()
         for assertion_id in grant.get("assertions") or []:
             assertion = assertions.get(assertion_id)
             if assertion is None:
-                results.append(("fail", "dangling_reference"))
+                results.append(("fail", "dangling_reference", "G-E2#3"))
                 continue
             covers.update(assertion.get("covers") or [])
             if assertion.get("kind") not in ASSERTION_KINDS:
-                results.append(("cannot_evaluate", "undefined_object_type"))
+                results.append(("cannot_evaluate", "undefined_object_type", "G-E2#3"))
                 continue
             if assertion.get("kind") != "assumption" or not assertion.get("verification_condition"):
-                results.append(("fail", "assertion_incomplete"))
+                results.append(("fail", "assertion_incomplete", "G-E2#3"))
             assumption = assertion.get("assumption")
             if isinstance(assumption, dict) and (
                 assumption.get("status") == "expired"
@@ -825,9 +865,9 @@ def check_ai_autonomy(data: dict) -> list[tuple]:
                     and not assumption.get("approved_by")
                 )
             ):
-                results.append(("cannot_evaluate", "assumption_unclosed"))
+                results.append(("cannot_evaluate", "assumption_unclosed", "G-E2#3"))
         if not {"scope", "boundary", "revocation"} <= covers:
-            results.append(("fail", "assertion_incomplete"))
+            results.append(("fail", "assertion_incomplete", "G-E2#2"))
     return results
 
 
@@ -839,23 +879,25 @@ def check_project_charter(data: dict) -> list[tuple]:
             continue
         charter = charters.get(project.get("id"))
         if charter is None:
-            results.append(("fail", "missing_charter"))
+            results.append(("fail", "missing_charter", "G-F1#1"))
             continue
         required = ("outcomes", "constraints", "accountable", "authorizing_assertion")
         if any(not charter.get(key) for key in required):
-            results.append(("fail", "incomplete_charter"))
+            results.append(("fail", "incomplete_charter", "G-F1#2"))
     return results
 
 
 def check_closure_acceptance(data: dict) -> list[tuple]:
     results = []
     for deliverable in data["deliverables"]:
-        accepted = any(
-            item.get("statement") in ACCEPTANCE_STATEMENTS and item.get("accountable_confirmation")
-            for item in deliverable.get("assertions") or []
-        )
-        if not accepted:
-            results.append(("fail", "missing_acceptance_assertion"))
+        assertions = deliverable.get("assertions") or []
+        statements = [
+            item for item in assertions if item.get("statement") in ACCEPTANCE_STATEMENTS
+        ]
+        if not statements:
+            results.append(("fail", "missing_acceptance_assertion", "G-F2#1"))
+        elif not any(item.get("accountable_confirmation") for item in statements):
+            results.append(("fail", "missing_acceptance_assertion", "G-F2#2"))
     return results
 
 
@@ -867,11 +909,11 @@ def check_procurement_contract(data: dict) -> list[tuple]:
             continue
         contract = contracts.get(commitment.get("contract"))
         if contract is None:
-            results.append(("fail", "missing_contract"))
+            results.append(("fail", "missing_contract", "G-F3#1"))
             continue
         required = ("deliverable_form", "acceptance_criteria", "constrained_by", "accountable_signature")
         if any(not contract.get(key) for key in required):
-            results.append(("fail", "incomplete_contract"))
+            results.append(("fail", "incomplete_contract", "G-F3#2"))
     return results
 
 
@@ -882,7 +924,7 @@ def check_schedule_evidence(data: dict) -> list[tuple]:
             continue
         evidence = commitment.get("evidence_assertions") or []
         if not evidence or any(not item.get("basis") for item in evidence):
-            results.append(("fail", "missing_schedule_evidence"))
+            results.append(("fail", "missing_schedule_evidence", "G-F4#1"))
     return results
 
 
@@ -892,10 +934,10 @@ def check_tailoring_record(data: dict) -> list[tuple]:
     for action in data["tailoring_actions"]:
         record = records.get(action.get("record"))
         if record is None:
-            results.append(("fail", "missing_tailoring_record"))
+            results.append(("fail", "missing_tailoring_record", "G-G1#1"))
             continue
         if any(not record.get(key) for key in ("trimmed_rule", "rationale", "scope", "approver")):
-            results.append(("fail", "incomplete_tailoring_record"))
+            results.append(("fail", "incomplete_tailoring_record", "G-G1#2"))
     return results
 
 
@@ -903,7 +945,7 @@ def check_tailoring_non_trimmable(data: dict) -> list[tuple]:
     results = []
     for record in data["tailoring_records"]:
         if record.get("trimmed_rule") in NON_TRIMMABLE:
-            results.append(("fail", "non_trimmable_rule"))
+            results.append(("fail", "non_trimmable_rule", "G-G2#1"))
     return results
 
 
@@ -912,9 +954,11 @@ def check_tailoring_reassessment(data: dict) -> list[tuple]:
     for record in data["tailoring_records"]:
         if record.get("reassessment_condition"):
             continue
-        if record.get("permanent") is True and record.get("reason"):
+        if record.get("permanent") is True:
+            if not record.get("reason"):
+                results.append(("fail", "missing_reassessment_condition", "G-G3#2"))
             continue
-        results.append(("fail", "missing_reassessment_condition"))
+        results.append(("fail", "missing_reassessment_condition", "G-G3#1"))
     return results
 
 
@@ -986,8 +1030,77 @@ def find_null(value, path: str = "<root>") -> str | None:
     return None
 
 
+ENTITY_COLLECTIONS = (
+    "actors",
+    "outcomes",
+    "commitments",
+    "constraints",
+    "deliverables",
+    "assertions",
+    "changes",
+    "projects",
+    "charters",
+    "contracts",
+    "tailoring_actions",
+    "tailoring_records",
+    "management_items",
+    "autonomy_grants",
+)
+
+APPLICABILITY_STATES = {"applicable", "inapplicable", "pending"}
+ASSUMPTION_STATUSES = {"pending", "satisfied", "expired"}
+MANAGEMENT_NODE_TYPES = {"ManagementActivity", "ManagementArtifact"}
+
+
+def nested_missing(data: dict) -> str | None:
+    """嵌套归一化：实体集合的每个元素必须有 id，缺失与顶层缺键同出口。"""
+    for name in ENTITY_COLLECTIONS:
+        value = data.get(name)
+        if not isinstance(value, list):
+            continue
+        for index, item in enumerate(value):
+            if isinstance(item, dict) and "id" not in item:
+                return f"{name}[{index}].id"
+    return None
+
+
+def enum_violation(data: dict) -> tuple[str, str | None] | None:
+    """封闭枚举全局强制：非法值一律 cannot_evaluate/undefined_enum_value。
+
+    可归属到 A.2 子句的两项（node_type、subject_group.relation）带回 clause，
+    使覆盖闸门仍能按子句取证；适用性与 assumption.status 无独立 A.2 子句。
+    """
+    applicability = data.get("applicability")
+    if isinstance(applicability, dict):
+        state = applicability.get("state")
+        if state is not None and state not in APPLICABILITY_STATES:
+            return "applicability.state", None
+    for collection in ("changes", "assertions"):
+        for item in data.get(collection) or []:
+            if not isinstance(item, dict):
+                continue
+            assumption = item.get("assumption")
+            if isinstance(assumption, dict) and assumption.get("status") is not None:
+                if assumption["status"] not in ASSUMPTION_STATUSES:
+                    return "assumption.status", None
+    for collection in ("commitments", "deliverables"):
+        for item in data.get(collection) or []:
+            if not isinstance(item, dict):
+                continue
+            node_type = item.get("node_type")
+            if node_type is not None and node_type not in MANAGEMENT_NODE_TYPES:
+                return "node_type", "G-A2#2"
+    for entry in data.get("subject_group_extension") or []:
+        if not isinstance(entry, dict):
+            continue
+        relation = entry.get("relation")
+        if relation is not None and relation not in EXTENSION_RELATIONS:
+            return "subject_group.relation", "G-B2#2"
+    return None
+
+
 def evaluate(check_id: str, data: dict) -> tuple[str, str | None, str]:
-    """全部 check 的唯一入口：适用性 → null 归一化 → 判定 → 全局引用校验。"""
+    """全部 check 的唯一入口：适用性 → 缺键/null/枚举归一化 → 判定 → 全局引用校验。"""
     severity = SPEC[check_id][1]
     applicability = data.get("applicability") or {}
     state = applicability.get("state") if isinstance(applicability, dict) else None
@@ -1001,6 +1114,11 @@ def evaluate(check_id: str, data: dict) -> tuple[str, str | None, str]:
         return "cannot_evaluate", "missing_input", severity
     if find_null(data) is not None:
         return "cannot_evaluate", "missing_input", severity
+    if nested_missing(data) is not None:
+        return "cannot_evaluate", "missing_input", severity
+    violation = enum_violation(data)
+    if violation:
+        return "cannot_evaluate", "undefined_enum_value", severity
     verdict, reason, severity = aggregate(
         check_id, CHECKS[check_id](data), SPEC[check_id][1]
     )
@@ -1081,7 +1199,7 @@ def _expect_missing(kind: str, check_id: str, data: dict, failures: list) -> boo
     return True
 
 
-def missing_key_sweep() -> int:
+def missing_key_sweep(quiet: bool = False) -> int:
     """负例实测：43 个必需键逐一单删，都必须 cannot_evaluate/missing_input。"""
     rows: list[tuple[str, str, str, str]] = []
     failures = 0
@@ -1099,11 +1217,12 @@ def missing_key_sweep() -> int:
             ok = (verdict, reason) == ("cannot_evaluate", "missing_input")
             failures += 0 if ok else 1
             rows.append((check_id, missing_key, actual, "通过" if ok else "偏离"))
-    print("| check_id | 删除的必需键 | 实际结论 | 判定 |")
-    print("|---|---|---|---|")
-    for row in rows:
-        print("| " + " | ".join(row) + " |")
-    print()
+    if not quiet:
+        print("| check_id | 删除的必需键 | 实际结论 | 判定 |")
+        print("|---|---|---|---|")
+        for row in rows:
+            print("| " + " | ".join(row) + " |")
+        print()
     print(f"缺键负例：{len(rows) - failures}/{len(rows)} 返回 cannot_evaluate/missing_input，偏离 {failures} 处")
     # 对照：绕开入口归一化直接调用 check 仍会崩溃，证明拦截在入口而非各 check 内的守卫。
     crashes = 0
@@ -1113,6 +1232,106 @@ def missing_key_sweep() -> int:
         except KeyError:
             crashes += 1
     print(f"对照：`{{}}` 直接进入 check 函数仍 {crashes}/{len(CHECKS)} 抛 KeyError（入口归一化负责拦截）")
+    return 0 if not failures else 1
+
+
+def nested_missing_sweep(root: Path, quiet: bool = False) -> int:
+    """嵌套缺键全表：删除实体集合元素的 id，必须 cannot_evaluate/missing_input。"""
+    method = (root / METHOD).read_text(encoding="utf-8")
+    rows: list[tuple[str, str, str, str]] = []
+    seen: set[tuple[str, str, int]] = set()
+    failures = 0
+    for case in extract_cases(method):
+        check_id = case["check_id"]
+        data = case["input"] or {}
+        for name in ENTITY_COLLECTIONS:
+            value = data.get(name)
+            if not isinstance(value, list):
+                continue
+            for index, item in enumerate(value):
+                if not isinstance(item, dict) or "id" not in item:
+                    continue
+                key = (check_id, name, index)
+                if key in seen:
+                    continue
+                seen.add(key)
+                clone = copy.deepcopy(data)
+                del clone[name][index]["id"]
+                try:
+                    verdict, reason, _ = evaluate(check_id, clone)
+                    actual = f"{verdict}/{reason}"
+                except Exception as exc:  # noqa: BLE001 - 负例就是要捕获崩溃
+                    verdict, reason = "crash", type(exc).__name__
+                    actual = f"{verdict}/{reason}"
+                ok = (verdict, reason) == ("cannot_evaluate", "missing_input")
+                failures += 0 if ok else 1
+                rows.append((check_id, f"{name}[{index}].id", actual, "通过" if ok else "偏离"))
+    if not quiet:
+        print("| check_id | 删除的嵌套键 | 实际结论 | 判定 |")
+        print("|---|---|---|---|")
+        for row in rows:
+            print("| " + " | ".join(row) + " |")
+        print()
+    print(f"嵌套缺键负例：{len(rows) - failures}/{len(rows)} 返回 cannot_evaluate/missing_input，偏离 {failures} 处")
+    return 0 if not failures else 1
+
+
+def enum_sweep(quiet: bool = False) -> int:
+    """封闭枚举负例：四个受控字段的非法值统一 cannot_evaluate/undefined_enum_value。"""
+    cases = [
+        (
+            "applicability.state",
+            "PROJECT_MINIMAL_EXISTENCE",
+            {key: [] for key in REQUIRED_KEYS["PROJECT_MINIMAL_EXISTENCE"]}
+            | {"applicability": {"state": "unknown_state"}},
+        ),
+        (
+            "assumption.status",
+            "CHANGE_CONSTRAINT_LINK",
+            {
+                "actors": [],
+                "outcomes": [],
+                "commitments": [],
+                "constraints": [],
+                "deliverables": [],
+                "assertions": [],
+                "changes": [{"id": "CH-1", "assumption": {"status": "unknown_status"}}],
+            },
+        ),
+        (
+            "node_type",
+            "CONSTRAINT_ANCHOR_REQUIRED",
+            {
+                "commitments": [],
+                "deliverables": [{"id": "D-1", "node_type": "MysteryNode"}],
+                "constraints": [],
+            },
+        ),
+        (
+            "subject_group.relation",
+            "DIMENSION_VALUE_CLOSED",
+            {
+                "management_items": [
+                    {"id": "M-1", "process_group": "initiating", "subject_group": "planning"}
+                ],
+                "subject_group_extension": [{"value": "innovation", "relation": "sideways"}],
+            },
+        ),
+    ]
+    rows = []
+    failures = 0
+    for field, check_id, data in cases:
+        verdict, reason, _ = evaluate(check_id, data)
+        ok = (verdict, reason) == ("cannot_evaluate", "undefined_enum_value")
+        failures += 0 if ok else 1
+        rows.append((field, check_id, f"{verdict}/{reason}", "通过" if ok else "偏离"))
+    if not quiet:
+        print("| 字段 | check_id | 实际结论 | 判定 |")
+        print("|---|---|---|---|")
+        for row in rows:
+            print("| " + " | ".join(row) + " |")
+        print()
+    print(f"枚举负例：{len(rows) - failures}/{len(rows)} 返回 cannot_evaluate/undefined_enum_value，偏离 {failures} 处")
     return 0 if not failures else 1
 
 
@@ -1206,8 +1425,11 @@ def aggregation_order_check() -> int:
     return 0 if not failures else 1
 
 
-def null_sweep(root: Path) -> int:
-    """负例实测：顶层键、嵌套对象键、数组元素为 null 都必须 cannot_evaluate。"""
+def null_sweep(root: Path, quick: bool = False) -> int:
+    """负例实测：顶层键、嵌套对象键、数组元素为 null 都必须 cannot_evaluate。
+
+    quick 模式只对每个 check_id 的第一个样例做嵌套/数组扫描，供 pre-commit 快检。
+    """
     failures: list[str] = []
 
     top_total = top_ok = 0
@@ -1222,8 +1444,12 @@ def null_sweep(root: Path) -> int:
     method = (root / METHOD).read_text(encoding="utf-8")
     array_total = array_ok = object_total = object_ok = 0
     array_paths: set[tuple[str, str]] = set()
+    quick_done: set[str] = set()
     for case in extract_cases(method):
         check_id = case["check_id"]
+        if quick and check_id in quick_done:
+            continue
+        quick_done.add(check_id)
         data = case["input"] or {}
         for path, node in list(_walk_paths(data)):
             if isinstance(node, list) and node:
@@ -1275,11 +1501,25 @@ def input_domain_issues(root: Path) -> list[str]:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="T-107 最小原型：执行 T-011 的 34 个样例")
+    parser = argparse.ArgumentParser(description="T-107 最小原型：执行 A.1 全部样例")
     parser.add_argument("--root", default=str(Path(__file__).resolve().parents[2]))
     parser.add_argument("--json", action="store_true", help="输出 JSON 报告")
+    parser.add_argument("--quiet", action="store_true", help="只输出汇总，不打印逐行表")
+    parser.add_argument(
+        "--quick", action="store_true", help="快检子集：每个 check_id 只扫第一个样例"
+    )
     parser.add_argument(
         "--null-sweep", action="store_true", help="负例：任意层级取 null 时不得抛异常"
+    )
+    parser.add_argument(
+        "--nested-missing-sweep",
+        action="store_true",
+        help="负例：实体集合元素缺 id 时必须 cannot_evaluate/missing_input",
+    )
+    parser.add_argument(
+        "--enum-sweep",
+        action="store_true",
+        help="负例：封闭枚举非法值统一 cannot_evaluate/undefined_enum_value",
     )
     parser.add_argument(
         "--input-domain",
@@ -1299,7 +1539,7 @@ def main() -> int:
     args = parser.parse_args()
     root = Path(args.root)
     if args.null_sweep:
-        return null_sweep(root)
+        return null_sweep(root, quick=args.quick)
     if args.input_domain:
         issues = input_domain_issues(root)
         for issue in issues:
@@ -1307,7 +1547,11 @@ def main() -> int:
         print(f"输入域闭包：{len(issues)} 处缺口")
         return 0 if not issues else 1
     if args.missing_key_sweep:
-        return missing_key_sweep()
+        return missing_key_sweep(quiet=args.quiet)
+    if args.nested_missing_sweep:
+        return nested_missing_sweep(root, quiet=args.quiet)
+    if args.enum_sweep:
+        return enum_sweep(quiet=args.quiet)
     if args.aggregation_order:
         return aggregation_order_check()
     method = (root / METHOD).read_text(encoding="utf-8")
@@ -1337,7 +1581,7 @@ def main() -> int:
     if args.json:
         print(json.dumps(summary, ensure_ascii=False, indent=2))
     else:
-        for case in cases:
+        for case in [] if args.quiet else cases:
             status = "ok  " if not case["mismatches"] else "FAIL"
             actual = case["actual"]
             print(

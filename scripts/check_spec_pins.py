@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""规格区段绑定：GRAMMAR.md 全文、A.2、schema §2bis/§3/§4 各自登记指纹。
+"""规格区段绑定：GRAMMAR.md 全文、A.2、A.1、schema §2bis/§3/§4、coverage.json 各自登记指纹。
 
 规则：
   1. 任一区段当前指纹与 scripts/spec-pins.json 不一致 → 阻断（先 --write）；
@@ -34,9 +34,16 @@ CONCLUSIONS = ("实质收敛", "认可", "通过")
 SECTIONS = (
     {"key": "GRAMMAR.md", "path": "GRAMMAR.md", "start": None, "end": None},
     {"key": f"{METHOD}#A.2", "path": METHOD, "start": "### A.2 ", "end": "### A.1 "},
+    {"key": f"{METHOD}#A.1", "path": METHOD, "start": "### A.1 ", "end": None},
     {"key": f"{SCHEMA}#2bis", "path": SCHEMA, "start": "## 2bis. ", "end": "## 3. "},
     {"key": f"{SCHEMA}#3", "path": SCHEMA, "start": "## 3. ", "end": "## 3bis. "},
     {"key": f"{SCHEMA}#4", "path": SCHEMA, "start": "## 4. ", "end": "## 5. "},
+    {
+        "key": "validation/checker-prototype/coverage.json",
+        "path": "validation/checker-prototype/coverage.json",
+        "start": None,
+        "end": None,
+    },
 )
 
 

@@ -7,20 +7,28 @@
       "path": "GRAMMAR.md"
     },
     "spec/methods/deterministic-checker.md#A.2": {
-      "sha256": "a3924c3de39b9997e31d0fe5b47831b804e5b605bd52fd001a8541fe44199ee0",
+      "sha256": "2d63803057f0574eda36cb5597c427394a1b8a60f05279d3573c0003f9945936",
+      "path": "spec/methods/deterministic-checker.md"
+    },
+    "spec/methods/deterministic-checker.md#A.1": {
+      "sha256": "fedf385d42b9062cbf4c0e3c945951fa291e9049ccc7aee9d51e132230c946a5",
       "path": "spec/methods/deterministic-checker.md"
     },
     "spec/CHECKER_INPUT_SCHEMA.md#2bis": {
-      "sha256": "e90cb2c848011040523e9c910a00df94d55dff06b3301ad9f10eb101d78a89cc",
+      "sha256": "2c4b9b8b0ebe1a754af8fd5b597cbefdea06d9ddc19b120d258488d40d0ae3c2",
       "path": "spec/CHECKER_INPUT_SCHEMA.md"
     },
     "spec/CHECKER_INPUT_SCHEMA.md#3": {
-      "sha256": "bf27719b5d25a7f1d9de3cbf4e39600d17dddbe07e005ad04282373daf8d03a6",
+      "sha256": "d9707fc668c2749e9538e4d9a521d275d8e695d6fdbae5a547000a352e1771e0",
       "path": "spec/CHECKER_INPUT_SCHEMA.md"
     },
     "spec/CHECKER_INPUT_SCHEMA.md#4": {
-      "sha256": "2784bcd5ab8a2f7e786a23e1f2f4ca425fb2bc37593d3c0885518d801f94c312",
+      "sha256": "90479fa9d70de7b7e2d5bb1f2dd7a25dbab429cd4da49c726236f430b30bda09",
       "path": "spec/CHECKER_INPUT_SCHEMA.md"
+    },
+    "validation/checker-prototype/coverage.json": {
+      "sha256": "517f0d88af135658293b99ef74c9287cd1c7b651ca3c2c6394c5ca530a7756bd",
+      "path": "validation/checker-prototype/coverage.json"
     }
   }
 }

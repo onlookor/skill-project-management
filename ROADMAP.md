@@ -67,11 +67,12 @@
   1. `python3 scripts/check_three_table.py` 退出 0：覆盖“正文 ↔ 判定列”“判定列 ↔ schema”“正文 ↔ schema”三对关系，子句闭合、枚举封闭、判定列不含叙述性短语、G-B1/G-B2 条件归属正确、原因码与子句映射一致。**该检查器只保证结构与已列举的语义短语规则，不保证全文语义等价**；语义闭合由出口 7 的非同源复核承接。
   2. 判定列子句覆盖 100%：A.2 每条子句有承接 `check_id` 或标 `not-checked` 并写理由（由出口 1 自动核对）。
   3. 表示规范在 schema 有载体：三态空值、量词、关系路径（含 `steps[].target_id`）、值域封闭（含 `subject_group` 17 项）、全局引用完整性、assumption 时效与批准资格、路径可达、适用性状态机、四值结论均有对应条款（由出口 1 的“判定列 → schema”与“正文 → schema”机械核对）。
-  4. 原型对改动后的判定列重跑：`python3 validation/checker-prototype/checker.py` 输出 57/57 样例、17/17 `check_id`，`--null-sweep` 214/214、`--missing-key-sweep` 43/43 全部 `cannot_evaluate` 且无崩溃，`--aggregation-order` 的 A2/E2 全部排列各收敛为 1 个结论。
-  5. 两个实现缺陷关闭：G-009（缺键/`null` 入口归一化）与 G-014（聚合顺序）的“关闭依据”为 `非同源复核：`，且复核结论为“实质收敛”；其余 15 条缺口状态不变（本里程碑不以 `open=0` 为出口）。
-  6. 覆盖闸门绿：`python3 scripts/check_coverage_gate.py` 退出 0，A.2 的 41 个子句各有至少 1 个正例与 1 个负例，负例方向与原因码机械匹配；`scripts/test_coverage_gate.py` 的 N01–N03 全部阻断。
-  7. 四道绑定生效：`check_checker_pins.py`（检查器哈希 + `basis`）、`check_spec_pins.py`（`GRAMMAR.md` 全文、A.2、schema §2bis/§3/§4 指纹 + 同批复核记录）、验收快照漂移检测、非同源复核判“实质收敛”。前两项在 pre-commit 中阻断；第三项明确只做漂移检测（本机无 CI，做不到权限分离，见 ADR-0014）；第四项靠流程。
-- **不构成出口的项**：原型 57/57、任一检查器退出 0、同批修改样例后的自证、哈希校验冒充的“版本分离”。T-133 对修订后版本的单次非同源复核是出口 5 与出口 7 的关闭依据，不是可选的“验证输入”。
+  4. 原型对改动后的判定列重跑：`python3 validation/checker-prototype/checker.py` 输出 60/60 样例、17/17 `check_id`，`--null-sweep` 225/225、`--missing-key-sweep` 43/43、`--nested-missing-sweep` 53/53、`--enum-sweep` 4/4 全部 `cannot_evaluate` 且无崩溃，`--aggregation-order` 的 A2/E2 全部排列各收敛为 1 个结论；上述样例与快检在 pre-commit 中执行。
+  5. 清单清零 + 非同源复核判“实质收敛”：`python3 scripts/check_gap_ledger.py` 退出 0 且 `open=0`（17 条全部 `closed`，每条 `关闭依据` 为 `非同源复核：` 或 `人工签收：`），且最后一次非同源复核对修订后版本明确判“实质收敛”。**不以“打不穿”作为关闭条件**：本机没有独立验证权，任何“无法伪造”的断言都超出可机械化范围。
+  6. 覆盖闸门绿：`python3 scripts/check_coverage_gate.py` 退出 0，A.2 的 41 个子句各有至少 1 个正例与 1 个负例，负例按**子句级**声明 `expected_failed_clauses` 并由原型实际求值核对（不再依赖共享 `reason` 码）；`scripts/test_coverage_gate.py` 的 N01–N04 全部阻断。
+  7. 验证权绑定生效：`check_checker_pins.py`（检查器哈希，含根检查器自身与 `.githooks/pre-commit`；`--write` 必须附非同源复核记录作 `basis`）、`check_spec_pins.py`（`GRAMMAR.md` 全文、A.2、A.1、schema §2bis/§3/§4、`coverage.json` 指纹 + 同批复核记录）、验收快照漂移检测、非同源复核判“实质收敛”。前三项在 pre-commit 中阻断；快照只做漂移检测。
+- **残余风险与外部控制**：即便上述出口全部满足，仍有两项风险**无法由本仓库内部机制消除**：(a) 复核记录可以伪造——机器只能核对记录的存在与字段，不能验证复核是否真实发生；(b) 同一方拥有写权限——检查器、规格、样例、复核记录都在同一工作区，同一方可以同改。两项均交由**外部控制**：真 CI 在受保护分支上执行验证、复核方独立持有工具链与提交权限。因此 M2 的关闭条件是“清单清零 + 非同源复核判实质收敛”，不是“机制打不穿”。
+- **不构成出口的项**：原型 60/60、任一检查器退出 0、同批修改样例后的自证、哈希校验冒充的“版本分离”。T-133 对修订后版本的单次非同源复核是出口 5 与出口 7 的关闭依据，不是可选的“验证输入”。
 - **依赖**：M1。**并行**：无（关键路径）。
 
 ### M3 本体定义

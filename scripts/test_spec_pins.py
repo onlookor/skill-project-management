@@ -4,10 +4,11 @@
 SP01 改 A.2 但不更新区段指纹 → 必须阻断；
 SP02 更新指纹但不附非同源复核记录 → 必须阻断；
 SP03 更新指纹并附合格复核记录 → 必须通过；
-SP04 复核记录的结论词不合格 → 必须阻断。
+SP04 复核记录的结论词不合格 → 必须阻断；
+SP05 只改 coverage.json 的引用关系、不改 A.1 样例 → 必须按指纹阻断。
 
 用法：python3 scripts/test_spec_pins.py [--root DIR]
-退出码：0 = 四例全部符合预期；1 = 至少一例不符。
+退出码：0 = 五例全部符合预期；1 = 至少一例不符。
 """
 
 from __future__ import annotations
@@ -83,6 +84,27 @@ def main() -> int:
             "缺少合格的非同源复核记录",
         ),
     ]
+
+    coverage_key = "validation/checker-prototype/coverage.json"
+    mutated_coverage = dict(current)
+    anchor = '"sample": "A.1.6-1"'
+    if current[coverage_key].count(anchor) != 1:
+        print("[错误] coverage.json 变异锚点不唯一，测试无意义。")
+        return 1
+    mutated_coverage[coverage_key] = current[coverage_key].replace(
+        anchor, '"sample": "A.1.6-3"', 1
+    )
+    cases.append(
+        (
+            "SP05",
+            "只改 coverage.json 引用关系、不改样例",
+            mutated_coverage,
+            current,
+            pins,
+            [],
+            "指纹未更新",
+        )
+    )
 
     failures = 0
     print("| 编号 | 场景 | 预期 | 实际 | 证据 |")

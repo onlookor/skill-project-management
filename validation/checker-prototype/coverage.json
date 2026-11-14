@@ -8,7 +8,12 @@
         "A.1.1-2"
       ],
       "negative": [
-        "A.1.1-3"
+        {
+          "sample": "A.1.1-3",
+          "expected_failed_clauses": [
+            "G-A1#1"
+          ]
+        }
       ]
     },
     "G-A1#2": {
@@ -17,7 +22,12 @@
         "A.1.1-2"
       ],
       "negative": [
-        "A.1.1-4"
+        {
+          "sample": "A.1.1-4",
+          "expected_failed_clauses": [
+            "G-A1#2"
+          ]
+        }
       ]
     },
     "G-A1#3": {
@@ -26,7 +36,12 @@
         "A.1.1-2"
       ],
       "negative": [
-        "A.1.1-5"
+        {
+          "sample": "A.1.1-5",
+          "expected_failed_clauses": [
+            "G-A1#3"
+          ]
+        }
       ]
     },
     "G-A1#4": {
@@ -35,7 +50,12 @@
         "A.1.1-2"
       ],
       "negative": [
-        "A.1.1-1"
+        {
+          "sample": "A.1.1-1",
+          "expected_failed_clauses": [
+            "G-A1#4"
+          ]
+        }
       ]
     },
     "G-A1#5": {
@@ -44,7 +64,12 @@
         "A.1.1-2"
       ],
       "negative": [
-        "A.1.1-6"
+        {
+          "sample": "A.1.1-6",
+          "expected_failed_clauses": [
+            "G-A1#5"
+          ]
+        }
       ]
     },
     "G-A1#6": {
@@ -53,7 +78,12 @@
         "A.1.1-2"
       ],
       "negative": [
-        "A.1.1-7"
+        {
+          "sample": "A.1.1-7",
+          "expected_failed_clauses": [
+            "G-A1#6"
+          ]
+        }
       ]
     },
     "G-A2#1": {
@@ -62,7 +92,12 @@
         "A.1.2-2"
       ],
       "negative": [
-        "A.1.2-1"
+        {
+          "sample": "A.1.2-1",
+          "expected_failed_clauses": [
+            "G-A2#1"
+          ]
+        }
       ]
     },
     "G-A2#2": {
@@ -71,7 +106,12 @@
         "A.1.2-2"
       ],
       "negative": [
-        "A.1.2-3"
+        {
+          "sample": "A.1.2-3",
+          "expected_failed_clauses": [
+            "G-A2#2"
+          ]
+        }
       ]
     },
     "G-B1#1": {
@@ -80,7 +120,12 @@
         "A.1.6-2"
       ],
       "negative": [
-        "A.1.6-3"
+        {
+          "sample": "A.1.6-3",
+          "expected_failed_clauses": [
+            "G-B1#1"
+          ]
+        }
       ]
     },
     "G-B1#2": {
@@ -89,7 +134,12 @@
         "A.1.6-2"
       ],
       "negative": [
-        "A.1.6-1"
+        {
+          "sample": "A.1.6-1",
+          "expected_failed_clauses": [
+            "G-B1#2"
+          ]
+        }
       ]
     },
     "G-B2#1": {
@@ -98,16 +148,27 @@
         "A.1.7-2"
       ],
       "negative": [
-        "A.1.7-1"
+        {
+          "sample": "A.1.7-1",
+          "expected_failed_clauses": [
+            "G-B2#1"
+          ]
+        }
       ]
     },
     "G-B2#2": {
       "check_id": "DIMENSION_VALUE_CLOSED",
       "positive": [
-        "A.1.7-2"
+        "A.1.7-2",
+        "A.1.7-4"
       ],
       "negative": [
-        "A.1.7-3"
+        {
+          "sample": "A.1.7-3",
+          "expected_failed_clauses": [
+            "G-B2#2"
+          ]
+        }
       ]
     },
     "G-C1#1": {
@@ -116,7 +177,12 @@
         "A.1.3-2"
       ],
       "negative": [
-        "A.1.3-1"
+        {
+          "sample": "A.1.3-1",
+          "expected_failed_clauses": [
+            "G-C1#1"
+          ]
+        }
       ]
     },
     "G-C1#2": {
@@ -125,7 +191,12 @@
         "A.1.3-2"
       ],
       "negative": [
-        "A.1.3-3"
+        {
+          "sample": "A.1.3-3",
+          "expected_failed_clauses": [
+            "G-C1#2"
+          ]
+        }
       ]
     },
     "G-C1#3": {
@@ -134,7 +205,12 @@
         "A.1.3-2"
       ],
       "negative": [
-        "A.1.3-4"
+        {
+          "sample": "A.1.3-4",
+          "expected_failed_clauses": [
+            "G-C1#3"
+          ]
+        }
       ]
     },
     "G-C2#1": {
@@ -143,7 +219,12 @@
         "A.1.8-2"
       ],
       "negative": [
-        "A.1.8-1"
+        {
+          "sample": "A.1.8-1",
+          "expected_failed_clauses": [
+            "G-C2#1"
+          ]
+        }
       ]
     },
     "G-C2#2": {
@@ -152,7 +233,10 @@
         "A.1.8-2"
       ],
       "negative": [
-        "A.1.8-1"
+        {
+          "sample": "A.1.8-3",
+          "expected_failed_clauses": []
+        }
       ]
     },
     "G-D1#1": {
@@ -161,7 +245,12 @@
         "A.1.4-2"
       ],
       "negative": [
-        "A.1.4-3"
+        {
+          "sample": "A.1.4-3",
+          "expected_failed_clauses": [
+            "G-D1#1"
+          ]
+        }
       ]
     },
     "G-D1#2": {
@@ -170,7 +259,12 @@
         "A.1.4-2"
       ],
       "negative": [
-        "A.1.4-4"
+        {
+          "sample": "A.1.4-4",
+          "expected_failed_clauses": [
+            "G-D1#2"
+          ]
+        }
       ]
     },
     "G-D1#3": {
@@ -179,7 +273,12 @@
         "A.1.4-2"
       ],
       "negative": [
-        "A.1.4-1"
+        {
+          "sample": "A.1.4-1",
+          "expected_failed_clauses": [
+            "G-D1#3"
+          ]
+        }
       ]
     },
     "G-D2#1": {
@@ -188,7 +287,12 @@
         "A.1.9-2"
       ],
       "negative": [
-        "A.1.9-1"
+        {
+          "sample": "A.1.9-1",
+          "expected_failed_clauses": [
+            "G-D2#1"
+          ]
+        }
       ]
     },
     "G-D2#2": {
@@ -197,7 +301,12 @@
         "A.1.9-2"
       ],
       "negative": [
-        "A.1.9-3"
+        {
+          "sample": "A.1.9-3",
+          "expected_failed_clauses": [
+            "G-D2#2"
+          ]
+        }
       ]
     },
     "G-D2#3": {
@@ -206,7 +315,12 @@
         "A.1.9-2"
       ],
       "negative": [
-        "A.1.9-4"
+        {
+          "sample": "A.1.9-4",
+          "expected_failed_clauses": [
+            "G-D2#3"
+          ]
+        }
       ]
     },
     "G-E1#1": {
@@ -215,7 +329,12 @@
         "A.1.5-2"
       ],
       "negative": [
-        "A.1.5-1"
+        {
+          "sample": "A.1.5-1",
+          "expected_failed_clauses": [
+            "G-E1#1"
+          ]
+        }
       ]
     },
     "G-E1#2": {
@@ -224,7 +343,12 @@
         "A.1.5-2"
       ],
       "negative": [
-        "A.1.5-3"
+        {
+          "sample": "A.1.5-3",
+          "expected_failed_clauses": [
+            "G-E1#2"
+          ]
+        }
       ]
     },
     "G-E1#3": {
@@ -233,7 +357,12 @@
         "A.1.5-2"
       ],
       "negative": [
-        "A.1.5-4"
+        {
+          "sample": "A.1.5-4",
+          "expected_failed_clauses": [
+            "G-E1#3"
+          ]
+        }
       ]
     },
     "G-E2#1": {
@@ -242,7 +371,18 @@
         "A.1.10-2"
       ],
       "negative": [
-        "A.1.10-1"
+        {
+          "sample": "A.1.10-1",
+          "expected_failed_clauses": [
+            "G-E2#1"
+          ]
+        },
+        {
+          "sample": "A.1.10-5",
+          "expected_failed_clauses": [
+            "G-E2#1"
+          ]
+        }
       ]
     },
     "G-E2#2": {
@@ -251,7 +391,12 @@
         "A.1.10-2"
       ],
       "negative": [
-        "A.1.10-3"
+        {
+          "sample": "A.1.10-3",
+          "expected_failed_clauses": [
+            "G-E2#2"
+          ]
+        }
       ]
     },
     "G-E2#3": {
@@ -260,7 +405,12 @@
         "A.1.10-2"
       ],
       "negative": [
-        "A.1.10-4"
+        {
+          "sample": "A.1.10-4",
+          "expected_failed_clauses": [
+            "G-E2#3"
+          ]
+        }
       ]
     },
     "G-F1#1": {
@@ -269,7 +419,12 @@
         "A.1.11-2"
       ],
       "negative": [
-        "A.1.11-1"
+        {
+          "sample": "A.1.11-1",
+          "expected_failed_clauses": [
+            "G-F1#1"
+          ]
+        }
       ]
     },
     "G-F1#2": {
@@ -278,7 +433,12 @@
         "A.1.11-2"
       ],
       "negative": [
-        "A.1.11-3"
+        {
+          "sample": "A.1.11-3",
+          "expected_failed_clauses": [
+            "G-F1#2"
+          ]
+        }
       ]
     },
     "G-F2#1": {
@@ -287,7 +447,12 @@
         "A.1.12-2"
       ],
       "negative": [
-        "A.1.12-1"
+        {
+          "sample": "A.1.12-1",
+          "expected_failed_clauses": [
+            "G-F2#1"
+          ]
+        }
       ]
     },
     "G-F2#2": {
@@ -296,7 +461,12 @@
         "A.1.12-2"
       ],
       "negative": [
-        "A.1.12-3"
+        {
+          "sample": "A.1.12-3",
+          "expected_failed_clauses": [
+            "G-F2#2"
+          ]
+        }
       ]
     },
     "G-F3#1": {
@@ -305,7 +475,12 @@
         "A.1.13-2"
       ],
       "negative": [
-        "A.1.13-1"
+        {
+          "sample": "A.1.13-1",
+          "expected_failed_clauses": [
+            "G-F3#1"
+          ]
+        }
       ]
     },
     "G-F3#2": {
@@ -314,7 +489,12 @@
         "A.1.13-2"
       ],
       "negative": [
-        "A.1.13-3"
+        {
+          "sample": "A.1.13-3",
+          "expected_failed_clauses": [
+            "G-F3#2"
+          ]
+        }
       ]
     },
     "G-F4#1": {
@@ -323,7 +503,12 @@
         "A.1.14-2"
       ],
       "negative": [
-        "A.1.14-1"
+        {
+          "sample": "A.1.14-1",
+          "expected_failed_clauses": [
+            "G-F4#1"
+          ]
+        }
       ]
     },
     "G-G1#1": {
@@ -332,7 +517,12 @@
         "A.1.15-2"
       ],
       "negative": [
-        "A.1.15-1"
+        {
+          "sample": "A.1.15-1",
+          "expected_failed_clauses": [
+            "G-G1#1"
+          ]
+        }
       ]
     },
     "G-G1#2": {
@@ -341,7 +531,12 @@
         "A.1.15-2"
       ],
       "negative": [
-        "A.1.15-3"
+        {
+          "sample": "A.1.15-3",
+          "expected_failed_clauses": [
+            "G-G1#2"
+          ]
+        }
       ]
     },
     "G-G2#1": {
@@ -350,7 +545,12 @@
         "A.1.16-2"
       ],
       "negative": [
-        "A.1.16-1"
+        {
+          "sample": "A.1.16-1",
+          "expected_failed_clauses": [
+            "G-G2#1"
+          ]
+        }
       ]
     },
     "G-G3#1": {
@@ -359,7 +559,12 @@
         "A.1.17-2"
       ],
       "negative": [
-        "A.1.17-1"
+        {
+          "sample": "A.1.17-1",
+          "expected_failed_clauses": [
+            "G-G3#1"
+          ]
+        }
       ]
     },
     "G-G3#2": {
@@ -368,7 +573,12 @@
         "A.1.17-2"
       ],
       "negative": [
-        "A.1.17-3"
+        {
+          "sample": "A.1.17-3",
+          "expected_failed_clauses": [
+            "G-G3#2"
+          ]
+        }
       ]
     }
   }

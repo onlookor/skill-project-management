@@ -689,3 +689,64 @@
 - **复核状态**：G-001–G-017 仍为 `open`（17/17），核查矩阵 `0/17 consistent`（全部缺口未关闭，故无 `consistent` 行）。G-009 与 G-014 待非同源复核判“实质收敛”后关闭，其余 15 条不动。
 - **关联 ADR**：ADR-0014（`proposed`）
 - **状态**：生效（绑定上线；缺口未关闭）
+
+---
+
+### 批次 0042 — 2026-11-14 — 按非同源复核清单机械化 + 缺口记账
+
+- **性质**：按非同源复核（基线 `d8bf413`，产物 `validation/reviews/2026-11-14-d8bf413-review.md`）列出的八项“本可机械化但没做”执行一轮；先按复核结论记账（closed 12 / partly 5 / open 0），再将 5 条 `partly` 按台账允许的状态记为 `open` 并写明残留。**不是**对实现质量的最终认可。
+- **涉及文件**：`.githooks/pre-commit`、`AGENTS.md`（3.6.8、7bis.4、目录树）、`ROADMAP.md`（M2 出口）、`adr/0014-validation-chain-self-attestation.md`、`GAP_LEDGER.md`（17 条状态与核查记录）、`GLOSSARY.md`、`knowledge/glossary-usage.json`、`scripts/README.md`、`scripts/check_checker_pins.py`、`scripts/check_spec_pins.py`、`scripts/check_coverage_gate.py`、`scripts/test_checker_pins.py`、`scripts/test_spec_pins.py`、`scripts/test_coverage_gate.py`、`scripts/checker-pins.json`、`scripts/spec-pins.json`、`spec/methods/deterministic-checker.md`（A.1/A.2/样例基线）、`spec/CHECKER_INPUT_SCHEMA.md`（§2bis/§2ter/§3/§4）、`validation/checker-prototype/checker.py`、`validation/checker-prototype/coverage.json`、`validation/pinned/checker.py`、`validation/reviews/2026-11-14-d8bf413-review.md`（新增）、`CHANGELOG.md`（本批次）
+- **变更摘要**：
+  1. **根检查器与 pre-commit 纳入保护**：`checker-pins.json` 登记 17 个受保护对象（15 个 `scripts/` 检查器 + `.githooks/pre-commit` + 验收原型），**`check_checker_pins.py` 自身不再自排除**；`--write` 的 `basis` 必须是含 `非同源复核：`、`复核产物：<存在的路径>`、`复核基线：<提交号>` 的复核记录，自由文本被拒（退出 2）。
+  2. **样例与覆盖矩阵纳入绑定**：`spec-pins.json` 由 5 个区段增至 7 个，新增方法 A.1 样例区段与 `validation/checker-prototype/coverage.json` 全文。
+  3. **覆盖闸门改子句级**：`coverage.json` 每条负例必须声明 `expected_failed_clauses`；闸门调用原型实际求值，核对“声明的子句真的被触发”，不再依赖共享 `reason` 码。守卫子句（G-C2#2）用空声明 + `pass` + 无触发子句表达。
+  4. **pre-commit 跑样例与关键扫描**：新增 A.1 全部 60 条样例、`--aggregation-order`、`--missing-key-sweep`、`--null-sweep --quick`、`--nested-missing-sweep`、`--enum-sweep`；改 `aggregate()` 或入口归一化后无法只靠十个检查器全绿。**单次耗时 29.78–31.46 s**（本机两次实测，含十个检查器）。
+  5. **嵌套对象缺键归一化**：入口 `nested_missing()` 覆盖 `ENTITY_COLLECTIONS` 的 14 个实体集合，逐元素要求 `id`；schema 新增 §2ter 全表，逐项列出 **53 项**嵌套缺键路径（`--nested-missing-sweep` 53/53）。检测前删 `commitments[0].id` 等 10 项曾静默 `pass`，现已统一 `cannot_evaluate/missing_input`。
+  6. **封闭枚举全局强制**：`applicability.state`、`assumption.status`、`node_type`、`subject_group.relation` 的非法值统一 `cannot_evaluate/undefined_enum_value`（`--enum-sweep` 4/4）；`orthogonal_to` 选“实现”而非删语义——`EXTENSION_RELATIONS` 纳入并允许无 `base`，A.1 新增正例 A.1.7-4，schema §4 与 A.2 `G-B2#2` 同步。理由：`orthogonal_to` 在 GRAMMAR 中表达“与基础主体组正交”的独立语义，删掉会失去对正交分组的约束能力，而实现成本仅一个关系枚举与 `base` 可空判定。
+  7. **E2 链终点限人类/法人**：`accountable: true` 且类型不是 `HumanActor`/`LegalEntity` → `fail/accountable_not_human`（A.1.10-5 从 `pass` 改为 `fail`），不再因链可达而通过。
+  8. **A.2 条数更正**：A.2 实际为 **41 条子句，不是 40**。台账 G-016、ADR-0013 与现存表述已更正；**批次 0034/0035/0036 的历史文本不改写**，以本更正为准。
+- **记账**：12 条关闭（G-002/004/005/006/009/010/011/012/013/014/015/016），`关闭依据` 逐条为 `非同源复核：基线 \`d8bf413\`……复核产物 \`validation/reviews/2026-11-14-d8bf413-review.md\``；5 条维持 `open`（G-001/003/007/008/017），残留分别写明“枚举未全量强制”“扁平字符串双轨”“嵌套/枚举仍在收敛”“覆盖 ≠ 充分”“语义等价未保证”。
+- **M2 出口改写**：改为“清单清零 + 非同源复核判实质收敛”；明写两项残余风险（复核记录可伪造、同一方拥有写权限）由外部控制（真 CI + 受保护分支 + 复核方独立持有工具链）承接，**不再以“打不穿”作为关闭条件**。
+- **正负例（`scripts/test_checker_pins.py`）**：
+
+| 编号 | 场景 | 预期 | 实际 | 退出码 | 证据 |
+|---|---|---|---|---|---|
+| CP01 | 改检查器不更新登记 | 阻断 | 阻断 | 1 | `scripts/check_sample.py：哈希不一致（登记 660bc902a1cf，工作区 606690d5617c）` |
+| CP02 | 更新登记但不给 basis | 拒绝 | 拒绝 | 2 | `检查器有改动，但 --basis 不合格：缺少 \`非同源复核：\` 前缀` |
+| CP03 | `--basis "测试"` | 拒绝 | 拒绝 | 2 | 同上 |
+| CP04 | 合格复核记录更新登记 | 通过 | 通过 | 0 | `登记与工作区一致` |
+| CP05 | 根检查器换成空壳 | 阻断 | 阻断 | 1 | `validation/checker-prototype/checker.py：哈希不一致` |
+| CP06 | 删除 pre-commit 检查行 | 阻断 | 阻断 | 1 | `.githooks/pre-commit：哈希不一致` |
+| CP07 | 验收检查器与快照不一致 | 阻断 | 阻断 | 1 | `验收检查器与 validation/pinned/checker.py 快照不一致` |
+
+- **正负例（`scripts/test_spec_pins.py`）**：
+
+| 编号 | 场景 | 预期 | 实际 | 证据 |
+|---|---|---|---|---|
+| SP01 | 改 A.2 不更新指纹 | 阻断 | 阻断 | `#A.2：指纹未更新` |
+| SP02 | 更新指纹但不附复核记录 | 阻断 | 阻断 | `区段已改动但同一提交缺少合格的非同源复核记录` |
+| SP03 | 更新指纹并附合格复核记录 | 通过 | 通过 | 无问题 |
+| SP04 | 复核记录结论词不合格 | 阻断 | 阻断 | 同 SP02 |
+| SP05 | 只改 `coverage.json` 引用关系、不改样例 | 阻断 | 阻断 | `coverage.json：指纹未更新（当前 22fb49ba7ceb，登记 517f0d88af13）` |
+
+- **正负例（`scripts/test_coverage_gate.py`）**：
+
+| 编号 | 负例动作 | 预期 | 实际 | 证据 |
+|---|---|---|---|---|
+| N01 | 删除子句唯一负例登记 | 阻断 | 阻断 | `G-F4#1：缺少负例` |
+| N02 | 负例期望改成 pass | 阻断 | 阻断 | `G-F4#1：负例 A.1.14-1 期望 verdict=pass，负例被改成正例` |
+| N03 | 删除负例样例块 | 阻断 | 阻断 | `A.1.14 的 YAML 块应为 4 的倍数，实际 2 个` |
+| N04 | B1#2 负例换成 B1#1 用例 | 阻断 | 阻断 | `G-B1#2：负例 A.1.6-1 实际触发 ['G-B1#1']，未触发声明的 G-B1#2` |
+
+- **回归实测**：
+  - `checker.py`：60/60 样例，17/17 `check_id`，新增 A.1.7-4（`pass`）、A.1.8-3（守卫 `pass`）、A.1.10-5（`fail/accountable_not_human`）。
+  - `--null-sweep`：225/225 返回 `cannot_evaluate`，崩溃 0（顶层 43、数组元素 159、嵌套 13）；`--null-sweep --quick`：80/80。
+  - `--missing-key-sweep`：43/43；对照 `{}` 直入 check 函数仍 17/17 抛 `KeyError`。
+  - `--nested-missing-sweep`：53/53；`--enum-sweep`：4/4；`--aggregation-order`：A2/E2 各 6 种排列各收敛 1 个结论；`--input-domain`：0 缺口。
+  - `check_coverage_gate.py`：子句 41、矩阵 41、正例 42、负例 41、守卫 1、样例 60、问题 0。
+  - `test_check_table_mutations.py`：变异 11/11，A.2 签收正负例 2/2。
+  - 十个检查器与 pre-commit 全部退出 0；`check_checker_pins.py` 登记 17 / 工作区 17 / 快照一致；`check_spec_pins.py` 区段 7 / 已登记 7 / 复核记录 1 / 问题 0。
+- **更正（不改写旧批次）**：批次 0034、0035、0036 中的“40 条子句”“非引用字段 40 个”按当时文本保留；A.2 实际为 41 条子句，schema 非引用字段实际为 41 个。批次 0034 已写明“新增 `G-D2#3`”却仍记 40 条，属计数错误；本批次以 41 为准。
+- **复核状态**：`open` 5 / `closed` 12；核查矩阵 `0/17 consistent`。关闭依据均来自非同源复核转录件，**转录件本身不是身份验证**。
+- **关联 ADR**：ADR-0014（`proposed`，本次补入自证/钩子/A.1/coverage 绑定与残余风险外置）
+- **状态**：生效（机械化项上线；5 条缺口仍 `open`）

@@ -14,9 +14,9 @@
 | `check_no_raw_material.py` | 阻断式检查：已跟踪文件中不得出现原始资料（PDF/EPUB/扫描件等）、文本层/OCR 转储与成段原文；允许受控的自建本体（`CONSTITUTION.md` 第 13.6 条） | `CONSTITUTION.md` 第 13 条 | 已实现 |
 | `check_gap_ledger.py` | 核查 `GAP_LEDGER.md`：字段枚举、核查矩阵与附录 A 全覆盖、`open` 缺口被矩阵引用、TODO 交叉引用、按里程碑计算到期；`--staged` 要求规则/判定文件与台账同批更新。到期未裁定退出 1 | `AGENTS.md` 3.6、`adr/0012-gap-ledger-and-adjudication.md` | 已实现 |
 | `check_three_table.py` | 三表机械对照：正文（规则 → 条款与子句范围）、判定列（`check_id` → 子句与原因码）、输入 schema（`check_id` → 输入域、具名枚举、原因码）。覆盖“正文 ↔ 判定列”“判定列 ↔ schema”“正文 ↔ schema”三对关系，核对子句闭合、枚举封闭、判定列不含叙述性短语、G-B1/G-B2 条件归属、原因码与子句映射。**深度边界**：它保证结构一致与已列举的语义短语规则，不保证规则正文与子句表的全文语义等价 | `adr/0013-unified-adjudication-of-check-semantics.md`、`spec/CHECKER_INPUT_SCHEMA.md` | 已实现 |
-| `check_coverage_gate.py` | 覆盖闸门：`validation/checker-prototype/coverage.json` 登记 A.2 每个子句的正例与负例，核对样例存在、`check_id` 一致、正例 `pass`、负例非 `pass` 且原因码属于该子句；缺正/负例、负例改成正例、样例未被引用均阻断。负例测试见 `test_coverage_gate.py` | `adr/0014-validation-chain-self-attestation.md` | 已实现 |
-| `check_checker_pins.py` | 检查器绑定：比对 `scripts/checker-pins.json` 登记哈希与工作区脚本，改动须 `--write --basis` 留痕；同时校验验收快照 `validation/pinned/checker.py` 与工作区副本一致（漂移检测，不是权限分离）。负例见 `test_checker_pins.py` | `adr/0014-validation-chain-self-attestation.md`、`AGENTS.md` 3.6.8 | 已实现 |
-| `check_spec_pins.py` | 规格区段绑定：登记 `GRAMMAR.md` 全文、方法 A.2、schema §2bis/§3/§4 指纹；区段相对 `HEAD` 改动时，同批必须附含 `非同源复核：`/`区段：`/`复核产物：`/结论词的复核记录，否则阻断。负例见 `test_spec_pins.py` | `adr/0014-validation-chain-self-attestation.md`、`AGENTS.md` 3.6.8 | 已实现 |
+| `check_coverage_gate.py` | 覆盖闸门：`validation/checker-prototype/coverage.json` 登记 A.2 每个子句的正例与负例，负例必须显式声明 `expected_failed_clauses`，闸门用原型实际求值核对“声明的子句真的被触发”；缺正/负例、负例改成正例、负例指错子句、样例未被引用均阻断。守卫子句允许空声明但必须 `pass` 且不触发任何子句。负例测试见 `test_coverage_gate.py` | `adr/0014-validation-chain-self-attestation.md` | 已实现 |
+| `check_checker_pins.py` | 检查器绑定：比对 `scripts/checker-pins.json` 登记哈希与工作区脚本（**含本脚本自身、`.githooks/pre-commit`、验收原型**），改动须 `--write --basis "<非同源复核记录>"`，`basis` 必须含 `非同源复核：`、`复核产物：<存在的路径>`、`复核基线：<提交号>`；同时校验验收快照 `validation/pinned/checker.py` 与工作区副本一致（漂移检测，不是权限分离）。负例见 `test_checker_pins.py` | `adr/0014-validation-chain-self-attestation.md`、`AGENTS.md` 3.6.8 | 已实现 |
+| `check_spec_pins.py` | 规格区段绑定：登记 `GRAMMAR.md` 全文、方法 A.2、方法 A.1、schema §2bis/§3/§4、`coverage.json` 全部指纹；区段相对 `HEAD` 改动时，同批必须附含 `非同源复核：`/`区段：`/`复核产物：`/结论词的复核记录，否则阻断。负例见 `test_spec_pins.py` | `adr/0014-validation-chain-self-attestation.md`、`AGENTS.md` 3.6.8 | 已实现 |
 | `check_glossary_usage.py` | 从 `git ls-files` 的 Markdown / JSONL 生成每条术语的使用位置基线 `knowledge/glossary-usage.json`，并在 `GLOSSARY.md` 第 4 节生成位置表；默认模式校验位置存在、行号有效、该行含术语、生成块未被手改、术语集合一致。`--write` 重生成 | `AGENTS.md` 5bis.1 | 已实现 |
 | `validate_ontology.py` | 用 `rdflib` + `pyshacl` 校验 `ontology/` 本体与 24 条 SHACL 形状；`--matrix` 逐条运行违规 fixture，确认每条形状能判出违规 | 无独立规格（边界见 `CONSTITUTION.md` 第 13.6 条与 `ontology/README.md`） | 已实现（可选依赖） |
 
@@ -71,7 +71,7 @@ python3 scripts/validate_ontology.py --matrix
 
 **本体的受控放行**（`CONSTITUTION.md` 第 13.6 条）：`.ttl`、`.shacl.ttl`、`.owl`、`.rdf`、`.nt`、`.n3`、`.jsonld` 允许入库，但**不豁免**体积、二进制、乱码、控制字符、点线、页码序列与长文本检查。本体文件的连续长注释行按 `RM-PROSEBLOCK` 处理（本体适用更严阈值：连续 12 行、每行 80 字符，以覆盖 PDF 换行后的段落形态）；头注释与 provenance 要求见 `ontology/README.md`。放行只针对“自写定义 + 标准术语标签”的本体，不针对原文转录。
 
-提交前接入：每个克隆需自行执行 `git config core.hooksPath .githooks`（只对当前克隆生效）。钩子依次运行十个检查器，任一失败即阻断提交：
+提交前接入：每个克隆需自行执行 `git config core.hooksPath .githooks`（只对当前克隆生效）。钩子依次运行十个检查器与原型快检，任一失败即阻断提交：
 
 ```
 python3 scripts/check_no_raw_material.py
@@ -80,6 +80,12 @@ python3 scripts/check_ledger_landings.py
 python3 scripts/check_gap_ledger.py --staged
 python3 scripts/check_three_table.py
 python3 scripts/check_coverage_gate.py
+python3 validation/checker-prototype/checker.py --quiet
+python3 validation/checker-prototype/checker.py --aggregation-order
+python3 validation/checker-prototype/checker.py --missing-key-sweep --quiet
+python3 validation/checker-prototype/checker.py --null-sweep --quick
+python3 validation/checker-prototype/checker.py --nested-missing-sweep --quiet
+python3 validation/checker-prototype/checker.py --enum-sweep --quiet
 python3 scripts/check_checker_pins.py
 python3 scripts/check_spec_pins.py
 python3 scripts/check_glossary_usage.py
