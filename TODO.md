@@ -32,6 +32,7 @@
 | T-042 | M1 | 验证套件 | 验证 `ASSUMPTION_PROTOCOL.md` 第 5 节的四条 `unknown` 处置纪律在检查器实现中一致 | 结果登记 | T-011 | `open` |
 | T-081 | M1 | 验证套件 | 验证 `CM-DET-CHECKER` 的退化路径（`runtime: deterministic-checker/human-fallback`）下 P1–P6 仍被满足 | 结果登记 | 无 | `open` |
 | T-130 | M1 | 判定口径裁定 | 裁定 G-A1 的“`Constraint` 作用于该 `Outcome` 或 `Commitment`”子句是否纳入 `PROJECT_MINIMAL_EXISTENCE`：当前 A 表判定列只检查四类节点存在与 `Commitment` 端点，未检查约束作用边；若纳入，属于改变已有 `check_id` 判定，需 ADR | 结构性变更需 ADR | T-011 样例编写时暴露 | `open` |
+| T-131 | M1 | 判定口径裁定 | 裁定 G-E2 的“该 `Assertion` 以 `assumption` 形式存在并附带验证条件”是否纳入 `AI_AUTONOMY_DELEGATION_AUDITABLE`：当前 A 表判定列只要求链上有 `Assertion` 声明范围/边界/撤销条件；若纳入，属于改变已有 `check_id` 判定，需 ADR | 结构性变更需 ADR | T-011 样例编写时暴露 | `open` |
 
 ### M2 反例库覆盖
 
