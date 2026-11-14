@@ -512,7 +512,7 @@ reason: null
 
 #### A.1.6 `DUAL_DIMENSION_ANNOTATION`（G-B1，`advisory` / `active`）
 
-**判定依据**：A 表“每个管理项携带 `process_group` 与 `subject_group` 两个标签”；G-B1 正文规定缺任一维度即违规。本项只检查**标签存在性**，标签值合法性归 A.1.7。
+**判定依据**：A 表“每个管理项携带 `process_group` 与 `subject_group` 两个标签且值在枚举内”。本组样例只针对**标签缺失**这一触发条件；值集违法由 A.1.7（G-B2）覆盖，避免两组样例重复同一条件，两项的判定列均不改动。
 
 **样例 1（触发 → `fail`）**：第二个管理项缺 `subject_group`。
 
