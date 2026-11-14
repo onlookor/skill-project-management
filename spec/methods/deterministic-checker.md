@@ -637,6 +637,150 @@ verdict: pass
 reason: null
 ```
 
+#### A.1.9 `ALL_IMPROVEMENT_ASSUMPTION`（G-D2，`warn` / `active`）
+
+**判定依据**：A 表“若全部关系为 `mitigates` 而无 `trades_off`/`exacerbates`，则变更被标记为 `assumption` 且携带验证条件”。样例用变更节点上的 `assumption` 与 `verification_condition` 表示该标记；字段位置为样例约定，判定条件本身不变。
+
+**样例 1（触发 → `fail`）**：全改善声明未附验证条件。
+
+```yaml
+changes:
+  - id: "CH-1"
+    relations: ["mitigates", "mitigates"]
+    assumption: null
+    verification_condition: null
+```
+
+期望输出：
+
+```yaml
+check_id: ALL_IMPROVEMENT_ASSUMPTION
+source_rule: G-D2
+severity: warn
+rule_status: active
+verdict: fail
+reason: all_improvement_without_verification
+```
+
+**样例 2（不触发 → `pass`）**：全改善声明已降级为 `assumption` 并附验证条件。
+
+```yaml
+changes:
+  - id: "CH-1"
+    relations: ["mitigates", "mitigates"]
+    assumption: "全改善声明"
+    verification_condition: "独立复核显示没有约束被恶化"
+```
+
+期望输出：
+
+```yaml
+check_id: ALL_IMPROVEMENT_ASSUMPTION
+source_rule: G-D2
+severity: warn
+rule_status: active
+verdict: pass
+reason: null
+```
+
+#### A.1.10 `AI_AUTONOMY_DELEGATION_AUDITABLE`（G-E2，`warn` / `active`）
+
+**判定依据**：A 表“自治权节点有 `delegated_from` 链终至 `Accountable`，且链上有 `Assertion` 声明范围/边界/撤销条件”。样例以 `delegated_from` 指向下一节点、`accountable: true` 标记链终点；单跳链是链长为 1 的合法情形。
+
+**样例 1（触发 → `fail`）**：委托链终止在另一个 `AIActor`，未到达 `Accountable`。
+
+```yaml
+actors:
+  - { id: "A-1", type: "AIActor" }
+  - { id: "A-2", type: "AIActor" }
+autonomy_grants:
+  - { id: "AG-1", actor: "A-1", delegated_from: "A-2", assertions: ["S-1"] }
+assertions:
+  - { id: "S-1", covers: ["scope", "boundary", "revocation"] }
+```
+
+期望输出：
+
+```yaml
+check_id: AI_AUTONOMY_DELEGATION_AUDITABLE
+source_rule: G-E2
+severity: warn
+rule_status: active
+verdict: fail
+reason: delegation_chain_not_accountable
+```
+
+**样例 2（不触发 → `pass`）**：链终点为 `Accountable`，且断言覆盖范围、边界与撤销条件。
+
+```yaml
+actors:
+  - { id: "A-1", type: "AIActor" }
+  - { id: "A-2", type: "HumanActor", accountable: true }
+autonomy_grants:
+  - { id: "AG-1", actor: "A-1", delegated_from: "A-2", assertions: ["S-1"] }
+assertions:
+  - { id: "S-1", covers: ["scope", "boundary", "revocation"] }
+```
+
+期望输出：
+
+```yaml
+check_id: AI_AUTONOMY_DELEGATION_AUDITABLE
+source_rule: G-E2
+severity: warn
+rule_status: active
+verdict: pass
+reason: null
+```
+
+#### A.1.11 `PROJECT_CHARTER_EXISTENCE`（G-F1，`advisory` / `assumption`）
+
+**判定依据**：A 表“进入执行阶段的 `Project` 有 `ProjectCharter`，且关联 Outcome 陈述、`Constraint`、`Accountable`、启动授权 `Assertion`”。样例假定输入只含已进入执行阶段的项目；`assumption` 期间输出 `advisory`。
+
+**样例 1（触发 → `fail`）**：执行阶段项目没有任何 `ProjectCharter`。
+
+```yaml
+projects:
+  - { id: "P-1", stage: "executing" }
+charters: []
+```
+
+期望输出：
+
+```yaml
+check_id: PROJECT_CHARTER_EXISTENCE
+source_rule: G-F1
+severity: advisory
+rule_status: assumption
+verdict: fail
+reason: missing_charter
+```
+
+**样例 2（不触发 → `pass`）**：章程存在且四项最小关联齐备。
+
+```yaml
+projects:
+  - { id: "P-1", stage: "executing" }
+charters:
+  - id: "PC-1"
+    project: "P-1"
+    outcomes: ["O-1"]
+    constraints: ["K-1"]
+    accountable: "A-1"
+    authorizing_assertion: "S-1"
+```
+
+期望输出：
+
+```yaml
+check_id: PROJECT_CHARTER_EXISTENCE
+source_rule: G-F1
+severity: advisory
+rule_status: assumption
+verdict: pass
+reason: null
+```
+
 ### B. 翻译规范（方法有关）
 
 从规则陈述到检查条件的翻译，遵循以下六条：
