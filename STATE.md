@@ -37,4 +37,5 @@
 | 文件 | 状态 | 说明 |
 |---|---|---|
 | `adr/ADR-TEMPLATE.md` | `template` | 模板，不承载已接受的决策 |
+| `adr/0013-unified-adjudication-of-check-semantics.md` | `skeleton` | 草案（文件内状态 `draft`）：范围与逐点待决项已建立，裁定结论待 T-133 全部 17 项复核完成后写入；裁定前不改变任何判定 |
 | `knowledge/methods/registry-skeleton.md` | `skeleton` | 方法注册表骨架，条目待填充 |

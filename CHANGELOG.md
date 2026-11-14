@@ -432,3 +432,19 @@
   - 五个检查器（`check_no_raw_material.py`、`check_anchors.py`、`check_ledger_landings.py`、`check_gap_ledger.py --staged`、`check_state.py`）均退出 0。
 - **关联 ADR**：无（缺口登记与状态更新；G-005–G-007 的裁定若改变已有 `check_id` 判定，届时另立 ADR）
 - **状态**：生效
+
+---
+
+### 批次 0032 — 2026-11-14 — ADR-0013 草案：单次裁定收口“判定列语义与表达能力补全”
+
+- **涉及文件**：新增 `adr/0013-unified-adjudication-of-check-semantics.md`；修改 `ROADMAP.md`（M2 出口 5）、`GAP_LEDGER.md`（核查记录）、`STATE.md`（例外表）、`AGENTS.md`（目录树）、`CHANGELOG.md`（本批次）
+- **变更摘要**：
+  1. **起草 ADR-0013（`draft`）**：把 G-001、G-002、G-003、G-005、G-006、G-007 并为**一次裁定**的范围，逐点列出 D0–D9 待决项（子句级覆盖、端点量词、空对象语义、悬空引用原因码、多违规 `reason` 优先级、`about` 反向引用、G-C1 断言内容、G-D1 `target` 类型、G-001 未定义判定对象、G-002/G-003 是否纳入判定列），每点给候选与影响面，不预设结论。
+  2. **裁定门**：T-133 全部 17 个 `check_id` 复核完成方可定稿；复核新增条目按“成因相同 + 处置路径相同 + 指向语义/表达补全”三项判据决定是否并入。G-004 明确不并入（`severity-mismatch`，按 T-100 单独裁定）。
+  3. **设计层风险单列**：给出四项判断——两表结构天然漂移（缺子句级覆盖声明，现有台账只做事后探测）；输入 schema 表达力不足（量词/空值/关系路径缺失，G-007 是表达缺陷而非文档不清）；检查项粒度过粗与过细并存（切分单位应是“可判定的规则子句”）；整体可收敛，但收敛判据应改为“同源缺口零新增”。
+  4. **复核期间冻结清单**：`GRAMMAR.md`、方法声明与附录 A 判定列/样例、`CHECKER_INPUT_SCHEMA.md`、原型 `checker.py`、只读验收包、`validation/test-cases/` 既有用例；本轮只改台账、调度文档、ADR 与 `STATE.md`。
+  5. **状态登记**：`STATE.md` 增例外行，把该 ADR 记为 `skeleton`（文件内状态 `draft`），避免 `adr/` 目录默认值 `accepted` 误标为已接受。
+- **钩子绕过**：无。
+- **验证**：五个检查器均退出 0；`check_gap_ledger.py` 仍为 7 条 `open`、L1 4 / L2 2 / L3 1、到期 0、矩阵 10/17 `consistent`；原型仍 34/34（本轮未触碰冻结文件）。
+- **关联 ADR**：ADR-0013（本批次创建，状态 `draft`）
+- **状态**：生效（ADR 草案登记；裁定未生效，判定列与样例未改）

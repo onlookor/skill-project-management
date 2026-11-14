@@ -229,7 +229,8 @@ project-management-grounding/
 │   ├── 0009-no-raw-material-in-git.md
 │   ├── 0010-self-authored-ontology-in-git.md
 │   ├── 0011-schedule-layer-and-plan.md
-│   └── 0012-gap-ledger-and-adjudication.md
+│   ├── 0012-gap-ledger-and-adjudication.md
+│   └── 0013-unified-adjudication-of-check-semantics.md
 │
 ├── .githooks/
 │   └── pre-commit                  # 阻断原始资料入库（CONSTITUTION 第 13 条）
