@@ -357,3 +357,25 @@
 - **验证**：四个检查器 0 错误（`check_anchors` 0 错误 0 警告；`check_ledger_landings` 1 条既有 `SPRINGER-PMBOK-2024` 警告）。
 - **关联 ADR**：无（执行层补丁；T-130、T-131 若改判定另走 ADR）
 - **状态**：生效
+
+---
+
+### 批次 0028 — 2026-11-14 — 缺口台账、到期裁定与 G 组样例修正
+
+- **涉及文件**：
+  - 新增：`GAP_LEDGER.md`、`scripts/check_gap_ledger.py`、`adr/0012-gap-ledger-and-adjudication.md`
+  - 修改：`spec/methods/deterministic-checker.md`（A.1.15/A.1.16 修正）、`AGENTS.md`（新增 3.6、目录树、7bis）、`ROADMAP.md`（M1/M3 工作项与出口、D4、发布门槛）、`TODO.md`（T-132；T-100/T-130/T-131 交叉引用）、`scripts/README.md`、`.githooks/pre-commit`、`scripts/check_state.py`、`validation/CHECKLIST.md`（`source_commit` 推进）、`CHANGELOG.md`（本批次）
+- **变更摘要**：
+  1. **修正 G 组样例名称与内容**：A.1.15 由错误的 `TAILORING_DECISION_JUSTIFICATION` 改为注册表实际的 `TAILORING_RECORD_EXISTENCE`（G-G1）；A.1.16 由 `TAILORING_RATIONALE_ANCHOR` 改为 `TAILORING_NON_TRIMMABLE_SET`（G-G2）。批次 0027 报告的“17/17”在名称层面有误，本批次更正。
+  2. **缺口归并**：G-D2、G-A2、G-E1 的未定义判定对象归并为 `G-001`（`undefined-object`，“规则引用了注册表中未定义的判定对象”）；T-130、T-131、T-100 保留独立编号，分别对应 `G-002`、`G-003`、`G-004`，台账注明四者同属“规则正文严于判定列”大类。
+  3. **临时治理机制**：`AGENTS.md` 3.6 规定入口三条件与机械判据、L1–L3 分级与停留上限、按里程碑的例行裁定点、四处置出口、到期阻断与撤除条件；ADR-0012 记录决策与不写入 `CONSTITUTION.md` 的理由；T-132（M3）承担撤除评估。
+  4. **机械核查**：`check_gap_ledger.py` 输出总数、`open`/`closed`、按级与到期计数、核查矩阵 `consistent` 比例；到期未裁定退出 1；`--staged` 要求规则/判定文件与台账同批更新。它成为第五个提交前检查器，并由 `check_state.py` 调用，使到期未裁定阻断发布。
+  5. `validation/CHECKLIST.md` 的 `source_commit` 推进到 `033528f`（ADR-0004）。
+- **钩子绕过**：无。
+- **验证**：
+  - 正面：`check_gap_ledger.py` 输出“4 条（open 4 / closed 0）；L1 1 / L2 2 / L3 1；到期 0；核查矩阵 12/17 consistent”，退出 0；五个检查器均退出 0。
+  - 负例 1（到期）：副本台账改为 `M2` 后，输出 `G-004 已到期未裁定（登记 M1，L1 上限 1，到期 M2，当前 M2）`，退出 1。
+  - 负例 2（暂存门）：只暂存方法判定列、不暂存台账时，输出“规则/判定变更必须先过缺口复核”，退出 1。
+  - 负例 3（发布阻断）：主工作区临时改为 `M2` 后运行 `check_state.py`，输出“缺口台账核查未通过（退出码 1）……G-004 已到期未裁定”，退出 1。
+- **关联 ADR**：ADR-0012
+- **状态**：生效
