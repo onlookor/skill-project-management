@@ -868,3 +868,16 @@
 - **涉及文件**：`SOURCE_LEDGER.md`、`adr/0016-pmbok8-concept-layer-use.md`（新增）、`adr/0017-grounding-ref-vs-evidence.md`（新增）、`validation/reviews/2026-11-14-t139-user-adjudication.md`（新增）、`knowledge/anchored-entries.jsonl`、`scripts/check_anchors.py`、`scripts/checker-pins.json`、`scripts/spec-pins.json`、`scripts/README.md`、`scripts/check_glossary_sync.md`、`spec/CHECKER_INPUT_SCHEMA.md`、`spec/ANCHOR_SPEC.md`、`spec/methods/deterministic-checker.md`、`spec/pilot/pilot-entries.json`、`spec/pilot/pilot-id-map.json`、`spec/pilot/M3_M4_PILOT_REPORT.md`、`GLOSSARY.md`、`GRAMMAR.md`、`scripts/anchor_baseline.json`、`knowledge/glossary-usage.json`、`GAP_LEDGER.md`、`TODO.md`、`CHANGELOG.md`。
 - **未改动**：`manifest.json`、`ROADMAP.md`，以及判据 7 的外部抽样（维持 `blocked-external`）。
 - **状态**：生效（放量仍未开始）
+
+---
+
+### 批次 0049 — 2026-11-14 — 修复 G-019：`RM-PROSEBLOCK` 识别结构化 JSONL
+
+- **性质**：修正检查器实现缺陷（`implementation-defect`），不新增判据。G-019 保持 `open`，按 `AGENTS.md` 3.6.6 等非同源复核或人工签收后关闭。
+- **修复**：`scripts/check_no_raw_material.py` 新增 `is_structured_jsonl()`，仅当文件为 `.jsonl` 且每行（非空）都解析为 JSON 对象时，豁免 `RM-PROSEBLOCK`。仅凭扩展名、JSON 字符串行、文本层转储改名 `.jsonl` 均不放行；PDF/OCR 转储检测保持原样。
+- **双向覆盖**：新增 `--self-test`，T-NRM-01 结构化 JSONL（15 行 × ≥100 字符）不报；T-NRM-02 每行一个 JSON 字符串仍报；T-NRM-03 真实 PDF 文本层（ISO 29148 第 4 页，15 行 × ≥100 字符）仍报；T-NRM-04 转储改名 `.jsonl` 仍报。4/4 通过；缺少本地 PDF 样本时返回 `2`（无法评估），可用 `PM_RESOURCE_DIR` 指定资源目录。
+- **实测**：15 条试点条目 JSONL（最长行 998 字符）与 20 条扩展 JSONL（最长 1004 字符）`RM-PROSEBLOCK` 均为 0 报。
+- **台账**：G-019 说明追加修复与负例记录，状态维持 `open`、关闭依据留空；T-140 → `done`（G-019 关闭待复核）。
+- **涉及文件**：`scripts/check_no_raw_material.py`、`scripts/checker-pins.json`、`scripts/README.md`、`validation/reviews/2026-11-14-g019-user-authorization.md`（新增）、`GAP_LEDGER.md`、`TODO.md`、`CHANGELOG.md`。
+- **未改动**：D4 决定、放量、判据 7 外部抽样、`manifest.json`、`ROADMAP.md`。
+- **状态**：生效（G-019 待复核关闭）

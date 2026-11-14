@@ -55,7 +55,7 @@
 | T-132 | M3 | 流程撤除 | 评估并撤除缺口台账临时机制（`GAP_LEDGER.md` 与 `scripts/check_gap_ledger.py`）：按 `AGENTS.md` 3.6.5 的三项撤除条件核对连续两个发布点的 `open=0`、核查矩阵 17/17 `consistent` 与全量“规则正文 ↔ 判定列”对照；满足则删除台账与检查器、移除钩子与 `check_state.py` 调用，未满足则按台账规则冻结 | 执行层补丁 + 钩子 | 硬约束：不晚于 M3 关闭 | `open` |
 | T-138 | M3 | 试点执行 | 按 `spec/M3_M4_PLAN.md` 第 3 节执行 15 条草稿试点：6 工件 + 6 工具 + 1 过程 + 1 焦点区 + 1 绩效域；产出草稿条目、`pilot-id-map`、1 份契约、1 份产物样例与 3 组冲突样例，并逐项判定 7 条判据与 6 条止损 | CHANGELOG + 试点报告 | D1/D2/D3/D8 已定；D4 降级 | `done`（2026-11-14：15 条落盘，14 条有候选 IRI、1 条 `null` 且有稳定自然键，止损未命中；外部抽样 blocked-external；批次 0047） |
 | T-139 | M3 | 字段语义统一 | 统一 `grounding_ref` 语义：D3 选定指向 `knowledge:<term>`，但现有 10 条 `knowledge/anchored-entries.jsonl` 指向来源 ID；放量前需在“修订 D3 表述”与“新增独立 `source_ref` 并迁移现有条目”之间二选一。试点按 D3 写入、来源移入 `evidence`，两套语义暂时并存 | 结构性变更需 ADR | T-138 试点发现；D4 同批 | `done`（2026-11-14：按“两种意图拆开”落实；10 条来源迁入 `evidence[]`，`grounding_ref` 只用于规则/本体到条目的绑定；语义写入 `ANCHOR_SPEC`、`CHECKER_INPUT_SCHEMA` §1.16 与 `GRAMMAR`；批次 0048） |
-| T-140 | M1 | 检查器修正 | 修正 `check_no_raw_material.py` 的 `RM-PROSEBLOCK`：连续 ≥15 行、每行 ≥100 字符且非 Markdown 表格行的结构化 JSON/JSONL 记录被误判为文本层转储；当前 `knowledge/anchored-entries.jsonl` 为 10 条，扩到 15 条即阻断 M3 铺开。按格式或记录结构豁免结构化数据，保留对 PDF/OCR 转储的检测；补“15 条长 JSONL 不报”与“15 行长文本转储仍报”两组负例；缺口台账编号 G-019 | 执行层补丁 | T-138 试点发现 | `open` |
+| T-140 | M1 | 检查器修正 | 修正 `check_no_raw_material.py` 的 `RM-PROSEBLOCK`：连续 ≥15 行、每行 ≥100 字符且非 Markdown 表格行的结构化 JSON/JSONL 记录被误判为文本层转储；当前 `knowledge/anchored-entries.jsonl` 为 10 条，扩到 15 条即阻断 M3 铺开。按格式或记录结构豁免结构化数据，保留对 PDF/OCR 转储的检测；补“15 条长 JSONL 不报”与“15 行长文本转储仍报”两组负例；缺口台账编号 G-019 | 执行层补丁 | T-138 试点发现 | `done`（2026-11-14，批次 0049：新增 `is_structured_jsonl()`，仅豁免每行一个 JSON 对象的 `.jsonl`；`--self-test` T-NRM-01–04 4/4 通过；15 条/20 条 JSONL 实测 0 报。G-019 仍 `open`，待非同源复核或人工签收） |
 
 ### M4 来源收口
 

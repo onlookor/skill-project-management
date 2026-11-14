@@ -61,7 +61,7 @@ python3 scripts/validate_ontology.py --matrix
 | `RM-BINARY` | 文本扩展名下出现 NUL 字节或无法按 UTF-8 解码 |
 | `RM-SIZE` | 单文件超过 512 KiB |
 | `RM-QUOTE` | 单条引用超过 400 字符，或连续引用块超过 800 字符 |
-| `RM-PROSEBLOCK` | 连续 15 行以上每行不少于 100 字符（PDF 文本转储的行形态） |
+| `RM-PROSEBLOCK` | 连续 15 行以上每行不少于 100 字符（PDF 文本转储的行形态）；结构化 JSONL（每行一个 JSON 对象）不适用 |
 | `RM-PAGESEQ` | 连续 5 行以上为页码或纯数字 |
 | `RM-DOTLEADER` | 单行出现 30 个以上连续点（目录转储） |
 | `RM-MOJIBAKE` | 出现 U+FFFD 替换字符 |
@@ -71,6 +71,8 @@ python3 scripts/validate_ontology.py --matrix
 | `RM-ONTO-COMMENT` | 本体文件中的单行 `#` 注释超过 400 字符 |
 
 **本体的受控放行**（`CONSTITUTION.md` 第 13.6 条）：`.ttl`、`.shacl.ttl`、`.owl`、`.rdf`、`.nt`、`.n3`、`.jsonld` 允许入库，但**不豁免**体积、二进制、乱码、控制字符、点线、页码序列与长文本检查。本体文件的连续长注释行按 `RM-PROSEBLOCK` 处理（本体适用更严阈值：连续 12 行、每行 80 字符，以覆盖 PDF 换行后的段落形态）；头注释与 provenance 要求见 `ontology/README.md`。放行只针对“自写定义 + 标准术语标签”的本体，不针对原文转录。
+
+**结构化 JSONL 的边界**：`RM-PROSEBLOCK` 只豁免“每行一个 JSON 对象”的 `.jsonl`（`is_structured_jsonl()`）。仅凭扩展名、或把原文逐行包成 JSON 字符串都不放行；文本层转储改名为 `.jsonl` 仍会被拦。双向覆盖用 `python3 scripts/check_no_raw_material.py --self-test` 验证（T-NRM-01 结构化 JSONL 不报；T-NRM-02 JSON 字符串行仍报；T-NRM-03 真实 PDF 文本层仍报；T-NRM-04 转储改名 `.jsonl` 仍报）；缺少本地 PDF 样本时返回 `2`（无法评估），可用 `PM_RESOURCE_DIR` 指定资源目录。
 
 提交前接入：每个克隆需自行执行 `git config core.hooksPath .githooks`（只对当前克隆生效）。钩子依次运行十个检查器与原型快检，任一失败即阻断提交：
 
