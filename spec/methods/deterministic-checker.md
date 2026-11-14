@@ -781,6 +781,138 @@ verdict: pass
 reason: null
 ```
 
+#### A.1.12 `CLOSURE_ACCEPTANCE_LINK`（G-F2，`advisory` / `assumption`）
+
+**判定依据**：A 表“每个 `Deliverable` 有‘已验收’或‘已移交’断言且关联 `Accountable` 确认”。样例假定输入只含进入收尾阶段的项目产物；确认记录用断言上的 `accountable_confirmation` 表示。
+
+**样例 1（触发 → `fail`）**：交付物没有任何验收或移交断言。
+
+```yaml
+deliverables:
+  - { id: "D-1", assertions: [] }
+```
+
+期望输出：
+
+```yaml
+check_id: CLOSURE_ACCEPTANCE_LINK
+source_rule: G-F2
+severity: advisory
+rule_status: assumption
+verdict: fail
+reason: missing_acceptance_assertion
+```
+
+**样例 2（不触发 → `pass`）**：存在“已验收”断言且关联 `Accountable` 确认。
+
+```yaml
+deliverables:
+  - id: "D-1"
+    assertions:
+      - { id: "S-1", statement: "已验收", accountable_confirmation: "A-1" }
+```
+
+期望输出：
+
+```yaml
+check_id: CLOSURE_ACCEPTANCE_LINK
+source_rule: G-F2
+severity: advisory
+rule_status: assumption
+verdict: pass
+reason: null
+```
+
+#### A.1.13 `PROCUREMENT_CONTRACT_ANCHOR`（G-F3，`advisory` / `assumption`）
+
+**判定依据**：A 表“每个外部采购承诺有 `Contract` 节点，声明交付物形态、验收判据、约束锚定、`Accountable` 签署”。样例以 `procurement: external` 标记外部采购承诺。
+
+**样例 1（触发 → `fail`）**：外部采购承诺没有合同锚定。
+
+```yaml
+commitments:
+  - { id: "C-1", procurement: "external", contract: null }
+contracts: []
+```
+
+期望输出：
+
+```yaml
+check_id: PROCUREMENT_CONTRACT_ANCHOR
+source_rule: G-F3
+severity: advisory
+rule_status: assumption
+verdict: fail
+reason: missing_contract
+```
+
+**样例 2（不触发 → `pass`）**：合同存在且四项最小声明齐备。
+
+```yaml
+commitments:
+  - { id: "C-1", procurement: "external", contract: "CT-1" }
+contracts:
+  - id: "CT-1"
+    deliverable_form: "硬件交付"
+    acceptance_criteria: "验收测试通过"
+    constrained_by: ["K-1"]
+    accountable_signature: "A-1"
+```
+
+期望输出：
+
+```yaml
+check_id: PROCUREMENT_CONTRACT_ANCHOR
+source_rule: G-F3
+severity: advisory
+rule_status: assumption
+verdict: pass
+reason: null
+```
+
+#### A.1.14 `SCHEDULE_EVIDENCE_LINK`（G-F4，`advisory` / `assumption`）
+
+**判定依据**：A 表“每个时间承诺至少关联一条依据断言（估算方法/历史数据/外部强加出处）”。样例以 `deadline` 触发适用性，以 `evidence_assertions` 表示依据。
+
+**样例 1（触发 → `fail`）**：带截止日期的时间承诺没有依据断言。
+
+```yaml
+commitments:
+  - { id: "C-1", deadline: "2026-12-31", evidence_assertions: [] }
+```
+
+期望输出：
+
+```yaml
+check_id: SCHEDULE_EVIDENCE_LINK
+source_rule: G-F4
+severity: advisory
+rule_status: assumption
+verdict: fail
+reason: missing_schedule_evidence
+```
+
+**样例 2（不触发 → `pass`）**：时间承诺关联一条历史数据依据。
+
+```yaml
+commitments:
+  - id: "C-1"
+    deadline: "2026-12-31"
+    evidence_assertions:
+      - { id: "S-1", basis: "historical_data", source: "过往三个同类项目" }
+```
+
+期望输出：
+
+```yaml
+check_id: SCHEDULE_EVIDENCE_LINK
+source_rule: G-F4
+severity: advisory
+rule_status: assumption
+verdict: pass
+reason: null
+```
+
 ### B. 翻译规范（方法有关）
 
 从规则陈述到检查条件的翻译，遵循以下六条：
