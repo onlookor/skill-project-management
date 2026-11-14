@@ -287,76 +287,94 @@
 
 ### A. check_id 注册表
 
-| check_id | 规则 | 判定（子句 id） | 输入 | 原因码 | 规则状态 |
-|---|---|---|---|---|---|
-| `PROJECT_MINIMAL_EXISTENCE` | G-A1 | `G-A1#1`–`G-A1#6` | `Project`、`Actor`、`Outcome`、`Commitment`、`Constraint` 节点 | missing_actor / missing_outcome / missing_commitment / missing_constraint / broken_commitment_endpoint / constraint_not_applied | `active` |
-| `CONSTRAINT_ANCHOR_REQUIRED` | G-A2 | `G-A2#1`–`G-A2#2` | 管理活动/产物节点、`Constraint` 节点 | unanchored_management_item / undefined_object_type | `active` |
-| `DUAL_DIMENSION_ANNOTATION` | G-B1 | `G-B1#1`–`G-B1#2` | 管理项节点 | missing_dimension | `active` |
-| `DIMENSION_VALUE_CLOSED` | G-B2 | `G-B2#1` | 管理项的标签值 | dimension_value_out_of_enum | `active` |
-| `DELIVERABLE_ASSERTION_LINK` | G-C1 | `G-C1#1`–`G-C1#3` | `Deliverable` 节点、`Assertion` 节点 | deliverable_without_assertion / assertion_without_content / assertion_about_mismatch | `active` |
-| `ASSERTION_MUTUAL_EXCLUSION` | G-C2 | `G-C2#1`–`G-C2#2` | 同一 `Deliverable` 的多条 `Assertion` | mutually_exclusive_active_assertions | `active`（`warn`） |
-| `CHANGE_CONSTRAINT_LINK` | G-D1 | `G-D1#1`–`G-D1#3` | 变更提议节点、`Constraint` 节点 | missing_change_target / invalid_change_target / missing_constraint_link / invalid_change_relation | `active` |
-| `ALL_IMPROVEMENT_ASSUMPTION` | G-D2 | `G-D2#1`–`G-D2#3` | 变更提议的关系类型集合 | all_improvement_without_verification / approval_basis_before_verification / assumption_unclosed | `active`（`warn`） |
-| `ROLE_MINIMAL_COMPLETENESS` | G-E1 | `G-E1#1`–`G-E1#3` | `Commitment` 节点、`Accountable`/`Responsible` 关系 | missing_accountable / multiple_accountable / unknown_accountable / accountable_not_human / missing_responsible / missing_role_merge_declaration | `active` |
-| `AI_AUTONOMY_DELEGATION_AUDITABLE` | G-E2 | `G-E2#1`–`G-E2#3` | `AIActor` 的自治权节点、`delegated_from` 路径 | delegation_chain_not_accountable / assertion_incomplete / assumption_unclosed / invalid_path / dangling_reference | `active`（`warn`） |
-| `PROJECT_CHARTER_EXISTENCE` | G-F1 | `G-F1#1`–`G-F1#2` | `Project` 节点、`ProjectCharter` 节点 | missing_charter / incomplete_charter | `assumption` |
-| `CLOSURE_ACCEPTANCE_LINK` | G-F2 | `G-F2#1`–`G-F2#2` | 收尾阶段的 `Deliverable`、`Assertion` | missing_acceptance_assertion | `assumption` |
-| `PROCUREMENT_CONTRACT_ANCHOR` | G-F3 | `G-F3#1`–`G-F3#2` | 外部采购类 `Commitment`、`Contract` 节点 | missing_contract / incomplete_contract | `assumption` |
-| `SCHEDULE_EVIDENCE_LINK` | G-F4 | `G-F4#1` | 带 `deadline`/`milestone` 的 `Commitment`、`Assertion` | missing_schedule_evidence | `assumption` |
-| `TAILORING_RECORD_EXISTENCE` | G-G1 | `G-G1#1`–`G-G1#2` | 裁剪动作、`TailoringRecord` | missing_tailoring_record / incomplete_tailoring_record | `assumption` |
-| `TAILORING_NON_TRIMMABLE_SET` | G-G2 | `G-G2#1` | `TailoringRecord` 的目标规则 | non_trimmable_rule | `assumption` |
-| `TAILORING_REASSESSMENT_CONDITION` | G-G3 | `G-G3#1`–`G-G3#2` | `TailoringRecord` | missing_reassessment_condition | `assumption` |
+| check_id | 规则 | 判定（子句 id） | 子句指纹 | 输入 | 原因码 | 规则状态 |
+|---|---|---|---|---|---|---|
+| `PROJECT_MINIMAL_EXISTENCE` | G-A1 | `G-A1#1`–`G-A1#6` | `6a4f8c0ad633` | `project`, `actors`, `outcomes`, `commitments`, `constraints` | missing_actor / missing_outcome / missing_commitment / missing_constraint / broken_commitment_endpoint / constraint_not_applied | active |
+| `CONSTRAINT_ANCHOR_REQUIRED` | G-A2 | `G-A2#1`–`G-A2#2` | `e662fd68fb27` | `commitments`, `deliverables`, `constraints` | unanchored_management_item / undefined_object_type | active |
+| `DUAL_DIMENSION_ANNOTATION` | G-B1 | `G-B1#1`–`G-B1#2` | `2cde52fd3961` | `management_items` | missing_dimension | active |
+| `DIMENSION_VALUE_CLOSED` | G-B2 | `G-B2#1`–`G-B2#2` | `f1ffbb599458` | `management_items` | dimension_value_out_of_enum / invalid_subject_group_extension | active |
+| `DELIVERABLE_ASSERTION_LINK` | G-C1 | `G-C1#1`–`G-C1#3` | `f2a5638c6328` | `deliverables`, `assertions` | deliverable_without_assertion / dangling_reference / assertion_without_content / assertion_about_mismatch | active |
+| `ASSERTION_MUTUAL_EXCLUSION` | G-C2 | `G-C2#1`–`G-C2#2` | `dad9a9f57643` | `assertions`, `deliverables` | mutually_exclusive_active_assertions | active |
+| `CHANGE_CONSTRAINT_LINK` | G-D1 | `G-D1#1`–`G-D1#3` | `3e473f8ea1e8` | `changes`, `constraints`, `commitments`, `deliverables` | missing_change_target / invalid_change_target / missing_constraint_link / invalid_change_relation | active |
+| `ALL_IMPROVEMENT_ASSUMPTION` | G-D2 | `G-D2#1`–`G-D2#3` | `c1573c1eb236` | `changes`, `actors` | all_improvement_without_verification / approval_basis_before_verification / assumption_unclosed | active |
+| `ROLE_MINIMAL_COMPLETENESS` | G-E1 | `G-E1#1`–`G-E1#3` | `a707061b238f` | `actors`, `commitments` | missing_accountable / multiple_accountable / unknown_accountable / accountable_not_human / missing_responsible / missing_role_merge_declaration | active |
+| `AI_AUTONOMY_DELEGATION_AUDITABLE` | G-E2 | `G-E2#1`–`G-E2#3` | `305ff2b257b0` | `actors`, `autonomy_grants`, `assertions` | delegation_chain_not_accountable / invalid_path / dangling_reference / assertion_incomplete / assumption_unclosed | active |
+| `PROJECT_CHARTER_EXISTENCE` | G-F1 | `G-F1#1`–`G-F1#2` | `a40c88e331b9` | `projects`, `charters`, `outcomes`, `constraints`, `actors`, `assertions` | missing_charter / incomplete_charter | assumption |
+| `CLOSURE_ACCEPTANCE_LINK` | G-F2 | `G-F2#1`–`G-F2#2` | `1c157ebdf8ff` | `deliverables`, `actors` | missing_acceptance_assertion | assumption |
+| `PROCUREMENT_CONTRACT_ANCHOR` | G-F3 | `G-F3#1`–`G-F3#2` | `3b6f71eed103` | `commitments`, `contracts`, `constraints`, `actors` | missing_contract / incomplete_contract | assumption |
+| `SCHEDULE_EVIDENCE_LINK` | G-F4 | `G-F4#1` | `3a1c2ec19e7e` | `commitments` | missing_schedule_evidence | assumption |
+| `TAILORING_RECORD_EXISTENCE` | G-G1 | `G-G1#1`–`G-G1#2` | `3e7dc444affc` | `tailoring_actions`, `tailoring_records`, `actors` | missing_tailoring_record / incomplete_tailoring_record | assumption |
+| `TAILORING_NON_TRIMMABLE_SET` | G-G2 | `G-G2#1` | `76a53059e6a6` | `tailoring_records` | non_trimmable_rule | assumption |
+| `TAILORING_REASSESSMENT_CONDITION` | G-G3 | `G-G3#1`–`G-G3#2` | `c4a47f27fec9` | `tailoring_records` | missing_reassessment_condition | assumption |
 
 ### A.2 子句表（规则正文 → 判定列的逐子句覆盖）
 
 > 用途：解决“一规则一句导致子条件被压缩”（ADR-0013 的问题 P1）。每条规则正文的规范性条件拆为 clause id；A 表每个 `check_id` 的“判定（子句 id）”列只列它覆盖的 clause，**不再写叙述性短语**；条件的自然语言表述与原因码统一放在本表。一个 `check_id` 可承载多个子句，逐子句独立求值、聚合为单一 verdict（任一 `fail` → `fail`；否则任一 `cannot_evaluate` → `cannot_evaluate`；否则 `pass`）。未覆盖的子句必须标 `not-checked` 并写理由，`scripts/check_three_table.py` 机械核对覆盖完整性与“A 表不含叙述性短语”。
+>
+> 复核签收：纪律基线（同源修订；非同源复核待提交后执行） / 2026-11-14 / A.2 指纹 `a7e02bdfd23f`
 
-| clause | 规则 | 子句（判定条件） | 原因码 | 承接 check_id | 子句 severity | 覆盖状态 |
-|---|---|---|---|---|---|---|
-| `G-A1#1` | G-A1 | 至少一个 `Actor` | `missing_actor` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked |
-| `G-A1#2` | G-A1 | 至少一个 `Outcome` | `missing_outcome` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked |
-| `G-A1#3` | G-A1 | 该 `Actor` 对 `Outcome` 的 `Commitment` 存在 | `missing_commitment` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked |
-| `G-A1#4` | G-A1 | 至少一个 `Constraint` | `missing_constraint` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked |
-| `G-A1#5` | G-A1 | `Commitment` 的 `by`/`to` 指向已登记的 `Actor`/`Outcome` | `broken_commitment_endpoint` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked |
-| `G-A1#6` | G-A1 | `Constraint` 作用于该 `Outcome` 或 `Commitment` | `constraint_not_applied` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked |
-| `G-A2#1` | G-A2 | 每个管理活动/产物至少一条 `constrained_by` 指向已登记 `Constraint` | `unanchored_management_item` | `CONSTRAINT_ANCHOR_REQUIRED` | `block` | checked |
-| `G-A2#2` | G-A2 | “管理活动/产物”为已定义节点类型 | `undefined_object_type` | `CONSTRAINT_ANCHOR_REQUIRED` | `block` | checked（`management_node_type`） |
-| `G-B1#1` | G-B1 | 每个管理项有 `process_group` 标签 | `missing_dimension` | `DUAL_DIMENSION_ANNOTATION` | `advisory` | checked |
-| `G-B1#2` | G-B1 | 每个管理项有 `subject_group` 标签 | `missing_dimension` | `DUAL_DIMENSION_ANNOTATION` | `advisory` | checked |
-| `G-B2#1` | G-B2 | 标签值在锚定枚举或契约扩展内 | `dimension_value_out_of_enum` | `DIMENSION_VALUE_CLOSED` | `advisory` | checked |
-| `G-C1#1` | G-C1 | 每个 `Deliverable` 至少一条见证断言（`asserted_by` 正向或 `about` 反向） | `deliverable_without_assertion` | `DELIVERABLE_ASSERTION_LINK` | `block` | checked |
-| `G-C1#2` | G-C1 | 断言内容是“是什么/什么状态/满足什么条件”的明确陈述 | `assertion_without_content` | `DELIVERABLE_ASSERTION_LINK` | `block` | checked |
-| `G-C1#3` | G-C1 | 断言 `about` 指向该交付物 | `assertion_about_mismatch` | `DELIVERABLE_ASSERTION_LINK` | `block` | checked |
-| `G-C2#1` | G-C2 | 同一 `Subject` 同一属性不得有不相容值 | `mutually_exclusive_active_assertions` | `ASSERTION_MUTUAL_EXCLUSION` | `warn` | checked |
-| `G-C2#2` | G-C2 | 只对 `active` 断言判不相容 | `mutually_exclusive_active_assertions` | `ASSERTION_MUTUAL_EXCLUSION` | `warn` | checked |
-| `G-D1#1` | G-D1 | 变更对象是 `Commitment` 或 `Deliverable` | `missing_change_target / invalid_change_target` | `CHANGE_CONSTRAINT_LINK` | `block` | checked |
-| `G-D1#2` | G-D1 | 变更提议至少一条边指向 `Constraint` | `missing_constraint_link` | `CHANGE_CONSTRAINT_LINK` | `block` | checked |
-| `G-D1#3` | G-D1 | 边类型 ∈ `relation` 枚举 | `invalid_change_relation` | `CHANGE_CONSTRAINT_LINK` | `block` | checked |
-| `G-D2#1` | G-D2 | 全部为 `mitigates` 时标 `assumption` 并附验证条件 | `all_improvement_without_verification` | `ALL_IMPROVEMENT_ASSUMPTION` | `warn` | checked |
-| `G-D2#2` | G-D2 | 验证条件满足前不得作为批准依据 | `approval_basis_before_verification` | `ALL_IMPROVEMENT_ASSUMPTION` | `warn` | checked（`approval_basis`） |
-| `G-D2#3` | G-D2 | `assumption` 为 `pending` 时须有 `approved_by`；`expired` 不得作为有效依据 | `assumption_unclosed` | `ALL_IMPROVEMENT_ASSUMPTION` | `warn` | checked（§1.9） |
-| `G-E1#1` | G-E1 | 唯一 `accountable_by` 且指向 `HumanActor`/`LegalEntity` | `missing_accountable / multiple_accountable / unknown_accountable / accountable_not_human` | `ROLE_MINIMAL_COMPLETENESS` | `block` | checked |
-| `G-E1#2` | G-E1 | 至少一个 `responsible_by` | `missing_responsible` | `ROLE_MINIMAL_COMPLETENESS` | `block` | checked |
-| `G-E1#3` | G-E1 | 角色重合时有 `role_merge_declaration` | `missing_role_merge_declaration` | `ROLE_MINIMAL_COMPLETENESS` | `warn` | checked |
-| `G-E2#1` | G-E2 | `delegated_from` 路径终至 `Accountable` | `delegation_chain_not_accountable / invalid_path / dangling_reference` | `AI_AUTONOMY_DELEGATION_AUDITABLE` | `warn` | checked |
-| `G-E2#2` | G-E2 | 路径上断言覆盖范围/边界/撤销条件 | `assertion_incomplete` | `AI_AUTONOMY_DELEGATION_AUDITABLE` | `warn` | checked |
-| `G-E2#3` | G-E2 | 该断言以 `assumption` 形式存在并附验证条件 | `assertion_incomplete / assumption_unclosed` | `AI_AUTONOMY_DELEGATION_AUDITABLE` | `warn` | checked |
-| `G-F1#1` | G-F1 | 执行阶段 `Project` 有 `ProjectCharter` | `missing_charter` | `PROJECT_CHARTER_EXISTENCE` | `advisory` | checked |
-| `G-F1#2` | G-F1 | 章程关联 Outcome 陈述、Constraint、Accountable、启动授权 | `incomplete_charter` | `PROJECT_CHARTER_EXISTENCE` | `advisory` | checked |
-| `G-F2#1` | G-F2 | 每个 `Deliverable` 有验收/移交断言 | `missing_acceptance_assertion` | `CLOSURE_ACCEPTANCE_LINK` | `advisory` | checked |
-| `G-F2#2` | G-F2 | 断言关联 `Accountable` 确认 | `missing_acceptance_assertion` | `CLOSURE_ACCEPTANCE_LINK` | `advisory` | checked |
-| `G-F3#1` | G-F3 | 外部采购承诺有 `Contract` 节点 | `missing_contract` | `PROCUREMENT_CONTRACT_ANCHOR` | `advisory` | checked |
-| `G-F3#2` | G-F3 | 契约声明四项内容 | `incomplete_contract` | `PROCUREMENT_CONTRACT_ANCHOR` | `advisory` | checked |
-| `G-F4#1` | G-F4 | 时间承诺关联依据断言 | `missing_schedule_evidence` | `SCHEDULE_EVIDENCE_LINK` | `advisory` | checked |
-| `G-G1#1` | G-G1 | 每次裁剪有 `TailoringRecord` | `missing_tailoring_record` | `TAILORING_RECORD_EXISTENCE` | `advisory` | checked |
-| `G-G1#2` | G-G1 | 记录声明四项内容 | `incomplete_tailoring_record` | `TAILORING_RECORD_EXISTENCE` | `advisory` | checked |
-| `G-G2#1` | G-G2 | 目标规则不在不可裁剪集 | `non_trimmable_rule` | `TAILORING_NON_TRIMMABLE_SET` | `advisory` | checked |
-| `G-G3#1` | G-G3 | 记录关联重新评估条件或声明“永久” | `missing_reassessment_condition` | `TAILORING_REASSESSMENT_CONDITION` | `advisory` | checked |
-| `G-G3#2` | G-G3 | 声明“永久”时附理由 | `missing_reassessment_condition` | `TAILORING_REASSESSMENT_CONDITION` | `advisory` | checked |
+| clause | 规则 | 子句（判定条件） | 原因码 | 承接 check_id | 子句 severity | 覆盖状态 | 规则状态 |
+|---|---|---|---|---|---|---|---|
+| `G-A1#1` | G-A1 | 至少一个 `Actor` | `missing_actor` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked | active |
+| `G-A1#2` | G-A1 | 至少一个 `Outcome` | `missing_outcome` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked | active |
+| `G-A1#3` | G-A1 | 该 `Actor` 对 `Outcome` 的 `Commitment` 存在 | `missing_commitment` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked | active |
+| `G-A1#4` | G-A1 | 至少一个 `Constraint` | `missing_constraint` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked | active |
+| `G-A1#5` | G-A1 | `Commitment` 的 `by`/`to` 指向已登记的 `Actor`/`Outcome` | `broken_commitment_endpoint` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked | active |
+| `G-A1#6` | G-A1 | `Constraint` 作用于该 `Outcome` 或 `Commitment` | `constraint_not_applied` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked | active |
+| `G-A2#1` | G-A2 | 每个管理活动/产物至少一条 `constrained_by` 指向已登记 `Constraint` | `unanchored_management_item` | `CONSTRAINT_ANCHOR_REQUIRED` | `block` | checked | active |
+| `G-A2#2` | G-A2 | “管理活动/产物”为已定义节点类型 | `undefined_object_type` | `CONSTRAINT_ANCHOR_REQUIRED` | `block` | checked（`node_type` 可选；提供时须 ∈ `management_node_type`） | active |
+| `G-B1#1` | G-B1 | 每个管理项有 `process_group` 标签 | `missing_dimension` | `DUAL_DIMENSION_ANNOTATION` | `advisory` | checked | active |
+| `G-B1#2` | G-B1 | 每个管理项有 `subject_group` 标签 | `missing_dimension` | `DUAL_DIMENSION_ANNOTATION` | `advisory` | checked | active |
+| `G-B2#1` | G-B2 | 标签值在锚定枚举或契约扩展内 | `dimension_value_out_of_enum` | `DIMENSION_VALUE_CLOSED` | `advisory` | checked | active |
+| `G-B2#2` | G-B2 | 扩展项声明 `relation ∈ subject_group_extension_relation`、`base` ∈ 17 项基础枚举，且 `value` 不与基础枚举重名 | `invalid_subject_group_extension` | `DIMENSION_VALUE_CLOSED` | `advisory` | checked | active |
+| `G-C1#1` | G-C1 | 每个 `Deliverable` 至少一条见证断言（`asserted_by` 正向或 `about` 反向） | `deliverable_without_assertion / dangling_reference` | `DELIVERABLE_ASSERTION_LINK` | `block` | checked | active |
+| `G-C1#2` | G-C1 | 断言内容是“是什么/什么状态/满足什么条件”的明确陈述 | `assertion_without_content` | `DELIVERABLE_ASSERTION_LINK` | `block` | checked | active |
+| `G-C1#3` | G-C1 | 断言 `about` 指向该交付物 | `assertion_about_mismatch` | `DELIVERABLE_ASSERTION_LINK` | `block` | checked | active |
+| `G-C2#1` | G-C2 | 同一 `Subject` 同一属性不得有不相容值 | `mutually_exclusive_active_assertions` | `ASSERTION_MUTUAL_EXCLUSION` | `warn` | checked | active |
+| `G-C2#2` | G-C2 | 只对 `active` 断言判不相容 | `mutually_exclusive_active_assertions` | `ASSERTION_MUTUAL_EXCLUSION` | `warn` | checked | active |
+| `G-D1#1` | G-D1 | 变更对象是 `Commitment` 或 `Deliverable` | `missing_change_target / invalid_change_target` | `CHANGE_CONSTRAINT_LINK` | `block` | checked | active |
+| `G-D1#2` | G-D1 | 变更提议至少一条边指向 `Constraint` | `missing_constraint_link` | `CHANGE_CONSTRAINT_LINK` | `block` | checked | active |
+| `G-D1#3` | G-D1 | 边类型 ∈ `relation` 枚举 | `invalid_change_relation` | `CHANGE_CONSTRAINT_LINK` | `block` | checked | active |
+| `G-D2#1` | G-D2 | 全部为 `mitigates` 时标 `assumption` 并附验证条件 | `all_improvement_without_verification` | `ALL_IMPROVEMENT_ASSUMPTION` | `warn` | checked | active |
+| `G-D2#2` | G-D2 | 验证条件满足前不得作为批准依据 | `approval_basis_before_verification` | `ALL_IMPROVEMENT_ASSUMPTION` | `warn` | checked（`approval_basis`） | active |
+| `G-D2#3` | G-D2 | `assumption` 为 `pending` 时须有 `approved_by`；`expired` 不得作为有效依据 | `assumption_unclosed` | `ALL_IMPROVEMENT_ASSUMPTION` | `warn` | checked（§1.9） | active |
+| `G-E1#1` | G-E1 | 唯一 `accountable_by` 且指向 `HumanActor`/`LegalEntity` | `missing_accountable / multiple_accountable / unknown_accountable / accountable_not_human` | `ROLE_MINIMAL_COMPLETENESS` | `block` | checked | active |
+| `G-E1#2` | G-E1 | 至少一个 `responsible_by` | `missing_responsible` | `ROLE_MINIMAL_COMPLETENESS` | `block` | checked | active |
+| `G-E1#3` | G-E1 | 角色重合时有 `role_merge_declaration` | `missing_role_merge_declaration` | `ROLE_MINIMAL_COMPLETENESS` | `warn` | checked | active |
+| `G-E2#1` | G-E2 | `delegated_from` 路径终至 `Accountable` | `delegation_chain_not_accountable / invalid_path / dangling_reference` | `AI_AUTONOMY_DELEGATION_AUDITABLE` | `warn` | checked | active |
+| `G-E2#2` | G-E2 | 路径上断言覆盖范围/边界/撤销条件 | `assertion_incomplete` | `AI_AUTONOMY_DELEGATION_AUDITABLE` | `warn` | checked | active |
+| `G-E2#3` | G-E2 | 该断言以 `assumption` 形式存在并附验证条件 | `assertion_incomplete / assumption_unclosed / dangling_reference` | `AI_AUTONOMY_DELEGATION_AUDITABLE` | `warn` | checked | active |
+| `G-F1#1` | G-F1 | 执行阶段 `Project` 有 `ProjectCharter` | `missing_charter` | `PROJECT_CHARTER_EXISTENCE` | `advisory` | checked | assumption |
+| `G-F1#2` | G-F1 | 章程关联 Outcome 陈述、Constraint、Accountable、启动授权 | `incomplete_charter` | `PROJECT_CHARTER_EXISTENCE` | `advisory` | checked | assumption |
+| `G-F2#1` | G-F2 | 每个 `Deliverable` 有验收/移交断言 | `missing_acceptance_assertion` | `CLOSURE_ACCEPTANCE_LINK` | `advisory` | checked | assumption |
+| `G-F2#2` | G-F2 | 断言关联 `Accountable` 确认 | `missing_acceptance_assertion` | `CLOSURE_ACCEPTANCE_LINK` | `advisory` | checked | assumption |
+| `G-F3#1` | G-F3 | 外部采购承诺有 `Contract` 节点 | `missing_contract` | `PROCUREMENT_CONTRACT_ANCHOR` | `advisory` | checked | assumption |
+| `G-F3#2` | G-F3 | 契约声明四项内容 | `incomplete_contract` | `PROCUREMENT_CONTRACT_ANCHOR` | `advisory` | checked | assumption |
+| `G-F4#1` | G-F4 | 时间承诺关联依据断言 | `missing_schedule_evidence` | `SCHEDULE_EVIDENCE_LINK` | `advisory` | checked | assumption |
+| `G-G1#1` | G-G1 | 每次裁剪有 `TailoringRecord` | `missing_tailoring_record` | `TAILORING_RECORD_EXISTENCE` | `advisory` | checked | assumption |
+| `G-G1#2` | G-G1 | 记录声明四项内容 | `incomplete_tailoring_record` | `TAILORING_RECORD_EXISTENCE` | `advisory` | checked | assumption |
+| `G-G2#1` | G-G2 | 目标规则不在不可裁剪集 | `non_trimmable_rule` | `TAILORING_NON_TRIMMABLE_SET` | `advisory` | checked | assumption |
+| `G-G3#1` | G-G3 | 记录关联重新评估条件或声明“永久” | `missing_reassessment_condition` | `TAILORING_REASSESSMENT_CONDITION` | `advisory` | checked | assumption |
+| `G-G3#2` | G-G3 | 声明“永久”时附理由 | `missing_reassessment_condition` | `TAILORING_REASSESSMENT_CONDITION` | `advisory` | checked | assumption |
 
-**原因码映射**：`原因码` 列是子句与稳定 `reason` 的唯一映射表。原型只能返回本列列出的原因码；`scripts/check_three_table.py` 校验每个原因码都在 schema 第 3 节或第 1.5/1.9/1.10 条有定义，且每个 checked 子句至少有一个原因码。`G-B1` 只负责两个标签是否存在，标签值是否在枚举内由 `G-B2#1` 单独承接，两者不得互相写入。
+**原因码映射**：`原因码` 列是子句与稳定 `reason` 的唯一映射表。原型只能返回本列列出的原因码；`scripts/check_three_table.py` 校验每个原因码都在 schema 第 3 节或第 1.5/1.9/1.10 条有定义，且每个 checked 子句至少有一个原因码。`G-B1` 只负责两个标签是否存在；标签值闭合由 `G-B2#1` 承接，扩展项声明合法性由 `G-B2#2` 承接，两者不得互相写入。`G-B2` 按行序判定：先看标签值是否落在基础枚举或**合法**扩展的取值域，再看每个扩展项自身是否声明合法。非法扩展的 `value` 不计入合法取值域，因此被标签引用时先命中 `G-B2#1`（`dimension_value_out_of_enum`）；未被引用或与基础枚举重名时命中 `G-B2#2`（`invalid_subject_group_extension`）。
 
 **severity 聚合规则**：一个 `check_id` 的 verdict 由其全部子句聚合；`severity` 取失败子句中的最高级（`advisory` < `warn` < `block`），`pass` 时取 A 表声明的 severity。`reason` 取首条失败子句的原因码；verdict 聚合顺序为 `fail > cannot_evaluate > pass`，与 schema 第 1.14 条一致。这解决了 G-004：`G-E1#3` 缺失只产生 `warn`，不再把合法产物按 `block` 判死。
+
+**悬空引用原因归属（规则子句原因优先）**：悬空引用落在规则子句的判定对象内时，返回该子句登记的原因码；只有子句原因码列显式列出 `dangling_reference` 时才返回该码（当前为 `G-C1#1`、`G-E2#1`、`G-E2#3`）。无子句承接的引用由 `validate_references()` 在全部子句 `pass` 后兜底，返回 `dangling_reference`。消费方以“check_id + reason”判别，不得只凭 `dangling_reference` 推断规则语义。
+
+| check_id | 子句 | 悬空引用对象 | 返回 reason |
+|---|---|---|---|
+| `CONSTRAINT_ANCHOR_REQUIRED` | `G-A2#1` | `constrained_by` → `constraints` | `unanchored_management_item` |
+| `DELIVERABLE_ASSERTION_LINK` | `G-C1#1` | `asserted_by` → `assertions` | `dangling_reference` |
+| `CHANGE_CONSTRAINT_LINK` | `G-D1#1` | `target.id` → `commitments` / `deliverables` | `invalid_change_target` |
+| `CHANGE_CONSTRAINT_LINK` | `G-D1#2` | `constraint` → `constraints` | `missing_constraint_link` |
+| `ROLE_MINIMAL_COMPLETENESS` | `G-E1#1` | `accountable_by` → `actors` | `unknown_accountable` |
+| `AI_AUTONOMY_DELEGATION_AUDITABLE` | `G-E2#1` | `delegated_from.steps[].target_id` → `actors` | `dangling_reference` |
+| `AI_AUTONOMY_DELEGATION_AUDITABLE` | `G-E2#3` | `assertions` → `assertions` | `dangling_reference` |
+| 其他 `check_id` | 无子句承接 | 2bis.1 中剩余引用 | `dangling_reference`（全局兜底） |
+
+**G-A2#2 可达性**：schema 第 2、3 节已为 `commitments[]` / `deliverables[]` 声明可选 `node_type`。提供且不在 `management_node_type` 内 → `cannot_evaluate` / `undefined_object_type`；未提供视为“未断言节点类型”，不触发本子句，也不影响 `G-A2#1`。这样该子句在声明输入域内可达，且不需要把 `node_type` 变成所有样例的必填键。
 
 ### A.1 参考样例（T-011）
 
@@ -367,6 +385,18 @@
 > **输入约定**：`commitments`、`deliverables` 等键即该 `check_id` 的量化域；样例假定输入已按规则适用范围筛选（例如 G-E1 的快照只含决策类 `Commitment`，G-A2 的快照只含管理活动/产物），检查本身不再做类型筛选。输入缺键或键不可求值时，原型应输出 `cannot_evaluate`，不得当作 `pass`。
 >
 > **输入 schema**：字段名与量化域由 `spec/CHECKER_INPUT_SCHEMA.md` 固定。本组样例是该 schema 的首批实例；此后新增或修改的样例必须遵循该文件，不得自行引入新字段。
+
+**样例基线（跨轮横比锚点）**：本轮样例基线为提交 `1a42b8b`（批次 0034《复核推翻后重开缺口并修订判定层》），共 34 个样例。此后报告的“34/34”一律相对该基线；换基线必须在此登记新提交号与全部输入改动。相对基线的输入块改动如下，**期望输出零改动**：
+
+| 样例 | 输入块改动 | 原因 |
+|---|---|---|
+| A.1.9-1 | `assumption: null` + `verification_condition: null` → `assumption: {}`；补 `actors: []` | 入口 null 归一化会把语义性 `null` 判成 `cannot_evaluate`；缺内容应由 `G-D2` 内容判定为 `fail`，且 §3 要求 `actors` |
+| A.1.9-2 | 补 `actors: []` | §3 要求 `actors` |
+| A.1.11-1 | 补 `outcomes: []`、`constraints: []`、`actors: []`、`assertions: []` | §3 要求这四个顶层键 |
+| A.1.12-1 | 补 `actors: []` | §3 要求 `actors` |
+| A.1.13-1 | 删除 `contract: null`；补 `constraints: []`、`actors: []` | 入口 null 归一化会把 `contract: null` 判成 `cannot_evaluate`；缺合同应由 `G-F3#1` 判 `fail`，且 §3 要求这两个键 |
+| A.1.15-1 | 删除 `record: null`；补 `actors: []` | 同上：缺记录应由 `G-G1#1` 判 `fail`；§3 要求 `actors` |
+| A.1.17-1 | 删除 `reassessment_condition: null` | 缺条件应由 `G-G3#1` 判 `fail`，不得被 null 归一化截成 `cannot_evaluate` |
 
 #### A.1.1 `PROJECT_MINIMAL_EXISTENCE`（G-A1，`block`）
 
@@ -727,8 +757,8 @@ reason: null
 changes:
   - id: "CH-1"
     relations: ["mitigates", "mitigates"]
-    assumption: null
-    verification_condition: null
+    assumption: {}
+actors: []
 ```
 
 期望输出：
@@ -750,6 +780,7 @@ changes:
     relations: ["mitigates", "mitigates"]
     assumption: "全改善声明"
     verification_condition: "独立复核显示没有约束被恶化"
+actors: []
 ```
 
 期望输出：
@@ -839,6 +870,10 @@ reason: null
 projects:
   - { id: "P-1", stage: "executing" }
 charters: []
+outcomes: []
+constraints: []
+actors: []
+assertions: []
 ```
 
 期望输出：
@@ -894,6 +929,7 @@ reason: null
 ```yaml
 deliverables:
   - { id: "D-1", assertions: [] }
+actors: []
 ```
 
 期望输出：
@@ -937,8 +973,10 @@ reason: null
 
 ```yaml
 commitments:
-  - { id: "C-1", procurement: "external", contract: null }
+  - { id: "C-1", procurement: "external" }
 contracts: []
+constraints: []
+actors: []
 ```
 
 期望输出：
@@ -1031,8 +1069,9 @@ reason: null
 
 ```yaml
 tailoring_actions:
-  - { id: "TA-1", record: null }
+  - { id: "TA-1" }
 tailoring_records: []
+actors: []
 ```
 
 期望输出：
@@ -1120,7 +1159,7 @@ reason: null
 
 ```yaml
 tailoring_records:
-  - { id: "TR-1", reassessment_condition: null, permanent: false }
+  - { id: "TR-1", permanent: false }
 ```
 
 期望输出：

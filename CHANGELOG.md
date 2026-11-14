@@ -499,3 +499,111 @@
   - **复核状态**：本批次未执行非同源复核；G-001–G-017 全部保持 `open`，不以本轮同源结果关闭。待复核会话对修订后版本单次重跑，结论记入 `GAP_LEDGER.md` 后再行关闭。
 - **关联 ADR**：ADR-0013（`proposed`，修订中）
 - **状态**：生效（修订中；缺口未关闭）
+
+---
+
+### 批次 0035 — 2026-11-14 — 四层修订（第一、二层）：入口 null 归一化与引用字段由 schema 生成
+
+- **涉及文件**：`validation/checker-prototype/checker.py`、`spec/CHECKER_INPUT_SCHEMA.md`、`spec/methods/deterministic-checker.md`（A.1.9/A.1.11–A.1.17 输入块）、`scripts/check_three_table.py`、`adr/0013-unified-adjudication-of-check-semantics.md`（§8.4）、`GAP_LEDGER.md`（核查记录）、`knowledge/glossary-usage.json`、`GLOSSARY.md`（生成块）、`CHANGELOG.md`（本批次）
+- **变更摘要**：
+  1. **第一层：入口统一 null 归一化**。新增 `find_null()`，在 `evaluate()`（`run_case` 的唯一入口）中一次覆盖**顶层键、嵌套对象键、数组元素**三种 `null`；命中即返回 `cannot_evaluate` / `missing_input`，17 个 `check` 函数不再各自兜底。D1 的 `commitments: null` 不再落入 `fail/invalid_change_target`。样例中 4 处语义性 `null`（A.1.9-1 `assumption/verification_condition`、A.1.13-1 `contract`、A.1.15-1 `record`、A.1.17-1 `reassessment_condition`）改为“缺键”或 `{}`，期望输出未变。
+  2. **第一层负例**：`--null-sweep` 重写为路径级扫描。顶层必需键 43/43、数组元素 89/89（覆盖 54 条 `(check_id, 路径)` / 27 条唯一路径）、嵌套对象键 6/6，合计 138/138 返回 `cannot_evaluate`，崩溃 0。单点负例：D1 `commitments: null`、D1 `deliverables: [null]`、C1 `assertions: [{...}, null]`、D1 `target: null` 均返回 `cannot_evaluate/missing_input`。
+  3. **第二层：引用字段清单由 schema 生成**。schema 新增 §2bis：2bis.1 用 34 行标注引用字段（源路径 / 字段 / 目标集合 / 形态，含 `type` 判别与 `any`），2bis.2 显式登记 40 个非引用字段。原型启动时解析 §2bis.1 生成 `REFERENCE_RULES`，删除手写 `checks` 列表；解析 §3 生成 `REQUIRED_KEYS`。补齐 `contracts[].accountable_signature` 与 `changes[].assumption.approved_by`（并新增 `assertions[].assumption.approved_by`）。
+  4. **第二层负例**：F3 的 `accountable_signature: "A-404"` → `fail/dangling_reference`，改回 `A-1` → `pass`；D2 的 `assumption.approved_by: "A-404"` → `fail/dangling_reference`。临时在 §2 `contracts[]` 行加入 `counterparty_id` 且不在 §2bis 标注时，`check_three_table.py` 输出“字段 `counterparty_id` 在第 2 节声明，但 §2bis 既未标注为引用也未登记为非引用”并退出 1；移除后退出 0。
+  5. **§3 输入域同步**：`ASSERTION_MUTUAL_EXCLUSION` +`deliverables`，`ALL_IMPROVEMENT_ASSUMPTION` +`actors`，`PROJECT_CHARTER_EXISTENCE` +`outcomes/constraints/actors/assertions`，`CLOSURE_ACCEPTANCE_LINK` +`actors`，`PROCUREMENT_CONTRACT_ANCHOR` +`constraints/actors`，`TAILORING_RECORD_EXISTENCE` +`actors`。新增 `--input-domain`：样例中实际出现的引用目标集合必须已在 §3 声明，实测 0 处缺口；样例顶层键无 §3 之外的额外集合。
+  6. **检查器**：`check_three_table.py` 新增第 6 项（§2 字段必须被 §2bis.1 或 §2bis.2 覆盖）与第 7 项（输入域闭包）。
+- **钩子绕过**：无。
+- **验证**：
+  - `python3 validation/checker-prototype/checker.py`：34/34 样例通过，17/17 `check_id` 通过。
+  - `python3 validation/checker-prototype/checker.py --null-sweep`：138/138，崩溃 0（顶层 43、数组元素 89、嵌套对象 6）。
+  - `python3 validation/checker-prototype/checker.py --input-domain`：0 处缺口。
+  - `python3 scripts/check_three_table.py`：正文 17 条规则、判定列 17 个 `check_id` / 40 个子句、schema 17 个输入域、引用字段 27 个 / 非引用字段 40 个；退出 0。负例（`counterparty_id` 未标注）退出 1。
+  - 七个检查器均退出 0（`check_state.py` 在开发态只对“HEAD 领先 tag”告警）。
+  - **复核状态**：G-001–G-017 仍为 `open`（17/17），本轮同源结果不构成关闭依据；第三、四层待执行，全部完成后只重跑一次非同源复核。
+- **关联 ADR**：ADR-0013（`proposed`，§8.4）
+- **状态**：生效（修订中；缺口未关闭）
+
+---
+
+### 批次 0036 — 2026-11-14 — 四层修订（第三层）：A 表由 A.2 派生与固定变异集
+
+- **涉及文件**：`spec/methods/deterministic-checker.md`（A 表 7 列、A.2 第 8 列、A.1 样例基线）、`scripts/check_three_table.py`（派生与逐格比较、`--write`、`--method`）、`scripts/test_check_table_mutations.py`（新增）、`adr/0013-unified-adjudication-of-check-semantics.md`（§8.4）、`GAP_LEDGER.md`（核查记录）、`CHANGELOG.md`（本批次）
+- **变更摘要**：
+  1. **A 表唯一生成路径**：A 表不再手工维护，`scripts/check_three_table.py --write` 由 A.2 重建；A 表列固定为 `check_id | 规则 | 判定（子句 id） | 子句指纹 | 输入 | 原因码 | 规则状态`。默认模式逐格比较“文件 A 表”与“A.2 生成结果”，不再做两表字段互比。
+  2. **子句指纹**：`sha256(clause id | 规则 | 子句文本 | 原因码 | 承接 check_id | severity | 规则状态)[:12]`，再按 `check_id` 聚合。任一项语义改动都会改变指纹并使检查失败；`canonical()` 只忽略空白差异。
+  3. **A.2 第 8 列**：40 条子句补 `规则状态`（F/G 组为 `assumption`，其余 `active`），与方法 §4.5、A 表规则状态列同源。
+  4. **样例基线**：A.1 区新增“样例基线（跨轮横比锚点）”，锚定提交 `1a42b8b`（批次 0034）、34 个样例，并逐条登记 A.1.9-1、A.1.9-2、A.1.11-1、A.1.12-1、A.1.13-1、A.1.15-1、A.1.17-1 的输入块改动与原因；**期望输出零改动**。此后“34/34”一律相对该基线比较。
+  5. **固定变异集**：新增 `scripts/test_check_table_mutations.py`，变异副本写入临时目录，不改工作区；基线必须退出 0，逐条变异必须退出 1 且命中预期证据，否则脚本退出 1。变异集固定为 11 条，可重复执行。
+- **变异测试全表**：
+
+| 编号 | 类别 | 变异内容 | 抓到 | 退出码 | 证据 |
+|---|---|---|---|---|---|
+| M01 | 子句语义 | G-C1#1 改成“必须有 Actor 负责人” | 是 | 1 | `DELIVERABLE_ASSERTION_LINK` 子句指纹不一致（`32a91e4431f9` → `6f4b58fcac7a`） |
+| M02 | 量词 | G-A1#1 的“至少一个”改为“恰好一个” | 是 | 1 | `PROJECT_MINIMAL_EXISTENCE` 子句指纹不一致（`6a4f8c0ad633` → `ad8e6f971ba0`） |
+| M03 | 原因码删除 | G-E1#1 删除 `multiple_accountable` | 是 | 1 | `ROLE_MINIMAL_COMPLETENESS` 子句指纹不一致（`a707061b238f` → `9a2223634395`） |
+| M04 | 枚举归属 | 把枚举条件写进 G-B1#2 | 是 | 1 | 子句 `G-B1#2` 写了枚举条件；枚举归属 G-B2 |
+| M05 | 枚举归属 | 从 G-B2#1 删除枚举条件 | 是 | 1 | `G-B2#1` 未写枚举条件；值闭合必须由 B2 承接 |
+| M06 | 承接规则 | G-C1#1 的承接 `check_id` 改指向 `CHANGE_CONSTRAINT_LINK` | 是 | 1 | `CHANGE_CONSTRAINT_LINK` 规则列不一致（文件 `G-D1`，生成 `G-C1、G-D1`） |
+| M07 | 子句 id | G-C1#1 改为 G-D1#4（指向别的规则） | 是 | 1 | `DELIVERABLE_ASSERTION_LINK` 子句 id 列不一致（`G-C1#1` → `G-D1#4`） |
+| M08 | severity | G-E1#3 的 severity 由 `warn` 改为 `block` | 是 | 1 | `ROLE_MINIMAL_COMPLETENESS` 子句指纹不一致（`a707061b238f` → `652398553027`） |
+| M09 | 规则状态 | G-B1#2 的规则状态由 `active` 改为 `assumption` | 是 | 1 | `DUAL_DIMENSION_ANNOTATION` 子句指纹不一致（`2cde52fd3961` → `6650cf0c3301`） |
+| M10 | 子句删除 | 删除 G-E1#3 整行 | 是 | 1 | `ROLE_MINIMAL_COMPLETENESS` 子句 id 列不一致（文件含 `G-E1#3`，生成不含） |
+| M11 | 原因码篡改 | G-D1#3 改为未定义的 `invalid_relation` | 是 | 1 | `CHANGE_CONSTRAINT_LINK` 子句指纹不一致（`3e473f8ea1e8` → `9dfa4c069d15`） |
+
+- **边界说明**：变异集只改 A.2、不改 A 表，检测机制是“A.2 派生结果 ≠ 提交的 A 表”。若改动 A.2 后执行 `--write` 重建 A 表，检查器无法区分“合法规格修订”与“绕过”，这只能由提交差异与评审承担；该结构性边界已在脚本与本节写明，不属于检查器可检测范围。
+- **钩子绕过**：无。
+- **验证**：
+  - `python3 scripts/check_three_table.py`：17 条规则 / 17 个 `check_id` / 40 个子句 / 17 个输入域；退出 0。
+  - `python3 scripts/test_check_table_mutations.py`：11 条变异，抓到 11 条，未抓到 0 条；退出 0。
+  - `python3 validation/checker-prototype/checker.py`：34/34，17/17 `check_id`；退出 0。
+  - `--null-sweep`：138/138，崩溃 0；`--input-domain`：0 缺口。
+  - **复核状态**：G-001–G-017 仍为 `open`（17/17），本轮同源结果不构成关闭依据；第四层完成后只重跑一次非同源复核。
+- **关联 ADR**：ADR-0013（`proposed`，§8.4）
+- **状态**：生效（修订中；缺口未关闭）
+
+---
+
+### 批次 0037 — 2026-11-14 — 四层修订（第四层）：扩展关系、悬空原因、violations 撤除、G-A2#2 可达
+
+- **涉及文件**：`spec/CHECKER_INPUT_SCHEMA.md`（§1.5、§1.14、§2、§2bis.2、§3、§4）、`spec/methods/deterministic-checker.md`（A.2 的 `G-B2#2`、`G-C1#1`、`G-E2#3`、原因码映射、悬空引用原因归属表、G-A2#2 可达性）、`validation/checker-prototype/checker.py`（`EXTENSION_RELATIONS`、`check_dimension_value`）、`adr/0013-unified-adjudication-of-check-semantics.md`（§8.4）、`GAP_LEDGER.md`（核查记录）、`CHANGELOG.md`（本批次）
+- **变更摘要**：
+  1. **`subject_group_extension` 扩展关系**：schema §2 定义 `value` / `relation` / `base` 三字段，§4 新增 `subject_group_extension_relation = {specializes, cross_cuts}`；`base` 必须是 17 项基础 `subject_group` 之一，`value` 不得与基础枚举重名。A.2 新增 `G-B2#2`（`invalid_subject_group_extension`），`G-B2#1` 只承接“标签值在基础枚举或**合法**扩展内”。原型按行序判定：先值闭合、后扩展声明。只写 `{value}` 不再通过。
+  2. **悬空引用原因统一为“规则子句原因优先”**：A.2 的“悬空引用原因归属”表固定每个 `check_id` 在悬空时返回的原因码；只有子句原因码列显式列出 `dangling_reference` 才返回该码（`G-C1#1`、`G-E2#1`、`G-E2#3`）。其余子句返回自己的原因码；无子句承接的引用由 `validate_references()` 在全部子句 `pass` 后兜底。schema §1.5 同步该定性。
+  3. **`violations[]` 选择撤除**：schema §1.14 明确“原型不输出 `violations[]`；`reason` 为按 A.2 行序首条命中原因码”；实现不新增该字段，`run_case` 输出键实测为 `check_id / source_rule / severity / rule_status / verdict / reason`。
+  4. **`G-A2#2` 在声明输入域内可达**：schema §2 的 `commitments[]` / `deliverables[]` 增加可选 `node_type`，§3 的 `CONSTRAINT_ANCHOR_REQUIRED` 判定所需字段注明“提供时须 ∈ `management_node_type`”。未提供视为未断言类型，不触发本子句；提供非法值 → `cannot_evaluate` / `undefined_object_type`。
+- **负例实测**：
+  - `subject_group_extension: [{value: "custom"}]` 且标签引用 `custom` → `fail` / `dimension_value_out_of_enum`；只写 `{value: "custom"}` 但未被引用 → `fail` / `invalid_subject_group_extension`；`value` 与基础枚举重名 → `fail` / `invalid_subject_group_extension`；合法 `{value: "custom", relation: "specializes", base: "planning"}` → `pass`。
+  - 悬空引用：`A2` → `unanchored_management_item`；`C1` → `dangling_reference`；`D1` → `invalid_change_target`；`E1` → `unknown_accountable`；`E2#1` / `E2#3` → `dangling_reference`。与 A.2 归属表逐行一致。
+  - `run_case` 输出不含 `violations[]`。
+  - `G-A2#2`：`node_type: "Unknown"` → `cannot_evaluate` / `undefined_object_type`；`node_type: "ManagementActivity"` + 完整 A.1.2-2 输入 → `pass`。
+- **验证**：
+  - `python3 validation/checker-prototype/checker.py`：34/34，17/17 `check_id`；退出 0。
+  - `--null-sweep`：138/138，崩溃 0；`--input-domain`：0 缺口。
+  - `python3 scripts/check_three_table.py`：17 条规则 / 17 个 `check_id` / 41 个子句 / 17 个输入域；退出 0。
+  - `python3 scripts/test_check_table_mutations.py`：11/11 抓到；退出 0。
+  - 七个检查器全部退出 0（`check_no_raw_material` 曾因 A.1 基线引用块 803 字符超 800 阈值失败，已把基线移出引用块后复跑通过；`check_glossary_usage --write` 已重建基线）。
+  - **复核状态**：G-001–G-017 仍为 `open`（17/17）。四层修订完成，只重跑一次非同源复核；在同源结果下不关闭任何缺口。
+- **关联 ADR**：ADR-0013（`proposed`，§8.4）
+- **状态**：生效（修订中；缺口未关闭）
+
+---
+
+### 批次 0038 — 2026-11-14 — 补漏：A.2 改动的非同源签收纪律
+
+- **性质**：这是对批次 0036“A 表由 A.2 派生”的**补漏**，不是新决定。派生检查只能保证“A 表与 A.2 一致”；改 A.2 再跑 `--write` 会使两者自洽，无法区分合法规格修订与绕过。签收纪律补上这一缺口。
+- **涉及文件**：`AGENTS.md`（新增 3.6.7）、`adr/0013-unified-adjudication-of-check-semantics.md`（决策表新增 `A2-SIGNOFF`，P1 子句数 40→41，P8 检查深度补签收同步）、`spec/methods/deterministic-checker.md`（A.2 区头新增复核签收行）、`scripts/check_three_table.py`（规则 8）、`scripts/test_check_table_mutations.py`（S01/S02）、`CHANGELOG.md`（本批次）
+- **签收格式**：`复核签收：<复核者/会话> / <YYYY-MM-DD> / A.2 指纹 `<12位>``。指纹 = 全部子句指纹按 clause id 排序后的 sha256 前 12 位。
+- **机械阻断**：`scripts/check_three_table.py` 规则 8 比对签收行指纹与当前 A.2 指纹；不一致即退出 1。`--write` 只重建 A 表，**不更新签收行**，因此“改 A.2 + --write”仍会被拦。
+- **正负例（`scripts/test_check_table_mutations.py`）**：
+
+| 编号 | 场景 | 预期 | 实际 | 退出码 | 证据 |
+|---|---|---|---|---|---|
+| S01 | 只改 A.2 + `--write`，不更新签收 | 阻断 | 阻断 | 1 | `A.2 已改动但复核签收未同步：签收行 … a7e02bdfd23f，当前 A.2 指纹 08979d4851b5` |
+| S02 | 改 A.2 并更新签收与指纹 | 通过 | 通过 | 0 | `[通过] 正文、判定列、schema 三表一致…A.2 签收与指纹同步…` |
+
+- **基线例外**：本次提交的签收行标注“纪律基线（同源修订；非同源复核待提交后执行）”，仅此一次；此后 A.2 改动必须由非同源复核更新签收行。
+- **边界**：检查器只验证签收记录与 A.2 同步，不能验证签收人是否真的非同源；后者由提交评审与 AGENTS 3.6.6 共同约束。
+- **验证**：变异集 11/11 抓到；签收正负例 2/2 符合预期；34/34、null-sweep 138/138、input-domain 0 缺口；七个检查器退出 0。
+- **复核状态**：G-001–G-017 仍为 `open`（17/17），等非同源复核结论。
+- **关联 ADR**：ADR-0013（`proposed`，§2.2、§8.4）
+- **状态**：生效（纪律补漏；缺口未关闭）

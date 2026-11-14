@@ -9,16 +9,17 @@
 ## 1. 通用约定
 
 1. 一个输入是一份 YAML 谓词快照，顶层为映射。顶层键即该 `check_id` 的**量化域**（例如 `deliverables` 表示“每个 `Deliverable`”）。
-2. **缺键即不可判定**：判定所需的顶层键缺失，或键的值为 `null`，原型输出 `cannot_evaluate` / `missing_input`，不得当作 `pass`。
+2. **缺键即不可判定**：判定所需的顶层键缺失，或键的值为 `null`，原型输出 `cannot_evaluate` / `missing_input`，不得当作 `pass`。归一化在 `run_case` 入口一次完成，覆盖**顶层键、嵌套对象键、数组元素**三种 `null` 情形；各 `check` 函数不再单独兜底。
 3. **空值三态**（D2）：
    - 缺键或 `null` → `cannot_evaluate`（输入缺失）；
    - `{}` → 对象存在但无字段，按字段必填判定 `fail`；
    - `[]` → 集合为空，按量词判定：全称下为真，存在下为假，不得当作缺失输入。
 4. **已按适用范围筛选**：输入只含该规则的适用对象。已筛选的范围包括：G-E1 的决策类 `Commitment`（`decision_class: true`）、G-A2 的管理活动/产物、G-F1 的执行阶段 `Project`、G-F2 的收尾阶段 `Deliverable`、G-F3 的外部采购承诺。检查本身不再做类型筛选。
-5. **引用完整性（统一策略，P4）**：所有引用字段必须指向同快照中已出现的 `id`。
-   - 悬空引用（引用的 `id` 不存在）→ `fail` / `dangling_reference`；
-   - 引用对象类型未在第 2 节定义 → `cannot_evaluate` / `undefined_object_type`（不得判 `fail`，因为缺的是表示能力而非事实）；
-   - 全局不区分检查项，任何 `check_id` 都按本条处理。
+5. **引用完整性（统一策略，P4）**：所有引用字段必须指向同快照中已出现的 `id`。引用字段清单由第 2bis 节的标注表生成，不在代码中另维护。
+   - **规则子句原因优先**：悬空引用落在某规则子句的判定对象内时，返回该子句在 A.2 中登记的原因码；只有该子句的原因码列显式包含 `dangling_reference`（当前仅 `G-E2#1`、`G-E2#3`），才返回 `dangling_reference`。A.2 的“悬空引用原因归属”表是消费方的判别依据。
+   - **全局兜底**：`validate_references()` 只在全部子句 `pass` 后运行，处理没有规则子句承接的悬空引用，返回 `fail` / `dangling_reference`。它不覆盖已命中的规则原因码。
+   - 引用对象类型未在第 2 节定义 → `cannot_evaluate` / `undefined_object_type`（不得判 `fail`，因为缺的是表示能力而非事实）。
+   - 判 `fail` 时仍须给出确定原因码；消费方按“check_id + 原因码”判别，不得只凭 `dangling_reference` 推断规则语义。
 6. **量词显式化（P3）**：
    - 顶层键默认**全称**：每个元素都必须满足判定列；
    - 对象内引用字段默认**存在且全部解析**：字段存在至少一个合法取值，且每个列出的引用都必须解析；
@@ -30,7 +31,7 @@
 11. **适用性（P7）**：输入可携带 `applicability: {state}`，`state ∈ {applicable, inapplicable, pending}`。`inapplicable` → `not_applicable`；`pending` → `cannot_evaluate` / `applicability_pending`；`applicable` 或未提供 → 正常判定。
 12. **结论与原因**：`verdict ∈ {pass, fail, cannot_evaluate, not_applicable}`；`reason` 为稳定原因码，`pass` / `not_applicable` 时为 `null`。原因码只用于样例断言，不是新的规范词汇。
 13. **severity / rule_status**：由附录 A 与 `validation/CHECKLIST.md` 决定，不由输入携带；`assumption` 组按 P6 输出 `advisory`。子句级 severity 覆盖见附录 A.2。
-14. **多违规优先级（D4）**：`reason` 单值；聚合顺序为 **`fail` > `cannot_evaluate` > `pass`**——任一子句 `fail` 即判 `fail`，不存在 `fail` 时才由 `cannot_evaluate` 决定；同一 verdict 内按附录 A.2 的子句行序取第一条命中。全部子句结果以 `violations[]` 输出，`reason` 只是首条。旧表述“`cannot_evaluate` 优先于 `fail`”已废止。
+14. **多违规优先级（D4）**：`reason` 单值；聚合顺序为 **`fail` > `cannot_evaluate` > `pass`**——任一子句 `fail` 即判 `fail`，不存在 `fail` 时才由 `cannot_evaluate` 决定；同一 verdict 内按附录 A.2 的子句行序取第一条命中，`reason` 即该子句的原因码。**原型不输出 `violations[]`**：四值结论与单一 `reason` 是唯一承诺；需要逐子句明细的消费方按 A.2 行序自行复算。旧表述“全部子句结果以 `violations[]` 输出”已撤除，“`cannot_evaluate` 优先于 `fail`”已废止。
 
 ## 2. 共享字段
 
@@ -39,37 +40,132 @@
 | `project` / `projects[]` | `id`, `stage` | 字符串 | `stage` 至少识别 `executing` |
 | `actors[]` | `id`, `type`, `accountable`, `delegated_from` | 字符串 / 布尔 | `type ∈ {HumanActor, LegalEntity, AIActor}`；`accountable: true` 表示委托链终点 |
 | `outcomes[]` | `id` | 字符串 | |
-| `commitments[]` | `id`, `by`, `to`, `constrained_by`, `accountable_by`, `responsible_by`, `role_merge_declaration`, `procurement`, `contract`, `deadline`, `milestone`, `evidence_assertions`, `decision_class` | 见各 `check_id` | `responsible_by` 为字符串列表；`decision_class: true` 标识决策类承诺（G-E1 输入已按此筛选） |
+| `commitments[]` | `id`, `by`, `to`, `constrained_by`, `accountable_by`, `responsible_by`, `role_merge_declaration`, `procurement`, `contract`, `deadline`, `milestone`, `evidence_assertions`, `decision_class`, `node_type` | 见各 `check_id` | `responsible_by` 为字符串列表；`decision_class: true` 标识决策类承诺（G-E1 输入已按此筛选）；`node_type` 可选，提供时须 ∈ `management_node_type`（G-A2#2） |
 | `constraints[]` | `id`, `constrains` | 字符串 | `constrains` 指向 `outcomes[].id` 或 `commitments[].id`；`{}` 视为未填 → `fail` |
-| `deliverables[]` | `id`, `constrained_by`, `asserted_by`, `assertions`, `form` | 列表 / 对象 | 两种断言表示：C1 用 `asserted_by` 引用，F2 内嵌 `assertions` |
-| `assertions[]` | `id`, `about`, `deliverable`, `subject`, `property`, `value`, `state`, `covers`, `basis`, `source`, `statement`, `statement_kind`, `kind`, `verification_condition`, `accountable_confirmation` | 见各 `check_id` | `state ∈ {active, ...}`；`covers` 为字符串列表；`statement_kind ∈ statement_kind`；`kind ∈ assertion_kind` |
+| `deliverables[]` | `id`, `constrained_by`, `asserted_by`, `assertions`, `form`, `node_type` | 列表 / 对象 | 两种断言表示：C1 用 `asserted_by` 引用，F2 内嵌 `assertions`；`node_type` 可选，提供时须 ∈ `management_node_type`（G-A2#2） |
+| `assertions[]` | `id`, `about`, `deliverable`, `subject`, `property`, `value`, `state`, `covers`, `basis`, `source`, `statement`, `statement_kind`, `kind`, `verification_condition`, `accountable_confirmation`, `assumption` | 见各 `check_id` | `state ∈ {active, ...}`；`covers` 为字符串列表；`statement_kind ∈ statement_kind`；`kind ∈ assertion_kind` |
 | `changes[]` | `id`, `constraint`, `relation`, `relations`, `target`, `assumption`, `verification_condition`, `approval_basis` | 见各 `check_id` | D1 用单数 `relation`；D2 用复数 `relations`；`target` 为 `{type, id}`；`approval_basis` 为被当作批准依据的产物 `id` 列表 |
 | `management_items[]` | `id`, `node_type`, `process_group`, `subject_group` | 字符串 | `node_type ∈ management_node_type` |
+| `subject_group_extension[]` | `value`, `relation`, `base` | 字符串 | 领域特化项：`relation ∈ subject_group_extension_relation`；`base` 必须是 17 项基础 `subject_group` 之一；`value` 不得与基础枚举重名。只写 `{value}` → `fail` / `invalid_subject_group_extension`；扩展项只能特化或横切已锚定的基础组，不得充当第 18 项基础枚举 |
 | `autonomy_grants[]` | `id`, `actor`, `delegated_from`, `assertions` | 对象 / 列表 | `delegated_from` 为第 1.10 条路径对象；禁止扁平字符串。终点须 `accountable: true` |
 | `charters[]` | `id`, `project`, `outcomes`, `constraints`, `accountable`, `authorizing_assertion` | 见 F1 | |
 | `contracts[]` | `id`, `deliverable_form`, `acceptance_criteria`, `constrained_by`, `accountable_signature` | 见 F3 | |
 | `tailoring_actions[]` | `id`, `record` | 字符串 | `record` 指向 `tailoring_records[].id` |
 | `tailoring_records[]` | `id`, `trimmed_rule`, `rationale`, `scope`, `approver`, `reassessment_condition`, `permanent`, `reason` | 见 G 组 | |
+| `assumption` | `verification_condition`, `status`, `verified_at`, `expires_at`, `approved_by`, `approval_basis` | 见 §1.9 | 变更或断言携带的假设对象；`pending` 且缺 `approved_by` → `assumption_unclosed` |
+
+## 2bis. 引用字段标注（生成源）
+
+> 本节的 2bis.1 是原型 `REFERENCE_RULES` 的**唯一生成源**；`validation/checker-prototype/checker.py` 启动时解析该表，代码中不得另写引用字段清单。2bis.2 显式登记第 2 节中**不是引用**的字段。第 2 节出现的每个字段必须落在 2bis.1（引用）或 2bis.2（非引用）之一；新增字段未登记时 `scripts/check_three_table.py` 退出 1，样例不得提交。
+
+### 2bis.1 引用字段
+
+路径语法：`对象[]` 表示逐元素展开，`.` 表示对象嵌套；`字段` 是路径末端的键。`形态`：`scalar`（单值）、`list`（id 列表）、`type`（按同对象的 `type` 选择目标集合）、`any`（任意已登记产物集合）。
+
+| 源路径 | 字段 | 目标集合 | 形态 |
+|---|---|---|---|
+| `commitments[]` | `by` | `actors` | scalar |
+| `commitments[]` | `to` | `outcomes` | scalar |
+| `commitments[]` | `accountable_by` | `actors` | scalar |
+| `commitments[]` | `responsible_by` | `actors` | list |
+| `commitments[]` | `contract` | `contracts` | scalar |
+| `commitments[]` | `constrained_by` | `constraints` | list |
+| `constraints[]` | `constrains` | `outcomes` ∪ `commitments` | scalar |
+| `deliverables[]` | `asserted_by` | `assertions` | list |
+| `deliverables[]` | `constrained_by` | `constraints` | list |
+| `deliverables[].assertions[]` | `about` | `deliverables` | scalar |
+| `deliverables[].assertions[]` | `deliverable` | `deliverables` | scalar |
+| `deliverables[].assertions[]` | `subject` | `deliverables` | scalar |
+| `deliverables[].assertions[]` | `accountable_confirmation` | `actors` | scalar |
+| `assertions[]` | `about` | `deliverables` | scalar |
+| `assertions[]` | `deliverable` | `deliverables` | scalar |
+| `assertions[]` | `subject` | `deliverables` | scalar |
+| `assertions[]` | `accountable_confirmation` | `actors` | scalar |
+| `assertions[].assumption` | `approved_by` | `actors` | scalar |
+| `changes[]` | `constraint` | `constraints` | scalar |
+| `changes[].target` | `id` | `Commitment→commitments`、`Deliverable→deliverables` | type |
+| `changes[]` | `approval_basis` | `any` | list |
+| `changes[].assumption` | `approved_by` | `actors` | scalar |
+| `charters[]` | `project` | `projects` | scalar |
+| `charters[]` | `outcomes` | `outcomes` | list |
+| `charters[]` | `constraints` | `constraints` | list |
+| `charters[]` | `accountable` | `actors` | scalar |
+| `charters[]` | `authorizing_assertion` | `assertions` | scalar |
+| `tailoring_actions[]` | `record` | `tailoring_records` | scalar |
+| `autonomy_grants[]` | `actor` | `actors` | scalar |
+| `autonomy_grants[].delegated_from.steps[]` | `target_id` | `actors` | scalar |
+| `autonomy_grants[]` | `assertions` | `assertions` | list |
+| `contracts[]` | `constrained_by` | `constraints` | list |
+| `contracts[]` | `accountable_signature` | `actors` | scalar |
+| `tailoring_records[]` | `approver` | `actors` | scalar |
+
+### 2bis.2 非引用字段
+
+本表显式登记第 2 节中不参与引用解析的字段（标量、枚举、自由文本、容器或局部 id）。容器字段的引用在 2bis.1 中按内部路径另行标注。
+
+| 非引用字段 | 说明 |
+|---|---|
+| `id` | 对象自身标识，不是引用 |
+| `stage` | 阶段枚举 |
+| `type` | 类型判别值，不是引用 |
+| `accountable` | 布尔标记（`actors[]`） |
+| `delegated_from` | 容器；引用在 `steps[].target_id`（2bis.1） |
+| `role_merge_declaration` | 声明文本 |
+| `procurement` | 采购标记 |
+| `deadline` | 日期 |
+| `milestone` | 里程碑标识（文本） |
+| `evidence_assertions` | 内嵌依据对象，局部 `id` 不进入全局解析 |
+| `decision_class` | 布尔标记 |
+| `form` | 交付物形态描述 |
+| `property` | 属性名 |
+| `value` | 属性值 |
+| `state` | 断言状态 |
+| `covers` | 覆盖范围字符串列表 |
+| `basis` | 依据类型 |
+| `source` | 来源文本 |
+| `statement` | 陈述文本 |
+| `statement_kind` | 陈述类型枚举 |
+| `kind` | 断言类型枚举 |
+| `verification_condition` | 验证条件文本 |
+| `assumption` | 容器；引用在 `approved_by`（2bis.1） |
+| `relation` | 关系枚举（D1） |
+| `relations` | 关系枚举列表（D2） |
+| `target` | 容器；引用在 `id`（2bis.1，按 `type` 判别） |
+| `node_type` | 节点类型枚举 |
+| `process_group` | 过程组枚举 |
+| `subject_group` | 主题组枚举 |
+| `base` | `subject_group_extension[]` 指向的基础主题组（枚举值，不是跨集合引用） |
+| `deliverable_form` | 形态声明 |
+| `acceptance_criteria` | 验收判据文本 |
+| `trimmed_rule` | 规则号 |
+| `rationale` | 理由文本 |
+| `scope` | 适用范围文本 |
+| `reassessment_condition` | 重新评估条件文本 |
+| `permanent` | 布尔标记 |
+| `reason` | 原因文本 |
+| `status` | 假设状态枚举 |
+| `verified_at` | 验证时间 |
+| `expires_at` | 失效时间 |
 
 ## 3. 各 check_id 的输入域
 
 | check_id | 必需顶层键 | 判定所需字段 | 失败原因码 |
 |---|---|---|---|
 | `PROJECT_MINIMAL_EXISTENCE` | `project`, `actors`, `outcomes`, `commitments`, `constraints` | `commitments[].by/to`、`constraints[].constrains` | `missing_actor` / `missing_outcome` / `missing_commitment` / `missing_constraint` / `broken_commitment_endpoint` / `constraint_not_applied` |
-| `CONSTRAINT_ANCHOR_REQUIRED` | `commitments`, `deliverables`, `constraints` | 每项的 `constrained_by` | `unanchored_management_item` |
+| `CONSTRAINT_ANCHOR_REQUIRED` | `commitments`, `deliverables`, `constraints` | 每项的 `constrained_by`；可选 `node_type`（提供时须 ∈ `management_node_type`，否则 G-A2#2 不可达） | `unanchored_management_item` / `undefined_object_type` |
 | `DUAL_DIMENSION_ANNOTATION` | `management_items` | `process_group`, `subject_group` | `missing_dimension` |
-| `DIMENSION_VALUE_CLOSED` | `management_items`（可选 `subject_group_extension`） | 同左 | `dimension_value_out_of_enum` |
+| `DIMENSION_VALUE_CLOSED` | `management_items`（可选 `subject_group_extension`） | `process_group`、`subject_group`、`subject_group_extension[].value/relation/base` | `dimension_value_out_of_enum` / `invalid_subject_group_extension` |
 | `DELIVERABLE_ASSERTION_LINK` | `deliverables`, `assertions` | `asserted_by` / `about`、`statement`, `statement_kind` | `deliverable_without_assertion` / `assertion_without_content` / `assertion_about_mismatch` |
-| `ASSERTION_MUTUAL_EXCLUSION` | `assertions` | `subject`, `property`, `value`, `state` | `mutually_exclusive_active_assertions` |
+| `ASSERTION_MUTUAL_EXCLUSION` | `assertions`, `deliverables` | `subject`, `property`, `value`, `state` | `mutually_exclusive_active_assertions` |
 | `CHANGE_CONSTRAINT_LINK` | `changes`, `constraints`, `commitments`, `deliverables` | `constraint`, `relation`, `target.type/id` | `missing_constraint_link` / `invalid_change_relation` / `missing_change_target` / `invalid_change_target` |
-| `ALL_IMPROVEMENT_ASSUMPTION` | `changes` | `relations`, `assumption`, `verification_condition`, `approval_basis` | `all_improvement_without_verification` / `approval_basis_before_verification` / `assumption_unclosed` |
+| `ALL_IMPROVEMENT_ASSUMPTION` | `changes`, `actors` | `relations`, `assumption`, `verification_condition`, `approval_basis` | `all_improvement_without_verification` / `approval_basis_before_verification` / `assumption_unclosed` |
 | `ROLE_MINIMAL_COMPLETENESS` | `actors`, `commitments` | `accountable_by`, `responsible_by`, `role_merge_declaration` | `missing_accountable` / `multiple_accountable` / `unknown_accountable` / `accountable_not_human` / `missing_responsible` / `missing_role_merge_declaration` |
 | `AI_AUTONOMY_DELEGATION_AUDITABLE` | `actors`, `autonomy_grants`, `assertions` | `delegated_from` 路径（第 1.10 条）、`accountable`、`covers`, `kind`, `verification_condition` | `delegation_chain_not_accountable` / `assertion_incomplete` / `assumption_unclosed` / `invalid_path` / `dangling_reference` |
-| `PROJECT_CHARTER_EXISTENCE` | `projects`, `charters` | `stage`, `project`, 四项声明 | `missing_charter` / `incomplete_charter` |
-| `CLOSURE_ACCEPTANCE_LINK` | `deliverables` | 内嵌 `assertions[].statement/accountable_confirmation` | `missing_acceptance_assertion` |
-| `PROCUREMENT_CONTRACT_ANCHOR` | `commitments`, `contracts` | `procurement`, `contract`, 四项声明 | `missing_contract` / `incomplete_contract` |
+| `PROJECT_CHARTER_EXISTENCE` | `projects`, `charters`, `outcomes`, `constraints`, `actors`, `assertions` | `stage`, `project`, 四项声明 | `missing_charter` / `incomplete_charter` |
+| `CLOSURE_ACCEPTANCE_LINK` | `deliverables`, `actors` | 内嵌 `assertions[].statement/accountable_confirmation` | `missing_acceptance_assertion` |
+| `PROCUREMENT_CONTRACT_ANCHOR` | `commitments`, `contracts`, `constraints`, `actors` | `procurement`, `contract`, 四项声明 | `missing_contract` / `incomplete_contract` |
 | `SCHEDULE_EVIDENCE_LINK` | `commitments` | `deadline` / `milestone`, `evidence_assertions[].basis` | `missing_schedule_evidence` |
-| `TAILORING_RECORD_EXISTENCE` | `tailoring_actions`, `tailoring_records` | `record`, 四项声明 | `missing_tailoring_record` / `incomplete_tailoring_record` |
+| `TAILORING_RECORD_EXISTENCE` | `tailoring_actions`, `tailoring_records`, `actors` | `record`, 四项声明 | `missing_tailoring_record` / `incomplete_tailoring_record` |
 | `TAILORING_NON_TRIMMABLE_SET` | `tailoring_records` | `trimmed_rule` | `non_trimmable_rule` |
 | `TAILORING_REASSESSMENT_CONDITION` | `tailoring_records` | `reassessment_condition` / `permanent` + `reason` | `missing_reassessment_condition` |
 
@@ -99,6 +195,7 @@
 | `assumption.status` | `pending`、`satisfied`、`expired` |
 | `applicability.state` | `applicable`、`inapplicable`、`pending` |
 | `management_node_type` | `ManagementActivity`、`ManagementArtifact` |
+| `subject_group_extension_relation` | `specializes`、`cross_cuts` |
 | 不可裁剪规则 | `G-A1`、`G-A2`、`G-C1`、`G-D1`、`G-E1` |
 | 验收/移交陈述 | `acceptance_statement`：`已验收`、`已移交` |
 

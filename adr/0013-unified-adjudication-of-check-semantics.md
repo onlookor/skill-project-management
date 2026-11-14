@@ -33,7 +33,7 @@
 |---|---|---|
 | P2 | 判定列只允许引用 schema 第 4 节的**具名枚举**；不得出现自然语言值。枚举集合由三表检查器校验闭合。 | `spec/CHECKER_INPUT_SCHEMA.md` 第 1.8、4 节；`scripts/check_three_table.py` 规则 5 |
 | P3 | 跨对象条件必须落为**关系路径**，量词显式：顶层域默认全称、引用必须全部解析、“存在一个”用集合非空表达。 | schema 第 1.6、1.7、3bis 节 |
-| P4 | 引用完整性采用**全局统一策略**：目标 `id` 不存在 → `fail` / `dangling_reference`；目标类型未在 schema 定义 → `cannot_evaluate` / `undefined_object_type`。所有 `check_id` 同一口径，由原型在进入各 `check` 前统一执行，不再只在 G-C1/G-E2 局部实现。 | schema 第 1.5 节；原型 `validate_references()` |
+| P4 | 引用完整性采用**全局统一策略**：目标 `id` 不存在 → `fail` / `dangling_reference`；目标类型未在 schema 定义 → `cannot_evaluate` / `undefined_object_type`。所有 `check_id` 同一口径，由原型在进入各 `check` 前统一执行，不再只在 G-C1/G-E2 局部实现。引用字段清单由 schema §2bis.1 的标注表生成，代码不维护第二份清单。 | schema 第 1.5、2bis 节；原型 `validate_references()` / `REFERENCE_RULES` |
 | P5 | `assumption` 表示为对象 `{verification_condition, status, verified_at, expires_at, approved_by, approval_basis}`；`expired`、或 `pending` 且缺 `approved_by` → `cannot_evaluate` / `assumption_unclosed`；未满足验证条件的变更不得出现在 `approval_basis` 中。 | schema 第 1.9、2 节；`ALL_IMPROVEMENT_ASSUMPTION`、`AI_AUTONOMY_DELEGATION_AUDITABLE` |
 | P6 | 链式条件用路径表示 `{start, steps: [{relation, direction, target_type, target_id}], reach}`，`steps[]` 必须带目标 `id` 才能定位下一节点；判定列写路径表达式，不再使用“终至”“链上有”等自然语言，也不再保留 `delegated_from` 扁平字符串写法。 | schema 第 1.10、3bis 节；G-E2 |
 | P7 | 结论枚举扩为 `{pass, fail, cannot_evaluate, not_applicable}`；适用性状态机 `applicable / inapplicable / pending` 固定映射，`pending` 不得静默转 `applicable`。 | 方法 §4.2、§4.4；原型 `run_case` |
@@ -42,9 +42,10 @@
 
 | 编号 | 决定 | 实现位置 |
 |---|---|---|
-| P1 | 规则正文的规范性条件拆为 **clause id**（`G-XX#n`），A 表“判定（子句 id）”列声明每个 `check_id` 覆盖的子句；verdict 由子句聚合（任一 `fail` → `fail`；否则任一 `cannot_evaluate` → `cannot_evaluate`），`severity` 取失败子句最高级，`reason` 取首条失败子句。 | 方法 A.2（40 个子句）；A 表“判定（子句 id）”列 |
+| P1 | 规则正文的规范性条件拆为 **clause id**（`G-XX#n`），A 表“判定（子句 id）”列声明每个 `check_id` 覆盖的子句；verdict 由子句聚合（任一 `fail` → `fail`；否则任一 `cannot_evaluate` → `cannot_evaluate`），`severity` 取失败子句最高级，`reason` 取首条失败子句。 | 方法 A.2（41 个子句）；A 表“判定（子句 id）”列 |
 | D0 | 采纳“子句级覆盖声明”。未覆盖子句必须标 `not-checked` 并写理由，不得留空。 | `scripts/check_three_table.py` 规则 4 |
-| P8 | 三表机械对照作为**交付物**，由 `scripts/check_three_table.py` 承接，见第 3 节。检查深度限定为：结构一致（规则 ↔ `check_id` ↔ schema 输入域）、子句闭合、枚举封闭、判定列不含叙述性短语、G-B1/G-B2 条件归属、原因码定义与映射；**不保证规则正文与子句表的全文语义等价**。 | 新增脚本 + pre-commit + `check_state.py` |
+| P8 | 三表机械对照作为**交付物**，由 `scripts/check_three_table.py` 承接，见第 3 节。检查深度限定为：结构一致（规则 ↔ `check_id` ↔ schema 输入域）、子句闭合、枚举封闭、判定列不含叙述性短语、G-B1/G-B2 条件归属、原因码定义与映射、A.2 签收同步；**不保证规则正文与子句表的全文语义等价**。 | 新增脚本 + pre-commit + `check_state.py` |
+| A2-SIGNOFF | **A.2 的任何改动必须由非同源复核签收**：A.2 区头的“复核签收”行必须携带当前 A.2 区段指纹（全部子句指纹按 clause id 排序后的 sha256 前 12 位）。只改 A.2 再跑 `--write` 会重建自洽的 A 表，派生一致性检查无法识别，因此由规则 8 阻断签收指纹不一致的提交；签收人资格复用 3.6.6 的非同源语义。 | 方法 A.2 区头；`scripts/check_three_table.py` 规则 8；`AGENTS.md` 第 3.6.7 条；`scripts/test_check_table_mutations.py` S01/S02 |
 | G-004 | `G-E1#3`（角色重合声明缺失）子句 severity 为 `warn`，不再与问责结构缺失同按 `block` 判死。 | 方法 A.2；原型 `check_role_minimal` 返回 severity 覆盖 |
 
 ### 2.3 逐点待决项结论（D1–D9）
@@ -157,4 +158,14 @@
 
 - 本 ADR 回到 `proposed`；G-001–G-008 重开；新增 G-009–G-017 登记为 `open`。
 - 修订完成后只重跑一次非同源复核；复核结论未到之前，任何缺口不得关闭，也不得以“原型通过”“检查器退出 0”作为关闭依据（`AGENTS.md` 3.6.6）。
+
+### 8.4 第二轮修订：四层顺序（已完成，待非同源复核）
+
+用户要求按层次修，不按单项打补丁。每层完成即报实测数字与负例。
+
+1. **第一层（已完成）**：`run_case` 入口 `find_null()` 一次覆盖顶层键、嵌套对象键、数组元素三种 `null`；命中即 `cannot_evaluate` / `missing_input`，17 个 `check` 函数不再各自兜底。`--null-sweep` 改为路径级扫描，覆盖样例中全部非空数组（89 个数组元素用例 / 54 条 `(check_id, 路径)` / 27 条唯一路径）。
+2. **第二层（已完成）**：§2bis.1 是 `REFERENCE_RULES` 的唯一生成源；§2bis.2 显式登记非引用字段；§2 每个字段必须被二者之一覆盖，新增字段未标注即三表检查器退出 1。补齐 `contracts[].accountable_signature` 与 `changes[].assumption.approved_by`。§3 必需顶层键同步为解析引用所需的集合（43 个 `(check_id, 键)`），原型 `REQUIRED_KEYS` 亦从 §3 生成；`--input-domain` 校验样例中的引用目标集合全部已声明。
+3. **第三层（已完成）**：A 表改为 7 列（`check_id | 规则 | 判定（子句 id） | 子句指纹 | 输入 | 原因码 | 规则状态`），只由 A.2 派生；A.2 增加第 8 列 `规则状态`。`scripts/check_three_table.py` 的 `--write` 是唯一生成路径，默认模式逐格比较“文件 A 表”与“A.2 生成结果”，不再做两表字段互比。子句指纹覆盖 clause id / 规则 / 子句文本 / 原因码 / 承接 `check_id` / severity / 规则状态，任一语义改动都会破坏一致性。新增 `scripts/test_check_table_mutations.py`：固定 11 条变异（子句语义、量词、原因码删除/篡改、枚举归属 ×2、承接规则、子句 id、severity、规则状态、子句删除），逐条调用检查器并要求退出 1；实测 11/11 抓到。A.1 区新增“样例基线”表，锚定提交 `1a42b8b`、34 个样例、输入块改动清单，期望输出零改动。
+4. **第四层（已完成）**：`subject_group_extension` 定义为 `{value, relation ∈ {specializes, cross_cuts}, base}`，`base` 必须是 17 项基础枚举，`value` 不得重名；A.2 新增 `G-B2#2`（`invalid_subject_group_extension`），只写 `{value}` 不再通过。悬空引用选择“规则子句原因优先”：A.2 新增归属表，只有 `G-C1#1`、`G-E2#1`、`G-E2#3` 可返回 `dangling_reference`，其余子句返回自己的原因码，无子句承接的引用由 `validate_references()` 兜底。`violations[]` 选择撤除：schema §1.14 明确原型不输出该字段，`reason` 为 A.2 行序首条命中。`G-A2#2` 通过给 `commitments[]` / `deliverables[]` 增加可选 `node_type` 变为可达；非法值 → `cannot_evaluate` / `undefined_object_type`，未提供不触发。实测 34/34、null-sweep 138/138、input-domain 0 缺口、三表退出 0、变异 11/11、七个检查器退出 0。G-001–G-017 仍为 `open`，只重跑一次非同源复核。
+5. **提交前补漏（A.2 签收纪律）**：派生检查无法识别“改 A.2 再 `--write`”的绕过，故新增 `AGENTS.md` 3.6.7、决策表 `A2-SIGNOFF`、A.2 区头“复核签收”行与 `check_three_table.py` 规则 8；只改 A.2 不更新签收 → 退出 1，改 A.2 并更新签收 → 通过。S01/S02 正负例固定于 `scripts/test_check_table_mutations.py`。这是补漏，不改变第四层的任何裁定。
 

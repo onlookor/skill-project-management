@@ -618,7 +618,7 @@
 | T-F-003 | constraint_domains | [`contracts/resolver.md`](contracts/resolver.md)、[`spec/INTERFACE_CONTRACT_SPEC.md`](spec/INTERFACE_CONTRACT_SPEC.md) |
 | T-F-004 | assertion_vocabulary | [`contracts/resolver.md`](contracts/resolver.md)、[`spec/INTERFACE_CONTRACT_SPEC.md`](spec/INTERFACE_CONTRACT_SPEC.md) |
 | T-F-005 | actor_roles | [`contracts/resolver.md`](contracts/resolver.md)、[`spec/INTERFACE_CONTRACT_SPEC.md`](spec/INTERFACE_CONTRACT_SPEC.md) |
-| T-F-006 | subject_group_extension | [`GRAMMAR.md`](GRAMMAR.md)、[`adr/0008-reanchor-dimension-rules.md`](adr/0008-reanchor-dimension-rules.md)、[`contracts/resolver.md`](contracts/resolver.md)、[`spec/CHECKER_INPUT_SCHEMA.md`](spec/CHECKER_INPUT_SCHEMA.md)、[`spec/INTERFACE_CONTRACT_SPEC.md`](spec/INTERFACE_CONTRACT_SPEC.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md) |
+| T-F-006 | subject_group_extension | [`CHANGELOG.md`](CHANGELOG.md)、[`GAP_LEDGER.md`](GAP_LEDGER.md)、[`GRAMMAR.md`](GRAMMAR.md)、[`adr/0008-reanchor-dimension-rules.md`](adr/0008-reanchor-dimension-rules.md)、[`adr/0013-unified-adjudication-of-check-semantics.md`](adr/0013-unified-adjudication-of-check-semantics.md)、[`contracts/resolver.md`](contracts/resolver.md)、[`spec/CHECKER_INPUT_SCHEMA.md`](spec/CHECKER_INPUT_SCHEMA.md)、[`spec/INTERFACE_CONTRACT_SPEC.md`](spec/INTERFACE_CONTRACT_SPEC.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md) |
 | T-F-007 | 扁平快照（flat snapshot） | （无） |
 | T-F-008 | 契约解析失败状态 | （无） |
 <!-- END GLOSSARY USAGE -->

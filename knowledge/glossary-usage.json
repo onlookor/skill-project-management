@@ -116,22 +116,12 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 292,
+          "line": 347,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 302,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 344,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 834,
+          "line": 865,
           "form": "code"
         },
         {
@@ -246,17 +236,7 @@
         },
         {
           "file": "adr/0013-unified-adjudication-of-check-semantics.md",
-          "line": 76,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 292,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 316,
+          "line": 77,
           "form": "code"
         },
         {
@@ -271,7 +251,12 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 373,
+          "line": 322,
+          "form": "code"
+        },
+        {
+          "file": "spec/methods/deterministic-checker.md",
+          "line": 403,
           "form": "code"
         },
         {
@@ -451,12 +436,12 @@
         },
         {
           "file": "adr/0013-unified-adjudication-of-check-semantics.md",
-          "line": 54,
+          "line": 55,
           "form": "code"
         },
         {
           "file": "adr/0013-unified-adjudication-of-check-semantics.md",
-          "line": 62,
+          "line": 63,
           "form": "code"
         },
         {
@@ -466,22 +451,22 @@
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 83,
+          "line": 179,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 98,
+          "line": 194,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 113,
+          "line": 210,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 115,
+          "line": 212,
           "form": "code"
         },
         {
@@ -491,67 +476,47 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 292,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 300,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 304,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 305,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 318,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
           "line": 320,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 321,
+          "line": 322,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 332,
+          "line": 323,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 367,
+          "line": 335,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 373,
+          "line": 385,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 413,
+          "line": 403,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 543,
+          "line": 443,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 547,
+          "line": 573,
+          "form": "code"
+        },
+        {
+          "file": "spec/methods/deterministic-checker.md",
+          "line": 577,
           "form": "code"
         },
         {
@@ -581,7 +546,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 361,
+          "line": 373,
           "form": "code"
         },
         {
@@ -701,52 +666,37 @@
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 98,
+          "line": 194,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 296,
+          "line": 330,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 297,
+          "line": 335,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 303,
+          "line": 349,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 327,
+          "line": 485,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 332,
+          "line": 573,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 346,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 455,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 543,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 890,
+          "line": 925,
           "form": "code"
         },
         {
@@ -771,7 +721,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 361,
+          "line": 373,
           "form": "code"
         },
         {
@@ -921,7 +871,7 @@
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 113,
+          "line": 210,
           "form": "code"
         },
         {
@@ -931,62 +881,47 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 292,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 293,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 298,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 319,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
           "line": 321,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 322,
+          "line": 323,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 333,
+          "line": 324,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 375,
+          "line": 336,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 413,
+          "line": 405,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 417,
+          "line": 443,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 500,
+          "line": 447,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 834,
+          "line": 530,
+          "form": "code"
+        },
+        {
+          "file": "spec/methods/deterministic-checker.md",
+          "line": 865,
           "form": "code"
         },
         {
@@ -1096,37 +1031,27 @@
         },
         {
           "file": "adr/0013-unified-adjudication-of-check-semantics.md",
-          "line": 62,
+          "line": 63,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 26,
+          "line": 27,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 83,
+          "line": 179,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 113,
+          "line": 210,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 292,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 317,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 318,
+          "line": 319,
           "form": "code"
         },
         {
@@ -1136,17 +1061,22 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 321,
+          "line": 322,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 373,
+          "line": 323,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 413,
+          "line": 403,
+          "form": "code"
+        },
+        {
+          "file": "spec/methods/deterministic-checker.md",
+          "line": 443,
           "form": "code"
         },
         {
@@ -1171,7 +1101,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 361,
+          "line": 373,
           "form": "code"
         },
         {
@@ -1301,47 +1231,27 @@
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 117,
+          "line": 214,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 296,
+          "line": 485,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 297,
+          "line": 799,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 303,
+          "line": 861,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 305,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 455,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 768,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 830,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 834,
+          "line": 865,
           "form": "code"
         },
         {
@@ -1431,67 +1341,62 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 300,
+          "line": 344,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 341,
+          "line": 350,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 347,
+          "line": 579,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 549,
+          "line": 600,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 570,
+          "line": 621,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 591,
+          "line": 799,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 768,
+          "line": 801,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 770,
+          "line": 831,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 800,
+          "line": 865,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 834,
+          "line": 925,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 890,
+          "line": 946,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 910,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 934,
+          "line": 970,
           "form": "code"
         }
       ]
@@ -1526,17 +1431,12 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 300,
+          "line": 600,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 570,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 591,
+          "line": 621,
           "form": "code"
         }
       ]
@@ -1546,7 +1446,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 361,
+          "line": 373,
           "form": "code"
         },
         {
@@ -1566,12 +1466,12 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 330,
+          "line": 333,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 678,
+          "line": 708,
           "form": "code"
         }
       ]
@@ -1601,12 +1501,12 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 338,
+          "line": 341,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 547,
+          "line": 577,
           "form": "code"
         }
       ]
@@ -1636,12 +1536,12 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 338,
+          "line": 341,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 547,
+          "line": 577,
           "form": "code"
         }
       ]
@@ -1681,17 +1581,12 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 301,
+          "line": 579,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 549,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 770,
+          "line": 801,
           "form": "code"
         }
       ]
@@ -1721,17 +1616,12 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 304,
+          "line": 351,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 348,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 934,
+          "line": 970,
           "form": "code"
         }
       ]
@@ -1761,27 +1651,22 @@
         },
         {
           "file": "adr/0013-unified-adjudication-of-check-semantics.md",
-          "line": 76,
+          "line": 77,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 302,
+          "line": 347,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 344,
+          "line": 865,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 834,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 836,
+          "line": 867,
           "form": "code"
         }
       ]
@@ -1821,27 +1706,12 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 306,
+          "line": 354,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 307,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 308,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 351,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 1028,
+          "line": 1066,
           "form": "code"
         }
       ]
@@ -1856,17 +1726,17 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 319,
+          "line": 331,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 322,
+          "line": 334,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 365,
+          "line": 377,
           "form": "code"
         },
         {
@@ -1976,32 +1846,32 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 320,
+          "line": 332,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 322,
+          "line": 334,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 362,
+          "line": 374,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 365,
+          "line": 377,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 380,
+          "line": 392,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 382,
+          "line": 394,
           "form": "code"
         },
         {
@@ -2027,6 +1897,16 @@
         {
           "file": "CHANGELOG.md",
           "line": 459,
+          "form": "code"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 534,
+          "form": "code"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 549,
           "form": "code"
         },
         {
@@ -2216,7 +2096,7 @@
         },
         {
           "file": "adr/0013-unified-adjudication-of-check-semantics.md",
-          "line": 62,
+          "line": 63,
           "form": "code"
         },
         {
@@ -2321,12 +2201,12 @@
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 28,
+          "line": 29,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 32,
+          "line": 33,
           "form": "code"
         },
         {
@@ -2336,22 +2216,37 @@
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 65,
+          "line": 47,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 97,
+          "line": 55,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 117,
+          "line": 130,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 122,
+          "line": 161,
+          "form": "code"
+        },
+        {
+          "file": "spec/CHECKER_INPUT_SCHEMA.md",
+          "line": 193,
+          "form": "code"
+        },
+        {
+          "file": "spec/CHECKER_INPUT_SCHEMA.md",
+          "line": 214,
+          "form": "code"
+        },
+        {
+          "file": "spec/CHECKER_INPUT_SCHEMA.md",
+          "line": 219,
           "form": "code"
         },
         {
@@ -2486,117 +2381,82 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 302,
+          "line": 338,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 303,
+          "line": 340,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 304,
+          "line": 346,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 305,
+          "line": 383,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 306,
+          "line": 752,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 307,
+          "line": 775,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 308,
+          "line": 861,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 335,
+          "line": 863,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 337,
+          "line": 865,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 343,
+          "line": 923,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 365,
+          "line": 968,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 722,
+          "line": 1021,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 745,
+          "line": 1064,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 830,
+          "line": 1114,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 832,
+          "line": 1154,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 834,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 888,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 932,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 983,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 1026,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 1075,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 1115,
-          "form": "code"
-        },
-        {
-          "file": "spec/methods/deterministic-checker.md",
-          "line": 1169,
+          "line": 1208,
           "form": "code"
         },
         {
@@ -2656,17 +2516,17 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 319,
+          "line": 331,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 399,
+          "line": 411,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 404,
+          "line": 416,
           "form": "code"
         },
         {
@@ -3231,6 +3091,51 @@
           "form": "code"
         },
         {
+          "file": "CHANGELOG.md",
+          "line": 517,
+          "form": "code"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 520,
+          "form": "code"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 533,
+          "form": "code"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 546,
+          "form": "code"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 556,
+          "form": "code"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 558,
+          "form": "code"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 571,
+          "form": "code"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 580,
+          "form": "code"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 582,
+          "form": "code"
+        },
+        {
           "file": "GAP_LEDGER.md",
           "line": 3,
           "form": "code"
@@ -3387,27 +3292,22 @@
         },
         {
           "file": "adr/0013-unified-adjudication-of-check-semantics.md",
-          "line": 74,
-          "form": "code"
-        },
-        {
-          "file": "adr/0013-unified-adjudication-of-check-semantics.md",
           "line": 75,
           "form": "code"
         },
         {
           "file": "adr/0013-unified-adjudication-of-check-semantics.md",
-          "line": 77,
+          "line": 76,
           "form": "code"
         },
         {
           "file": "adr/0013-unified-adjudication-of-check-semantics.md",
-          "line": 90,
+          "line": 78,
           "form": "code"
         },
         {
           "file": "adr/0013-unified-adjudication-of-check-semantics.md",
-          "line": 100,
+          "line": 91,
           "form": "code"
         },
         {
@@ -3417,12 +3317,22 @@
         },
         {
           "file": "adr/0013-unified-adjudication-of-check-semantics.md",
-          "line": 112,
+          "line": 102,
           "form": "code"
         },
         {
           "file": "adr/0013-unified-adjudication-of-check-semantics.md",
-          "line": 114,
+          "line": 113,
+          "form": "code"
+        },
+        {
+          "file": "adr/0013-unified-adjudication-of-check-semantics.md",
+          "line": 115,
+          "form": "code"
+        },
+        {
+          "file": "adr/0013-unified-adjudication-of-check-semantics.md",
+          "line": 168,
           "form": "code"
         },
         {
@@ -3462,22 +3372,12 @@
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 21,
+          "line": 27,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 26,
-          "form": "code"
-        },
-        {
-          "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 42,
-          "form": "code"
-        },
-        {
-          "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 45,
+          "line": 43,
           "form": "code"
         },
         {
@@ -3487,7 +3387,12 @@
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 78,
+          "line": 47,
+          "form": "code"
+        },
+        {
+          "file": "spec/CHECKER_INPUT_SCHEMA.md",
+          "line": 174,
           "form": "code"
         },
         {
@@ -3567,17 +3472,22 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 359,
+          "line": 362,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 365,
+          "line": 375,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 367,
+          "line": 383,
+          "form": "code"
+        },
+        {
+          "file": "spec/methods/deterministic-checker.md",
+          "line": 385,
           "form": "code"
         }
       ]
@@ -3592,7 +3502,7 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 365,
+          "line": 377,
           "form": "code"
         },
         {
@@ -3747,12 +3657,12 @@
         },
         {
           "file": "adr/0013-unified-adjudication-of-check-semantics.md",
-          "line": 129,
+          "line": 130,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 122,
+          "line": 219,
           "form": "code"
         },
         {
@@ -3772,12 +3682,12 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 359,
+          "line": 362,
           "form": "code"
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 365,
+          "line": 383,
           "form": "code"
         },
         {
@@ -4049,7 +3959,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 344,
+          "line": 356,
           "form": "code"
         },
         {
@@ -4109,7 +4019,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 344,
+          "line": 356,
           "form": "code"
         },
         {
@@ -4343,6 +4253,16 @@
       "term": "subject_group_extension",
       "locations": [
         {
+          "file": "CHANGELOG.md",
+          "line": 570,
+          "form": "code"
+        },
+        {
+          "file": "GAP_LEDGER.md",
+          "line": 123,
+          "form": "code"
+        },
+        {
           "file": "GRAMMAR.md",
           "line": 64,
           "form": "code"
@@ -4353,18 +4273,23 @@
           "form": "code"
         },
         {
+          "file": "adr/0013-unified-adjudication-of-check-semantics.md",
+          "line": 169,
+          "form": "code"
+        },
+        {
           "file": "contracts/resolver.md",
           "line": 16,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 61,
+          "line": 157,
           "form": "code"
         },
         {
           "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 105,
+          "line": 202,
           "form": "code"
         },
         {
@@ -4379,7 +4304,7 @@
         },
         {
           "file": "spec/methods/deterministic-checker.md",
-          "line": 637,
+          "line": 667,
           "form": "code"
         }
       ]

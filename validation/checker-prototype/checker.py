@@ -13,12 +13,15 @@ severity（G-E1#3 为 warn）承接，不再把合法产物按 block 判死。
 from __future__ import annotations
 
 import argparse
+import copy
 import json
 import re
 import sys
 from pathlib import Path
 
+ROOT = Path(__file__).resolve().parents[2]
 METHOD = Path("spec/methods/deterministic-checker.md")
+SCHEMA = Path("spec/CHECKER_INPUT_SCHEMA.md")
 
 # ---------------------------------------------------------------- 注册表常量
 
@@ -74,6 +77,7 @@ BASE_SUBJECT_GROUPS = {
     "lessons-learned",
 }
 CHANGE_RELATIONS = {"mitigates", "exacerbates", "trades_off"}
+EXTENSION_RELATIONS = {"specializes", "cross_cuts"}
 CHANGE_TARGET_TYPES = {"Commitment", "Deliverable"}
 STATEMENT_KINDS = {"what", "state", "condition"}
 ASSERTION_KINDS = {"fact", "assumption", "decision"}
@@ -84,154 +88,170 @@ ACCEPTANCE_STATEMENTS = {"已验收", "已移交"}
 # 有意为之：原型不再存在“声明未覆盖但仍输出 pass”的暗区。
 COVERAGE_GAPS: dict[str, str] = {}
 
-# 每个 check 的必需顶层键。键存在但值为 null 与键缺失同等处理：
-# 返回 cannot_evaluate / missing_input，而不是进入迭代抛 TypeError。
-REQUIRED_KEYS: dict[str, tuple[str, ...]] = {
-    "PROJECT_MINIMAL_EXISTENCE": ("project", "actors", "outcomes", "commitments", "constraints"),
-    "CONSTRAINT_ANCHOR_REQUIRED": ("commitments", "deliverables", "constraints"),
-    "DELIVERABLE_ASSERTION_LINK": ("deliverables", "assertions"),
-    "CHANGE_CONSTRAINT_LINK": ("changes", "constraints"),
-    "ROLE_MINIMAL_COMPLETENESS": ("actors", "commitments"),
-    "DUAL_DIMENSION_ANNOTATION": ("management_items",),
-    "DIMENSION_VALUE_CLOSED": ("management_items",),
-    "ASSERTION_MUTUAL_EXCLUSION": ("assertions",),
-    "ALL_IMPROVEMENT_ASSUMPTION": ("changes",),
-    "AI_AUTONOMY_DELEGATION_AUDITABLE": ("actors", "autonomy_grants", "assertions"),
-    "PROJECT_CHARTER_EXISTENCE": ("projects", "charters"),
-    "CLOSURE_ACCEPTANCE_LINK": ("deliverables",),
-    "PROCUREMENT_CONTRACT_ANCHOR": ("commitments", "contracts"),
-    "SCHEDULE_EVIDENCE_LINK": ("commitments",),
-    "TAILORING_RECORD_EXISTENCE": ("tailoring_actions", "tailoring_records"),
-    "TAILORING_NON_TRIMMABLE_SET": ("tailoring_records",),
-    "TAILORING_REASSESSMENT_CONDITION": ("tailoring_records",),
-}
+# ---------------------------------------------------------------- schema 生成
+# 输入域与引用规则只从 spec/CHECKER_INPUT_SCHEMA.md 派生，代码不保留第二份清单。
+# §3 的“必需顶层键”列生成 REQUIRED_KEYS；§2bis.1 的标注表生成 REFERENCE_RULES。
 
 
-def require_fields(data: dict, keys: tuple[str, ...]) -> tuple[str, str | None] | None:
-    """必需键缺失或取 null 时统一返回 cannot_evaluate。"""
-    if any(key not in data or data[key] is None for key in keys):
-        return "cannot_evaluate", "missing_input"
-    return None
+def split_row(line: str) -> list[str] | None:
+    stripped = line.strip()
+    if not stripped.startswith("|"):
+        return None
+    return [cell.strip() for cell in stripped.strip("|").split("|")]
+
+
+def parse_required_keys(text: str) -> dict[str, tuple[str, ...]]:
+    """从 schema §3 解析每个 check_id 的必需顶层键。"""
+    required: dict[str, tuple[str, ...]] = {}
+    in_section = False
+    for line in text.splitlines():
+        if line.startswith("## 3."):
+            in_section = True
+            continue
+        if in_section and line.startswith("## "):
+            break
+        if not in_section:
+            continue
+        cells = split_row(line)
+        if not cells or len(cells) < 2:
+            continue
+        match = re.fullmatch(r"`([A-Z_]+)`", cells[0])
+        if not match:
+            continue
+        declared = cells[1].split("（可选")[0]
+        required[match.group(1)] = tuple(
+            re.findall(r"`([a-z][a-z0-9_]*)`", declared)
+        )
+    return required
+
+
+def parse_reference_rules(text: str) -> list[dict]:
+    """从 schema §2bis.1 解析引用字段标注，生成原型唯一的引用规则表。"""
+    rules: list[dict] = []
+    in_section = False
+    for line in text.splitlines():
+        if line.startswith("### 2bis.1"):
+            in_section = True
+            continue
+        if line.startswith("### 2bis.2"):
+            break
+        if not in_section:
+            continue
+        cells = split_row(line)
+        if not cells or len(cells) != 4 or not cells[0].startswith("`"):
+            continue
+        path = cells[0].strip("`")
+        field = cells[1].strip("`")
+        target_cell = cells[2].strip("`")
+        form = cells[3].strip("`")
+        if "→" in target_cell:
+            targets: object = {}
+            for part in re.split(r"[、,，]", target_cell):
+                kind, collection = part.strip("` ").split("→")
+                targets[kind.strip()] = collection.strip()
+            form = "type"
+        elif "∪" in target_cell:
+            targets = [part.strip("` ") for part in target_cell.split("∪")]
+        elif target_cell == "any":
+            targets = ["*"]
+        else:
+            targets = [target_cell]
+        rules.append({"path": path, "field": field, "targets": targets, "form": form})
+    return rules
+
+
+_SCHEMA_TEXT = (ROOT / SCHEMA).read_text(encoding="utf-8")
+REQUIRED_KEYS = parse_required_keys(_SCHEMA_TEXT)
+REFERENCE_RULES = parse_reference_rules(_SCHEMA_TEXT)
+
 
 
 def ids(items) -> set:
     return {item.get("id") for item in items if isinstance(item, dict)}
 
 
-def validate_references(data: dict) -> tuple[str, str | None] | None:
-    """全局引用完整性：所有已知跨对象引用必须解析到同快照中的 id。
+def resolve_path(data: dict, path: str) -> list[dict]:
+    """按 schema §2bis 的路径语法取值；`[]` 表示逐元素展开。"""
+    nodes: list[object] = [data]
+    for segment in path.split("."):
+        many = segment.endswith("[]")
+        key = segment[:-2] if many else segment
+        found: list[object] = []
+        for node in nodes:
+            if not isinstance(node, dict):
+                continue
+            value = node.get(key)
+            if value is None:
+                continue
+            if many:
+                if isinstance(value, list):
+                    found.extend(item for item in value if isinstance(item, dict))
+            elif isinstance(value, dict):
+                found.append(value)
+        nodes = found
+    return [node for node in nodes if isinstance(node, dict)]
 
-    返回 None 表示无问题；返回 (verdict, reason) 表示首个问题。
-    目标集合在快照中缺失时无法判定 → cannot_evaluate / missing_input；
-    目标 id 不存在 → fail / dangling_reference。该检查在 check 返回 pass
-    时统一执行，保证引用完整性不只作用于 G-C1。
-    """
-    actor_ids = ids(data.get("actors") or [])
-    outcome_ids = ids(data.get("outcomes") or [])
-    commitment_ids = ids(data.get("commitments") or [])
-    deliverable_ids = ids(data.get("deliverables") or [])
-    constraint_ids = ids(data.get("constraints") or [])
-    assertion_ids = ids(data.get("assertions") or [])
-    contract_ids = ids(data.get("contracts") or [])
-    project_ids = ids(data.get("projects") or [])
-    record_ids = ids(data.get("tailoring_records") or [])
 
-    checks: list[tuple[str, str, set | None, str | None]] = [
-        ("commitments", "by", actor_ids, "actors"),
-        ("commitments", "to", outcome_ids, "outcomes"),
-        ("commitments", "accountable_by", actor_ids, "actors"),
-        ("commitments", "responsible_by", actor_ids, "actors"),
-        ("commitments", "contract", contract_ids, "contracts"),
-        ("commitments", "constrained_by", constraint_ids, "constraints"),
-        ("constraints", "constrains", outcome_ids | commitment_ids, "outcomes"),
-        ("deliverables", "asserted_by", assertion_ids, "assertions"),
-        ("deliverables", "constrained_by", constraint_ids, "constraints"),
-        ("changes", "constraint", constraint_ids, "constraints"),
-        ("charters", "project", project_ids, "projects"),
-        ("charters", "accountable", actor_ids, "actors"),
-        ("charters", "authorizing_assertion", assertion_ids, "assertions"),
-        ("tailoring_actions", "record", record_ids, "tailoring_records"),
-        ("autonomy_grants", "actor", actor_ids, "actors"),
-        ("autonomy_grants", "assertions", assertion_ids, "assertions"),
-        ("contracts", "constrained_by", constraint_ids, "constraints"),
-        ("tailoring_records", "approver", actor_ids, "actors"),
-    ]
-    for collection, field, target_ids, target_collection in checks:
-        items = data.get(collection)
-        if items is None:
+def target_ids_for(data: dict, collections) -> tuple[set, str | None]:
+    """返回目标集合的 id 并集；目标集合缺失时返回缺失集合名。"""
+    if collections == ["*"]:
+        merged: set = set()
+        for value in data.values():
+            if isinstance(value, list):
+                merged |= ids(value)
+        return merged, None
+    merged = set()
+    for collection in collections:
+        if collection not in data or data[collection] is None:
+            return set(), collection
+        merged |= ids(data[collection])
+    return merged, None
+
+
+def iter_rule_refs(data: dict, rule: dict):
+    """逐个产出 (引用值列表, 目标集合列表)；空值不产出。"""
+    for item in resolve_path(data, rule["path"]):
+        ref = item.get(rule["field"])
+        if ref in (None, "", []):
             continue
-        for item in items:
-            if not isinstance(item, dict):
+        refs = ref if isinstance(ref, list) else [ref]
+        if rule["form"] == "type":
+            target = rule["targets"].get(item.get("type"))
+            if target is None:
                 continue
-            ref = item.get(field)
-            if ref in (None, "", []):
+            yield refs, [target]
+        else:
+            yield refs, rule["targets"]
+
+
+def referenced_collections(data: dict) -> set[str]:
+    """返回解析当前快照引用所需的全部目标集合（供输入域闭包检查使用）。"""
+    needed: set[str] = set()
+    for rule in REFERENCE_RULES:
+        for _refs, collections in iter_rule_refs(data, rule):
+            if collections == ["*"]:
                 continue
-            refs = ref if isinstance(ref, list) else [ref]
+            needed.update(collections)
+    return needed
+
+
+def validate_references(data: dict) -> tuple[str, str | None] | None:
+    """全局引用完整性：按 schema §2bis 的标注逐字段解析引用。
+
+    规则表由 schema 生成，代码不维护第二份字段清单。返回 None 表示无问题；
+    目标集合缺失 → cannot_evaluate / missing_input；目标 id 不存在 →
+    fail / dangling_reference。该检查在 check 返回 pass 时统一执行。
+    """
+    for rule in REFERENCE_RULES:
+        for refs, collections in iter_rule_refs(data, rule):
+            target_ids, missing = target_ids_for(data, collections)
             for ref_id in refs:
                 if not isinstance(ref_id, str):
                     return "cannot_evaluate", "undefined_object_type"
-                if target_collection not in data or data[target_collection] is None:
+                if missing:
                     return "cannot_evaluate", "missing_input"
                 if ref_id not in target_ids:
                     return "fail", "dangling_reference"
-
-    # 列表型引用：charters.outcomes / charters.constraints。
-    for charter in data.get("charters") or []:
-        if not isinstance(charter, dict):
-            continue
-        for field, target_ids, target_collection in (
-            ("outcomes", outcome_ids, "outcomes"),
-            ("constraints", constraint_ids, "constraints"),
-        ):
-            refs = charter.get(field) or []
-            for ref_id in refs:
-                if target_collection not in data or data[target_collection] is None:
-                    return "cannot_evaluate", "missing_input"
-                if ref_id not in target_ids:
-                    return "fail", "dangling_reference"
-
-    # changes.target：按 type 选择目标集合。
-    for change in data.get("changes") or []:
-        if not isinstance(change, dict):
-            continue
-        target = change.get("target")
-        if not isinstance(target, dict):
-            continue
-        target_type, target_id = target.get("type"), target.get("id")
-        if target_type == "Commitment" and target_id and target_id not in commitment_ids:
-            return "fail", "dangling_reference"
-        if target_type == "Deliverable" and target_id and target_id not in deliverable_ids:
-            return "fail", "dangling_reference"
-
-    # assertions 的 about/deliverable/subject 指向 Deliverable；内嵌断言同样适用。
-    def check_assertion_refs(assertions) -> tuple[str, str | None] | None:
-        for assertion in assertions or []:
-            if not isinstance(assertion, dict):
-                continue
-            for field in ("about", "deliverable", "subject"):
-                ref = assertion.get(field)
-                if not ref:
-                    continue
-                if "deliverables" not in data or data["deliverables"] is None:
-                    return "cannot_evaluate", "missing_input"
-                if ref not in deliverable_ids:
-                    return "fail", "dangling_reference"
-            confirmation = assertion.get("accountable_confirmation")
-            if confirmation:
-                if "actors" not in data or data["actors"] is None:
-                    return "cannot_evaluate", "missing_input"
-                if confirmation not in actor_ids:
-                    return "fail", "dangling_reference"
-        return None
-
-    issue = check_assertion_refs(data.get("assertions"))
-    if issue:
-        return issue
-    for deliverable in data.get("deliverables") or []:
-        if isinstance(deliverable, dict):
-            issue = check_assertion_refs(deliverable.get("assertions"))
-            if issue:
-                return issue
     return None
 
 
@@ -498,9 +518,6 @@ def load_yaml(text: str) -> object:
 
 
 def check_project_minimal_existence(data: dict) -> tuple[str, str | None]:
-    guard = require_fields(data, REQUIRED_KEYS["PROJECT_MINIMAL_EXISTENCE"])
-    if guard:
-        return guard
     actor_ids = {item.get("id") for item in data["actors"]}
     outcome_ids = {item.get("id") for item in data["outcomes"]}
     if not data["actors"]:
@@ -523,9 +540,6 @@ def check_project_minimal_existence(data: dict) -> tuple[str, str | None]:
 
 
 def check_constraint_anchor(data: dict) -> tuple[str, str | None]:
-    guard = require_fields(data, REQUIRED_KEYS["CONSTRAINT_ANCHOR_REQUIRED"])
-    if guard:
-        return guard
     constraint_ids = {item.get("id") for item in data["constraints"]}
     for item in list(data["commitments"]) + list(data["deliverables"]):
         node_type = item.get("node_type")
@@ -538,9 +552,6 @@ def check_constraint_anchor(data: dict) -> tuple[str, str | None]:
 
 
 def check_deliverable_assertion(data: dict) -> tuple[str, str | None]:
-    guard = require_fields(data, REQUIRED_KEYS["DELIVERABLE_ASSERTION_LINK"])
-    if guard:
-        return guard
     assertion_by_id = {item.get("id"): item for item in data["assertions"]}
     for deliverable in data["deliverables"]:
         deliverable_id = deliverable.get("id")
@@ -560,9 +571,6 @@ def check_deliverable_assertion(data: dict) -> tuple[str, str | None]:
 
 
 def check_change_constraint(data: dict) -> tuple[str, str | None]:
-    guard = require_fields(data, REQUIRED_KEYS["CHANGE_CONSTRAINT_LINK"])
-    if guard:
-        return guard
     constraint_ids = {item.get("id") for item in data["constraints"]}
     commitment_ids = {item.get("id") for item in data.get("commitments") or []}
     deliverable_ids = {item.get("id") for item in data.get("deliverables") or []}
@@ -583,9 +591,6 @@ def check_change_constraint(data: dict) -> tuple[str, str | None]:
 
 
 def check_role_minimal(data: dict) -> tuple[str, str | None]:
-    guard = require_fields(data, REQUIRED_KEYS["ROLE_MINIMAL_COMPLETENESS"])
-    if guard:
-        return guard
     actors = {item.get("id"): item for item in data["actors"]}
     for commitment in data["commitments"]:
         accountable = commitment.get("accountable_by")
@@ -607,9 +612,6 @@ def check_role_minimal(data: dict) -> tuple[str, str | None]:
 
 
 def check_dual_dimension(data: dict) -> tuple[str, str | None]:
-    guard = require_fields(data, REQUIRED_KEYS["DUAL_DIMENSION_ANNOTATION"])
-    if guard:
-        return guard
     for item in data["management_items"]:
         if not item.get("process_group") or not item.get("subject_group"):
             return "fail", "missing_dimension"
@@ -617,23 +619,35 @@ def check_dual_dimension(data: dict) -> tuple[str, str | None]:
 
 
 def check_dimension_value(data: dict) -> tuple[str, str | None]:
-    guard = require_fields(data, REQUIRED_KEYS["DIMENSION_VALUE_CLOSED"])
-    if guard:
-        return guard
-    extension = {entry.get("value") for entry in data.get("subject_group_extension") or []}
+    extension: set[str] = set()
+    for entry in data.get("subject_group_extension") or []:
+        value = entry.get("value")
+        if (
+            isinstance(value, str)
+            and entry.get("relation") in EXTENSION_RELATIONS
+            and entry.get("base") in BASE_SUBJECT_GROUPS
+            and value not in BASE_SUBJECT_GROUPS
+        ):
+            extension.add(value)
     for item in data["management_items"]:
         if item.get("process_group") not in PROCESS_GROUPS:
             return "fail", "dimension_value_out_of_enum"
         subject = item.get("subject_group")
         if subject not in BASE_SUBJECT_GROUPS and subject not in extension:
             return "fail", "dimension_value_out_of_enum"
+    for entry in data.get("subject_group_extension") or []:
+        value = entry.get("value")
+        if (
+            not isinstance(value, str)
+            or entry.get("relation") not in EXTENSION_RELATIONS
+            or entry.get("base") not in BASE_SUBJECT_GROUPS
+            or value in BASE_SUBJECT_GROUPS
+        ):
+            return "fail", "invalid_subject_group_extension"
     return "pass", None
 
 
 def check_assertion_mutual_exclusion(data: dict) -> tuple[str, str | None]:
-    guard = require_fields(data, REQUIRED_KEYS["ASSERTION_MUTUAL_EXCLUSION"])
-    if guard:
-        return guard
     seen: dict[tuple, set] = {}
     for assertion in data["assertions"]:
         if assertion.get("state") != "active":
@@ -646,9 +660,6 @@ def check_assertion_mutual_exclusion(data: dict) -> tuple[str, str | None]:
 
 
 def check_all_improvement(data: dict) -> tuple[str, str | None]:
-    guard = require_fields(data, REQUIRED_KEYS["ALL_IMPROVEMENT_ASSUMPTION"])
-    if guard:
-        return guard
     for change in data["changes"]:
         relations = change.get("relations") or []
         assumption = change.get("assumption")
@@ -669,9 +680,6 @@ def check_all_improvement(data: dict) -> tuple[str, str | None]:
 
 
 def check_ai_autonomy(data: dict) -> tuple[str, str | None]:
-    guard = require_fields(data, REQUIRED_KEYS["AI_AUTONOMY_DELEGATION_AUDITABLE"])
-    if guard:
-        return guard
     actors = {item.get("id"): item for item in data["actors"]}
     assertions = {item.get("id"): item for item in data["assertions"]}
     for grant in data["autonomy_grants"]:
@@ -729,9 +737,6 @@ def check_ai_autonomy(data: dict) -> tuple[str, str | None]:
 
 
 def check_project_charter(data: dict) -> tuple[str, str | None]:
-    guard = require_fields(data, REQUIRED_KEYS["PROJECT_CHARTER_EXISTENCE"])
-    if guard:
-        return guard
     charters = {item.get("project"): item for item in data["charters"]}
     for project in data["projects"]:
         if project.get("stage") != "executing":
@@ -746,9 +751,6 @@ def check_project_charter(data: dict) -> tuple[str, str | None]:
 
 
 def check_closure_acceptance(data: dict) -> tuple[str, str | None]:
-    guard = require_fields(data, REQUIRED_KEYS["CLOSURE_ACCEPTANCE_LINK"])
-    if guard:
-        return guard
     for deliverable in data["deliverables"]:
         accepted = any(
             item.get("statement") in ACCEPTANCE_STATEMENTS and item.get("accountable_confirmation")
@@ -760,9 +762,6 @@ def check_closure_acceptance(data: dict) -> tuple[str, str | None]:
 
 
 def check_procurement_contract(data: dict) -> tuple[str, str | None]:
-    guard = require_fields(data, REQUIRED_KEYS["PROCUREMENT_CONTRACT_ANCHOR"])
-    if guard:
-        return guard
     contracts = {item.get("id"): item for item in data["contracts"]}
     for commitment in data["commitments"]:
         if commitment.get("procurement") != "external":
@@ -777,9 +776,6 @@ def check_procurement_contract(data: dict) -> tuple[str, str | None]:
 
 
 def check_schedule_evidence(data: dict) -> tuple[str, str | None]:
-    guard = require_fields(data, REQUIRED_KEYS["SCHEDULE_EVIDENCE_LINK"])
-    if guard:
-        return guard
     for commitment in data["commitments"]:
         if not (commitment.get("deadline") or commitment.get("milestone")):
             continue
@@ -790,9 +786,6 @@ def check_schedule_evidence(data: dict) -> tuple[str, str | None]:
 
 
 def check_tailoring_record(data: dict) -> tuple[str, str | None]:
-    guard = require_fields(data, REQUIRED_KEYS["TAILORING_RECORD_EXISTENCE"])
-    if guard:
-        return guard
     records = {item.get("id"): item for item in data["tailoring_records"]}
     for action in data["tailoring_actions"]:
         record = records.get(action.get("record"))
@@ -804,9 +797,6 @@ def check_tailoring_record(data: dict) -> tuple[str, str | None]:
 
 
 def check_tailoring_non_trimmable(data: dict) -> tuple[str, str | None]:
-    guard = require_fields(data, REQUIRED_KEYS["TAILORING_NON_TRIMMABLE_SET"])
-    if guard:
-        return guard
     for record in data["tailoring_records"]:
         if record.get("trimmed_rule") in NON_TRIMMABLE:
             return "fail", "non_trimmable_rule"
@@ -814,9 +804,6 @@ def check_tailoring_non_trimmable(data: dict) -> tuple[str, str | None]:
 
 
 def check_tailoring_reassessment(data: dict) -> tuple[str, str | None]:
-    guard = require_fields(data, REQUIRED_KEYS["TAILORING_REASSESSMENT_CONDITION"])
-    if guard:
-        return guard
     for record in data["tailoring_records"]:
         if record.get("reassessment_condition"):
             continue
@@ -877,27 +864,53 @@ def extract_cases(method_text: str) -> list[dict]:
     return cases
 
 
-def run_case(case: dict) -> dict:
-    check_id = case["check_id"]
-    expected = case["expected"] or {}
-    severity, rule_status = SPEC[check_id][1], SPEC[check_id][2]
-    data = case["input"] or {}
+def find_null(value, path: str = "<root>") -> str | None:
+    """入口归一化：递归定位顶层键、嵌套对象键、数组元素中的 null。"""
+    if value is None:
+        return path
+    if isinstance(value, dict):
+        for key, item in value.items():
+            hit = find_null(item, f"{path}.{key}")
+            if hit:
+                return hit
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            hit = find_null(item, f"{path}[{index}]")
+            if hit:
+                return hit
+    return None
+
+
+def evaluate(check_id: str, data: dict) -> tuple[str, str | None, str]:
+    """全部 check 的唯一入口：适用性 → null 归一化 → 判定 → 全局引用校验。"""
+    severity = SPEC[check_id][1]
     applicability = data.get("applicability") or {}
     state = applicability.get("state") if isinstance(applicability, dict) else None
     if state == "inapplicable":
-        verdict, reason = "not_applicable", None
-    elif state == "pending":
-        verdict, reason = "cannot_evaluate", "applicability_pending"
-    else:
-        result = CHECKS[check_id](data)
-        verdict, reason = result[0], result[1]
-        if len(result) > 2 and result[2]:
-            severity = result[2]
-        # 引用完整性全局生效：check 自身判 pass 时，再统一校验所有已知引用。
-        if verdict == "pass":
-            reference_issue = validate_references(data)
-            if reference_issue:
-                verdict, reason = reference_issue
+        return "not_applicable", None, severity
+    if state == "pending":
+        return "cannot_evaluate", "applicability_pending", severity
+    # 一次归一化覆盖三种情形，各 check 函数不再各自打补丁。
+    if find_null(data) is not None:
+        return "cannot_evaluate", "missing_input", severity
+    result = CHECKS[check_id](data)
+    verdict, reason = result[0], result[1]
+    if len(result) > 2 and result[2]:
+        severity = result[2]
+    # 引用完整性全局生效：check 自身判 pass 时，再统一校验所有已知引用。
+    if verdict == "pass":
+        reference_issue = validate_references(data)
+        if reference_issue:
+            verdict, reason = reference_issue
+    return verdict, reason, severity
+
+
+def run_case(case: dict) -> dict:
+    check_id = case["check_id"]
+    expected = case["expected"] or {}
+    rule_status = SPEC[check_id][2]
+    data = case["input"] or {}
+    verdict, reason, severity = evaluate(check_id, data)
     actual = {
         "check_id": check_id,
         "source_rule": SPEC[check_id][0],
@@ -916,29 +929,117 @@ def run_case(case: dict) -> dict:
     return {**case, "actual": actual, "mismatches": mismatches}
 
 
-def null_sweep() -> int:
-    """负例实测：每个必需键单独取 null，必须返回 cannot_evaluate 而非崩溃。"""
+def _walk_paths(value, prefix: tuple = ()):
+    """产出 (路径元组, 节点) 覆盖全部嵌套结构。"""
+    if isinstance(value, dict):
+        for key, item in value.items():
+            path = prefix + (key,)
+            yield path, item
+            yield from _walk_paths(item, path)
+    elif isinstance(value, list):
+        for index, item in enumerate(value):
+            path = prefix + (index,)
+            yield path, item
+            yield from _walk_paths(item, path)
+
+
+def _render_path(path: tuple) -> str:
+    rendered = ""
+    for part in path:
+        if isinstance(part, int):
+            rendered += "[]"
+        else:
+            rendered = f"{rendered}.{part}" if rendered else part
+    return rendered
+
+
+def _assign(data, path: tuple, value) -> None:
+    cursor = data
+    for key in path[:-1]:
+        cursor = cursor[key]
+    cursor[path[-1]] = value
+
+
+def _expect_missing(kind: str, check_id: str, data: dict, failures: list) -> bool:
+    try:
+        verdict, reason, _ = evaluate(check_id, data)
+    except Exception as exc:  # noqa: BLE001 - 负例就是要捕获崩溃
+        failures.append(f"{kind} [{check_id}] 抛 {type(exc).__name__}: {exc}")
+        return False
+    if (verdict, reason) != ("cannot_evaluate", "missing_input"):
+        failures.append(
+            f"{kind} [{check_id}] 期望 cannot_evaluate/missing_input，实际 {verdict}/{reason}"
+        )
+        return False
+    return True
+
+
+def null_sweep(root: Path) -> int:
+    """负例实测：顶层键、嵌套对象键、数组元素为 null 都必须 cannot_evaluate。"""
     failures: list[str] = []
-    total = 0
+
+    top_total = top_ok = 0
     for check_id, keys in REQUIRED_KEYS.items():
         for null_key in keys:
-            total += 1
-            data = {key: (None if key == null_key else []) for key in keys}
-            try:
-                result = CHECKS[check_id](data)
-            except Exception as exc:  # noqa: BLE001 - 负例就是要捕获崩溃
-                failures.append(f"{check_id}.{null_key}: 抛 {type(exc).__name__}: {exc}")
-                continue
-            verdict, reason = result[0], result[1]
-            if (verdict, reason) != ("cannot_evaluate", "missing_input"):
-                failures.append(
-                    f"{check_id}.{null_key}: 期望 cannot_evaluate/missing_input，"
-                    f"实际 {verdict}/{reason}"
-                )
+            top_total += 1
+            data = {key: [] for key in keys}
+            data[null_key] = None
+            if _expect_missing(f"顶层键 {null_key}", check_id, data, failures):
+                top_ok += 1
+
+    method = (root / METHOD).read_text(encoding="utf-8")
+    array_total = array_ok = object_total = object_ok = 0
+    array_paths: set[tuple[str, str]] = set()
+    for case in extract_cases(method):
+        check_id = case["check_id"]
+        data = case["input"] or {}
+        for path, node in list(_walk_paths(data)):
+            if isinstance(node, list) and node:
+                array_total += 1
+                array_paths.add((check_id, _render_path(path)))
+                clone = copy.deepcopy(data)
+                _assign(clone, path + (0,), None)
+                if _expect_missing(
+                    f"数组元素 {_render_path(path)}[0]", check_id, clone, failures
+                ):
+                    array_ok += 1
+            elif isinstance(node, dict) and len(path) > 1 and isinstance(path[-1], str):
+                object_total += 1
+                clone = copy.deepcopy(data)
+                _assign(clone, path, None)
+                if _expect_missing(
+                    f"嵌套对象键 {_render_path(path)}", check_id, clone, failures
+                ):
+                    object_ok += 1
+
     for failure in failures:
         print(f"[FAIL] {failure}")
-    print(f"null 负例：{total - len(failures)}/{total} 返回 cannot_evaluate，崩溃 {len(failures)} 处")
+    print(f"null 负例（顶层必需键）：{top_ok}/{top_total}")
+    print(
+        f"null 负例（数组元素）：{array_ok}/{array_total}"
+        f"，覆盖 {len(array_paths)} 条唯一非空数组路径"
+    )
+    print(f"null 负例（嵌套对象键）：{object_ok}/{object_total}")
+    total, ok = top_total + array_total + object_total, top_ok + array_ok + object_ok
+    print(f"null 负例合计：{ok}/{total} 返回 cannot_evaluate，崩溃 {len(failures)} 处")
     return 0 if not failures else 1
+
+
+def input_domain_issues(root: Path) -> list[str]:
+    """检查 §3 输入域是否覆盖样例中实际出现的引用目标集合。"""
+    method = (root / METHOD).read_text(encoding="utf-8")
+    issues: list[str] = []
+    for case in extract_cases(method):
+        check_id = case["check_id"]
+        required = set(REQUIRED_KEYS.get(check_id, ()))
+        needed = referenced_collections(case["input"] or {})
+        missing = sorted(needed - required)
+        if missing:
+            issues.append(
+                f"{case['section']}-{case['case']} {check_id}: 引用目标集合 "
+                f"{missing} 未在 §3 必需顶层键中声明"
+            )
+    return issues
 
 
 def main() -> int:
@@ -946,12 +1047,23 @@ def main() -> int:
     parser.add_argument("--root", default=str(Path(__file__).resolve().parents[2]))
     parser.add_argument("--json", action="store_true", help="输出 JSON 报告")
     parser.add_argument(
-        "--null-sweep", action="store_true", help="负例：必需键取 null 时不得抛异常"
+        "--null-sweep", action="store_true", help="负例：任意层级取 null 时不得抛异常"
+    )
+    parser.add_argument(
+        "--input-domain",
+        action="store_true",
+        help="检查样例中出现的引用目标集合是否都已在 schema §3 声明",
     )
     args = parser.parse_args()
-    if args.null_sweep:
-        return null_sweep()
     root = Path(args.root)
+    if args.null_sweep:
+        return null_sweep(root)
+    if args.input_domain:
+        issues = input_domain_issues(root)
+        for issue in issues:
+            print(f"[FAIL] {issue}")
+        print(f"输入域闭包：{len(issues)} 处缺口")
+        return 0 if not issues else 1
     method = (root / METHOD).read_text(encoding="utf-8")
     cases = [run_case(case) for case in extract_cases(method)]
     passed = [case for case in cases if not case["mismatches"]]
