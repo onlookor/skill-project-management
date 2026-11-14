@@ -294,6 +294,222 @@
 | `TAILORING_NON_TRIMMABLE_SET` | G-G2 | `TailoringRecord` 的目标规则 | 目标规则 ∉ {G-A1, G-A2, G-C1, G-D1, G-E1} | `assumption` |
 | `TAILORING_REASSESSMENT_CONDITION` | G-G3 | `TailoringRecord` | 每条记录关联至少一条重新评估条件断言，或显式声明“永久”并附理由 | `assumption` |
 
+### A.1 参考样例（T-011）
+
+> 用途：作为 T-107 最小原型的验收输入。样例只按 A 表“判定”列执行，**不新增谓词、不改判定**；输入为谓词快照（YAML），输出为第 4.2 节三值枚举中的 `verdict` 与稳定原因码 `reason`。原因码只用于样例断言，不构成新的规范词汇。
+>
+> **范围**：仅 A 表中规则状态 `active` 且 severity 为 `block` 的 5 个 `check_id`。这 5 项当前均为 `active` / `block`（A 表与 `validation/CHECKLIST.md` 一致）；下列期望输出省略 `rule_status: active` 与 `severity: block`，原型断言时一并校验。
+>
+> **输入约定**：`commitments`、`deliverables` 等键即该 `check_id` 的量化域；样例假定输入已按规则适用范围筛选（例如 G-E1 的快照只含决策类 `Commitment`，G-A2 的快照只含管理活动/产物），检查本身不再做类型筛选。输入缺键或键不可求值时，原型应输出 `cannot_evaluate`，不得当作 `pass`。
+
+#### A.1.1 `PROJECT_MINIMAL_EXISTENCE`（G-A1，`block`）
+
+**判定依据**：A 表“四类节点均存在且 `Commitment` 的 `by` 指向 `Actor`、`to` 指向 `Outcome`”。
+
+**样例 1（触发 → `fail`）**：`Constraint` 集为空。
+
+```yaml
+project: { id: "P-1" }
+actors: [{ id: "A-1", type: "HumanActor" }]
+outcomes: [{ id: "O-1" }]
+commitments: [{ id: "C-1", by: "A-1", to: "O-1" }]
+constraints: []
+```
+
+期望输出：
+
+```yaml
+check_id: PROJECT_MINIMAL_EXISTENCE
+source_rule: G-A1
+verdict: fail
+reason: missing_constraint
+```
+
+**样例 2（不触发 → `pass`）**：四类节点齐备，承诺端点有效。
+
+```yaml
+project: { id: "P-2" }
+actors: [{ id: "A-1", type: "HumanActor" }]
+outcomes: [{ id: "O-1" }]
+commitments: [{ id: "C-1", by: "A-1", to: "O-1" }]
+constraints: [{ id: "K-1", constrains: "O-1" }]
+```
+
+期望输出：
+
+```yaml
+check_id: PROJECT_MINIMAL_EXISTENCE
+source_rule: G-A1
+verdict: pass
+reason: null
+```
+
+> 边界说明：G-A1 正文还要求 `Constraint` “作用于该 `Outcome` 或 `Commitment`”，A 表判定列只要求四类节点存在，未包含该边检查。上述样例不覆盖“`Constraint` 存在但未作用于任何 `Outcome`/`Commitment`”的情形；该子句是否纳入判定需另行裁定（T-130），本轮不改判定。
+
+#### A.1.2 `CONSTRAINT_ANCHOR_REQUIRED`（G-A2，`block`）
+
+**判定依据**：A 表“每个管理活动/产物至少有一条 `constrained_by` 边指向已登记 `Constraint`”。
+
+**样例 1（触发 → `fail`）**：一个管理产物没有约束锚定。
+
+```yaml
+commitments: [{ id: "C-1", constrained_by: ["K-1"] }]
+deliverables: [{ id: "D-1", constrained_by: [] }]
+constraints: [{ id: "K-1" }]
+```
+
+期望输出：
+
+```yaml
+check_id: CONSTRAINT_ANCHOR_REQUIRED
+source_rule: G-A2
+verdict: fail
+reason: unanchored_management_item
+```
+
+**样例 2（不触发 → `pass`）**：每个管理活动/产物都有非空约束锚定。
+
+```yaml
+commitments: [{ id: "C-1", constrained_by: ["K-1", "K-2"] }]
+deliverables: [{ id: "D-1", constrained_by: ["K-1"] }]
+constraints: [{ id: "K-1" }, { id: "K-2" }]
+```
+
+期望输出：
+
+```yaml
+check_id: CONSTRAINT_ANCHOR_REQUIRED
+source_rule: G-A2
+verdict: pass
+reason: null
+```
+
+#### A.1.3 `DELIVERABLE_ASSERTION_LINK`（G-C1，`block`）
+
+**判定依据**：A 表“每个 `Deliverable` 至少有一条 `asserted_by` 边指向 `Assertion`”。
+
+**样例 1（触发 → `fail`）**：交付物没有任何断言。
+
+```yaml
+deliverables: [{ id: "D-1", asserted_by: [] }]
+assertions: [{ id: "S-1", about: "D-2" }]
+```
+
+期望输出：
+
+```yaml
+check_id: DELIVERABLE_ASSERTION_LINK
+source_rule: G-C1
+verdict: fail
+reason: deliverable_without_assertion
+```
+
+**样例 2（不触发 → `pass`）**：每个交付物至少关联一条断言。
+
+```yaml
+deliverables: [
+  { id: "D-1", asserted_by: ["S-1"] },
+  { id: "D-2", asserted_by: ["S-2", "S-3"] }
+]
+assertions: [{ id: "S-1" }, { id: "S-2" }, { id: "S-3" }]
+```
+
+期望输出：
+
+```yaml
+check_id: DELIVERABLE_ASSERTION_LINK
+source_rule: G-C1
+verdict: pass
+reason: null
+```
+
+#### A.1.4 `CHANGE_CONSTRAINT_LINK`（G-D1，`block`）
+
+**判定依据**：A 表“每个变更提议至少有一条边指向 `Constraint`，且边类型 ∈ {`mitigates`, `exacerbates`, `trades_off`}”。
+
+**样例 1（触发 → `fail`）**：变更使用了枚举外的关系类型。
+
+```yaml
+changes: [{ id: "CH-1", constraint: "K-1", relation: "affects" }]
+constraints: [{ id: "K-1" }]
+```
+
+期望输出：
+
+```yaml
+check_id: CHANGE_CONSTRAINT_LINK
+source_rule: G-D1
+verdict: fail
+reason: invalid_change_relation
+```
+
+**样例 2（不触发 → `pass`）**：每个变更都锚定约束且关系类型合法。
+
+```yaml
+changes: [
+  { id: "CH-1", constraint: "K-1", relation: "mitigates" },
+  { id: "CH-2", constraint: "K-2", relation: "trades_off" }
+]
+constraints: [{ id: "K-1" }, { id: "K-2" }]
+```
+
+期望输出：
+
+```yaml
+check_id: CHANGE_CONSTRAINT_LINK
+source_rule: G-D1
+verdict: pass
+reason: null
+```
+
+#### A.1.5 `ROLE_MINIMAL_COMPLETENESS`（G-E1，`block`）
+
+**判定依据**：A 表“每个决策类 `Commitment` 有唯一 `accountable_by` 指向 `HumanActor`/`LegalEntity`，且至少一个 `responsible_by`；重合时有 `role_merge_declaration`”。
+
+**样例 1（触发 → `fail`）**：`Accountable` 落在 `AIActor` 上。
+
+```yaml
+actors: [
+  { id: "A-1", type: "AIActor" },
+  { id: "A-2", type: "HumanActor" }
+]
+commitments: [
+  { id: "C-1", accountable_by: "A-1", responsible_by: ["A-2"] }
+]
+```
+
+期望输出：
+
+```yaml
+check_id: ROLE_MINIMAL_COMPLETENESS
+source_rule: G-E1
+verdict: fail
+reason: accountable_not_human
+```
+
+**样例 2（不触发 → `pass`）**：唯一人类 `Accountable` 与至少一个 `Responsible`，二者不重合。
+
+```yaml
+actors: [
+  { id: "A-1", type: "HumanActor" },
+  { id: "A-2", type: "AIActor" }
+]
+commitments: [
+  { id: "C-1", accountable_by: "A-1", responsible_by: ["A-2"] }
+]
+```
+
+期望输出：
+
+```yaml
+check_id: ROLE_MINIMAL_COMPLETENESS
+source_rule: G-E1
+verdict: pass
+reason: null
+```
+
+> 边界说明：`Accountable` 与 `Responsible` 重合但缺 `role_merge_declaration` 的子情形不纳入本组 `block` 样例。该子情形的 warn/block 拆分已登记为 T-100（ERRATA E-004），在裁定前不改变判定。
+
 ### B. 翻译规范（方法有关）
 
 从规则陈述到检查条件的翻译，遵循以下六条：
