@@ -298,7 +298,7 @@
 
 > 用途：作为 T-107 最小原型的验收输入。样例只按 A 表“判定”列执行，**不新增谓词、不改判定**；输入为谓词快照（YAML），输出为第 4.2 节三值枚举中的 `verdict` 与稳定原因码 `reason`。原因码只用于样例断言，不构成新的规范词汇。
 >
-> **范围**：仅 A 表中规则状态 `active` 且 severity 为 `block` 的 5 个 `check_id`。这 5 项当前均为 `active` / `block`（A 表与 `validation/CHECKLIST.md` 一致）；下列期望输出省略 `rule_status: active` 与 `severity: block`，原型断言时一并校验。
+> **范围**：A 表全部 17 个 `check_id`，按 severity 分批补齐。`block` 级样例省略 `severity` / `rule_status`（原型按 `block` / `active` 校验）；`warn` 级与 `assumption` 级样例在期望输出中显式给出 `severity` 与 `rule_status`，实际 severity 以 `validation/CHECKLIST.md` 为准。
 >
 > **输入约定**：`commitments`、`deliverables` 等键即该 `check_id` 的量化域；样例假定输入已按规则适用范围筛选（例如 G-E1 的快照只含决策类 `Commitment`，G-A2 的快照只含管理活动/产物），检查本身不再做类型筛选。输入缺键或键不可求值时，原型应输出 `cannot_evaluate`，不得当作 `pass`。
 
@@ -509,6 +509,133 @@ reason: null
 ```
 
 > 边界说明：`Accountable` 与 `Responsible` 重合但缺 `role_merge_declaration` 的子情形不纳入本组 `block` 样例。该子情形的 warn/block 拆分已登记为 T-100（ERRATA E-004），在裁定前不改变判定。
+
+#### A.1.6 `DUAL_DIMENSION_ANNOTATION`（G-B1，`advisory` / `active`）
+
+**判定依据**：A 表“每个管理项携带 `process_group` 与 `subject_group` 两个标签”；G-B1 正文规定缺任一维度即违规。本项只检查**标签存在性**，标签值合法性归 A.1.7。
+
+**样例 1（触发 → `fail`）**：第二个管理项缺 `subject_group`。
+
+```yaml
+management_items:
+  - { id: "M-1", process_group: "managing-delivery", subject_group: "planning" }
+  - { id: "M-2", process_group: "closing" }
+```
+
+期望输出：
+
+```yaml
+check_id: DUAL_DIMENSION_ANNOTATION
+source_rule: G-B1
+severity: advisory
+rule_status: active
+verdict: fail
+reason: missing_dimension
+```
+
+**样例 2（不触发 → `pass`）**：两个管理项均携带双标签。
+
+```yaml
+management_items:
+  - { id: "M-1", process_group: "managing-delivery", subject_group: "planning" }
+  - { id: "M-2", process_group: "closing", subject_group: "lessons-learned" }
+```
+
+期望输出：
+
+```yaml
+check_id: DUAL_DIMENSION_ANNOTATION
+source_rule: G-B1
+severity: advisory
+rule_status: active
+verdict: pass
+reason: null
+```
+
+#### A.1.7 `DIMENSION_VALUE_CLOSED`（G-B2，`advisory` / `active`）
+
+**判定依据**：A 表“标签值 ∈ 所锚定标准的枚举 ∪ 契约声明的 `subject_group_extension`”。本组样例覆盖“基础枚举内 / 枚举外”两种；`subject_group_extension` 分支依赖接口契约的槽位声明，不在此二例中固化。
+
+**样例 1（触发 → `fail`）**：`subject_group` 使用了基础枚举外的自定义值。
+
+```yaml
+management_items:
+  - { id: "M-1", process_group: "managing-delivery", subject_group: "innovation" }
+```
+
+期望输出：
+
+```yaml
+check_id: DIMENSION_VALUE_CLOSED
+source_rule: G-B2
+severity: advisory
+rule_status: active
+verdict: fail
+reason: dimension_value_out_of_enum
+```
+
+**样例 2（不触发 → `pass`）**：两个标签值均在基础枚举内。
+
+```yaml
+management_items:
+  - { id: "M-1", process_group: "initiating", subject_group: "planning" }
+  - { id: "M-2", process_group: "closing", subject_group: "lessons-learned" }
+```
+
+期望输出：
+
+```yaml
+check_id: DIMENSION_VALUE_CLOSED
+source_rule: G-B2
+severity: advisory
+rule_status: active
+verdict: pass
+reason: null
+```
+
+#### A.1.8 `ASSERTION_MUTUAL_EXCLUSION`（G-C2，`warn` / `active`）
+
+**判定依据**：A 表“不存在两条 `active` 断言对同一 `Subject` 同一属性给出不相容值”；G-C2 要求冲突时同时呈现两条断言，不得静默择一。
+
+**样例 1（触发 → `fail`）**：同一交付物的两条 `active` 断言对 `status` 给出不相容值。
+
+```yaml
+deliverables: [{ id: "D-1" }]
+assertions:
+  - { id: "S-1", deliverable: "D-1", subject: "D-1", property: "status", value: "accepted", state: "active" }
+  - { id: "S-2", deliverable: "D-1", subject: "D-1", property: "status", value: "rejected", state: "active" }
+```
+
+期望输出：
+
+```yaml
+check_id: ASSERTION_MUTUAL_EXCLUSION
+source_rule: G-C2
+severity: warn
+rule_status: active
+verdict: fail
+reason: mutually_exclusive_active_assertions
+```
+
+**样例 2（不触发 → `pass`）**：两条 `active` 断言描述不同属性，不构成互斥。
+
+```yaml
+deliverables: [{ id: "D-1" }]
+assertions:
+  - { id: "S-1", deliverable: "D-1", subject: "D-1", property: "status", value: "accepted", state: "active" }
+  - { id: "S-2", deliverable: "D-1", subject: "D-1", property: "acceptance_date", value: "2026-11-14", state: "active" }
+```
+
+期望输出：
+
+```yaml
+check_id: ASSERTION_MUTUAL_EXCLUSION
+source_rule: G-C2
+severity: warn
+rule_status: active
+verdict: pass
+reason: null
+```
 
 ### B. 翻译规范（方法有关）
 
