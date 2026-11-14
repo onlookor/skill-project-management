@@ -1270,6 +1270,11 @@
       "term": "Accountable",
       "locations": [
         {
+          "file": "CHANGELOG.md",
+          "line": 623,
+          "form": "code"
+        },
+        {
           "file": "CHARTER.md",
           "line": 44,
           "form": "code"
@@ -3133,6 +3138,11 @@
         {
           "file": "CHANGELOG.md",
           "line": 582,
+          "form": "code"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 626,
           "form": "code"
         },
         {

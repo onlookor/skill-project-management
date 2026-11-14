@@ -607,3 +607,25 @@
 - **复核状态**：G-001–G-017 仍为 `open`（17/17），等非同源复核结论。
 - **关联 ADR**：ADR-0013（`proposed`，§2.2、§8.4）
 - **状态**：生效（纪律补漏；缺口未关闭）
+
+---
+
+### 批次 0039 — 2026-11-14 — 第一段：缺键归一化与顺序无关聚合
+
+- **性质**：纯缺陷修复，不涉及设计变更。对应 G-009（缺键/`null` 路径）与 G-014（聚合顺序）。17 条缺口仍为 `open`，本批次不关闭任何缺口。
+- **涉及文件**：`validation/checker-prototype/checker.py`（入口归一化、17 个 check 改为子句级结果列表、`aggregate()`、`--missing-key-sweep`、`--aggregation-order`）、`GAP_LEDGER.md`（G-009/G-014 描述更新，状态仍 `open`）、`CHANGELOG.md`（本批次）
+- **变更摘要**：
+  1. **缺键路径**：`evaluate()` 在进入 check 前先比对 schema §3 生成的 `REQUIRED_KEYS`，键不存在与值为 `null` 走同一出口 `cannot_evaluate` / `missing_input`。check 函数内不再承担缺键守卫；`{}` 直入 check 仍 17/17 抛 `KeyError`，证明拦截在入口。
+  2. **聚合顺序**：17 个 check 统一返回子句级结果列表，由 `aggregate()` 聚合：verdict 取 `fail > cannot_evaluate > pass` 最高级；reason 只在胜出 verdict 内按 A.2 行序取首条；severity 取胜出子句最高级（缺省用 check 默认）。函数内不得提前 `return` 首个失败；`check_ai_autonomy` 的路径子句与断言子句分别收集，`invalid_path` 不再掩盖断言 `fail`。
+- **负例实测**：
+  - `--missing-key-sweep`：43 个必需键逐一单删，43/43 返回 `cannot_evaluate/missing_input`，偏离 0。
+  - 对照：`{}` 直入 17 个 check 函数仍 17/17 抛 `KeyError`，说明修复位于入口归一化而非函数内守卫。
+  - `--aggregation-order`：A2（3 项：fail/`cannot_evaluate`/fail）6 种排列 → 1 种结论 `fail/unanchored_management_item`；E2（3 个 grant：`invalid_path`/断言不完整/链未达 `Accountable`）6 种排列 → 1 种结论 `fail/delegation_chain_not_accountable`。
+  - `--null-sweep`：138/138，崩溃 0；`--input-domain`：0 缺口。
+- **验证**：
+  - `python3 validation/checker-prototype/checker.py`：34/34，17/17 `check_id`；退出 0。
+  - `python3 scripts/check_three_table.py`：退出 0；`python3 scripts/test_check_table_mutations.py`：11/11 抓到，签收正负例 2/2，退出 0。
+  - 七个检查器全部退出 0。
+  - **复核状态**：G-001–G-017 仍为 `open`（17/17）。G-009 与 G-014 待非同源复核关闭，其余 15 条不动。
+- **关联 ADR**：ADR-0013（`proposed`，§2.1 P7、§2.3 D4）
+- **状态**：生效（缺陷修复；缺口未关闭）

@@ -17,6 +17,7 @@ import copy
 import json
 import re
 import sys
+from itertools import permutations
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -163,6 +164,57 @@ def parse_reference_rules(text: str) -> list[dict]:
 _SCHEMA_TEXT = (ROOT / SCHEMA).read_text(encoding="utf-8")
 REQUIRED_KEYS = parse_required_keys(_SCHEMA_TEXT)
 REFERENCE_RULES = parse_reference_rules(_SCHEMA_TEXT)
+
+_METHOD_TEXT = (ROOT / METHOD).read_text(encoding="utf-8")
+
+
+def parse_reason_order(text: str) -> dict[str, list[str]]:
+    """按 A.2 行序生成每个 check_id 的原因码优先级，用于顺序无关的 reason 选择。"""
+    order: dict[str, list[str]] = {}
+    for line in text.splitlines():
+        cells = split_row(line)
+        if not cells or len(cells) < 8:
+            continue
+        if not (cells[0].startswith("`G-") and cells[0].endswith("`")):
+            continue
+        check_id = cells[4].strip("`")
+        slot = order.setdefault(check_id, [])
+        for reason in re.findall(r"[a-z][a-z0-9_]+", cells[3]):
+            if reason not in slot:
+                slot.append(reason)
+    return order
+
+
+REASON_ORDER = parse_reason_order(_METHOD_TEXT)
+
+VERDICT_RANK = {"pass": 0, "cannot_evaluate": 1, "fail": 2}
+SEVERITY_RANK = {"advisory": 0, "warn": 1, "block": 2}
+
+
+def aggregate(
+    check_id: str, results: list[tuple], default_severity: str
+) -> tuple[str, str | None, str]:
+    """顺序无关聚合：fail > cannot_evaluate > pass；reason 按 A.2 行序取首条。
+
+    - verdict 取所有子句结论的最高级，与子句求值顺序无关；
+    - reason 只在胜出 verdict 的子句里按 A.2 行序取首条，与输入顺序无关；
+    - severity 取胜出 verdict 的子句 severity 最高级，缺省用 check 的默认 severity。
+    """
+    if not results:
+        return "pass", None, default_severity
+    verdict = max((item[0] for item in results), key=lambda value: VERDICT_RANK[value])
+    winners = [item for item in results if item[0] == verdict]
+    reasons = [item[1] for item in winners if len(item) > 1 and item[1]]
+    severity = default_severity
+    for item in winners:
+        if len(item) > 2 and item[2] and SEVERITY_RANK[item[2]] > SEVERITY_RANK[severity]:
+            severity = item[2]
+    if not reasons:
+        return verdict, None, severity
+    for candidate in REASON_ORDER.get(check_id, []):
+        if candidate in reasons:
+            return verdict, candidate, severity
+    return verdict, sorted(reasons)[0], severity
 
 
 
@@ -514,111 +566,124 @@ def load_yaml(text: str) -> object:
 
 
 # ---------------------------------------------------------------- 判定实现
-# 每个函数返回 (verdict, reason)。reason 为稳定原因码；pass 时为 None。
+# 每个函数返回子句级结果列表 [(verdict, reason[, severity])]；空列表表示 pass。
+# 聚合由 aggregate() 完成，函数内不得提前 return 首个失败。
 
 
-def check_project_minimal_existence(data: dict) -> tuple[str, str | None]:
+def check_project_minimal_existence(data: dict) -> list[tuple]:
+    results = []
     actor_ids = {item.get("id") for item in data["actors"]}
     outcome_ids = {item.get("id") for item in data["outcomes"]}
     if not data["actors"]:
-        return "fail", "missing_actor"
+        results.append(("fail", "missing_actor"))
     if not data["outcomes"]:
-        return "fail", "missing_outcome"
+        results.append(("fail", "missing_outcome"))
     if not data["commitments"]:
-        return "fail", "missing_commitment"
+        results.append(("fail", "missing_commitment"))
     if not data["constraints"]:
-        return "fail", "missing_constraint"
+        results.append(("fail", "missing_constraint"))
+    commitment_ids = {item.get("id") for item in data["commitments"]}
     for commitment in data["commitments"]:
         if commitment.get("by") not in actor_ids or commitment.get("to") not in outcome_ids:
-            return "fail", "broken_commitment_endpoint"
-    commitment_ids = {item.get("id") for item in data["commitments"]}
+            results.append(("fail", "broken_commitment_endpoint"))
     for constraint in data["constraints"]:
         target = constraint.get("constrains")
         if not target or target not in (outcome_ids | commitment_ids):
-            return "fail", "constraint_not_applied"
-    return "pass", None
+            results.append(("fail", "constraint_not_applied"))
+    return results
 
 
-def check_constraint_anchor(data: dict) -> tuple[str, str | None]:
+def check_constraint_anchor(data: dict) -> list[tuple]:
+    results = []
     constraint_ids = {item.get("id") for item in data["constraints"]}
     for item in list(data["commitments"]) + list(data["deliverables"]):
         node_type = item.get("node_type")
         if node_type is not None and node_type not in ("ManagementActivity", "ManagementArtifact"):
-            return "cannot_evaluate", "undefined_object_type"
+            results.append(("cannot_evaluate", "undefined_object_type"))
         refs = item.get("constrained_by") or []
         if not refs or any(ref not in constraint_ids for ref in refs):
-            return "fail", "unanchored_management_item"
-    return "pass", None
+            results.append(("fail", "unanchored_management_item"))
+    return results
 
 
-def check_deliverable_assertion(data: dict) -> tuple[str, str | None]:
+def check_deliverable_assertion(data: dict) -> list[tuple]:
+    results = []
     assertion_by_id = {item.get("id"): item for item in data["assertions"]}
     for deliverable in data["deliverables"]:
         deliverable_id = deliverable.get("id")
         refs = deliverable.get("asserted_by") or []
         if any(ref not in assertion_by_id for ref in refs):
-            return "fail", "dangling_reference"
+            results.append(("fail", "dangling_reference"))
         about_ids = [aid for aid, item in assertion_by_id.items() if item.get("about") == deliverable_id]
         if not refs and not about_ids:
-            return "fail", "deliverable_without_assertion"
+            results.append(("fail", "deliverable_without_assertion"))
         for assertion_id in list(dict.fromkeys(list(refs) + sorted(about_ids))):
-            assertion = assertion_by_id[assertion_id]
+            assertion = assertion_by_id.get(assertion_id)
+            if assertion is None:
+                continue
             if not assertion.get("statement") or assertion.get("statement_kind") not in STATEMENT_KINDS:
-                return "fail", "assertion_without_content"
+                results.append(("fail", "assertion_without_content"))
             if assertion.get("about") != deliverable_id:
-                return "fail", "assertion_about_mismatch"
-    return "pass", None
+                results.append(("fail", "assertion_about_mismatch"))
+    return results
 
 
-def check_change_constraint(data: dict) -> tuple[str, str | None]:
+def check_change_constraint(data: dict) -> list[tuple]:
+    results = []
     constraint_ids = {item.get("id") for item in data["constraints"]}
     commitment_ids = {item.get("id") for item in data.get("commitments") or []}
     deliverable_ids = {item.get("id") for item in data.get("deliverables") or []}
     for change in data["changes"]:
         if change.get("constraint") not in constraint_ids:
-            return "fail", "missing_constraint_link"
+            results.append(("fail", "missing_constraint_link"))
         if change.get("relation") not in CHANGE_RELATIONS:
-            return "fail", "invalid_change_relation"
+            results.append(("fail", "invalid_change_relation"))
         target = change.get("target")
         if not isinstance(target, dict) or not target.get("type") or not target.get("id"):
-            return "fail", "missing_change_target"
+            results.append(("fail", "missing_change_target"))
+            continue
         if target["type"] not in CHANGE_TARGET_TYPES:
-            return "fail", "invalid_change_target"
+            results.append(("fail", "invalid_change_target"))
+            continue
         known = commitment_ids if target["type"] == "Commitment" else deliverable_ids
         if target["id"] not in known:
-            return "fail", "invalid_change_target"
-    return "pass", None
+            results.append(("fail", "invalid_change_target"))
+    return results
 
 
-def check_role_minimal(data: dict) -> tuple[str, str | None]:
+def check_role_minimal(data: dict) -> list[tuple]:
+    results = []
     actors = {item.get("id"): item for item in data["actors"]}
     for commitment in data["commitments"]:
         accountable = commitment.get("accountable_by")
         if not accountable:
-            return "fail", "missing_accountable"
-        if isinstance(accountable, list):
-            return "fail", "multiple_accountable"
-        actor = actors.get(accountable)
-        if actor is None:
-            return "fail", "unknown_accountable"
-        if actor.get("type") not in ("HumanActor", "LegalEntity"):
-            return "fail", "accountable_not_human"
+            results.append(("fail", "missing_accountable"))
+        elif isinstance(accountable, list):
+            results.append(("fail", "multiple_accountable"))
+        else:
+            actor = actors.get(accountable)
+            if actor is None:
+                results.append(("fail", "unknown_accountable"))
+            elif actor.get("type") not in ("HumanActor", "LegalEntity"):
+                results.append(("fail", "accountable_not_human"))
         responsible = commitment.get("responsible_by") or []
         if not responsible:
-            return "fail", "missing_responsible"
-        if accountable in responsible and not commitment.get("role_merge_declaration"):
-            return "fail", "missing_role_merge_declaration", "warn"
-    return "pass", None
+            results.append(("fail", "missing_responsible"))
+        if accountable and accountable in responsible and not commitment.get("role_merge_declaration"):
+            results.append(("fail", "missing_role_merge_declaration", "warn"))
+    return results
 
 
-def check_dual_dimension(data: dict) -> tuple[str, str | None]:
+def check_dual_dimension(data: dict) -> list[tuple]:
+    results = []
     for item in data["management_items"]:
         if not item.get("process_group") or not item.get("subject_group"):
-            return "fail", "missing_dimension"
-    return "pass", None
+            results.append(("fail", "missing_dimension"))
+    return results
 
 
-def check_dimension_value(data: dict) -> tuple[str, str | None]:
+def check_dimension_value(data: dict) -> list[tuple]:
+    results = []
     extension: set[str] = set()
     for entry in data.get("subject_group_extension") or []:
         value = entry.get("value")
@@ -631,10 +696,10 @@ def check_dimension_value(data: dict) -> tuple[str, str | None]:
             extension.add(value)
     for item in data["management_items"]:
         if item.get("process_group") not in PROCESS_GROUPS:
-            return "fail", "dimension_value_out_of_enum"
+            results.append(("fail", "dimension_value_out_of_enum"))
         subject = item.get("subject_group")
         if subject not in BASE_SUBJECT_GROUPS and subject not in extension:
-            return "fail", "dimension_value_out_of_enum"
+            results.append(("fail", "dimension_value_out_of_enum"))
     for entry in data.get("subject_group_extension") or []:
         value = entry.get("value")
         if (
@@ -643,11 +708,12 @@ def check_dimension_value(data: dict) -> tuple[str, str | None]:
             or entry.get("base") not in BASE_SUBJECT_GROUPS
             or value in BASE_SUBJECT_GROUPS
         ):
-            return "fail", "invalid_subject_group_extension"
-    return "pass", None
+            results.append(("fail", "invalid_subject_group_extension"))
+    return results
 
 
-def check_assertion_mutual_exclusion(data: dict) -> tuple[str, str | None]:
+def check_assertion_mutual_exclusion(data: dict) -> list[tuple]:
+    results = []
     seen: dict[tuple, set] = {}
     for assertion in data["assertions"]:
         if assertion.get("state") != "active":
@@ -655,11 +721,12 @@ def check_assertion_mutual_exclusion(data: dict) -> tuple[str, str | None]:
         key = (assertion.get("subject"), assertion.get("property"))
         seen.setdefault(key, set()).add(assertion.get("value"))
     if any(len(values) > 1 for values in seen.values()):
-        return "fail", "mutually_exclusive_active_assertions"
-    return "pass", None
+        results.append(("fail", "mutually_exclusive_active_assertions"))
+    return results
 
 
-def check_all_improvement(data: dict) -> tuple[str, str | None]:
+def check_all_improvement(data: dict) -> list[tuple]:
+    results = []
     for change in data["changes"]:
         relations = change.get("relations") or []
         assumption = change.get("assumption")
@@ -669,59 +736,77 @@ def check_all_improvement(data: dict) -> tuple[str, str | None]:
         )
         if relations and all(item == "mitigates" for item in relations):
             if not assumption or not (change.get("verification_condition") or assumption_condition):
-                return "fail", "all_improvement_without_verification"
-            if status == "expired" or (
+                results.append(("fail", "all_improvement_without_verification"))
+            elif status == "expired" or (
                 status == "pending" and not assumption.get("approved_by")
             ):
-                return "cannot_evaluate", "assumption_unclosed"
+                results.append(("cannot_evaluate", "assumption_unclosed"))
         if change.get("approval_basis") and status != "satisfied":
-            return "fail", "approval_basis_before_verification"
-    return "pass", None
+            results.append(("fail", "approval_basis_before_verification"))
+    return results
 
 
-def check_ai_autonomy(data: dict) -> tuple[str, str | None]:
+def check_ai_autonomy(data: dict) -> list[tuple]:
+    """G-E2：路径子句（#1）与断言子句（#2/#3）分别收集，聚合时 fail 胜出。"""
+    results = []
     actors = {item.get("id"): item for item in data["actors"]}
     assertions = {item.get("id"): item for item in data["assertions"]}
     for grant in data["autonomy_grants"]:
         actor_id = grant.get("actor")
         if actor_id not in actors:
-            return "fail", "dangling_reference"
+            results.append(("fail", "dangling_reference"))
         path = grant.get("delegated_from")
         if not isinstance(path, dict):
-            return "cannot_evaluate", "invalid_path"
-        start = path.get("start") or actor_id
-        steps = path.get("steps")
-        reach = path.get("reach")
-        if start not in actors or not isinstance(steps, list) or not steps:
-            return "cannot_evaluate", "invalid_path"
-        cursor = start
-        for step in steps:
-            if not isinstance(step, dict):
-                return "cannot_evaluate", "invalid_path"
-            if step.get("relation") != "delegated_from" or step.get("direction") != "out":
-                return "cannot_evaluate", "invalid_path"
-            if step.get("target_type") != "Actor":
-                return "cannot_evaluate", "undefined_object_type"
-            target_id = step.get("target_id")
-            if not target_id:
-                return "cannot_evaluate", "invalid_path"
-            if target_id not in actors:
-                return "fail", "dangling_reference"
-            cursor = target_id
-        if reach != "accountable":
-            return "cannot_evaluate", "invalid_path"
-        if actors[cursor].get("accountable") is not True:
-            return "fail", "delegation_chain_not_accountable"
+            results.append(("cannot_evaluate", "invalid_path"))
+        else:
+            start = path.get("start") or actor_id
+            steps = path.get("steps")
+            reach = path.get("reach")
+            if start not in actors or not isinstance(steps, list) or not steps:
+                results.append(("cannot_evaluate", "invalid_path"))
+            else:
+                cursor = start
+                path_ok = True
+                for step in steps:
+                    if not isinstance(step, dict):
+                        results.append(("cannot_evaluate", "invalid_path"))
+                        path_ok = False
+                        break
+                    if step.get("relation") != "delegated_from" or step.get("direction") != "out":
+                        results.append(("cannot_evaluate", "invalid_path"))
+                        path_ok = False
+                        break
+                    if step.get("target_type") != "Actor":
+                        results.append(("cannot_evaluate", "undefined_object_type"))
+                        path_ok = False
+                        break
+                    target_id = step.get("target_id")
+                    if not target_id:
+                        results.append(("cannot_evaluate", "invalid_path"))
+                        path_ok = False
+                        break
+                    if target_id not in actors:
+                        results.append(("fail", "dangling_reference"))
+                        path_ok = False
+                        break
+                    cursor = target_id
+                if path_ok and reach != "accountable":
+                    results.append(("cannot_evaluate", "invalid_path"))
+                    path_ok = False
+                if path_ok and actors[cursor].get("accountable") is not True:
+                    results.append(("fail", "delegation_chain_not_accountable"))
         covers: set = set()
         for assertion_id in grant.get("assertions") or []:
             assertion = assertions.get(assertion_id)
             if assertion is None:
-                return "fail", "dangling_reference"
+                results.append(("fail", "dangling_reference"))
+                continue
             covers.update(assertion.get("covers") or [])
             if assertion.get("kind") not in ASSERTION_KINDS:
-                return "cannot_evaluate", "undefined_object_type"
+                results.append(("cannot_evaluate", "undefined_object_type"))
+                continue
             if assertion.get("kind") != "assumption" or not assertion.get("verification_condition"):
-                return "fail", "assertion_incomplete"
+                results.append(("fail", "assertion_incomplete"))
             assumption = assertion.get("assumption")
             if isinstance(assumption, dict) and (
                 assumption.get("status") == "expired"
@@ -730,87 +815,97 @@ def check_ai_autonomy(data: dict) -> tuple[str, str | None]:
                     and not assumption.get("approved_by")
                 )
             ):
-                return "cannot_evaluate", "assumption_unclosed"
+                results.append(("cannot_evaluate", "assumption_unclosed"))
         if not {"scope", "boundary", "revocation"} <= covers:
-            return "fail", "assertion_incomplete"
-    return "pass", None
+            results.append(("fail", "assertion_incomplete"))
+    return results
 
 
-def check_project_charter(data: dict) -> tuple[str, str | None]:
+def check_project_charter(data: dict) -> list[tuple]:
+    results = []
     charters = {item.get("project"): item for item in data["charters"]}
     for project in data["projects"]:
         if project.get("stage") != "executing":
             continue
         charter = charters.get(project.get("id"))
         if charter is None:
-            return "fail", "missing_charter"
+            results.append(("fail", "missing_charter"))
+            continue
         required = ("outcomes", "constraints", "accountable", "authorizing_assertion")
         if any(not charter.get(key) for key in required):
-            return "fail", "incomplete_charter"
-    return "pass", None
+            results.append(("fail", "incomplete_charter"))
+    return results
 
 
-def check_closure_acceptance(data: dict) -> tuple[str, str | None]:
+def check_closure_acceptance(data: dict) -> list[tuple]:
+    results = []
     for deliverable in data["deliverables"]:
         accepted = any(
             item.get("statement") in ACCEPTANCE_STATEMENTS and item.get("accountable_confirmation")
             for item in deliverable.get("assertions") or []
         )
         if not accepted:
-            return "fail", "missing_acceptance_assertion"
-    return "pass", None
+            results.append(("fail", "missing_acceptance_assertion"))
+    return results
 
 
-def check_procurement_contract(data: dict) -> tuple[str, str | None]:
+def check_procurement_contract(data: dict) -> list[tuple]:
+    results = []
     contracts = {item.get("id"): item for item in data["contracts"]}
     for commitment in data["commitments"]:
         if commitment.get("procurement") != "external":
             continue
         contract = contracts.get(commitment.get("contract"))
         if contract is None:
-            return "fail", "missing_contract"
+            results.append(("fail", "missing_contract"))
+            continue
         required = ("deliverable_form", "acceptance_criteria", "constrained_by", "accountable_signature")
         if any(not contract.get(key) for key in required):
-            return "fail", "incomplete_contract"
-    return "pass", None
+            results.append(("fail", "incomplete_contract"))
+    return results
 
 
-def check_schedule_evidence(data: dict) -> tuple[str, str | None]:
+def check_schedule_evidence(data: dict) -> list[tuple]:
+    results = []
     for commitment in data["commitments"]:
         if not (commitment.get("deadline") or commitment.get("milestone")):
             continue
         evidence = commitment.get("evidence_assertions") or []
         if not evidence or any(not item.get("basis") for item in evidence):
-            return "fail", "missing_schedule_evidence"
-    return "pass", None
+            results.append(("fail", "missing_schedule_evidence"))
+    return results
 
 
-def check_tailoring_record(data: dict) -> tuple[str, str | None]:
+def check_tailoring_record(data: dict) -> list[tuple]:
+    results = []
     records = {item.get("id"): item for item in data["tailoring_records"]}
     for action in data["tailoring_actions"]:
         record = records.get(action.get("record"))
         if record is None:
-            return "fail", "missing_tailoring_record"
+            results.append(("fail", "missing_tailoring_record"))
+            continue
         if any(not record.get(key) for key in ("trimmed_rule", "rationale", "scope", "approver")):
-            return "fail", "incomplete_tailoring_record"
-    return "pass", None
+            results.append(("fail", "incomplete_tailoring_record"))
+    return results
 
 
-def check_tailoring_non_trimmable(data: dict) -> tuple[str, str | None]:
+def check_tailoring_non_trimmable(data: dict) -> list[tuple]:
+    results = []
     for record in data["tailoring_records"]:
         if record.get("trimmed_rule") in NON_TRIMMABLE:
-            return "fail", "non_trimmable_rule"
-    return "pass", None
+            results.append(("fail", "non_trimmable_rule"))
+    return results
 
 
-def check_tailoring_reassessment(data: dict) -> tuple[str, str | None]:
+def check_tailoring_reassessment(data: dict) -> list[tuple]:
+    results = []
     for record in data["tailoring_records"]:
         if record.get("reassessment_condition"):
             continue
         if record.get("permanent") is True and record.get("reason"):
             continue
-        return "fail", "missing_reassessment_condition"
-    return "pass", None
+        results.append(("fail", "missing_reassessment_condition"))
+    return results
 
 
 CHECKS = {
@@ -890,13 +985,15 @@ def evaluate(check_id: str, data: dict) -> tuple[str, str | None, str]:
         return "not_applicable", None, severity
     if state == "pending":
         return "cannot_evaluate", "applicability_pending", severity
-    # 一次归一化覆盖三种情形，各 check 函数不再各自打补丁。
+    # 入口归一化：键缺失与值为 null 走同一出口，不依赖 check 函数内的守卫。
+    missing = [key for key in REQUIRED_KEYS.get(check_id, ()) if key not in data]
+    if missing:
+        return "cannot_evaluate", "missing_input", severity
     if find_null(data) is not None:
         return "cannot_evaluate", "missing_input", severity
-    result = CHECKS[check_id](data)
-    verdict, reason = result[0], result[1]
-    if len(result) > 2 and result[2]:
-        severity = result[2]
+    verdict, reason, severity = aggregate(
+        check_id, CHECKS[check_id](data), SPEC[check_id][1]
+    )
     # 引用完整性全局生效：check 自身判 pass 时，再统一校验所有已知引用。
     if verdict == "pass":
         reference_issue = validate_references(data)
@@ -972,6 +1069,131 @@ def _expect_missing(kind: str, check_id: str, data: dict, failures: list) -> boo
         )
         return False
     return True
+
+
+def missing_key_sweep() -> int:
+    """负例实测：43 个必需键逐一单删，都必须 cannot_evaluate/missing_input。"""
+    rows: list[tuple[str, str, str, str]] = []
+    failures = 0
+    for check_id in sorted(REQUIRED_KEYS):
+        keys = REQUIRED_KEYS[check_id]
+        for missing_key in keys:
+            data = {key: [] for key in keys}
+            del data[missing_key]
+            try:
+                verdict, reason, _ = evaluate(check_id, data)
+                actual = f"{verdict}/{reason}"
+            except Exception as exc:  # noqa: BLE001 - 负例就是要捕获崩溃
+                verdict, reason = "crash", type(exc).__name__
+                actual = f"{verdict}/{reason}"
+            ok = (verdict, reason) == ("cannot_evaluate", "missing_input")
+            failures += 0 if ok else 1
+            rows.append((check_id, missing_key, actual, "通过" if ok else "偏离"))
+    print("| check_id | 删除的必需键 | 实际结论 | 判定 |")
+    print("|---|---|---|---|")
+    for row in rows:
+        print("| " + " | ".join(row) + " |")
+    print()
+    print(f"缺键负例：{len(rows) - failures}/{len(rows)} 返回 cannot_evaluate/missing_input，偏离 {failures} 处")
+    # 对照：绕开入口归一化直接调用 check 仍会崩溃，证明拦截在入口而非各 check 内的守卫。
+    crashes = 0
+    for check_id in sorted(CHECKS):
+        try:
+            CHECKS[check_id]({})
+        except KeyError:
+            crashes += 1
+    print(f"对照：`{{}}` 直接进入 check 函数仍 {crashes}/{len(CHECKS)} 抛 KeyError（入口归一化负责拦截）")
+    return 0 if not failures else 1
+
+
+def aggregation_order_check() -> int:
+    """顺序无关性证据：同一组冲突子句的全部排列必须给同一结论。"""
+    # A2：fail（未锚定）与 cannot_evaluate（未定义节点类型）冲突。
+    a2_items = [
+        {"id": "D-1", "constrained_by": []},
+        {"id": "D-2", "node_type": "MysteryNode", "constrained_by": []},
+        {"id": "D-3", "constrained_by": []},
+    ]
+    # E2：invalid_path（cannot_evaluate）与断言不完整/链未达 Accountable（fail）冲突。
+    e2_grants = [
+        {"id": "AG-1", "actor": "A-1", "delegated_from": "broken", "assertions": []},
+        {
+            "id": "AG-2",
+            "actor": "A-1",
+            "delegated_from": {
+                "start": "A-1",
+                "steps": [
+                    {
+                        "relation": "delegated_from",
+                        "direction": "out",
+                        "target_type": "Actor",
+                        "target_id": "A-2",
+                    }
+                ],
+                "reach": "accountable",
+            },
+            "assertions": [],
+        },
+        {
+            "id": "AG-3",
+            "actor": "A-1",
+            "delegated_from": {
+                "start": "A-1",
+                "steps": [
+                    {
+                        "relation": "delegated_from",
+                        "direction": "out",
+                        "target_type": "Actor",
+                        "target_id": "A-3",
+                    }
+                ],
+                "reach": "accountable",
+            },
+            "assertions": [],
+        },
+    ]
+    e2_base = {
+        "actors": [
+            {"id": "A-1", "type": "AIActor"},
+            {"id": "A-2", "type": "HumanActor", "accountable": True},
+            {"id": "A-3", "type": "AIActor"},
+        ],
+        "assertions": [],
+    }
+    cases = [
+        (
+            "CONSTRAINT_ANCHOR_REQUIRED",
+            lambda perm: {
+                "commitments": [],
+                "deliverables": list(perm),
+                "constraints": [],
+            },
+            a2_items,
+        ),
+        (
+            "AI_AUTONOMY_DELEGATION_AUDITABLE",
+            lambda perm: {**copy.deepcopy(e2_base), "autonomy_grants": list(perm)},
+            e2_grants,
+        ),
+    ]
+    failures = 0
+    for check_id, build, items in cases:
+        conclusions = set()
+        orders = 0
+        for perm in permutations(items):
+            orders += 1
+            conclusions.add(evaluate(check_id, build(perm))[:2])
+        ok = len(conclusions) == 1
+        failures += 0 if ok else 1
+        raw = CHECKS[check_id](build(items))
+        distribution: dict[str, int] = {}
+        for item in raw:
+            distribution[item[0]] = distribution.get(item[0], 0) + 1
+        rendered_dist = "、".join(f"{key}={value}" for key, value in sorted(distribution.items()))
+        rendered = "、".join(f"{v}/{r}" for v, r in sorted(conclusions))
+        print(f"{check_id}：子句结果 {rendered_dist}；排列 {orders} 种，结论 {len(conclusions)} 种（{rendered}）")
+    print(f"顺序无关性：{'通过' if not failures else '未通过'}，偏离 {failures} 项")
+    return 0 if not failures else 1
 
 
 def null_sweep(root: Path) -> int:
@@ -1054,6 +1276,16 @@ def main() -> int:
         action="store_true",
         help="检查样例中出现的引用目标集合是否都已在 schema §3 声明",
     )
+    parser.add_argument(
+        "--missing-key-sweep",
+        action="store_true",
+        help="负例：43 个必需键逐一单删，必须 cannot_evaluate/missing_input",
+    )
+    parser.add_argument(
+        "--aggregation-order",
+        action="store_true",
+        help="顺序无关性：同一组冲突子句的全部排列给同一结论",
+    )
     args = parser.parse_args()
     root = Path(args.root)
     if args.null_sweep:
@@ -1064,6 +1296,10 @@ def main() -> int:
             print(f"[FAIL] {issue}")
         print(f"输入域闭包：{len(issues)} 处缺口")
         return 0 if not issues else 1
+    if args.missing_key_sweep:
+        return missing_key_sweep()
+    if args.aggregation_order:
+        return aggregation_order_check()
     method = (root / METHOD).read_text(encoding="utf-8")
     cases = [run_case(case) for case in extract_cases(method)]
     passed = [case for case in cases if not case["mismatches"]]
