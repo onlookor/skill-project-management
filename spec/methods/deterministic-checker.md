@@ -913,6 +913,134 @@ verdict: pass
 reason: null
 ```
 
+#### A.1.15 `TAILORING_DECISION_JUSTIFICATION`（G-G1，`advisory` / `assumption`）
+
+**判定依据**：A 表“每个 `TailoringRecord` 有至少一个候选方法比较，并写明与项目属性的关系”。
+
+**样例 1（触发 → `fail`）**：裁剪记录没有候选方法比较。
+
+```yaml
+tailoring_records:
+  - id: "TR-1"
+    considered_methods: []
+    project_attribute: "受监管环境"
+    relation: "确定性检查器提供可审计证据"
+```
+
+期望输出：
+
+```yaml
+check_id: TAILORING_DECISION_JUSTIFICATION
+source_rule: G-G1
+severity: advisory
+rule_status: assumption
+verdict: fail
+reason: missing_method_comparison
+```
+
+**样例 2（不触发 → `pass`）**：列出两个候选方法并写明与项目属性的关系。
+
+```yaml
+tailoring_records:
+  - id: "TR-1"
+    considered_methods: ["CM-DET-CHECKER", "CM-SKILL-CARD"]
+    project_attribute: "受监管环境"
+    relation: "CM-DET-CHECKER 提供可审计证据"
+```
+
+期望输出：
+
+```yaml
+check_id: TAILORING_DECISION_JUSTIFICATION
+source_rule: G-G1
+severity: advisory
+rule_status: assumption
+verdict: pass
+reason: null
+```
+
+#### A.1.16 `TAILORING_RATIONALE_ANCHOR`（G-G2，`advisory` / `assumption`）
+
+**判定依据**：A 表“每条裁剪理由至少关联一个断言或 `Constraint`”。
+
+**样例 1（触发 → `fail`）**：裁剪理由没有任何断言或约束锚定。
+
+```yaml
+tailoring_records:
+  - { id: "TR-1", rationale: "选择确定性检查器", anchors: [] }
+```
+
+期望输出：
+
+```yaml
+check_id: TAILORING_RATIONALE_ANCHOR
+source_rule: G-G2
+severity: advisory
+rule_status: assumption
+verdict: fail
+reason: unanchored_rationale
+```
+
+**样例 2（不触发 → `pass`）**：裁剪理由关联一条断言。
+
+```yaml
+tailoring_records:
+  - { id: "TR-1", rationale: "选择确定性检查器", anchors: ["S-1"] }
+assertions:
+  - { id: "S-1", statement: "监管审计要求可重复的检查证据" }
+```
+
+期望输出：
+
+```yaml
+check_id: TAILORING_RATIONALE_ANCHOR
+source_rule: G-G2
+severity: advisory
+rule_status: assumption
+verdict: pass
+reason: null
+```
+
+#### A.1.17 `TAILORING_REASSESSMENT_CONDITION`（G-G3，`advisory` / `assumption`）
+
+**判定依据**：A 表“每条记录关联至少一条重新评估条件断言，或显式声明‘永久’并附理由”。本组样例覆盖“条件断言”分支；`permanent` 分支的字段表示待原型按同一判定执行，不改变判定列。
+
+**样例 1（触发 → `fail`）**：既无重新评估条件，也未声明永久。
+
+```yaml
+tailoring_records:
+  - { id: "TR-1", reassessment_condition: null, permanent: false }
+```
+
+期望输出：
+
+```yaml
+check_id: TAILORING_REASSESSMENT_CONDITION
+source_rule: G-G3
+severity: advisory
+rule_status: assumption
+verdict: fail
+reason: missing_reassessment_condition
+```
+
+**样例 2（不触发 → `pass`）**：关联一条重新评估条件。
+
+```yaml
+tailoring_records:
+  - { id: "TR-1", reassessment_condition: "监管要求变化时", permanent: false }
+```
+
+期望输出：
+
+```yaml
+check_id: TAILORING_REASSESSMENT_CONDITION
+source_rule: G-G3
+severity: advisory
+rule_status: assumption
+verdict: pass
+reason: null
+```
+
 ### B. 翻译规范（方法有关）
 
 从规则陈述到检查条件的翻译，遵循以下六条：
