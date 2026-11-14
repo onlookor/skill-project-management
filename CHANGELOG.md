@@ -325,3 +325,19 @@
 - **验证**：负例（`v9.9.9` 发布提交无 trailer）退出 1；正例（`v9.9.8` 携带三项 trailer）退出 0；主工作区四个检查器 0 错误，`check_state.py` 输出开发态警告。
 - **关联 ADR**：无（操作约定，规则出处 `AGENTS.md` 3.5.1 / 3.5.2）
 - **状态**：生效
+
+---
+
+### 批次 0026 — 2026-11-14 — 补 5 个 block 级 check_id 参考样例
+
+- **涉及文件**：
+  - 修改：`spec/methods/deterministic-checker.md`（附录 A.1）、`validation/CHECKLIST.md`（`source_commit` 推进）、`TODO.md`（T-011、T-130）
+- **变更摘要**：
+  1. 为 5 个 `block` 级 `check_id`（`PROJECT_MINIMAL_EXISTENCE`、`CONSTRAINT_ANCHOR_REQUIRED`、`DELIVERABLE_ASSERTION_LINK`、`CHANGE_CONSTRAINT_LINK`、`ROLE_MINIMAL_COMPLETENESS`）各补触发/不触发两组输入/输出样例，共 10 个；输入为 YAML 谓词快照，输出含 `check_id`、`source_rule`、`verdict`、`reason`。
+  2. 样例只按附录 A 注册表判定列编写，未新增谓词、未改判定；`ROLE_MINIMAL_COMPLETENESS` 的角色合并子情形按 ERRATA E-004 / T-100 暂不纳入。
+  3. 编写中发现 G-A1 的“约束作用于 `Outcome`/`Commitment`”子句未进入判定列，登记 T-130（M1，改判定需 ADR）。
+  4. `validation/CHECKLIST.md` 的 `source_commit` 推进到样例提交 `c938c35`（ADR-0004）。
+- **钩子绕过**：无。
+- **验证**：四个检查器 0 错误（`check_anchors` 0 错误 0 警告；`check_ledger_landings` 1 条既有 `SPRINGER-PMBOK-2024` 警告）。
+- **关联 ADR**：无（执行层补丁；T-130 若改判定另走 ADR）
+- **状态**：生效

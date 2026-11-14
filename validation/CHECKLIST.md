@@ -2,7 +2,7 @@
 
 **生成依据**：`spec/COMPILATION_META.md`（编译元框架，P1–P6 与准入条件）+ `spec/methods/deterministic-checker.md`（CM-DET-CHECKER 方法的 check_id 注册表与翻译规范）。
 **性质**：本清单是检查项规格的人类可读投影，**不是检查执行器**。执行由确定性校验器按 `spec/methods/deterministic-checker.md` 的注册表执行。清单与注册表不一致时以注册表为准，重建本清单。
-**source_commit**：`b16e3b86474ea9af0c18e1e3fddd5004c23f898e`（生成基线；源文件为 `GRAMMAR.md`、`SOURCE_LEDGER.md`、`spec/methods/deterministic-checker.md` 与 `knowledge/` 谓词定义，见 ADR-0004）
+**source_commit**：`c938c3594bdf34425237be2e04c18d2de802dad8`（生成基线；源文件为 `GRAMMAR.md`、`SOURCE_LEDGER.md`、`spec/methods/deterministic-checker.md` 与 `knowledge/` 谓词定义，见 ADR-0004）
 
 ### 规则组 A
 
