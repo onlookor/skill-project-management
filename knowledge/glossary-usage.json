@@ -3160,6 +3160,16 @@
           "form": "code"
         },
         {
+          "file": "adr/0020-case-material-handling.md",
+          "line": 20,
+          "form": "code"
+        },
+        {
+          "file": "adr/0020-case-material-handling.md",
+          "line": 24,
+          "form": "code"
+        },
+        {
           "file": "knowledge/methods/registry-skeleton.md",
           "line": 36,
           "form": "code"
