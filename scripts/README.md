@@ -53,15 +53,19 @@ python3 scripts/validate_ontology.py --matrix
 
 `check_anchors.py` 退出码：`0` 通过（可有警告/提示）；`1` 存在错误；`2` 结构或基线无法解析。规则/来源被有意修改后，用 `--write-baseline` 重冻基线，并把基线变更与内容变更同批提交。`--root` 可指向副本，用于插行负例演练。
 
-`check_no_raw_material.py` 退出码：`0` 通过；`1` 发现违规（逐条列出规则码与位置，提交应被阻断）；`2` 不在 git 仓库中。判定规则：
+`check_no_raw_material.py` 退出码：`0` 通过；`1` 发现违规（逐条列出规则码与位置，提交应被阻断）；`2` 不在 git 仓库中，或 `--self-test` 缺少真实 PDF 样本而无法完整评估（非 PDF 用例已全部执行，**2 不等于通过**）。判定规则：
 
 | 规则码 | 判定 |
 |---|---|
+| `RM-MAGIC` | 文件头是 PDF/ZIP/GZIP/PNG/JPEG/GIF/TIFF/RAR/7Z/PostScript/OLE/DjVu（先于扩展名判断，改名无效） |
 | `RM-EXT` | 被跟踪文件扩展名属于文档/电子书/扫描件/压缩包 |
-| `RM-BINARY` | 文本扩展名下出现 NUL 字节或无法按 UTF-8 解码 |
+| `RM-BINARY` | 文本文件（含未知扩展名）出现 NUL 字节或无法按 UTF-8 解码 |
 | `RM-SIZE` | 单文件超过 512 KiB |
+| `RM-LONGLINE` | 单行超过 8192 字符（含单行整段原文） |
+| `RM-BASE64` | 出现 256 字符以上的 base64 形态长串，或 64 字符以上且解码后是已知二进制魔数 |
 | `RM-QUOTE` | 单条引用超过 400 字符，或连续引用块超过 800 字符 |
-| `RM-PROSEBLOCK` | 连续 15 行以上每行不少于 100 字符（PDF 文本转储的行形态）；结构化 JSONL（每行一个 JSON 对象）不适用 |
+| `RM-PROSEBLOCK` | 连续 15 行以上每行不少于 100 字符（PDF 文本转储的行形态），空行不重置计数；仅“每行一个合法记录”的结构化 JSONL 不适用 |
+| `RM-PAGEDUMP` | 正文页形态：非空行 ≥20 且 ≥60% 是 60–115 字符、无 Markdown 标记的连续正文行，其中 ≥50% 不以句末标点结尾 |
 | `RM-PAGESEQ` | 连续 5 行以上为页码或纯数字 |
 | `RM-DOTLEADER` | 单行出现 30 个以上连续点（目录转储） |
 | `RM-MOJIBAKE` | 出现 U+FFFD 替换字符 |
@@ -70,9 +74,11 @@ python3 scripts/validate_ontology.py --matrix
 | `RM-ONTO-LITERAL` | 本体文件中的字符串/三引号字面量超过 400 字符 |
 | `RM-ONTO-COMMENT` | 本体文件中的单行 `#` 注释超过 400 字符 |
 
+**扫描面**：扫描对象是 `git ls-files` 的全部已跟踪文件。`.log`、`.csv`、`.html`、`.htm`、`.xml`、`.tex`、`.rst`、`.tsv`、`.svg`、`.dat` 与未知/无扩展名文件均按文本扫描（fail-closed）；二进制由 `RM-MAGIC` 与 `RM-BINARY` 拦截。覆盖范围与准入口径的剩余缺口见 `GAP_LEDGER.md` G-020（未跟踪文件、子模块不扫）。
+
 **本体的受控放行**（`CONSTITUTION.md` 第 13.6 条）：`.ttl`、`.shacl.ttl`、`.owl`、`.rdf`、`.nt`、`.n3`、`.jsonld` 允许入库，但**不豁免**体积、二进制、乱码、控制字符、点线、页码序列与长文本检查。本体文件的连续长注释行按 `RM-PROSEBLOCK` 处理（本体适用更严阈值：连续 12 行、每行 80 字符，以覆盖 PDF 换行后的段落形态）；头注释与 provenance 要求见 `ontology/README.md`。放行只针对“自写定义 + 标准术语标签”的本体，不针对原文转录。
 
-**结构化 JSONL 的边界**：`RM-PROSEBLOCK` 只豁免“每行一个 JSON 对象”的 `.jsonl`（`is_structured_jsonl()`）。仅凭扩展名、或把原文逐行包成 JSON 字符串都不放行；文本层转储改名为 `.jsonl` 仍会被拦。双向覆盖用 `python3 scripts/check_no_raw_material.py --self-test` 验证（T-NRM-01 结构化 JSONL 不报；T-NRM-02 JSON 字符串行仍报；T-NRM-03 真实 PDF 文本层仍报；T-NRM-04 转储改名 `.jsonl` 仍报）；缺少本地 PDF 样本时返回 `2`（无法评估），可用 `PM_RESOURCE_DIR` 指定资源目录。
+**结构化 JSONL 的边界**：`RM-PROSEBLOCK` 的豁免不是“每行是 JSON 对象”即放行，而是按语料 schema 校验：顶层键白名单（不含 `text`/`content`/`body`/`page`/`chunk`/`payload`/`raw`）、字符串值上限（身份键 120 / 一般值 400 / `evidence` 200 字符）、`relations` 与 `evidence` 子结构与子值上限；任一未知键、超长值或异常结构即不豁免。另有跨记录判据：连续 15 条记录的主文本值都是 60 字符以上、无句末标点的片段时按 `RM-PROSEBLOCK` 处理。解析前先剥 UTF-8 BOM。双向覆盖用 `python3 scripts/check_no_raw_material.py --self-test` 验证（T-NRM-01 合法 JSONL、01b BOM、02 JSON 字符串行、03 真实正文第 6 页、04 对象包裹正文、05 对象包裹/超长/base64/30 万字符单行、06 `.log/.csv/.html/.dat` 与 PDF/gzip 魔数、07 长行夹空行/未知扩展名，共 18 项）；缺少本地 PDF 样本时返回 `2`（非 PDF 用例已执行，2 不等于通过），可用 `PM_RESOURCE_DIR` 指定资源目录。
 
 提交前接入：每个克隆需自行执行 `git config core.hooksPath .githooks`（只对当前克隆生效）。钩子依次运行十个检查器与原型快检，任一失败即阻断提交：
 

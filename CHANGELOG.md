@@ -881,3 +881,23 @@
 - **涉及文件**：`scripts/check_no_raw_material.py`、`scripts/checker-pins.json`、`scripts/README.md`、`validation/reviews/2026-11-14-g019-user-authorization.md`（新增）、`GAP_LEDGER.md`、`TODO.md`、`CHANGELOG.md`。
 - **未改动**：D4 决定、放量、判据 7 外部抽样、`manifest.json`、`ROADMAP.md`。
 - **状态**：生效（G-019 待复核关闭）
+
+---
+
+### 批次 0050 — 2026-11-15 — G-019 二次加固、G-020 登记（覆盖范围与准入形态）
+
+- **性质**：按外部复核（基线 `dcd2240`，`/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019/REPORT.md`）修复 `--self-test` 与 `RM-PROSEBLOCK` 的绕过面；同时新立覆盖范围缺口。G-019 保持 `open`，不自行关闭；D4 未动、未放量、未碰判据 7 外部抽样。
+- **一、G-019 六条补强**（`scripts/check_no_raw_material.py`）：
+  - **值级判据**：JSONL 豁免不再只看“每行是对象”。顶层字符串值上限 400 字符（`term`/`label_*`/`status`/`candidate_iri*` 等身份键 120），`relations` 子值 ≤120，`evidence` 字符串 ≤200；超限即不豁免。
+  - **键白名单**：`JSONL_TOP_KEYS` 固定为语料实际键集合，**不含** `text`/`content`/`body`/`page`/`chunk`/`payload`/`raw`；`relations` 与 `evidence` 各有子键白名单，未知键不豁免。
+  - **单行与 base64**：新增 `RM-LONGLINE`（单行 >8192 字符）与 `RM-BASE64`（≥256 字符 base64 形态串，或 ≥64 字符且解码后命中已知魔数）。
+  - **形态识别**：新增 `RM-MAGIC`，在扩展名判断前识别 PDF/ZIP/GZIP/PNG/JPEG/GIF/TIFF/RAR/7Z/PostScript/OLE/DjVu；未知扩展名不再跳过，一律按文本扫描（NUL/非 UTF-8 → `RM-BINARY`）；`TEXT_EXTS` 纳入 `.log/.csv/.html/.htm/.xml/.tex/.rst/.tsv/.svg/.dat`。
+  - **段落级判据**：新增 `RM-PAGEDUMP`（非空行 ≥20、60–115 字符且无 Markdown 标记的行占比 ≥0.6、其中 ≥50% 不以句末标点结尾），补上原判据只对目录页有效的问题。
+  - **BOM**：JSONL 解析前 `lstrip("\ufeff")`，合法 BOM JSONL 不再误报。
+- **二、负例与自测**：`--self-test` 扩为 18 项断言——T-NRM-01 合法 JSONL、01b BOM、02 JSON 字符串行、03 真实正文第 6 页 `.txt`（断言 `RM-PAGEDUMP` 命中且无 `RM-DOTLEADER`，排除干扰）、04 对象包裹正文、05 对象包裹/超长值/base64/单行 30 万字符、06 `.log/.csv/.html/.dat` 与 PDF/gzip 魔数、07 长行夹空行/未知扩展名。18/18 通过。PDF 资源缺失时返回 `2`，并明确“非 PDF 用例已执行 N 项，2 ≠ 通过”；不依赖 PDF 的负例始终执行。
+- **三、全仓实测**：放宽扫描面后，130 个跟踪文件 0 错误、**0 新命中**（无合法 csv/html/日志形态误报，未加白名单豁免）。15 条试点条 JSONL（最长 998 字符）、20 条扩展 JSONL（最长 1003 字符）、20 条权威条目 JSONL（最长 683 字符）`RM-PROSEBLOCK` 均为 0 报。
+- **四、G-020 登记**：`representation-defect`、L1、登记 M1、到期 M2、是否阻断=否、待裁定方=架构负责人、关联 T-142。成因是第 13 条“原始资料不许入库”实际执行为“某些扩展名下某些形态的文本不许入库”：只扫 `git ls-files` 已跟踪文件、内容扫描按扩展名名单分流、不扫子模块、未知形态依赖 fail-closed。与 G-019 的边界：G-019 是既有判据缺失（`implementation-defect`），G-020 是防线覆盖面与准入口径（设计层判断），建议出口 `rule-change` 或 `check-change`。矩阵首行与矩阵说明同步。
+- **五、台账与调度**：G-019 说明追加本批加固与负例记录，状态维持 `open`、关闭依据留空；新增 G-020；核查记录追加批次 0050。台账 20 条（`open` 4：G-017、G-018、G-019、G-020 / `closed` 16）。`TODO.md` 新增 T-141（`done`）、T-142（`open`），T-140 保持 `done`。
+- **涉及文件**：`scripts/check_no_raw_material.py`、`scripts/README.md`、`scripts/checker-pins.json`（重冻）、`validation/reviews/2026-11-15-g019-hardening-user-authorization.md`（新增，检查器绑定 `basis`）、`GAP_LEDGER.md`、`TODO.md`、`CHANGELOG.md`。
+- **未改动**：D4 决定、放量、判据 7 外部抽样、`manifest.json`、`ROADMAP.md`、`GRAMMAR.md`/A.2/A.1/schema（`spec-pins` 不受影响）。
+- **状态**：生效（G-019 待非同源复核关闭）
