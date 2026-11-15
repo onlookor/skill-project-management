@@ -4,8 +4,9 @@
 - **日期**：2026-11-15
 - **决策者**：用户（2026-11-15 批准全部 10 条 D 项，裁定记录见 `validation/reviews/2026-11-15-admission-axis-authorization.md`）
 - **serves_charter**：C6（知识可检索、规则可检查）
-- **grounding_refs**：无（本决策不引入新的来源内容）
-- **affected_files**：`CONSTITUTION.md` 第 13.3/13.5 条（已修订）；`spec/RAW_MATERIAL_ADMISSION.md`（方案）；`scripts/check_no_raw_material.py`（实现批次改造）；`spec/ACCESS_ZONES.md`、`contracts/schema/knowledge-entry.schema.json`、`contracts/schema/pilot-conflict.schema.json`（实现批次新增）；`GAP_LEDGER.md`（G-019/G-020 改写）；`TODO.md`（T-143/T-144）；`scripts/README.md`、`.githooks/pre-commit`、`scripts/check_state.py`
+- **grounding_refs**：`ISO21502-2020`、`GB-T-37507-2025`、`PRINCE2-2023`、`ProjectCO-2024`、`ThingFO-2021`、`PMBOK8-2025`、`SPRINGER-PMBOK-2024`（作为第 5 条第 2 项的“受影响对象”；见下条）
+- **受影响对象**：`SOURCE_LEDGER.md` 的上述 7 个 `active` 条目——13.1 所禁止入库的原文正是这些条目的原作，本决策改变的是它们的保护方式与判定位置，不改变来源本身。`GRAMMAR.md` 规则不受影响：本次只改判定与执行面，不增删规则、不改规则语义，故不引用规则号。
+- **affected_files**：`CONSTITUTION.md` 第 13.3/13.5/13.6 条（已修订）；`spec/RAW_MATERIAL_ADMISSION.md`（方案）；`scripts/check_no_raw_material.py`（实现批次改造）；`spec/ACCESS_ZONES.md`、`contracts/schema/knowledge-entry.schema.json`、`contracts/schema/pilot-conflict.schema.json`、`contracts/schema/package-manifest.schema.json`、`contracts/schema/ontology-fixtures-manifest.schema.json`、`contracts/schema/pilot-artifact.schema.json`、`contracts/schema/pilot-id-map.schema.json`（实现批次新增）；`GAP_LEDGER.md`（G-019/G-020/G-021）；`TODO.md`（T-143/T-144/T-145）；`scripts/README.md`、`.githooks/pre-commit`、`scripts/check_state.py`
 
 ## 背景
 
@@ -46,15 +47,15 @@
 ### 负面
 
 - 散文区与数据区 `prose_fields` 内的原文抄袭不再有仓库内机械判据；这是明确接受的残余风险，依赖外部指纹与人工复核。
-- 需要一次 `CONSTITUTION.md` 第 13 条修订；第 13.5 条“不得降低阻断强度”与本次换轴的张力，已由人类责任方于 2026-11-15 裁定为“不构成实质性降低”：被删判据经实测漏杀与误杀并存（`RM-PAGEDUMP` 真实召回 4/15，整页单条与切块均 0 命中），不提供有效保护。
+- 需要一次 `CONSTITUTION.md` 第 13 条修订。第 13.5 条“不得降低阻断强度”与本次换轴的张力，由人类责任方于 2026-11-15 以“**承认降低、显式接受、列明补偿控制**”的方式裁定：被删判据实测双向失准（`RM-PAGEDUMP` 真实召回 4/15，整页单条与切块均 0 命中；`RM-PROSEBLOCK` 误杀 450–1500 字符合法定义），删除它们使散文区确实失去一条弱保护，该下降由裁定显式承担，不表述为“不构成降低”。补偿控制与承接见 `CONSTITUTION.md` 13.5 第 1–6 项与 T-145。
 - 需要新增归区表与 JSON Schema，并重写检查器；实现批次的工作量大于继续打补丁。
 - 外部指纹方案依赖仓库外资源常驻，干净克隆无法自证；与 ADR-0015 同类，属于已接受的信任边界。
 
 ### 需要跟进的事项
 
 - T-143：本方案与 ADR 提案编制（批次 0051 完成）。
-- T-144：实现批次已完成（批次 0052–0055：条文与 ADR、归区表与 schema、检查器重写、全仓过检、台账改写）；G-019/G-020 仍待非同源复核，不自行关闭。
-- T-145：外部指纹与内容层残余风险承接（方向已记，时点未定，与 ADR-0015 同批外置）。
+- T-144：实现批次已完成（批次 0052–0055：条文与 ADR、归区表与 schema、检查器重写、全仓过检、台账改写）；批次 0056–0058 按复核修复（程序闭合、裁定句改写、八项实现修复、G-020 关闭）。G-019/G-021 仍待非同源复核，不自行关闭。
+- T-145：外部指纹与人工评审的承接分工、时点与降级方式已定：外部指纹由维护方在 M4 来源收口前交付，人工评审由人类责任方在来源/知识/规则变更的同批执行；干净克隆缺 `resources/` 时降级为“不执行”并显式声明。与 ADR-0015 同批外置。
 - G-019：已改写为“形态判据退役与准入制落地”，保持 `open`，待非同源复核。
 - G-020：已拆分并改写为“子模块、外部生成物与未登记路径的扫描范围”，文件枚举一半不再保留、形态分类一半并入 G-019，保持 `open`。
 - G-021：已登记（`representation-defect`/L3，出口倾向 `accepted`），保持 `open`，不自行关闭。

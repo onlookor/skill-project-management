@@ -2030,6 +2030,11 @@
           "form": "code"
         },
         {
+          "file": "CHANGELOG.md",
+          "line": 989,
+          "form": "code"
+        },
+        {
           "file": "CHARTER.md",
           "line": 41,
           "form": "code"
@@ -2062,6 +2067,11 @@
         {
           "file": "CONSTITUTION.md",
           "line": 162,
+          "form": "code"
+        },
+        {
+          "file": "CONSTITUTION.md",
+          "line": 338,
           "form": "code"
         },
         {
@@ -2187,6 +2197,11 @@
         {
           "file": "TODO.md",
           "line": 35,
+          "form": "code"
+        },
+        {
+          "file": "TODO.md",
+          "line": 63,
           "form": "code"
         },
         {
@@ -2761,7 +2776,7 @@
         },
         {
           "file": "CONSTITUTION.md",
-          "line": 342,
+          "line": 351,
           "form": "code"
         },
         {
@@ -4196,6 +4211,16 @@
     "T-D-004": {
       "term": "SOURCE_LEDGER",
       "locations": [
+        {
+          "file": "CONSTITUTION.md",
+          "line": 339,
+          "form": "code"
+        },
+        {
+          "file": "TODO.md",
+          "line": 63,
+          "form": "code"
+        },
         {
           "file": "spec/M3_M4_PLAN.md",
           "line": 196,

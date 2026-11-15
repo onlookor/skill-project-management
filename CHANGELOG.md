@@ -978,3 +978,14 @@
 - **涉及文件**：`GAP_LEDGER.md`、`TODO.md`、`adr/0018-raw-material-admission-control.md`、`AGENTS.md`、`CHANGELOG.md`。
 - **未改动**：`manifest.json`（未发布，版本与 tag 保持 `0.5.1` / `v0.5.1`，`check_state.py` 一致性核对通过）、`STATE.md`（无新增文件例外）、D4、放量、判据 7 外部抽样。
 - **状态**：生效（G-019/G-020/G-021 均 `open`，关闭依据留空，待非同源复核）
+
+---
+
+### 批次 0056 — 2026-11-15 — 复核修复（第一批：程序闭合与裁定句改写）
+
+- **性质**：按非同源复核（`/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-admission/REPORT.md`，sha256 `905cf234539cccb916f9096e3e137f12876e24b2fb9c1960a034157ac33aff06`，基线 `deaac46`）第一、二件修复。D4 未动、未放量、未碰判据 7 外部抽样。
+- **第 5 条程序闭合**：`adr/0018-raw-material-admission-control.md` 的 `grounding_refs` 由“无”改为 7 个 `active` 来源条目，并新增“受影响对象”行——引用对象是 13.1 所保护原文的原作，不是决策的内容依据；同时说明 `GRAMMAR.md` 无规则受影响（本次只改判定与执行面）。条件 2 由此补齐。
+- **13.5 裁定句改写**：删除“不构成实质性降低”的回避性表述，改为“承认降低、显式接受、列明补偿控制”；列 6 项补偿控制（数据区 schema 与集合字段、本体区三项机械承接、散文区硬约束、外部指纹、人工评审、未命中不等于合规），并写明缺失即失效。13.5 增“唯一例外”句，限定本次裁定不构成先例。13.6 结尾“行形态检查继续执行”改为实际执行的五项检查。
+- **T-145**：改为有承接方、有时点的交付项——外部指纹由维护方在 M4 来源收口前交付；人工评审由人类责任方在来源/知识/规则变更同批执行；干净克隆缺 `resources/` 时降级为“不执行”并显式声明，结论按 `assumption` 处理。
+- **涉及文件**：`CONSTITUTION.md`、`adr/0018-raw-material-admission-control.md`、`TODO.md`、`CHANGELOG.md`。
+- **状态**：生效（八项实现修复待批次 0057；台账处置待批次 0058）
