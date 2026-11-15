@@ -31,7 +31,7 @@
       "path": "validation/checker-prototype/coverage.json"
     },
     "contracts/schema/knowledge-entry.schema.json": {
-      "sha256": "3570c88d921d3775140c648cf9593524e2bfd323c60925e375ed4987fe1c74b8",
+      "sha256": "754a2ef72f46689033167414f9c4d900b6557ccdce077aa388b64614f826e3c5",
       "path": "contracts/schema/knowledge-entry.schema.json"
     },
     "contracts/schema/pilot-conflict.schema.json": {

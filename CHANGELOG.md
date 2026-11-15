@@ -1005,3 +1005,18 @@
 - **全仓复跑**：143 个跟踪文件（D 22 / O 30 / P 72 / C 19 / 未归类 0），0 命中。
 - **涉及文件**：`scripts/check_no_raw_material.py`、`scripts/check_spec_pins.py`、`scripts/checker-pins.json`、`scripts/spec-pins.json`、`scripts/README.md`、`spec/ACCESS_ZONES.md`、`contracts/schema/`（4 新增 + 2 修改）、`validation/reviews/2026-11-15-admission-r2-review.md`、`AGENTS.md`、`GLOSSARY.md`、`knowledge/glossary-usage.json`、`CHANGELOG.md`。
 - **状态**：生效（台账处置待批次 0058）
+
+---
+
+### 批次 0058 — 2026-11-15 — 复核修复（第三批：台账处置与 basis 更正）
+
+- **性质**：按非同源复核 `verify-admission`（sha256 `905cf234539cccb916f9096e3e137f12876e24b2fb9c1960a034157ac33aff06`，基线 `deaac46`）第四件修复，并更正批次 0057 的 `checker-pins` basis。D4 未动、未放量、未碰判据 7 外部抽样。
+- **G-020 关闭**：状态 `closed`、出口 `accepted`，关闭依据为上述复核报告（路径 + sha256 + 基线 + §6），并登记三条备注：① 子模块不纳入是声明式排除，不是“已扫描无违规”；② 引入子模块须与 `spec/ACCESS_ZONES.md` 同批重新裁定；③ 现状 0 gitlink、无 `.gitmodules`。说明中注明该报告不构成 G-019/G-021 的关闭依据。
+- **G-019 维持 `open`**：说明补记 r2 复核结论——“13/18 个数据区文件不受内容 schema 或字段配额约束”，以及批次 0056–0057 的修正（5 个文件补 schema、集合字段收紧、2800 配额、13.6 三项检查、归区表入指纹）；现数据区 22 个文件，10 受 schema、7 schema 自身、5 生成器。
+- **G-021 改写**：把“可修的实现缺陷”（`relations` 键空间、`evidence`/`claim_mapping` 长度、2500/2800 矛盾）从已接受残余中剥离，注明批次 0057 已修；残余收窄为“改写、翻译、合理切块是否实质替代原作”，量级改为实测口径（每文件 10 × 2000 字符、单条跨字段可达 2800），不再用 15 × 390；D-7 承接方与时点指向 T-145。仍 `open`。
+- **`checker-pins` basis 更正**：`--write --basis` 改为指向仓库外复核产物 + sha256 + 基线，不再指向仓库内转录件；`check_checker_pins.py` 同步收紧——`basis` 的复核产物必须位于仓库外、必须带 64 位 sha256 且与实际摘要一致，转录件只作索引。`validation/reviews/2026-11-15-admission-r2-review.md` 保留但明确标注“非权威、不构成依据”。
+- **子模块排除机械化**：`check_no_raw_material.py` 对 gitlink、符号链接与缺失路径显式判 `RM-ZONE`，使 G-020 的“声明式排除”不再静默。
+- **schema 补说明**：`knowledge-entry` 的 `entry_type`/`status` 明确为自由文本（不设枚举）。
+- **全仓复跑**：143 个跟踪文件 0 命中，自测 43/43；`checker-pins` 17/17、`spec-pins` 11 区段、`check_gap_ledger --staged` 均通过。
+- **涉及文件**：`GAP_LEDGER.md`、`TODO.md`、`adr/0018-raw-material-admission-control.md`、`scripts/check_no_raw_material.py`、`scripts/check_checker_pins.py`、`scripts/checker-pins.json`、`contracts/schema/knowledge-entry.schema.json`、`validation/reviews/2026-11-15-admission-r2-review.md`、`CHANGELOG.md`。
+- **状态**：生效（G-019/G-021 待非同源复核）

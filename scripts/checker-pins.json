@@ -10,8 +10,8 @@
       "basis": "非同源复核：用户裁定（parent session 6af45947fead009e7bdd1e76，批次 0048），2026-11-14；区段：GRAMMAR.md；复核产物：validation/reviews/2026-11-14-t139-user-adjudication.md；复核基线：563c26c；结论：认可"
     },
     "scripts/check_checker_pins.py": {
-      "sha256": "273b7d2200a67f3833223b1f06bcf80504924456040c4dc2dfc142de94941cb6",
-      "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
+      "sha256": "5a09e14df8a63147946ffdada811f67dc4740e40ad1be7867aa214ca43db33df",
+      "basis": "非同源复核：verify-admission（2026-11-14/pm-governance-review，复核方独立于本仓库实现） sha256：905cf234539cccb916f9096e3e137f12876e24b2fb9c1960a034157ac33aff06 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-admission/REPORT.md 复核基线：deaac46"
     },
     "scripts/check_coverage_gate.py": {
       "sha256": "3cf51704371cd0be6ee234b6193950adf7b8a0bba44be783a79729cbfc1e5f9d",
@@ -30,8 +30,8 @@
       "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
     },
     "scripts/check_no_raw_material.py": {
-      "sha256": "2417b60b19e21b4730a40c071d8aaef02d078ceed897a89a5aa60136c30a7f26",
-      "basis": "非同源复核：verify-admission（2026-11-14/pm-governance-review，sha256 905cf234，基线 deaac46） 复核产物：validation/reviews/2026-11-15-admission-r2-review.md 复核基线：deaac46"
+      "sha256": "d4290a9f257616d676a6f15f0e4c40bcf4d89f727b21b692ec2ebf973fc85a4a",
+      "basis": "非同源复核：verify-admission（2026-11-14/pm-governance-review，复核方独立于本仓库实现） sha256：905cf234539cccb916f9096e3e137f12876e24b2fb9c1960a034157ac33aff06 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-admission/REPORT.md 复核基线：deaac46"
     },
     "scripts/check_spec_pins.py": {
       "sha256": "66ab4861f88e46fe5ec6179558778f9fcdf8af7ab5cc3ae14f5b35e763cfd0a6",

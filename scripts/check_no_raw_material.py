@@ -1169,6 +1169,16 @@ def main():
     findings = []
     files = tracked_files(root)
     for rel in files:
+        path = root / rel
+        if path.is_symlink() or not path.is_file():
+            findings.append(
+                Finding(
+                    "RM-ZONE", rel, None,
+                    "非普通文件（子模块 gitlink、符号链接或缺失路径）；"
+                    "D-8 只作声明式排除，出现即需重新裁定扫描范围",
+                )
+            )
+            continue
         findings.extend(check_file(root, rel, zones, data_table))
 
     for f in findings:

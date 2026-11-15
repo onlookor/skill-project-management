@@ -13,8 +13,16 @@
     "term": {"type": "string", "minLength": 1, "maxLength": 120},
     "label_zh": {"type": "string", "maxLength": 120},
     "label_en": {"type": "string", "maxLength": 120},
-    "entry_type": {"type": "string", "maxLength": 120},
-    "status": {"type": "string", "maxLength": 120},
+    "entry_type": {
+      "type": "string",
+      "maxLength": 120,
+      "description": "自由文本，不设枚举；M3 试点取值见 spec/pilot/pilot-entries.json"
+    },
+    "status": {
+      "type": "string",
+      "maxLength": 120,
+      "description": "条目生命周期状态，自由文本，不设枚举"
+    },
     "definition": {"type": "string", "minLength": 1, "maxLength": 2000},
     "definitionStatus": {
       "type": "string",

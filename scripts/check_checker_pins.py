@@ -65,16 +65,28 @@ def write_pins(path: Path, pins: dict) -> None:
 
 
 def valid_basis(root: Path, text: str) -> tuple[bool, str]:
-    """basis 必须是可核对到复核产物的非同源复核记录，不接受自由文本。"""
+    """basis 必须指向仓库外的复核产物，并与其 sha256 一致；转录件只作索引。"""
     if "非同源复核：" not in text:
         return False, "缺少 `非同源复核：` 前缀"
     artifact = re.search(r"复核产物：`?([^`\s；，、]+)`?", text)
     if artifact is None:
         return False, "缺少 `复核产物：<路径>`"
-    if not (root / artifact.group(1)).exists():
-        return False, f"复核产物不存在：{artifact.group(1)}"
+    artifact_path = Path(artifact.group(1))
+    if not artifact_path.exists():
+        return False, f"复核产物不存在：{artifact_path}"
+    try:
+        artifact_path.resolve().relative_to(root.resolve())
+    except ValueError:
+        pass
+    else:
+        return False, "复核产物位于本仓库内；转录件只作索引，不能作为 basis"
     if re.search(r"复核基线：`?[0-9a-f]{7,40}`?", text) is None:
         return False, "缺少 `复核基线：<提交号>`"
+    recorded = re.search(r"sha256：`?([0-9a-f]{64})`?", text)
+    if recorded is None:
+        return False, "缺少 `sha256：<64 位十六进制>`"
+    if digest(artifact_path) != recorded.group(1):
+        return False, "`sha256` 与复核产物不一致"
     return True, ""
 
 

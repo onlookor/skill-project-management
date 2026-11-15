@@ -1,6 +1,6 @@
-# 准入制 r2 复核转录与指纹重冻依据（批次 0057）
+# 准入制 r2 复核转录索引（批次 0057–0058）
 
-**性质**：非同源复核报告的本仓库转录件，**非权威、不构成缺口关闭依据**；原文以仓库外报告为准。本文件只用于 `scripts/check_spec_pins.py` 的区段改动依据。
+**性质**：非同源复核报告的**仓库内索引件**，非权威、不构成依据、不构成缺口关闭证据；任何 `basis` 只指向下方仓库外产物路径 + sha256 + 基线。本文件可被改写，因此不能被用来自证。
 
 - 非同源复核：`2026-11-14/pm-governance-review/verify-admission`（复核方独立于本仓库实现，按 `CONSTITUTION.md` 第 13 条与 `spec/RAW_MATERIAL_ADMISSION.md` 逐项比对）
 - 复核产物：`/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-admission/REPORT.md`；sha256 `905cf234539cccb916f9096e3e137f12876e24b2fb9c1960a034157ac33aff06`
