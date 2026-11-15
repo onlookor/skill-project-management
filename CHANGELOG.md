@@ -901,3 +901,16 @@
 - **涉及文件**：`scripts/check_no_raw_material.py`、`scripts/README.md`、`scripts/checker-pins.json`（重冻）、`validation/reviews/2026-11-15-g019-hardening-user-authorization.md`（新增，检查器绑定 `basis`）、`GAP_LEDGER.md`、`TODO.md`、`CHANGELOG.md`。
 - **未改动**：D4 决定、放量、判据 7 外部抽样、`manifest.json`、`ROADMAP.md`、`GRAMMAR.md`/A.2/A.1/schema（`spec-pins` 不受影响）。
 - **状态**：生效（G-019 待非同源复核关闭）
+
+---
+
+### 批次 0051 — 2026-11-15 — 原始资料防线换轴方案（只出方案）
+
+- **性质**：按 r2 复核（基线 `58641d0`，`/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r2/REPORT.md`）出改造方案。本批**不改实现、不改 `CONSTITUTION.md`**；D4 未动、未放量、未碰判据 7 外部抽样。
+- **失效证据**：形态启发式双向失准且不收敛——整页正文单条记录 0 命中、390 字符补句号切块 0 命中、base64 60 字符切块 0 命中、`RM-PAGEDUMP` 真实召回 4/15、合法 450–1500 字符定义被 `RM-PROSEBLOCK`/`RM-ONTO-LITERAL` 误杀、中文正文页与 80 列硬换行文档分别漏判与误报。
+- **方案**：新增 `spec/RAW_MATERIAL_ADMISSION.md`——以分区准入替代形态推断；D 数据区（结构化 + schema + 字段配额）、O 本体区（13.6 + 谓词分档）、P 散文区（P0/P1/P2，仅硬约束）、C 代码/配置区；未归类路径 fail-closed；现有 131 个跟踪文件逐条判定（D 16 / O 30 / C 19 / P 66）；数据区 schema 来源、散文残留按字段位置判定、规则清单逐条留改删（`RM-PROSEBLOCK`/`RM-PAGEDUMP`/`RM-PAGESEQ` 退役，新增 `RM-ZONE`/`RM-SCHEMA`/`RM-FIELD`）；第 13 条条文级修订草案；迁移四步与不设豁免期的理由；残余风险与 ADR-0015 的关系；G-019/G-020 改写建议；成本量级与 10 条待批 D 清单。
+- **ADR**：新增 `adr/0018-raw-material-admission-control.md`（`proposed`），记录五个被否方案及理由，尤其“继续加启发式”因双向失准被否。
+- **台账**：G-019、G-020 均追加本批说明，状态维持 `open`、关闭依据留空，不自行关闭；核查记录追加批次 0051，总数仍 20（`open` 4 / `closed` 16）。`TODO.md` 新增 T-143（`done`）、T-144（`open`）。`STATE.md` 新增 `adr/0018` 与 `spec/RAW_MATERIAL_ADMISSION.md` 的 `skeleton` 例外。
+- **涉及文件**：`spec/RAW_MATERIAL_ADMISSION.md`（新增）、`adr/0018-raw-material-admission-control.md`（新增）、`GAP_LEDGER.md`、`TODO.md`、`STATE.md`、`CHANGELOG.md`。
+- **未改动**：`scripts/check_no_raw_material.py`、`CONSTITUTION.md`、`scripts/README.md`、`checker-pins.json`、`spec-pins.json`、D4、放量、判据 7 外部抽样。
+- **状态**：方案待批（ADR-0018 `proposed`，T-144 `open`）
