@@ -37,16 +37,16 @@ MUTATIONS: list[tuple[str, str, str, str, str, str]] = [
         "M02",
         "量词",
         "G-A1#1 的“至少一个”改为“恰好一个”",
-        "| `G-A1#1` | G-A1 | 至少一个 `Actor` |",
-        "| `G-A1#1` | G-A1 | 恰好一个 `Actor` |",
+        "| `G-A1#1` | G-A1 | 至少一个 `Actor`，且 `actors[].type` 必填并在 `actor_type` 枚举内（键缺失按 §1.11 判 `missing_input`） |",
+        "| `G-A1#1` | G-A1 | 恰好一个 `Actor`，且 `actors[].type` 必填并在 `actor_type` 枚举内（键缺失按 §1.11 判 `missing_input`） |",
         "PROJECT_MINIMAL_EXISTENCE 的子句指纹",
     ),
     (
         "M03",
         "原因码删除",
         "G-E1#1 删除原因码 `multiple_accountable`",
-        "| `G-E1#1` | G-E1 | 唯一 `accountable_by` 且指向 `HumanActor`/`LegalEntity` | `missing_accountable / multiple_accountable / unknown_accountable / accountable_not_human` |",
-        "| `G-E1#1` | G-E1 | 唯一 `accountable_by` 且指向 `HumanActor`/`LegalEntity` | `missing_accountable / unknown_accountable / accountable_not_human` |",
+        "| `G-E1#1` | G-E1 | 唯一 `accountable_by` 且指向 `HumanActor`/`LegalEntity`；`actors[].type` 必填并在 `actor_type` 枚举内（键缺失按 §1.11 判 `missing_input`） | `missing_accountable / missing_input / multiple_accountable / unknown_accountable / accountable_not_human / undefined_enum_value` | `ROLE_MINIMAL_COMPLETENESS` | `block` | checked | active |",
+        "| `G-E1#1` | G-E1 | 唯一 `accountable_by` 且指向 `HumanActor`/`LegalEntity`；`actors[].type` 必填并在 `actor_type` 枚举内（键缺失按 §1.11 判 `missing_input`） | `missing_accountable / missing_input / unknown_accountable / accountable_not_human / undefined_enum_value` | `ROLE_MINIMAL_COMPLETENESS` | `block` | checked | active |",
         "ROLE_MINIMAL_COMPLETENESS 的子句指纹",
     ),
     (
@@ -219,8 +219,8 @@ def main() -> int:
     signoff_failures = 0
     signoff_rows: list[tuple[str, str, str, str, str, str]] = []
     with tempfile.TemporaryDirectory(prefix="pm-signoff-") as tmp:
-        anchor = "| `G-A1#1` | G-A1 | 至少一个 `Actor` |"
-        replacement = "| `G-A1#1` | G-A1 | 至少有一个 `Actor` |"
+        anchor = "| `G-A1#1` | G-A1 | 至少一个 `Actor`，且 `actors[].type` 必填并在 `actor_type` 枚举内（键缺失按 §1.11 判 `missing_input`） |"
+        replacement = "| `G-A1#1` | G-A1 | 至少有一个 `Actor`，且 `actors[].type` 必填并在 `actor_type` 枚举内（键缺失按 §1.11 判 `missing_input`） |"
         if original.count(anchor) != 1:
             signoff_rows.append(("S01", "只改 A.2 + --write，不更新签收", "阻断", "未执行", "-", "变异锚点不唯一"))
             signoff_rows.append(("S02", "改 A.2 并更新签收", "通过", "未执行", "-", "变异锚点不唯一"))

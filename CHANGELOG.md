@@ -1197,3 +1197,17 @@
 - **计数**：A.1 样例 66 → 68，覆盖矩阵负例 47 → 49（新增 2 条负例：对象型 A.1.1-11、数组型 A.1.11-4）。
 - **pins**：本批按裁定重冻，basis 指向 G-018 复核报告并显式标注“覆盖范围缺失：报告审查的是批次 0071，未审查本批修复，仅作指纹登记”。`check_dependency_pins.py` 的 r7 basis 未改。
 - **涉及文件**：`spec/CHECKER_INPUT_SCHEMA.md`、`spec/methods/deterministic-checker.md`、`validation/checker-prototype/checker.py`、`validation/checker-prototype/coverage.json`、`validation/pinned/checker.py`、`AGENTS.md`、`.githooks/pre-commit`、`GAP_LEDGER.md`、`CHANGELOG.md`、`validation/reviews/2026-11-15-g018-actor-type-enum.md`、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`spec/GLOSSARY.md`（位置刷新）。
+
+---
+
+### 批次 0073 — 2026-11-15 — G-018 r2 复判整改：`missing_input` 登记、撤回 `G-F1#2`、覆盖闸门语义变更
+
+- **依据**：G-018 第二轮非同源复核报告（基线 `ea9b674`，`/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r2/REPORT.md`，sha256 `17f631140bc700bf5826a7468f6919e7fc7f65da56302aef9d152b7fd1c1232d`）判不可关闭；运行时行为已认可，本批只修表示层与归属。缺口状态仍为 `open`。
+- **`missing_input` 登记**：A.2 的 `G-A1#1`、`G-E1#1`、`G-E2#1` 原因码列补 `missing_input`，子句条件写明 `actors[].type` 必填、键缺失按 §1.11 判 `missing_input`；schema §3 三行原因码列同步；A 表由 `check_three_table.py --write` 重建。`clause_of()` 对三个 `check_id` 的 `missing_input` 均返回对应子句，`PROJECT_CHARTER_EXISTENCE` 返回 `None`（无子句归属）。
+- **撤回 `G-F1#2` 归属**：`PROJECT_CHARTER_EXISTENCE` 的子句语义是章程关联完整性，承接不了“任意 actor 类型合法”；实现对全部 `actors[]` 生效（含章程无关 actor、无执行阶段项目），与 A.2“关联的”不符。删除 `ACTOR_TYPE_CLAUSES` 中的 F1 项，A.2 该行、schema §3、§1.11 归属同步复原；F 类数组型样例 A.1.11-4 移入覆盖矩阵新增的 `global_normalization` 分区。不补 ADR：撤回即恢复原判定逻辑，不构成结构性变更。
+- **覆盖闸门规则 6 语义变更**：从“每条样例必须被至少一个子句引用”改为“被子句或 `global_normalization` 分区之一引用”。新增生产路径 `evaluate_trace()` 取证（`evaluate()` 改为其薄包装），删除绕过入口归一化的 `failed_clauses()`；子句负例须 verdict/reason 与子句归属均命中声明，全局归一化样例声明 `expected_clause: null`；新增 `(reason, clause)` 登记检查，样例 reason 必须出现在 A.2 该子句原因码列。该变更只改验证工具、不改任何 `check_id` 判定逻辑，按方法 §9 不需要 ADR；已在 `scripts/README.md`、`TODO.md` T-137、覆盖矩阵说明中写明。
+- **更正批次 0072 的记述**：F 类 `G-F1#2` 归属是本批自行扩展，既不属 r1 复核“阻断项 1”（对象/数组 `type` 崩溃），也不属“阻断项 2（A.2 未同步）”；该归属已按 r2 报告 §3.2 撤回。A.2 签收不再引用这两个说法。
+- **计数**：A.1 样例 68 不变；覆盖矩阵子句 41、正例 43、负例 49 → 47、`global_normalization` 2、样例 68。`--enum-sweep` 仍 5 项。
+- **pins**：`spec/CHECKER_INPUT_SCHEMA.md#4` 用 r2 报告重冻（basis 含 `非同源复核：`、`复核产物：`、`sha256：`、`复核基线：ea9b674`、`区段：spec/CHECKER_INPUT_SCHEMA.md#4`、`结论：认可（§4 actor_type 与实现一致）`）；其余本批改动区段保持“未审查本批”占位，待 r3 报告统一重冻，不预写结论词。`check_dependency_pins.py` 的 r7 basis 未改。
+- **涉及文件**：`spec/CHECKER_INPUT_SCHEMA.md`、`spec/methods/deterministic-checker.md`、`validation/checker-prototype/checker.py`、`validation/checker-prototype/coverage.json`、`validation/pinned/checker.py`、`scripts/check_coverage_gate.py`、`scripts/test_coverage_gate.py`、`scripts/README.md`、`TODO.md`、`GAP_LEDGER.md`、`CHANGELOG.md`、`validation/reviews/2026-11-15-g018-actor-type-enum.md`、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`AGENTS.md`、`.githooks/pre-commit`（如计数或说明需同步）。
+- **状态**：G-018 维持 `open`，关闭依据留空，待 r3 非同源复核在修复提交上确认。

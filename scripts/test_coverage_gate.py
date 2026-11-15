@@ -157,7 +157,7 @@ def main() -> int:
                 original_method.replace(B1_NEGATIVE_INPUT, B1_OTHER_INPUT), encoding="utf-8"
             )
             result = run_gate(root, method_path, root / MANIFEST)
-            expected = "G-B1#2：负例 A.1.6-1 实际触发 ['G-B1#1']，未触发声明的 G-B1#2"
+            expected = "G-B1#2：负例 A.1.6-1 生产路径触发 G-B1#1，未命中声明的 G-B1#2"
             blocked = result.returncode == 1 and expected in result.stdout
             failures += 0 if blocked else 1
             rows.append(

@@ -14,8 +14,8 @@
       "basis": "非同源复核：verify-admission（2026-11-14/pm-governance-review，复核方独立于本仓库实现） sha256：905cf234539cccb916f9096e3e137f12876e24b2fb9c1960a034157ac33aff06 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-admission/REPORT.md 复核基线：deaac46"
     },
     "scripts/check_coverage_gate.py": {
-      "sha256": "3cf51704371cd0be6ee234b6193950adf7b8a0bba44be783a79729cbfc1e5f9d",
-      "basis": "非同源复核：外部复核基线 48128a8，产物 /tmp/verify-4812/REPORT_48128a8.md；复核产物：validation/reviews/2026-11-14-48128a8-external.md；复核基线：48128a8"
+      "sha256": "465dbfc1ef772c6ad69c9922d100dfac4219f985a63505d978057b76c815d9ac",
+      "basis": "未审查本批（批次 0073 改动；r2 报告审查基线 ea9b674，未覆盖本批修复；仅作指纹登记，待 r3 非同源复核后统一重冻，不作验收依据）"
     },
     "scripts/check_gap_ledger.py": {
       "sha256": "58ddb3692d2d82bc31fe8cc1115d6e8a2e7684b0340a8536585d12b34f955e5c",
@@ -46,16 +46,16 @@
       "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
     },
     "scripts/test_check_table_mutations.py": {
-      "sha256": "8492412e9d18bfac5c1b896a60a5394dbb0477bf053a0f40bd0b4f4d90e23e5d",
-      "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
+      "sha256": "22930a9aa0684a0454ed67aa6940d6cf035b847ea783476bbc533b94519c31f4",
+      "basis": "未审查本批（批次 0073 改动；r2 报告审查基线 ea9b674，未覆盖本批修复；仅作指纹登记，待 r3 非同源复核后统一重冻，不作验收依据）"
     },
     "scripts/test_checker_pins.py": {
       "sha256": "43ed4a0b3f172bb7a1a40706f5aa3e1110eff32f8ab99773e8c8a2f80e5a54df",
       "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
     },
     "scripts/test_coverage_gate.py": {
-      "sha256": "eb861fd06d37588d756ec898d5b1344ef20d05e2f3cadd1267ed2e577ac2a0e7",
-      "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
+      "sha256": "f3b217f338d492b5a632c9a9a098a054be2d77cfae4e6c0b847a23159f531897",
+      "basis": "未审查本批（批次 0073 改动；r2 报告审查基线 ea9b674，未覆盖本批修复；仅作指纹登记，待 r3 非同源复核后统一重冻，不作验收依据）"
     },
     "scripts/test_spec_pins.py": {
       "sha256": "66dd27f828d149cddcfb7400c87d58a85cdd080291f6fc1068529c73c4d0df7b",
@@ -66,8 +66,8 @@
       "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
     },
     "validation/checker-prototype/checker.py": {
-      "sha256": "a8cbf2f3481a1797a3b41266b97183eb03c287def2a2607063b4e6d038dec10c",
-      "basis": "非同源复核：G-018 第一轮复核（覆盖范围缺失：报告基线 0b88547，未审查批次 0072 的修复；仅作指纹登记，不作验收依据） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018/REPORT.md sha256：4a72e5a12cfa8795342762e539a4b3108988a2411588a0f9056fc7497e59fb21 复核基线：0b88547"
+      "sha256": "b457a7a6160d71b250fd76e8e47993cee0dbe9395fb79b413e131a060ad3bae3",
+      "basis": "未审查本批（批次 0073 改动；r2 报告审查基线 ea9b674，未覆盖本批修复；仅作指纹登记，待 r3 非同源复核后统一重冻，不作验收依据）"
     },
     "scripts/check_dependency_pins.py": {
       "sha256": "648a93a7161478ad1ebcdaf0b48cb05aa4fa48d98f15825e8f737e4441ae428b",

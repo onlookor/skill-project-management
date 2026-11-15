@@ -211,17 +211,17 @@ VERDICT_RANK = {"pass": 0, "cannot_evaluate": 1, "fail": 2}
 SEVERITY_RANK = {"advisory": 0, "warn": 1, "block": 2}
 
 
-def aggregate(
+def _rank_results(
     check_id: str, results: list[tuple], default_severity: str
-) -> tuple[str, str | None, str]:
-    """顺序无关聚合：fail > cannot_evaluate > pass；reason 按 A.2 行序取首条。
+) -> tuple[str, str | None, str | None, str]:
+    """顺序无关聚合：fail > cannot_evaluate > pass；reason 与子句按 A.2 行序取首条。
 
     - verdict 取所有子句结论的最高级，与子句求值顺序无关；
-    - reason 只在胜出 verdict 的子句里按 A.2 行序取首条，与输入顺序无关；
+    - reason 与胜出子句只在胜出 verdict 的结果里按 A.2 行序取首条，与输入顺序无关；
     - severity 取胜出子句在 A.2 登记的 severity 最高级，缺省用 check 的默认 severity。
     """
     if not results:
-        return "pass", None, default_severity
+        return "pass", None, None, default_severity
     verdict = max((item[0] for item in results), key=lambda value: VERDICT_RANK[value])
     winners = [item for item in results if item[0] == verdict]
     enriched = []
@@ -239,28 +239,76 @@ def aggregate(
         if severities
         else default_severity
     )
+    return verdict, reason, clause, severity
+
+
+def aggregate(
+    check_id: str, results: list[tuple], default_severity: str
+) -> tuple[str, str | None, str]:
+    verdict, reason, _clause, severity = _rank_results(check_id, results, default_severity)
     return verdict, reason, severity
 
 
-def failed_clauses(check_id: str, data: dict) -> list[str]:
-    """返回该输入实际触发的子句 id（按 A.2 行序）。供覆盖闸门机械核对。
+def evaluate_trace(check_id: str, data: dict) -> dict:
+    """生产路径取证：返回 `evaluate()` 的结论及其子句归属。
 
-    入口级拦截（必需顶层键缺失或为 `null`）由 `evaluate()` 返回无子句的
-    `missing_input`；本函数与之一致，这类输入不产生子句，直接返回空集。
-    枚举归一化仍在此生效，因此 `actors[].type` 为 `null` 时仍能取证到子句——
-    该子句只用于覆盖核对，不表示生产路径会归出它。
+    与 `evaluate()` 共用同一执行路径，供覆盖闸门核对“样例声明的子句是否真的
+    由生产路径触发”。入口归一化（必需键缺失、`null`、嵌套缺键）与适用性
+    短路不产生子句，`clause` 为 `None`；这类样例只能登记在
+    `coverage.json` 的 `global_normalization` 分区。
     """
-    if any(key not in data or data[key] is None for key in REQUIRED_KEYS.get(check_id, ())):
-        return []
-    results = enum_results(check_id, data) + CHECKS[check_id](data)
-    seen = []
-    for item in results:
-        clause = item[2] if len(item) > 2 else None
-        clause = clause or clause_of(check_id, item[1])
-        if clause and clause not in seen:
-            seen.append(clause)
-    seen.sort(key=lambda clause: CLAUSE_INDEX.get(clause, 10**6))
-    return seen
+    severity = SPEC[check_id][1]
+    applicability = data.get("applicability") or {}
+    state = applicability.get("state") if isinstance(applicability, dict) else None
+    if state == "inapplicable":
+        return {
+            "verdict": "not_applicable",
+            "reason": None,
+            "clause": None,
+            "severity": severity,
+            "stage": "applicability",
+        }
+    if state == "pending":
+        return {
+            "verdict": "cannot_evaluate",
+            "reason": "applicability_pending",
+            "clause": None,
+            "severity": severity,
+            "stage": "applicability",
+        }
+    if any(key not in data for key in REQUIRED_KEYS.get(check_id, ())):
+        return {
+            "verdict": "cannot_evaluate",
+            "reason": "missing_input",
+            "clause": None,
+            "severity": severity,
+            "stage": "entry",
+        }
+    if find_null(data) is not None or nested_missing(data) is not None:
+        return {
+            "verdict": "cannot_evaluate",
+            "reason": "missing_input",
+            "clause": None,
+            "severity": severity,
+            "stage": "entry",
+        }
+    verdict, reason, clause, severity = _rank_results(
+        check_id, enum_results(check_id, data) + CHECKS[check_id](data), SPEC[check_id][1]
+    )
+    stage = "clause" if clause else "check"
+    if verdict == "pass":
+        reference_issue = validate_references(data)
+        if reference_issue:
+            verdict, reason = reference_issue
+            clause = None
+            stage = "reference"
+    return {
+        "verdict": verdict,
+        "reason": reason,
+        "clause": clause,
+        "severity": severity,
+        "stage": stage,
+    }
 
 
 
@@ -1083,12 +1131,12 @@ APPLICABILITY_STATES = {"applicable", "inapplicable", "pending"}
 ASSUMPTION_STATUSES = {"pending", "satisfied", "expired"}
 MANAGEMENT_NODE_TYPES = {"ManagementActivity", "ManagementArtifact"}
 ACTOR_TYPES = {"HumanActor", "LegalEntity", "AIActor"}
-# `actors[].type` 非法/缺失归属到该 check 的 Actor 子句；其余 check 无独立子句。
+# `actors[].type` 是全局封闭枚举，但只有 A1/E1/E2 有承接它的子句；
+# 其余 check_id 只做全局校验，结果无子句归属（覆盖矩阵登记在 global_normalization）。
 ACTOR_TYPE_CLAUSES = {
     "PROJECT_MINIMAL_EXISTENCE": "G-A1#1",
     "ROLE_MINIMAL_COMPLETENESS": "G-E1#1",
     "AI_AUTONOMY_DELEGATION_AUDITABLE": "G-E2#1",
-    "PROJECT_CHARTER_EXISTENCE": "G-F1#2",
 }
 
 
@@ -1179,30 +1227,8 @@ def enum_results(check_id: str, data: dict) -> list[tuple]:
 
 def evaluate(check_id: str, data: dict) -> tuple[str, str | None, str]:
     """全部 check 的唯一入口：适用性 → 缺键/null/枚举归一化 → 判定 → 全局引用校验。"""
-    severity = SPEC[check_id][1]
-    applicability = data.get("applicability") or {}
-    state = applicability.get("state") if isinstance(applicability, dict) else None
-    if state == "inapplicable":
-        return "not_applicable", None, severity
-    if state == "pending":
-        return "cannot_evaluate", "applicability_pending", severity
-    # 入口归一化：键缺失与值为 null 走同一出口，不依赖 check 函数内的守卫。
-    missing = [key for key in REQUIRED_KEYS.get(check_id, ()) if key not in data]
-    if missing:
-        return "cannot_evaluate", "missing_input", severity
-    if find_null(data) is not None:
-        return "cannot_evaluate", "missing_input", severity
-    if nested_missing(data) is not None:
-        return "cannot_evaluate", "missing_input", severity
-    verdict, reason, severity = aggregate(
-        check_id, enum_results(check_id, data) + CHECKS[check_id](data), SPEC[check_id][1]
-    )
-    # 引用完整性全局生效：check 自身判 pass 时，再统一校验所有已知引用。
-    if verdict == "pass":
-        reference_issue = validate_references(data)
-        if reference_issue:
-            verdict, reason = reference_issue
-    return verdict, reason, severity
+    trace = evaluate_trace(check_id, data)
+    return trace["verdict"], trace["reason"], trace["severity"]
 
 
 def run_case(case: dict) -> dict:

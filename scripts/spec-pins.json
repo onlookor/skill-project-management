@@ -8,9 +8,9 @@
       "basis": "初始登记"
     },
     "spec/methods/deterministic-checker.md#A.2": {
-      "sha256": "20a99835640f42af6f9b56dbc85a9bb92add1934ba7417bfe37d78963cd297ec",
+      "sha256": "3d3fd107d94880b79cda1ab6a4612ff083c8a1e3dc2aa87f8076b414fbe161cd",
       "path": "spec/methods/deterministic-checker.md",
-      "basis": "非同源复核：G-018 第一轮复核（覆盖范围缺失：报告基线 0b88547，未审查批次 0072 的修复；仅作指纹登记，不作验收依据） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018/REPORT.md sha256：4a72e5a12cfa8795342762e539a4b3108988a2411588a0f9056fc7497e59fb21 复核基线：0b88547"
+      "basis": "未审查本批（批次 0073 改动；r2 报告审查基线 ea9b674，未覆盖本批修复；仅作指纹登记，待 r3 非同源复核后统一重冻，不作验收依据）"
     },
     "spec/methods/deterministic-checker.md#A.1": {
       "sha256": "1c7ef44a14dd2d7bc0e3ae279baade81c3b6d2a5ea6c221e644362337f23b3bc",
@@ -23,19 +23,19 @@
       "basis": "初始登记"
     },
     "spec/CHECKER_INPUT_SCHEMA.md#3": {
-      "sha256": "82f9c100f3f9944a22c524895a93e7a563a10372552190dc95608f185a653471",
+      "sha256": "e27b36d0eed24e39bbeb29ada4e81aec83fba26c3c02650e5606f7bbf79b035f",
       "path": "spec/CHECKER_INPUT_SCHEMA.md",
-      "basis": "非同源复核：G-018 第一轮复核（覆盖范围缺失：报告基线 0b88547，未审查批次 0072 的修复；仅作指纹登记，不作验收依据） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018/REPORT.md sha256：4a72e5a12cfa8795342762e539a4b3108988a2411588a0f9056fc7497e59fb21 复核基线：0b88547"
+      "basis": "未审查本批（批次 0073 改动；r2 报告审查基线 ea9b674，未覆盖本批修复；仅作指纹登记，待 r3 非同源复核后统一重冻，不作验收依据）"
     },
     "spec/CHECKER_INPUT_SCHEMA.md#4": {
       "sha256": "b8a5fa2f13b76bc6c962b2294295b4fa73ec98f4257f886652485d79f90f1367",
       "path": "spec/CHECKER_INPUT_SCHEMA.md",
-      "basis": "非同源复核：G-019 第七轮复核（verify-g019-r7，基线 7300283；本批在其基线上实施 G-018，改动验收待 G-018 非同源复核） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r7/REPORT.md sha256：65e319da5b5e3a511b5d8dbf6b3f45f1ddbc9f86e8a4a86c17b4121cea20dacb 复核基线：7300283"
+      "basis": "非同源复核：G-018 第二轮复核（verify-g018-r2，基线 ea9b674） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r2/REPORT.md sha256：17f631140bc700bf5826a7468f6919e7fc7f65da56302aef9d152b7fd1c1232d 复核基线：ea9b674 区段：spec/CHECKER_INPUT_SCHEMA.md#4 结论：认可（§4 actor_type 与实现一致）"
     },
     "validation/checker-prototype/coverage.json": {
-      "sha256": "103a3e818454d41a0a5d9f36a5993741c8860c8f76ffbb7f43c10f6c3af1d8c4",
+      "sha256": "bda6c5da3e06790c5af0dab6a591020c3f9cf06ed394dd6b51b137f7010a5e7a",
       "path": "validation/checker-prototype/coverage.json",
-      "basis": "非同源复核：G-018 第一轮复核（覆盖范围缺失：报告基线 0b88547，未审查批次 0072 的修复；仅作指纹登记，不作验收依据） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018/REPORT.md sha256：4a72e5a12cfa8795342762e539a4b3108988a2411588a0f9056fc7497e59fb21 复核基线：0b88547"
+      "basis": "未审查本批（批次 0073 改动；r2 报告审查基线 ea9b674，未覆盖本批修复；仅作指纹登记，待 r3 非同源复核后统一重冻，不作验收依据）"
     },
     "contracts/schema/knowledge-entry.schema.json": {
       "sha256": "aa3e9dc79e205679a397bda8f165b71846c367c882375b7f12086cdf2e1369a0",

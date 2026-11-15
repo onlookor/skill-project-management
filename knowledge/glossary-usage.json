@@ -1395,11 +1395,6 @@
           "form": "code"
         },
         {
-          "file": "spec/CHECKER_INPUT_SCHEMA.md",
-          "line": 33,
-          "form": "code"
-        },
-        {
           "file": "spec/INTERFACE_CONTRACT_SPEC.md",
           "line": 25,
           "form": "code"
@@ -3606,6 +3601,16 @@
           "form": "code"
         },
         {
+          "file": "CHANGELOG.md",
+          "line": 1206,
+          "form": "code"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 1208,
+          "form": "code"
+        },
+        {
           "file": "GAP_LEDGER.md",
           "line": 3,
           "form": "code"
@@ -3708,6 +3713,11 @@
         {
           "file": "TODO.md",
           "line": 35,
+          "form": "code"
+        },
+        {
+          "file": "TODO.md",
+          "line": 36,
           "form": "code"
         },
         {

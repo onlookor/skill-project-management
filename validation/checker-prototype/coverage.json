@@ -1,6 +1,6 @@
 {
-  "version": 1,
-  "note": "A.2 每个子句至少 1 正例 + 1 负例；样例编号形如 A.1.5-3。正例期望 verdict=pass；负例期望 verdict≠pass，且 expected_failed_clauses 必须被 failed_clauses() 实际触发（声明集合是实际命中集合的子集）。本闸门不核对 reason 码与子句原因码列的对应关系。failed_clauses() 绕过入口归一化：必需键缺失或为 null 时返回空集；A.1.10-6（actors[].type 为 null）的期望 verdict 来自生产 evaluate() 的入口归一化，其子句归属仅用于取证，不代表生产路径会归出该子句。由 scripts/check_coverage_gate.py 机械核对。",
+  "version": 2,
+  "note": "A.2 每个子句至少 1 正例 + 1 负例；样例编号形如 A.1.5-3。正例期望无 reason 的 pass；负例声明单一 expected_clause，闸门用生产 evaluate_trace() 核对 verdict/reason 与子句归属，并核对样例声明的 reason 已登记在 A.2 该子句的原因码列。入口归一化（必需键缺失、null、嵌套缺键）与无子句的全局枚举样例登记在 global_normalization 分区（expected_clause 为 null），不挂子句但必须被消费。每个样例必须被子句或全局归一化分区之一引用，同一编号不得两处登记。由 scripts/check_coverage_gate.py 机械核对。",
   "clauses": {
     "G-A1#1": {
       "check_id": "PROJECT_MINIMAL_EXISTENCE",
@@ -10,33 +10,23 @@
       "negative": [
         {
           "sample": "A.1.1-3",
-          "expected_failed_clauses": [
-            "G-A1#1"
-          ]
+          "expected_clause": "G-A1#1"
         },
         {
           "sample": "A.1.1-8",
-          "expected_failed_clauses": [
-            "G-A1#1"
-          ]
+          "expected_clause": "G-A1#1"
         },
         {
           "sample": "A.1.1-9",
-          "expected_failed_clauses": [
-            "G-A1#1"
-          ]
+          "expected_clause": "G-A1#1"
         },
         {
           "sample": "A.1.1-10",
-          "expected_failed_clauses": [
-            "G-A1#1"
-          ]
+          "expected_clause": "G-A1#1"
         },
         {
           "sample": "A.1.1-11",
-          "expected_failed_clauses": [
-            "G-A1#1"
-          ]
+          "expected_clause": "G-A1#1"
         }
       ]
     },
@@ -48,9 +38,7 @@
       "negative": [
         {
           "sample": "A.1.1-4",
-          "expected_failed_clauses": [
-            "G-A1#2"
-          ]
+          "expected_clause": "G-A1#2"
         }
       ]
     },
@@ -62,9 +50,7 @@
       "negative": [
         {
           "sample": "A.1.1-5",
-          "expected_failed_clauses": [
-            "G-A1#3"
-          ]
+          "expected_clause": "G-A1#3"
         }
       ]
     },
@@ -76,9 +62,7 @@
       "negative": [
         {
           "sample": "A.1.1-1",
-          "expected_failed_clauses": [
-            "G-A1#4"
-          ]
+          "expected_clause": "G-A1#4"
         }
       ]
     },
@@ -90,9 +74,7 @@
       "negative": [
         {
           "sample": "A.1.1-6",
-          "expected_failed_clauses": [
-            "G-A1#5"
-          ]
+          "expected_clause": "G-A1#5"
         }
       ]
     },
@@ -104,9 +86,7 @@
       "negative": [
         {
           "sample": "A.1.1-7",
-          "expected_failed_clauses": [
-            "G-A1#6"
-          ]
+          "expected_clause": "G-A1#6"
         }
       ]
     },
@@ -118,9 +98,7 @@
       "negative": [
         {
           "sample": "A.1.2-1",
-          "expected_failed_clauses": [
-            "G-A2#1"
-          ]
+          "expected_clause": "G-A2#1"
         }
       ]
     },
@@ -132,9 +110,7 @@
       "negative": [
         {
           "sample": "A.1.2-3",
-          "expected_failed_clauses": [
-            "G-A2#2"
-          ]
+          "expected_clause": "G-A2#2"
         }
       ]
     },
@@ -146,9 +122,7 @@
       "negative": [
         {
           "sample": "A.1.6-3",
-          "expected_failed_clauses": [
-            "G-B1#1"
-          ]
+          "expected_clause": "G-B1#1"
         }
       ]
     },
@@ -160,9 +134,7 @@
       "negative": [
         {
           "sample": "A.1.6-1",
-          "expected_failed_clauses": [
-            "G-B1#2"
-          ]
+          "expected_clause": "G-B1#2"
         }
       ]
     },
@@ -174,9 +146,7 @@
       "negative": [
         {
           "sample": "A.1.7-1",
-          "expected_failed_clauses": [
-            "G-B2#1"
-          ]
+          "expected_clause": "G-B2#1"
         }
       ]
     },
@@ -189,9 +159,7 @@
       "negative": [
         {
           "sample": "A.1.7-3",
-          "expected_failed_clauses": [
-            "G-B2#2"
-          ]
+          "expected_clause": "G-B2#2"
         }
       ]
     },
@@ -203,9 +171,7 @@
       "negative": [
         {
           "sample": "A.1.3-1",
-          "expected_failed_clauses": [
-            "G-C1#1"
-          ]
+          "expected_clause": "G-C1#1"
         }
       ]
     },
@@ -217,9 +183,7 @@
       "negative": [
         {
           "sample": "A.1.3-3",
-          "expected_failed_clauses": [
-            "G-C1#2"
-          ]
+          "expected_clause": "G-C1#2"
         }
       ]
     },
@@ -231,9 +195,7 @@
       "negative": [
         {
           "sample": "A.1.3-4",
-          "expected_failed_clauses": [
-            "G-C1#3"
-          ]
+          "expected_clause": "G-C1#3"
         }
       ]
     },
@@ -246,9 +208,7 @@
       "negative": [
         {
           "sample": "A.1.8-1",
-          "expected_failed_clauses": [
-            "G-C2#1"
-          ]
+          "expected_clause": "G-C2#1"
         }
       ]
     },
@@ -260,9 +220,7 @@
       "negative": [
         {
           "sample": "A.1.8-4",
-          "expected_failed_clauses": [
-            "G-C2#2"
-          ]
+          "expected_clause": "G-C2#2"
         }
       ]
     },
@@ -274,9 +232,7 @@
       "negative": [
         {
           "sample": "A.1.4-3",
-          "expected_failed_clauses": [
-            "G-D1#1"
-          ]
+          "expected_clause": "G-D1#1"
         }
       ]
     },
@@ -288,9 +244,7 @@
       "negative": [
         {
           "sample": "A.1.4-4",
-          "expected_failed_clauses": [
-            "G-D1#2"
-          ]
+          "expected_clause": "G-D1#2"
         }
       ]
     },
@@ -302,9 +256,7 @@
       "negative": [
         {
           "sample": "A.1.4-1",
-          "expected_failed_clauses": [
-            "G-D1#3"
-          ]
+          "expected_clause": "G-D1#3"
         }
       ]
     },
@@ -316,9 +268,7 @@
       "negative": [
         {
           "sample": "A.1.9-1",
-          "expected_failed_clauses": [
-            "G-D2#1"
-          ]
+          "expected_clause": "G-D2#1"
         }
       ]
     },
@@ -330,9 +280,7 @@
       "negative": [
         {
           "sample": "A.1.9-3",
-          "expected_failed_clauses": [
-            "G-D2#2"
-          ]
+          "expected_clause": "G-D2#2"
         }
       ]
     },
@@ -344,9 +292,7 @@
       "negative": [
         {
           "sample": "A.1.9-4",
-          "expected_failed_clauses": [
-            "G-D2#3"
-          ]
+          "expected_clause": "G-D2#3"
         }
       ]
     },
@@ -358,15 +304,11 @@
       "negative": [
         {
           "sample": "A.1.5-1",
-          "expected_failed_clauses": [
-            "G-E1#1"
-          ]
+          "expected_clause": "G-E1#1"
         },
         {
           "sample": "A.1.5-5",
-          "expected_failed_clauses": [
-            "G-E1#1"
-          ]
+          "expected_clause": "G-E1#1"
         }
       ]
     },
@@ -378,9 +320,7 @@
       "negative": [
         {
           "sample": "A.1.5-3",
-          "expected_failed_clauses": [
-            "G-E1#2"
-          ]
+          "expected_clause": "G-E1#2"
         }
       ]
     },
@@ -392,9 +332,7 @@
       "negative": [
         {
           "sample": "A.1.5-4",
-          "expected_failed_clauses": [
-            "G-E1#3"
-          ]
+          "expected_clause": "G-E1#3"
         }
       ]
     },
@@ -406,21 +344,11 @@
       "negative": [
         {
           "sample": "A.1.10-1",
-          "expected_failed_clauses": [
-            "G-E2#1"
-          ]
+          "expected_clause": "G-E2#1"
         },
         {
           "sample": "A.1.10-5",
-          "expected_failed_clauses": [
-            "G-E2#1"
-          ]
-        },
-        {
-          "sample": "A.1.10-6",
-          "expected_failed_clauses": [
-            "G-E2#1"
-          ]
+          "expected_clause": "G-E2#1"
         }
       ]
     },
@@ -432,9 +360,7 @@
       "negative": [
         {
           "sample": "A.1.10-3",
-          "expected_failed_clauses": [
-            "G-E2#2"
-          ]
+          "expected_clause": "G-E2#2"
         }
       ]
     },
@@ -446,9 +372,7 @@
       "negative": [
         {
           "sample": "A.1.10-4",
-          "expected_failed_clauses": [
-            "G-E2#3"
-          ]
+          "expected_clause": "G-E2#3"
         }
       ]
     },
@@ -460,9 +384,7 @@
       "negative": [
         {
           "sample": "A.1.11-1",
-          "expected_failed_clauses": [
-            "G-F1#1"
-          ]
+          "expected_clause": "G-F1#1"
         }
       ]
     },
@@ -474,15 +396,7 @@
       "negative": [
         {
           "sample": "A.1.11-3",
-          "expected_failed_clauses": [
-            "G-F1#2"
-          ]
-        },
-        {
-          "sample": "A.1.11-4",
-          "expected_failed_clauses": [
-            "G-F1#2"
-          ]
+          "expected_clause": "G-F1#2"
         }
       ]
     },
@@ -494,9 +408,7 @@
       "negative": [
         {
           "sample": "A.1.12-1",
-          "expected_failed_clauses": [
-            "G-F2#1"
-          ]
+          "expected_clause": "G-F2#1"
         }
       ]
     },
@@ -508,9 +420,7 @@
       "negative": [
         {
           "sample": "A.1.12-3",
-          "expected_failed_clauses": [
-            "G-F2#2"
-          ]
+          "expected_clause": "G-F2#2"
         }
       ]
     },
@@ -522,9 +432,7 @@
       "negative": [
         {
           "sample": "A.1.13-1",
-          "expected_failed_clauses": [
-            "G-F3#1"
-          ]
+          "expected_clause": "G-F3#1"
         }
       ]
     },
@@ -536,9 +444,7 @@
       "negative": [
         {
           "sample": "A.1.13-3",
-          "expected_failed_clauses": [
-            "G-F3#2"
-          ]
+          "expected_clause": "G-F3#2"
         }
       ]
     },
@@ -550,9 +456,7 @@
       "negative": [
         {
           "sample": "A.1.14-1",
-          "expected_failed_clauses": [
-            "G-F4#1"
-          ]
+          "expected_clause": "G-F4#1"
         }
       ]
     },
@@ -564,9 +468,7 @@
       "negative": [
         {
           "sample": "A.1.15-1",
-          "expected_failed_clauses": [
-            "G-G1#1"
-          ]
+          "expected_clause": "G-G1#1"
         }
       ]
     },
@@ -578,9 +480,7 @@
       "negative": [
         {
           "sample": "A.1.15-3",
-          "expected_failed_clauses": [
-            "G-G1#2"
-          ]
+          "expected_clause": "G-G1#2"
         }
       ]
     },
@@ -592,9 +492,7 @@
       "negative": [
         {
           "sample": "A.1.16-1",
-          "expected_failed_clauses": [
-            "G-G2#1"
-          ]
+          "expected_clause": "G-G2#1"
         }
       ]
     },
@@ -606,9 +504,7 @@
       "negative": [
         {
           "sample": "A.1.17-1",
-          "expected_failed_clauses": [
-            "G-G3#1"
-          ]
+          "expected_clause": "G-G3#1"
         }
       ]
     },
@@ -620,11 +516,25 @@
       "negative": [
         {
           "sample": "A.1.17-3",
-          "expected_failed_clauses": [
-            "G-G3#2"
-          ]
+          "expected_clause": "G-G3#2"
         }
       ]
     }
-  }
+  },
+  "global_normalization": [
+    {
+      "sample": "A.1.10-6",
+      "check_id": "AI_AUTONOMY_DELEGATION_AUDITABLE",
+      "expected_verdict": "cannot_evaluate",
+      "expected_reason": "missing_input",
+      "expected_clause": null
+    },
+    {
+      "sample": "A.1.11-4",
+      "check_id": "PROJECT_CHARTER_EXISTENCE",
+      "expected_verdict": "cannot_evaluate",
+      "expected_reason": "undefined_enum_value",
+      "expected_clause": null
+    }
+  ]
 }
