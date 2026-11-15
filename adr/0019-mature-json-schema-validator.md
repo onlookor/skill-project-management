@@ -29,6 +29,8 @@
 
 **威胁模型（与 ADR-0015 同一信任模型）**：这道核对能发现误装、版本漂移、安装树被改动、同名假 wheel 与非针对性的运行时替换；**不构成对有权写本机 Python 环境者的防护**。`PYTHONPATH` 注入、`sitecustomize`、直接修改 `site-packages` 均在被信任边界之外——检测它们只能提高干扰成本，不能作为安全保证。残留缺口登记为 G-022。
 
+**`pattern` 回溯风险不属于本威胁模型成员**：`contracts/schema/` 是仓库自写的可信资产，不是外部输入，也不是对手可控的载荷；schema 作者与维护者是同一信任域，正则回溯不是需要设防的攻击面。因此 `RM-SCHEMA-LINT` 只对 `pattern` 设 512 字符上限（控制复核与求值成本），**不做嵌套量词或其他回溯形态的启发式判定**——那类启发式既会误拒合法的“分隔符 + 段 + 重复”写法（如官方 semver 正则、dotted-id、dotted-version、list-of-pairs），又会漏掉 `^(a|aa)+$` 这类真正呈指数行为的模式，属以覆盖之名引入不可复核的偏差。若将来 schema 来源变更为外部输入，必须新立 ADR 重新评估，不得沿用本条结论。
+
 **三重核对都是强制项。** wheel 放在仓库外的持久路径 `~/.local/share/pm-governance/wheels/`（不提交进 git），获取方式：
 
 ```
@@ -48,7 +50,7 @@ python3 -m pip download --no-deps --no-cache-dir jsonschema==4.26.0 -d ~/.local/
 
 - **只覆盖校验语义**：`jsonschema` 只决定“一条 schema 如何解释一条数据”。它不接触数据内容、不生成证据、不替代复核，也不进入任何判定链的输入端。
 - **不覆盖数据与证据**：`contracts/schema/` 的 schema 文本、`knowledge/` 条目、`ontology/`、`validation/reviews/` 与 `SOURCE_LEDGER.md` 仍全部在仓库内，且仍由仓库内检查器与钉扎保护。
-- **不改变失败方向**：依赖缺失、导入路径不在分发目录、安装树逐文件哈希不符、运行时行为探测失败或版本/指纹不符时，`check_no_raw_material.py` 与 `check_dependency_pins.py` 必须以“无法评估”退出 2 或阻断退出 1，不得降级为跳过校验，也不得只警告后继续。
+- **不改变失败方向**：依赖无法导入、分发产物缺失时按“无法评估”退出 2；产物存在但安装树逐文件哈希不符、导入路径不在分发目录或运行时行为探测失败时，逐条报错后退出 1（`check_no_raw_material.py` 为逐文件 `RM-SCHEMA`/`RM-SCHEMA-LINT`，`check_dependency_pins.py` 为对应 `DP-*` 项）。两者都不得降级为跳过校验，也不得只警告后继续。
 - **可替换性**：校验入口只依赖 `jsonschema` 的 `Draft202012Validator` 与 `check_schema` 两个公开接口；替换实现只改一处适配层，不触碰输出契约（reason code、文件路径、JSON 指针、退出码）。
 
 ## 撤销条件与退回档次
@@ -72,7 +74,7 @@ python3 -m pip download --no-deps --no-cache-dir jsonschema==4.26.0 -d ~/.local/
 - 校验语义由规范实现承担，`items` 布尔/元组、`enum`/`const` 与同级断言、`oneOf` 排他等问题由结构消除，不再依赖逐轮补洞。
 - schema 自身用官方元 schema 校验，schema 写错即失败。
 - 依赖被替换可被发现：版本、分发产物 sha256、按 wheel RECORD 逐文件核对的安装树与导入路径断言共同生效；产物缺失按“无法评估”阻断，不再只警告。
-- 缺失的本地 `$ref`、灾难性回溯 `pattern` 与超深嵌套均转为带 reason code 与指针的可诊断失败，不再抛未捕获异常或崩溃。
+- 缺失的本地 `$ref`、超长 `pattern` 与超深嵌套均转为带 reason code 与指针的可诊断失败，不再抛未捕获异常或崩溃；`pattern` 只按 512 字符上限检查，不做会误拒合法写法的回溯形态启发式。
 
 ### 负面
 

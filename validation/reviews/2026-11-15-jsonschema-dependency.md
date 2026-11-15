@@ -55,4 +55,12 @@
 - `adr/0019-mature-json-schema-validator.md`：输出契约段（指针来源本仓库、消息取自库）、威胁模型段（不防护有权写本机 Python 环境者）、G-022 跟进；`README.md`、`scripts/README.md` 同步。
 - `GAP_LEDGER.md`：G-021 以 `accepted` 关闭（修正 2,400 为单值路径上限）；新增 G-022 并以 `accepted` 关闭；G-019 补 0067–0068 与残留、维持 `open`；G-020 未改。
 
+## 批次 0069 改动范围（r6 复判：三处口径对齐）
+
+- 依据：`/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r6/REPORT.md`，sha256 `1db2586e…6bd1db`，基线 `bafcb04`。
+- `scripts/check_no_raw_material.py`：撤掉 `pattern` 嵌套量词启发式，只保留 512 字符上限；删除依赖该启发式的负例，改为“官方 semver / dotted-id / dotted-version / list-of-pairs / `^(a|aa)+$` 全部放行”与“只按长度拒绝超长 `pattern`”，`--self-test` 82 → 83 项。
+- `adr/0019-mature-json-schema-validator.md`：威胁模型一节明确 `pattern` 回溯风险不属于威胁模型成员（schema 为自写可信资产、非外部输入）；“不改变失败方向”改为分档表述（导入失败/产物缺失退 2，逐文件核对不符与运行时探测失败退 1）。
+- `scripts/README.md`：`RM-SCHEMA` 退出码与 `RM-SCHEMA-LINT` 的 `pattern` 口径对齐实现；自测数量与 r6 用例更新。
+- `GAP_LEDGER.md`：G-019 改“非针对性替换均阻断”，补记 `sitecustomize` 只替换 `validator_for` 时不阻断（G-022 信任边界），说明剩余项只有口径对齐；G-021、G-022 未动。
+
 **不构成**：G-019 的关闭依据（该条仍 `open`，残留须非同源复核）；也不证明任何提交者身份。G-021 与 G-022 的关闭依据是本索引所指的 r5 报告，不是本索引。

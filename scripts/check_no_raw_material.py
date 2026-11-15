@@ -157,7 +157,6 @@ MAX_RECORD_PROSE_CHARS = 2800
 MAX_FILE_PROSE_CHARS = 32 * 1024
 MAX_SCHEMA_DEPTH = 64
 MAX_PATTERN_CHARS = 512
-NESTED_QUANTIFIER_RE = re.compile(r"\((?:\?:)?[^()]{0,300}[+*][^()]{0,300}\)\s*[+*{]")
 BASE64_RUN_CHARS = 256
 BASE64_PROBE_CHARS = 64
 
@@ -500,12 +499,7 @@ def _lint_node(node, pointer, strict, errors, depth=0):
         elif len(pattern) > MAX_PATTERN_CHARS:
             errors.append(
                 f"{pointer}：`pattern` 长度 {len(pattern)} 超过 {MAX_PATTERN_CHARS}，"
-                "拒绝评估（灾难性回溯风险不可控）"
-            )
-        elif NESTED_QUANTIFIER_RE.search(pattern):
-            errors.append(
-                f"{pointer}：`pattern` 含嵌套量词，存在灾难性回溯风险；"
-                "请改写为线性模式（如用更窄的字符类替代 `(a+)+`）"
+                "拒绝评估（复核成本不可控）"
             )
         else:
             try:
@@ -1912,14 +1906,45 @@ def run_self_test():
             f"缺失本地 $ref 报错而不崩溃（{ref_hits[:1]}）",
         )
 
-        evil_pattern = {
-            "type": "string", "maxLength": 8192, "pattern": "^(a+)+$",
+        # r6：撤掉嵌套量词启发式（schema 是自写可信资产，正则回溯不在威胁模型内），
+        # 只保留 512 字符上限；常见“分隔符+段+重复”写法与交替型必须全部放行。
+        common_patterns = {
+            "semver": (
+                r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)"
+                r"(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)"
+                r"(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?"
+                r"(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$"
+            ),
+            "dotted-id": r"^[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*$",
+            "dotted-version": r"^\d+(?:\.\d+)*$",
+            "list-of-pairs": (
+                r"^[A-Za-z0-9_-]+:[A-Za-z0-9_-]+"
+                r"(?:,[A-Za-z0-9_-]+:[A-Za-z0-9_-]+)*$"
+            ),
+            "alternation": r"^(a|aa)+$",
         }
-        lint_errors, _ = lint_schema_doc("evil-pattern", evil_pattern)
+        rejected = {}
+        for name, pattern in common_patterns.items():
+            pattern_errors, _ = lint_schema_doc(
+                f"pattern-{name}",
+                {"type": "string", "maxLength": 8192, "pattern": pattern},
+            )
+            if pattern_errors:
+                rejected[name] = pattern_errors
         report(
-            "T-NRM-12[catastrophic-pattern]",
-            any("嵌套量词" in message for message in lint_errors),
-            f"灾难性回溯 pattern 被 lint 拒绝（{lint_errors[:1]}）",
+            "T-NRM-12[pattern-common-forms]",
+            not rejected,
+            f"常见分隔符重复与交替型 pattern 全部放行（拒绝 {rejected}）",
+        )
+
+        overlong, _ = lint_schema_doc(
+            "pattern-too-long",
+            {"type": "string", "maxLength": 8192, "pattern": "a" * 513},
+        )
+        report(
+            "T-NRM-12[pattern-length-only]",
+            any("超过 512" in message for message in overlong),
+            f"只按 512 字符上限拒绝超长 pattern（{overlong[:1]}）",
         )
 
         deep = {"type": "string", "maxLength": 5}

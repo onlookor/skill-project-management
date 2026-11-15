@@ -1152,3 +1152,15 @@
 - **台账（四、五）**：G-021 修正“`positions[].stance` 只有 2,400 预算”为“单值路径上限 2,400，16,800 才是单条总和预算”，按 3.6.4 补理由、批准依据、承接方与时点，以 r5 报告为关闭依据，改 `closed` / `accepted`；G-022 同批 `closed` / `accepted`（成因、影响、承接方与 ADR-0015 外置方向）；G-019 补本轮修复与残留、维持 `open`；G-020 未改。台账 22 条：`open` 3 / `closed` 19。
 - **自测（六）**：`check_no_raw_material.py --self-test` 76 → 82 项（缺失 `$ref`、灾难性 `pattern`、深嵌套、`sitecustomize`、`additionalProperties` 指针、`propertyNames` 指针）；依赖负例 13 项。
 - **涉及文件**：`scripts/check_dependency_pins.py`、`scripts/test_dependency_pins.py`、`scripts/check_no_raw_material.py`、`adr/0019-mature-json-schema-validator.md`、`README.md`、`scripts/README.md`、`GAP_LEDGER.md`、`CHANGELOG.md`、`validation/reviews/2026-11-15-jsonschema-dependency.md`、`scripts/checker-pins.json`。
+
+---
+
+### 批次 0069 — 2026-11-15 — r6 复判：撤掉 `pattern` 启发式、退出码与替换范围口径对齐
+
+- **依据**：r6 复判报告 `/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r6/REPORT.md`（sha256 `1db2586e…6bd1db`，基线 `bafcb04`）。
+- **撤掉 `pattern` 嵌套量词启发式**：schema 是仓库自写的可信资产、不是外部输入，正则回溯不在威胁模型内；`RM-SCHEMA-LINT` 只保留 512 字符上限。ADR-0019 威胁模型一节写明该风险不属于威胁模型成员及理由，不再保留“已用启发式覆盖”的说法。实测原启发式误拒 4 个合法常见写法（官方 semver 正则 179 字符、dotted-id、dotted-version、list-of-pairs，均由 `(?:\.\w+)*` 类“分隔符 + 段 + 重复”触发），又漏拒 `^(a|aa)+$`；撤除后 5 个写法全部放行。
+- **自测改写**：删除依赖启发式的负例，新增“常见写法全部放行”与“只按 512 字符上限拒绝超长 `pattern`”，82 → 83 项，不留空壳。
+- **退出码表述对齐**：`scripts/README.md` 原称运行时探测失败“退出 2”，实测为逐文件 24 条 `RM-SCHEMA`/`RM-SCHEMA-LINT` 后退出 1，只有 `jsonschema` 导入失败才退 2；ADR-0019“不改变失败方向”同步改写为分档表述。
+- **替换范围表述对齐**：`sitecustomize` 只替换 `validator_for`、保留 `Draft202012Validator` 时不阻断，属 G-022 声明的信任边界（有权写本机 Python 环境者的针对性替换）。更正批次 0068“`sitecustomize` 全部阻断”的表述：被阻断的是空实现/整体替换与同名假 wheel。
+- **台账**：G-019 说明改“非针对性替换均阻断”，补记 r6 实测与“剩余项只有三处口径对齐、本轮已全部完成”，维持 `open`；G-021、G-022 未动；G-020 未改。台账 22 条：`open` 3 / `closed` 19。
+- **涉及文件**：`scripts/check_no_raw_material.py`、`adr/0019-mature-json-schema-validator.md`、`scripts/README.md`、`GAP_LEDGER.md`、`CHANGELOG.md`、`validation/reviews/2026-11-15-jsonschema-dependency.md`、`scripts/checker-pins.json`。

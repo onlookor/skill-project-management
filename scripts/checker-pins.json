@@ -30,8 +30,8 @@
       "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
     },
     "scripts/check_no_raw_material.py": {
-      "sha256": "6b679c09212f9044132cedf891dd3c7ebe444b9dc2a5a88b4d4721f54f1ae128",
-      "basis": "非同源复核：G-019 r5（基线 3d7211c）要求逐文件核对安装树、恢复契约指针、把缺失 $ref 与深嵌套/灾难性 pattern 转为可诊断失败；用户 2026-11-15 裁定按“收紧威胁模型 + 修可机械修的部分”执行。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r5/REPORT.md；sha256：5373a537d05870dcf4f52756bf7e0012bc0128879e22df92cb85d86007258108；复核基线：3d7211c"
+      "sha256": "5fd7d6395a2eb84f46fbb9ca2d7ad47bfa7e7ab467d1a532a254785cc3bd5492",
+      "basis": "非同源复核：G-019 r6（基线 bafcb04）要求撤掉 pattern 嵌套量词启发式只留 512 字符上限、退出码表述与实现对齐、替换范围表述与实测对齐。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r6/REPORT.md；sha256：1db2586ee7f5614920fc6a6ab3f2afc34c4445ff997df8b0aaec48327d6bd1db；复核基线：bafcb04"
     },
     "scripts/check_spec_pins.py": {
       "sha256": "9e16d25fd45b13737a0076080d87d0c0f309eb97e4472acfaf91fec2c87cee55",
