@@ -110,6 +110,11 @@
           "form": "code"
         },
         {
+          "file": "spec/D6_REBASELINE_PROPOSAL.md",
+          "line": 517,
+          "form": "code"
+        },
+        {
           "file": "spec/M3_M4_PLAN.md",
           "line": 186,
           "form": "term_id"
@@ -581,7 +586,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 443,
+          "line": 446,
           "form": "code"
         },
         {
@@ -705,6 +710,11 @@
           "form": "code"
         },
         {
+          "file": "spec/D6_REBASELINE_PROPOSAL.md",
+          "line": 517,
+          "form": "code"
+        },
+        {
           "file": "spec/methods/deterministic-checker.md",
           "line": 330,
           "form": "code"
@@ -756,7 +766,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 443,
+          "line": 446,
           "form": "code"
         },
         {
@@ -1095,6 +1105,11 @@
           "form": "code"
         },
         {
+          "file": "spec/D6_REBASELINE_PROPOSAL.md",
+          "line": 517,
+          "form": "code"
+        },
+        {
           "file": "spec/methods/deterministic-checker.md",
           "line": 319,
           "form": "code"
@@ -1161,7 +1176,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 443,
+          "line": 446,
           "form": "code"
         },
         {
@@ -1541,7 +1556,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 443,
+          "line": 446,
           "form": "code"
         },
         {
@@ -1891,17 +1906,17 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 401,
-          "form": "code"
-        },
-        {
-          "file": "AGENTS.md",
           "line": 404,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 447,
+          "line": 407,
+          "form": "code"
+        },
+        {
+          "file": "AGENTS.md",
+          "line": 450,
           "form": "code"
         },
         {
@@ -2011,17 +2026,12 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 402,
+          "line": 405,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 404,
-          "form": "code"
-        },
-        {
-          "file": "AGENTS.md",
-          "line": 444,
+          "line": 407,
           "form": "code"
         },
         {
@@ -2031,12 +2041,17 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 462,
+          "line": 450,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 464,
+          "line": 465,
+          "form": "code"
+        },
+        {
+          "file": "AGENTS.md",
+          "line": 467,
           "form": "code"
         },
         {
@@ -2231,7 +2246,7 @@
         },
         {
           "file": "ROADMAP.md",
-          "line": 49,
+          "line": 64,
           "form": "code"
         },
         {
@@ -2711,17 +2726,17 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 401,
+          "line": 404,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 481,
+          "line": 484,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 486,
+          "line": 489,
           "form": "code"
         },
         {
@@ -2951,17 +2966,17 @@
         },
         {
           "file": "ROADMAP.md",
-          "line": 33,
+          "line": 46,
           "form": "code"
         },
         {
           "file": "ROADMAP.md",
-          "line": 133,
+          "line": 149,
           "form": "code"
         },
         {
           "file": "ROADMAP.md",
-          "line": 253,
+          "line": 271,
           "form": "code"
         },
         {
@@ -3677,27 +3692,12 @@
         },
         {
           "file": "ROADMAP.md",
-          "line": 38,
+          "line": 51,
           "form": "code"
         },
         {
           "file": "ROADMAP.md",
-          "line": 63,
-          "form": "code"
-        },
-        {
-          "file": "ROADMAP.md",
-          "line": 66,
-          "form": "code"
-        },
-        {
-          "file": "ROADMAP.md",
-          "line": 67,
-          "form": "code"
-        },
-        {
-          "file": "ROADMAP.md",
-          "line": 71,
+          "line": 78,
           "form": "code"
         },
         {
@@ -3707,12 +3707,27 @@
         },
         {
           "file": "ROADMAP.md",
-          "line": 83,
+          "line": 82,
           "form": "code"
         },
         {
           "file": "ROADMAP.md",
-          "line": 252,
+          "line": 86,
+          "form": "code"
+        },
+        {
+          "file": "ROADMAP.md",
+          "line": 96,
+          "form": "code"
+        },
+        {
+          "file": "ROADMAP.md",
+          "line": 98,
+          "form": "code"
+        },
+        {
+          "file": "ROADMAP.md",
+          "line": 270,
           "form": "code"
         },
         {
@@ -4042,7 +4057,7 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 447,
+          "line": 450,
           "form": "code"
         },
         {
@@ -4167,7 +4182,7 @@
         },
         {
           "file": "ROADMAP.md",
-          "line": 67,
+          "line": 82,
           "form": "code"
         },
         {
@@ -4430,12 +4445,12 @@
         },
         {
           "file": "ROADMAP.md",
-          "line": 38,
+          "line": 51,
           "form": "code"
         },
         {
           "file": "ROADMAP.md",
-          "line": 49,
+          "line": 64,
           "form": "code"
         },
         {
@@ -4530,7 +4545,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 426,
+          "line": 429,
           "form": "code"
         },
         {
@@ -4590,7 +4605,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 426,
+          "line": 429,
           "form": "code"
         },
         {

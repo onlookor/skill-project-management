@@ -22,6 +22,11 @@
       "path": "spec/CHECKER_INPUT_SCHEMA.md",
       "basis": "无复核声明（不构成认可，不放行）"
     },
+    "AGENTS.md#3.5": {
+      "sha256": "93cbf044bf807f5e52632b191af36cd1d5d8f8e1662bfb92175862cd19ab61d4",
+      "path": "AGENTS.md",
+      "basis": "无复核声明（不构成认可，不放行）"
+    },
     "validation/checker-prototype/coverage.json": {
       "sha256": "bda6c5da3e06790c5af0dab6a591020c3f9cf06ed394dd6b51b137f7010a5e7a",
       "path": "validation/checker-prototype/coverage.json",

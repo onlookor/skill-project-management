@@ -38,6 +38,7 @@ PINS = Path("scripts/spec-pins.json")
 REGISTRY = Path("scripts/no-review-declarations.json")
 METHOD = "spec/methods/deterministic-checker.md"
 SCHEMA = "spec/CHECKER_INPUT_SCHEMA.md"
+AGENTS = "AGENTS.md"
 SCHEMA_DIR = "contracts/schema"
 CONCLUSIONS = ("实质收敛", "认可", "通过")
 # 唯一允许的“无复核”字面量：它记录事实，但不构成认可、也不放行。
@@ -58,6 +59,7 @@ SECTIONS = (
     {"key": f"{METHOD}#A.2", "path": METHOD, "start": "### A.2 ", "end": "### A.1 "},
     {"key": f"{METHOD}#A.1", "path": METHOD, "start": "### A.1 ", "end": None},
     {"key": SCHEMA, "path": SCHEMA, "start": None, "end": None},
+    {"key": f"{AGENTS}#3.5", "path": AGENTS, "start": "#### 3.5 ", "end": "#### 3.6 "},
     {
         "key": "validation/checker-prototype/coverage.json",
         "path": "validation/checker-prototype/coverage.json",
