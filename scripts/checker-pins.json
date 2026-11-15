@@ -34,8 +34,8 @@
       "basis": "非同源复核：verify-admission（2026-11-14/pm-governance-review，复核方独立于本仓库实现） sha256：905cf234539cccb916f9096e3e137f12876e24b2fb9c1960a034157ac33aff06 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-admission/REPORT.md 复核基线：deaac46"
     },
     "scripts/check_spec_pins.py": {
-      "sha256": "66ab4861f88e46fe5ec6179558778f9fcdf8af7ab5cc3ae14f5b35e763cfd0a6",
-      "basis": "非同源复核：verify-admission（2026-11-14/pm-governance-review，sha256 905cf234，基线 deaac46） 复核产物：validation/reviews/2026-11-15-admission-r2-review.md 复核基线：deaac46"
+      "sha256": "0d0d00bd5cf51541660c92be47f56db2f03dc044a6e31cdd75d28bf3ae6c234a",
+      "basis": "非同源复核：G-019 第三轮复核（基线 3664b64）要求 spec-pins 依据标准与 checker-pins 对齐。 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r3/REPORT.md sha256：877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0 复核基线：3664b64"
     },
     "scripts/check_state.py": {
       "sha256": "f0e636ec254a5b435932e3f0755ec0b215ad1be5a3bbe93067dc2009c1793098",
@@ -58,8 +58,8 @@
       "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
     },
     "scripts/test_spec_pins.py": {
-      "sha256": "6a2fb9c8d1e9d0f17e96253347243636b332defce7d1684ea7c2caf407084c12",
-      "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
+      "sha256": "01e368d3c442983f38c143ec9de85de9966cdfd553009f64d2336df09c6327fa",
+      "basis": "非同源复核：G-019 r3 复核（基线 3664b64）第五节 P0-3 / P1-8。 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r3/REPORT.md sha256：877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0 复核基线：3664b64"
     },
     "scripts/validate_ontology.py": {
       "sha256": "132e579e6b411eb781db8230895bdaec1bbdd547f2a74188031fbfe1d7dcd92f",

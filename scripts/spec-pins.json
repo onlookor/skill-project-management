@@ -1,50 +1,81 @@
 {
   "version": 1,
-  "note": "规格区段指纹。区段改动必须 --write 并同批附非同源复核记录；指纹只证明内容一致，不证明签收人身份。",
+  "note": "规格区段指纹。区段新增或改动必须 --write --basis 并同批附非同源复核记录；basis 必须指向仓库外复核产物并与其 sha256 一致。指纹只证明内容一致，不证明签收人身份。",
   "sections": {
     "GRAMMAR.md": {
       "sha256": "72ae1575dc21ccd2043414f008bf0f27a79fdee225867cef725f2efe9091ad4f",
-      "path": "GRAMMAR.md"
+      "path": "GRAMMAR.md",
+      "basis": "初始登记"
     },
     "spec/methods/deterministic-checker.md#A.2": {
       "sha256": "ecdc0064d22247a6fd6aba4dbc4ce57323064b9108495921ee68324f99f2e90f",
-      "path": "spec/methods/deterministic-checker.md"
+      "path": "spec/methods/deterministic-checker.md",
+      "basis": "初始登记"
     },
     "spec/methods/deterministic-checker.md#A.1": {
       "sha256": "dcffbff73fd989b76fecc9462e51600098fba1e2a05811bc3e143e36269ecd03",
-      "path": "spec/methods/deterministic-checker.md"
+      "path": "spec/methods/deterministic-checker.md",
+      "basis": "初始登记"
     },
     "spec/CHECKER_INPUT_SCHEMA.md#2bis": {
       "sha256": "2c4b9b8b0ebe1a754af8fd5b597cbefdea06d9ddc19b120d258488d40d0ae3c2",
-      "path": "spec/CHECKER_INPUT_SCHEMA.md"
+      "path": "spec/CHECKER_INPUT_SCHEMA.md",
+      "basis": "初始登记"
     },
     "spec/CHECKER_INPUT_SCHEMA.md#3": {
       "sha256": "d9707fc668c2749e9538e4d9a521d275d8e695d6fdbae5a547000a352e1771e0",
-      "path": "spec/CHECKER_INPUT_SCHEMA.md"
+      "path": "spec/CHECKER_INPUT_SCHEMA.md",
+      "basis": "初始登记"
     },
     "spec/CHECKER_INPUT_SCHEMA.md#4": {
       "sha256": "90479fa9d70de7b7e2d5bb1f2dd7a25dbab429cd4da49c726236f430b30bda09",
-      "path": "spec/CHECKER_INPUT_SCHEMA.md"
+      "path": "spec/CHECKER_INPUT_SCHEMA.md",
+      "basis": "初始登记"
     },
     "validation/checker-prototype/coverage.json": {
       "sha256": "168d0416312d3c82a13e3c8a14856e580327897932c961b05d9453bb765e560b",
-      "path": "validation/checker-prototype/coverage.json"
+      "path": "validation/checker-prototype/coverage.json",
+      "basis": "初始登记"
     },
     "contracts/schema/knowledge-entry.schema.json": {
       "sha256": "754a2ef72f46689033167414f9c4d900b6557ccdce077aa388b64614f826e3c5",
-      "path": "contracts/schema/knowledge-entry.schema.json"
+      "path": "contracts/schema/knowledge-entry.schema.json",
+      "basis": "初始登记"
     },
     "contracts/schema/pilot-conflict.schema.json": {
       "sha256": "7cb450d5808515463504d97ca637b13539ad312cf5fd5f71bd690a11e78b54ea",
-      "path": "contracts/schema/pilot-conflict.schema.json"
+      "path": "contracts/schema/pilot-conflict.schema.json",
+      "basis": "初始登记"
     },
     "contracts/schema/pm-slot-contract.schema.json": {
       "sha256": "c2ad4334598b6c4572c9337535a344b31ef592e0a9c68cbd548abcab02c69a17",
-      "path": "contracts/schema/pm-slot-contract.schema.json"
+      "path": "contracts/schema/pm-slot-contract.schema.json",
+      "basis": "初始登记"
+    },
+    "contracts/schema/package-manifest.schema.json": {
+      "sha256": "6d2996d5327715e3efb4e433ecd9ef1736a19a6063ef7f7876f0a8d531a0defc",
+      "path": "contracts/schema/package-manifest.schema.json",
+      "basis": "非同源复核：G-019 第三轮复核（基线 3664b64），报告要求把 contracts/schema 下全部 schema 纳入绑定并列 P0/P1 项。 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r3/REPORT.md sha256：877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0 复核基线：3664b64"
+    },
+    "contracts/schema/ontology-fixtures-manifest.schema.json": {
+      "sha256": "9bfe980e121e7cada79d71c6a458ae7de1927d5040b4cf179fb5a9d24363d15e",
+      "path": "contracts/schema/ontology-fixtures-manifest.schema.json",
+      "basis": "非同源复核：G-019 第三轮复核（基线 3664b64），报告要求把 contracts/schema 下全部 schema 纳入绑定并列 P0/P1 项。 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r3/REPORT.md sha256：877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0 复核基线：3664b64"
+    },
+    "contracts/schema/pilot-artifact.schema.json": {
+      "sha256": "35001772cc9dcf02688568c1761ef0014087e523c9a917e6c0947875592a16e3",
+      "path": "contracts/schema/pilot-artifact.schema.json",
+      "basis": "非同源复核：G-019 第三轮复核（基线 3664b64），报告要求把 contracts/schema 下全部 schema 纳入绑定并列 P0/P1 项。 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r3/REPORT.md sha256：877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0 复核基线：3664b64"
+    },
+    "contracts/schema/pilot-id-map.schema.json": {
+      "sha256": "21f6979f395adc90313bd8f5556bc1b9023ac8634961abc9a8125a1520810a85",
+      "path": "contracts/schema/pilot-id-map.schema.json",
+      "basis": "非同源复核：G-019 第三轮复核（基线 3664b64），报告要求把 contracts/schema 下全部 schema 纳入绑定并列 P0/P1 项。 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r3/REPORT.md sha256：877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0 复核基线：3664b64"
     },
     "spec/ACCESS_ZONES.md": {
       "sha256": "51b57d665e8b801a924ed294060a329006aa13bb761d0f6dcc7e506867a60219",
-      "path": "spec/ACCESS_ZONES.md"
+      "path": "spec/ACCESS_ZONES.md",
+      "basis": "初始登记"
     }
   }
 }

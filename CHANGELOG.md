@@ -1020,3 +1020,16 @@
 - **全仓复跑**：143 个跟踪文件 0 命中，自测 43/43；`checker-pins` 17/17、`spec-pins` 11 区段、`check_gap_ledger --staged` 均通过。
 - **涉及文件**：`GAP_LEDGER.md`、`TODO.md`、`adr/0018-raw-material-admission-control.md`、`scripts/check_no_raw_material.py`、`scripts/check_checker_pins.py`、`scripts/checker-pins.json`、`contracts/schema/knowledge-entry.schema.json`、`validation/reviews/2026-11-15-admission-r2-review.md`、`CHANGELOG.md`。
 - **状态**：生效（G-019/G-021 待非同源复核）
+
+---
+
+### 批次 0059 — 2026-11-15 — 结构性修法（第一批：指纹自动发现与依据标准对齐）
+
+- **性质**：按非同源复核 `verify-g019-r3`（sha256 `877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0`，基线 `3664b64`）第五节 P0-3 与 P1-8 修复。D4 未动、未放量、未碰判据 7 外部抽样。
+- **schema 自动发现**：`check_spec_pins.py` 不再依赖人工清单——运行时枚举 `contracts/schema/` 下全部文件，出现未登记文件即报错（文件路径 + “未登记为规格区段”），退出 1。`package-manifest`、`ontology-fixtures-manifest`、`pilot-artifact`、`pilot-id-map` 四份漏钉 schema 同批登记，区段由 11 增至 15。
+- **依据标准对齐**：`check_spec_pins.py` 的 `basis` 与复核记录改按 `check_checker_pins.py` 同一标准校验——`复核产物：` 必须指向**仓库外**文件、`sha256：` 必须为 64 位且与产物实际摘要一致、必须含 `复核基线：`；仓库内转录件只作索引。`--write` 在区段新增或变更时强制 `--basis`，逐区段保存 basis（未变更项保留原值或标“初始登记”）。原“复核产物文件名出现在记录里”这一较弱条件删除。
+- **负例**：`scripts/test_spec_pins.py` 由 5 例扩到 8 例——新增 SP06/SP06b（仓库内转录件当依据 → 阻断）、SP07（`contracts/schema/` 下未登记文件 → 阻断）。外部复核产物在系统临时目录生成，不写入仓库。8/8 通过。
+- **指纹重冻**：`spec-pins` 15 区段；`checker-pins` 17 个受保护对象。两处 basis 均指向上述仓库外复核报告 + sha256 + 基线 `3664b64`。
+- **全仓复跑**：143 个跟踪文件 0 命中；`checker-pins` 17/17；`spec-pins` 15/15；`test_spec_pins` 8/8。
+- **涉及文件**：`scripts/check_spec_pins.py`、`scripts/test_spec_pins.py`、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`scripts/README.md`、`CHANGELOG.md`。
+- **状态**：生效（G-019/G-021 仍 `open`，待非同源复核）
