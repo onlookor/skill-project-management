@@ -16,7 +16,7 @@
 | `check_three_table.py` | 三表机械对照：正文（规则 → 条款与子句范围）、判定列（`check_id` → 子句与原因码）、输入 schema（`check_id` → 输入域、具名枚举、原因码）。覆盖“正文 ↔ 判定列”“判定列 ↔ schema”“正文 ↔ schema”三对关系，核对子句闭合、枚举封闭、判定列不含叙述性短语、G-B1/G-B2 条件归属、原因码与子句映射。**深度边界**：它保证结构一致与已列举的语义短语规则，不保证规则正文与子句表的全文语义等价 | `adr/0013-unified-adjudication-of-check-semantics.md`、`spec/CHECKER_INPUT_SCHEMA.md` | 已实现 |
 | `check_coverage_gate.py` | 覆盖闸门：`validation/checker-prototype/coverage.json` 登记 A.2 每个子句的正例与负例，负例必须显式声明**非空** `expected_failed_clauses`，闸门用原型实际求值核对“声明的子句真的被触发”；缺正/负例、负例改成正例、负例指错子句、**空声明**、样例未被引用均阻断。不存在守卫豁免：`expected_failed_clauses: []` 不算负例。负例测试见 `test_coverage_gate.py` | `adr/0014-validation-chain-self-attestation.md` | 已实现 |
 | `check_checker_pins.py` | 检查器绑定：比对 `scripts/checker-pins.json` 登记哈希与工作区脚本（**含本脚本自身、`.githooks/pre-commit`、验收原型**），改动须 `--write --basis "<非同源复核记录>"`，`basis` 必须含 `非同源复核：`、`复核产物：<存在的路径>`、`复核基线：<提交号>`；同时校验验收快照 `validation/pinned/checker.py` 与工作区副本一致（漂移检测，不是权限分离）。负例见 `test_checker_pins.py` | `adr/0014-validation-chain-self-attestation.md`、`AGENTS.md` 3.6.8 | 已实现 |
-| `check_dependency_pins.py` | 外部校验依赖指纹：`scripts/dependency-pins.json` 登记 `jsonschema` 的版本、分发产物 sha256 与安装树 `RECORD` 摘要；版本、安装树任一不符即阻断，找到 wheel 时再核对产物 sha256，产物缺席只警告（安装树摘要仍能发现替换）；依赖缺失按“无法评估”退出，不降级为跳过。负例见 `test_dependency_pins.py` | ADR-0019 | 已实现 |
+| `check_dependency_pins.py` | 外部校验依赖指纹：`scripts/dependency-pins.json` 登记 `jsonschema` 的版本、分发产物 sha256 与安装树 `RECORD` 摘要；**三重均为强制项**。wheel 默认从仓库外持久路径 `~/.local/share/pm-governance/wheels/` 读取（`JSONSCHEMA_WHEEL` 或 `--artifact` 可覆盖）；产物缺失、版本或安装树不符一律阻断。负例见 `test_dependency_pins.py` | ADR-0019 | 已实现 |
 | `check_spec_pins.py` | 规格区段绑定：登记 `GRAMMAR.md` 全文、方法 A.2/A.1、schema §2bis/§3/§4、`coverage.json`，以及 `contracts/schema/` 下**全部** schema（自动发现：目录里出现未登记文件即阻断，取代人工清单）。区段新增或改动须 `--write --basis`，`basis` 与 `check_checker_pins` 同一标准——`复核产物：` 必须指向仓库外文件、`sha256：` 与之一致、含 `复核基线：`，仓库内转录件只作索引；区段相对 `HEAD` 改动时同批还须附同样标准的复核记录。负例见 `test_spec_pins.py` | `adr/0014-validation-chain-self-attestation.md`、`AGENTS.md` 3.6.8 | 已实现 |
 | `check_glossary_usage.py` | 从 `git ls-files` 的 Markdown / JSONL 生成每条术语的使用位置基线 `knowledge/glossary-usage.json`，并在 `GLOSSARY.md` 第 4 节生成位置表；默认模式校验位置存在、行号有效、该行含术语、生成块未被手改、术语集合一致。`--write` 重生成 | `AGENTS.md` 5bis.1 | 已实现 |
 | `validate_ontology.py` | 用 `rdflib` + `pyshacl` 校验 `ontology/` 本体与 24 条 SHACL 形状；`--matrix` 逐条运行违规 fixture，确认每条形状能判出违规 | 无独立规格（边界见 `CONSTITUTION.md` 第 13.6 条与 `ontology/README.md`） | 已实现（可选依赖） |
@@ -39,14 +39,15 @@ python3 scripts/check_glossary_usage.py
 python3 scripts/validate_ontology.py --matrix
 ```
 
-**外部依赖**：仅数据区 schema 校验使用 `jsonschema`（ADR-0019）。安装与核对：
+**外部依赖**：仅数据区 schema 校验使用 `jsonschema`（ADR-0019）。安装、取 wheel 与核对：
 
 ```
 python3 -m pip install --user jsonschema==4.26.0
-JSONSCHEMA_WHEEL=<jsonschema-4.26.0-py3-none-any.whl> python3 scripts/check_dependency_pins.py
+python3 -m pip download --no-deps --no-cache-dir jsonschema==4.26.0 -d ~/.local/share/pm-governance/wheels
+python3 scripts/check_dependency_pins.py
 ```
 
-`check_dependency_pins.py` 退出码：`0` 通过；`1` 版本、安装树或分发产物指纹不符；`2` 依赖缺失或 `scripts/dependency-pins.json` 不可解析——按“无法评估”处理，不得视为通过。升级依赖必须同批 `--write` 并用 `--artifact` 记录新 wheel 的 sha256。
+`check_dependency_pins.py` 退出码：`0` 通过；`1` 版本、安装树或分发产物指纹不符；`2` 依赖缺失、分发产物缺失或 `scripts/dependency-pins.json` 不可解析——按“无法评估”处理，不得视为通过。wheel 不提交进 git；`JSONSCHEMA_WHEEL=<wheel>` 可覆盖默认目录。升级依赖必须同批 `--write --artifact <wheel>` 记录新 sha256。
 
 `check_gap_ledger.py` 退出码：`0` 通过；`1` 结构非法或存在到期未裁定（含规则/判定文件与台账未同批暂存）；`2` 台账或方法注册表无法解析。输出首行给出总数、`open`/`closed`、按级与到期计数、核查矩阵 `consistent` 比例。`--staged` 用于 pre-commit；独立运行时省略该参数。只有 `open` 缺口必须被核查矩阵引用——`closed` 缺口已记录处置出口，不再锚定矩阵，否则矩阵永远无法达到撤除条件要求的 17/17 `consistent`。
 

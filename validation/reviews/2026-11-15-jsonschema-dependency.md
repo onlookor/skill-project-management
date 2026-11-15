@@ -40,4 +40,10 @@
 - 自测新增 `T-NRM-12` 11 项，逐条复现 r4 四类缺陷并确认已由结构消除：`items: true`、元组 `items`、`enum`/`const` 跳过 `maxLength`、`x-prose-fields` 路径拼错、`contracts/schema/sub/` 未 lint 与未钉扎；另含官方元 schema、依赖缺失 fail-closed、20 条假设与 8 条 `positions` 不再被误杀。
 - `GAP_LEDGER.md`：G-021 按 r4 实测改写（删除“均计入总量口径”，列出容量差额与 8 条未登记通道，给出反向误杀处置），维持 `open`；G-019 补记 0064–0066，维持 `open`；G-020 未改动。
 
+## 批次 0067 改动范围（DP-ARTIFACT 语义收口）
+
+- wheel 移至仓库外持久目录 `~/.local/share/pm-governance/wheels/`（不提交进 git），sha256 与登记值一致；`check_dependency_pins.py` 实际执行产物核对。
+- `DP-ARTIFACT` 缺失从警告改为“无法评估”并退出 2；版本、安装树、产物三重全部强制；负例 9 → 10 项。
+- 根 `README.md`、`scripts/README.md`、`adr/0019-mature-json-schema-validator.md` 写明路径、获取方式与退档口径。
+
 **不构成**：G-019、G-021 的关闭依据；也不证明任何提交者身份。

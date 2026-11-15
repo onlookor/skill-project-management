@@ -1126,3 +1126,15 @@
 - **G-019**：补记 0064–0066 落地（成熟实现、元 schema、递归、严格路径、依赖指纹），维持 `open`。G-020 未改动。
 - **涉及文件**：`GAP_LEDGER.md`、`scripts/check_no_raw_material.py`、`validation/reviews/2026-11-15-jsonschema-dependency.md`、`adr/0019-mature-json-schema-validator.md`、`TODO.md`、`CHANGELOG.md`、`scripts/spec-pins.json`、`scripts/checker-pins.json`。
 - **状态**：三段完成；G-019/G-021 仍 `open`。
+
+---
+
+### 批次 0067 — 2026-11-15 — 让分发产物核对真正执行（DP-ARTIFACT 语义收口）
+
+- **性质**：修正“自报三重核对、实际只跑两重”的缺陷。此前 pip 缓存找不到 wheel，产物核对降级为 `DP-ARTIFACT` 警告，登记的 sha256 从未被验证——与“声明了但不生效”同类。
+- **产物落地**：`jsonschema==4.26.0` 的 wheel 取自 PyPI，放在仓库外持久路径 `~/.local/share/pm-governance/wheels/`（不提交进 git），实测 sha256 与登记值 `d489f15263b8d200f8387e64b4c3a75f06629559fb73deb8fdfb525f2dab50ce` 一致。
+- **语义收口**：`DP-ARTIFACT` 从“警告”改为“无法评估”——产物缺失即退出 2，并在消息中给出下载命令与默认目录；版本、安装树、产物三重全部强制。`JSONSCHEMA_WHEEL` / `--artifact` 保留为覆盖。输出与文档统一为“缺失 = 未评估，不是通过”。
+- **文档**：根 `README.md`、`scripts/README.md`、`adr/0019-mature-json-schema-validator.md` 写明 wheel 路径、获取命令与第三重不生效时的退档口径（不得保留只报警的检查）。
+- **负例**：`test_dependency_pins.py` 9 → 10 项；DP-T03 改为“产物缺席按无法评估阻断”，新增 DP-T10 验证默认读取持久目录。
+- **复跑**：`check_dependency_pins.py` 输出“分发产物 sha256 核对 1 个”，全套检查器与 pre-commit 全绿。
+- **涉及文件**：`scripts/check_dependency_pins.py`、`scripts/test_dependency_pins.py`、`README.md`、`scripts/README.md`、`adr/0019-mature-json-schema-validator.md`、`spec/ACCESS_ZONES.md`、`CHANGELOG.md`、`scripts/checker-pins.json`、`scripts/spec-pins.json`。

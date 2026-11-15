@@ -69,14 +69,20 @@
 python3 -m pip install --user jsonschema==4.26.0
 ```
 
-- 核对依赖未被替换（版本 + 安装树摘要；提供 wheel 时再核对分发产物 sha256）：
+- 三重核对依赖未被替换（版本 + 安装树摘要 + 分发产物 sha256）。wheel 放在**仓库外**的持久路径，不提交进 git：
+
+```
+python3 -m pip download --no-deps --no-cache-dir jsonschema==4.26.0 -d ~/.local/share/pm-governance/wheels
+```
+
+- 运行核对（默认读取上面的目录；`JSONSCHEMA_WHEEL=<wheel>` 可覆盖）：
 
 ```
 python3 scripts/check_dependency_pins.py
 JSONSCHEMA_WHEEL=<jsonschema-4.26.0-py3-none-any.whl> python3 scripts/check_dependency_pins.py
 ```
 
-- 依赖缺失或指纹不符时，数据区校验以“无法评估”阻断，不会降级为跳过校验。升级依赖必须同批更新 `scripts/dependency-pins.json` 并在 `CHANGELOG.md` 记录。
+- 产物缺失、依赖缺失或指纹不符时，检查器以“无法评估”退出 2 并阻断，不会降级为只核对安装树或跳过校验。升级依赖必须同批更新 `scripts/dependency-pins.json` 并在 `CHANGELOG.md` 记录。
 
 ## 版本与发布
 

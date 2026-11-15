@@ -25,6 +25,14 @@
 
 数据区与 schema 自身的校验改用成熟实现 `jsonschema`（固定 `4.26.0`），并把版本、分发产物 sha256 与安装树摘要登记进指纹机制（`scripts/dependency-pins.json`，由 `scripts/check_dependency_pins.py` 核对）。自写 `validate()` 退役；对外输出契约不变。
 
+**三重核对都是强制项。** wheel 放在仓库外的持久路径 `~/.local/share/pm-governance/wheels/`（不提交进 git），获取方式：
+
+```
+python3 -m pip download --no-deps --no-cache-dir jsonschema==4.26.0 -d ~/.local/share/pm-governance/wheels
+```
+
+`JSONSCHEMA_WHEEL` 或 `--artifact` 可覆盖默认路径。**找不到 wheel 时按“无法评估”退出 2**，不是警告、不算通过；这样“登记的 sha256 从未被验证”不会伪装成绿灯。若某环境确实拿不到 wheel，必须在本文件与 `README.md` 显式登记“第三重当前不生效”及其生效条件，不得保留一个只报警的检查。
+
 **本 ADR 只批准“校验语义”的外部依赖，不批准任何数据与证据的外部依赖。** `contracts/schema/` 的内容、`knowledge/` 条目、本体、复核记录与来源登记仍必须自包含在仓库内；不得以“依赖库会处理”为由把数据、证据或判据移出仓库。
 
 ## 考虑过的替代方案
@@ -59,13 +67,13 @@
 
 - 校验语义由规范实现承担，`items` 布尔/元组、`enum`/`const` 与同级断言、`oneOf` 排他等问题由结构消除，不再依赖逐轮补洞。
 - schema 自身用官方元 schema 校验，schema 写错即失败。
-- 依赖被替换可被发现：版本、分发产物 sha256 与安装树摘要三重核对。
+- 依赖被替换可被发现：版本、分发产物 sha256 与安装树摘要三重核对，且三重都实际执行；产物缺失按“无法评估”阻断，不再只警告。
 
 ### 负面
 
 - 引入一个仓库外运行时依赖，破坏“零外部依赖即可运行”的旧假设；已在 `scripts/README.md` 与根 `README.md` 写明安装步骤。
 - 指纹对安装树敏感：升级 `jsonschema` 必须同批更新 `scripts/dependency-pins.json`，否则 pre-commit 阻断。
-- 分发产物不在本地时只能核对安装树（会给出警告），产物级核对需要设置 `JSONSCHEMA_WHEEL`。
+- 分发产物必须放在仓库外的持久路径（`~/.local/share/pm-governance/wheels/`）；换机器或清理该目录后，检查器会以“无法评估”退出 2，需要重新 `pip download`。这是有意的 fail-closed：产物级核对不能靠 pip 缓存的偶然存在。
 
 ### 需要跟进的事项
 

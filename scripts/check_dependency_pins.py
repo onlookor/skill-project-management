@@ -5,20 +5,25 @@
 `jsonschema`；本检查器保证“依赖被替换能被发现”，而不是只锁版本号。
 
 判定轴（任一命中即非零退出）：
-  DP-VERSION   已安装版本与登记不符
+  DP-VERSION   已安装版本与登记不符（未安装按“无法评估”退出 2）
   DP-TREE      已安装分发树的 RECORD 摘要与登记不符（文件被替换或增删）
-  DP-ARTIFACT  找到分发产物（wheel）但 sha256 与登记不符
+  DP-ARTIFACT  未找到分发产物，或找到但 sha256 与登记不符
   DP-REGISTRY  登记表缺项、多项或结构非法
 
-分发产物不在本地时只核对安装树并给出警告——安装树摘要覆盖分发内的全部文件，
-仍能发现替换；把 wheel 放到任意候选路径可完成双重核对。依赖缺失按“无法评估”
-退出 2，绝不降级为通过。
+三重核对都是强制项：版本、安装树 `RECORD` 摘要、分发产物 wheel 的 sha256。
+wheel 默认从持久路径 `~/.local/share/pm-governance/wheels/` 读取（`JSONSCHEMA_WHEEL`
+或 `--artifact` 可覆盖）。找不到产物即“无法评估”退出 2，不降级为只核对安装树——
+永远只报警的检查等于没有。依赖缺失同样按“无法评估”处理，绝不降级为通过。
+
+获取 wheel（放在仓库外，不提交进 git）：
+  python3 -m pip download --no-deps --no-cache-dir \
+      jsonschema==4.26.0 -d ~/.local/share/pm-governance/wheels
 
 用法：
   python3 scripts/check_dependency_pins.py
   python3 scripts/check_dependency_pins.py --write --artifact <wheel 路径>
   JSONSCHEMA_WHEEL=<wheel 路径> python3 scripts/check_dependency_pins.py
-退出码：0 = 通过；1 = 指纹不符；2 = 依赖缺失或登记表不可解析（不得视为通过）。
+退出码：0 = 通过；1 = 指纹不符；2 = 依赖或分发产物缺失、登记表不可解析（无法评估，不得视为通过）。
 """
 
 import argparse
@@ -32,6 +37,7 @@ from pathlib import Path
 PINS_FILE = "scripts/dependency-pins.json"
 PACKAGES = ("jsonschema",)
 ARTIFACT_ENV = "JSONSCHEMA_WHEEL"
+ARTIFACT_DIR = Path.home() / ".local" / "share" / "pm-governance" / "wheels"
 
 
 def sha256_file(path):
@@ -77,10 +83,11 @@ def artifact_candidates(pin, override):
     filename = (pin.get("artifact") or {}).get("filename")
     if not filename:
         return []
+    candidates = [ARTIFACT_DIR / filename]
     cache = Path.home() / ".cache" / "pip"
-    if not cache.is_dir():
-        return []
-    return sorted(cache.rglob(filename))[:3]
+    if cache.is_dir():
+        candidates.extend(sorted(cache.rglob(filename))[:3])
+    return candidates
 
 
 def evaluate(pins, states, artifacts):
@@ -102,7 +109,7 @@ def evaluate(pins, states, artifacts):
         state = states.get(name)
         if state is None:
             errors.append(
-                f"[错误] DP-VERSION 依赖 {name} 未安装；请运行 "
+                f"[无法评估] DP-VERSION 依赖 {name} 未安装；请运行 "
                 f"`python3 -m pip install --user {name}=={pin.get('version')}`；"
                 "依赖缺失不得降级为跳过校验"
             )
@@ -126,9 +133,12 @@ def evaluate(pins, states, artifacts):
             )
         artifact = pin.get("artifact") or {}
         if not artifacts:
-            warnings.append(
-                f"[警告] DP-ARTIFACT 未找到 {name} 的分发产物（{artifact.get('filename')}）；"
-                f"本次只核对安装树。设置 {ARTIFACT_ENV}=<wheel 路径> 可完成产物 sha256 核对"
+            errors.append(
+                f"[无法评估] DP-ARTIFACT 未找到 {name} 的分发产物"
+                f"（{artifact.get('filename')}）；分发产物核对是强制项，"
+                f"请放到 {ARTIFACT_DIR} 或设置 {ARTIFACT_ENV}=<wheel 路径>："
+                "python3 -m pip download --no-deps --no-cache-dir "
+                f"{name}=={pin.get('version')} -d {ARTIFACT_DIR}"
             )
             continue
         for path in artifacts:
@@ -217,12 +227,12 @@ def main():
     for line in errors:
         print(line)
     if errors:
-        if any("依赖" in line and "未安装" in line for line in errors):
+        if any(line.startswith("[无法评估]") for line in errors):
             return 2
         return 1
     total = sum(state["files"] for state in states.values() if state)
     print(f"[通过] 依赖指纹 {len(PACKAGES)} 个包、{total} 个文件；"
-          f"分发产物核对 {len(artifacts)} 个")
+          f"分发产物 sha256 核对 {len(artifacts)} 个")
     return 0
 
 

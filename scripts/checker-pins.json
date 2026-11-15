@@ -70,12 +70,12 @@
       "basis": "非同源复核：外部复核基线 48128a8，产物 /tmp/verify-4812/REPORT_48128a8.md；复核产物：validation/reviews/2026-11-14-48128a8-external.md；复核基线：48128a8"
     },
     "scripts/check_dependency_pins.py": {
-      "sha256": "ba5b07a3bd19dbc5772be37394292e2f742169be65f8850528b1634d122eff50",
-      "basis": "非同源复核：G-019 r4（基线 f049f28）指出自写子集语义失真；依赖指纹机制按用户 2026-11-15 裁定。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md；sha256：47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb；复核基线：f049f28"
+      "sha256": "a5fbe383f954fdb0c32e2930caebbd2dc7d72ff20bfdc30eb4836a4b52de617f",
+      "basis": "非同源复核：G-019 r4（基线 11c5d92）指出自写子集语义失真与反向误杀；本批按用户 2026-11-15 裁定接入成熟实现，并把分发产物核对改为强制项。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md；sha256：47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb；复核基线：11c5d92"
     },
     "scripts/test_dependency_pins.py": {
-      "sha256": "16d3f9e792d0c0e4fd0e984cc0f0675fb9d2c5bc5ff49d9264ecff68e4dde22b",
-      "basis": "非同源复核：G-019 r4（基线 f049f28）指出自写子集语义失真；依赖指纹机制按用户 2026-11-15 裁定。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md；sha256：47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb；复核基线：f049f28"
+      "sha256": "fb586b6cf648feab1e662572144d1a627032a32f071f3ecead06cbcefa101d24",
+      "basis": "非同源复核：G-019 r4（基线 11c5d92）指出自写子集语义失真与反向误杀；本批按用户 2026-11-15 裁定接入成熟实现，并把分发产物核对改为强制项。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md；sha256：47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb；复核基线：11c5d92"
     }
   },
   "note": "受保护脚本的哈希登记：scripts/ 下检查器（含本脚本）、.githooks/pre-commit、validation/checker-prototype/checker.py。改动必须 --write --basis 并附非同源复核记录；本文件与快照检测都不提供权限分离。"
