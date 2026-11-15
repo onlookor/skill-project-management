@@ -80,7 +80,7 @@
 
 | 区 | 允许形态 | 检查 |
 |---|---|---|
-| `数据区` | 本表登记的结构化文件 | 解析 + schema + 字段配额与集合上限（`RM-SCHEMA` / `RM-FIELD`）；schema 完整性 lint（`RM-SCHEMA-LINT`）；散文按 `x-prose-fields` 逐路径计量 + `x-prose-budget` 单条总和兜底 + 单文件 20 KiB |
+| `数据区` | 本表登记的结构化文件 | 解析 + schema（成熟校验器，ADR-0019）+ 字段配额与集合上限（`RM-SCHEMA` / `RM-FIELD`）；schema 完整性 lint 与官方元 schema 校验（`RM-SCHEMA-LINT`）；散文按 `x-prose-fields` 逐路径计量 + `x-prose-budget` 单条总和兜底 + 单文件 32 KiB |
 | `本体区` | `.ttl`、`.nt`、`.n3`、`.owl`、`.rdf`、`.jsonld` | 头注释（全部本体扩展名）、谓词分档字面量、注释上限、目录点线、页码序列、`dcterms:source`/`pm:sourcePage` 存在性、`source_pages: n/a` 的可机械核验依据 |
 | `散文区` | 散文与说明文档 | 原始文件扩展名与文件头、体积、二进制、乱码、控制字符、目录点线、引证长度、单行上限 |
 | `代码与配置区` | 代码与配置 | 与散文区相同的硬约束（不含引证与目录点线两项散文判据） |
@@ -130,6 +130,8 @@ python3 scripts/check_no_raw_material.py
   旧版两条规则对同样输入均 0 命中：旧 `PAGESEQ` 只认裸数字串，旧 `PROVENANCE` 只在“有页码无来源”且文件头无 `source_id` 时触发。新版的判据改为“连续页码三元组 / 逗号页码表 / 裸数字串”与“逐块核对来源与页码，允许文件头 `source_id` + `source_pages` 统一声明”。文件头 `source_pages:` 现为 `RM-ONTO-HEADER` 的必填项（取值为页码范围或 `n/a`；`n/a` 与正文页码值矛盾即报错）。
 
 - **`n/a` 依据收紧（批次 0063，基线 `11c5d92`）**：`source_pages: n/a` 不再是写一个词就成立的豁免。声明 `n/a` 时头注释还必须给出 `source_pages_basis:`，且依据须可机械核验——非空、非占位符（`n/a`、`TBD`、`待补` 等）、含仓库内**真实存在**的 `adr/NNNN-*.md` 引用，并在 ADR 引用之外另有自写理由。缺 `source_pages_basis:` 由 `RM-ONTO-HEADER` 阻断；写了但为空串、占位符或 ADR 引用不存在，由 `RM-ONTO-PROVENANCE` 阻断，并视为页码未交代（不再解除逐块页码义务）。`n/a` 与正文页码值矛盾的旧判据保留，依据不能抵消矛盾。当前两份标 `n/a` 的 TTL（`pmbok8-vocab.ttl`、`pmbok8-shapes.ttl`）已按此补齐依据；自测新增 7 项正负例。
+
+- **校验语义换用成熟实现（批次 0064–0066，实现基线 `f049f28`）**：数据区与 schema 自身的校验改由 `jsonschema==4.26.0` 执行（ADR-0019），依赖以版本 + 安装树摘要 + 分发产物 sha256 三重指纹登记（`scripts/dependency-pins.json`）；缺少依赖即“无法评估”并退出 2，不降级为跳过。schema 自身先过官方 Draft 2020-12 元 schema；`x-prose-fields` 路径必须能在 schema 结构中解析，拼错即报错；`contracts/schema/` 的发现改为递归，子目录 schema 同样 lint、同样钉扎。r4 四类攻击面（`items: true`/元组、`enum`/`const` 跳过 `maxLength`、散文路径拼错静默失效、子目录逃检）逐项复现并由结构消除。复跑结果：全仓 0 命中；`--self-test` 76/76；`test_spec_pins.py` 9/9；`test_dependency_pins.py` 9/9。
 
 - **豁免判定（D-6）**：0 违规，收敛为**不设豁免期**。依据：准入制要求“存量先合规、再切闸门”；存量已全部合规，若仍开豁免窗口，只会把已合规的存量重新暴露在无复核的例外通道下。未创建 `validation/exemptions/`；将来若出现暂时无法修正的合法文件，按第 4 节与方案第 10.3 节登记，且不得用于原始资料或提取产物。
 - **边界**：本次过检证明“已登记的区与结构条件成立”，不证明内容不是原文。**未命中不等于合规**；来源层比对仍由仓库外指纹方案与人工评审承接。

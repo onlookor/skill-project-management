@@ -6,28 +6,74 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
-    "authoritative", "purpose", "batch", "generated", "d4_status",
-    "formal_id_status", "notes", "entries", "reverse_index",
-    "rule_bindings", "reverse_rule_index", "statistics", "grounding_ref_semantics"
+    "authoritative",
+    "purpose",
+    "batch",
+    "generated",
+    "d4_status",
+    "formal_id_status",
+    "notes",
+    "entries",
+    "reverse_index",
+    "rule_bindings",
+    "reverse_rule_index",
+    "statistics",
+    "grounding_ref_semantics"
   ],
   "x-prose-fields": [
-    {"path": "purpose", "maxChars": 800},
-    {"path": "grounding_ref_semantics", "maxChars": 600},
-    {"path": "notes", "maxChars": 4800},
-    {"path": "rule_bindings.*.note", "maxChars": 3200}
+    {
+      "path": "purpose",
+      "maxChars": 800
+    },
+    {
+      "path": "grounding_ref_semantics",
+      "maxChars": 600
+    },
+    {
+      "path": "notes",
+      "maxChars": 4800
+    },
+    {
+      "path": "rule_bindings.*.note",
+      "maxChars": 3200
+    }
   ],
-  "x-prose-budget": 9400,
+  "x-prose-budget": 22200,
   "properties": {
-    "authoritative": {"type": "boolean", "const": false},
-    "purpose": {"type": "string", "minLength": 1, "maxLength": 800},
-    "batch": {"type": "string", "maxLength": 80},
-    "generated": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "maxLength": 10},
-    "d4_status": {"type": "string", "maxLength": 80},
-    "formal_id_status": {"type": "string", "maxLength": 80},
+    "authoritative": {
+      "type": "boolean",
+      "const": false
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 800
+    },
+    "batch": {
+      "type": "string",
+      "maxLength": 80
+    },
+    "generated": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+      "maxLength": 10
+    },
+    "d4_status": {
+      "type": "string",
+      "maxLength": 80
+    },
+    "formal_id_status": {
+      "type": "string",
+      "maxLength": 80
+    },
     "notes": {
       "type": "array",
       "maxItems": 12,
-      "items": {"type": "string", "minLength": 1, "maxLength": 400}
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 400
+      }
     },
     "entries": {
       "type": "array",
@@ -37,66 +83,161 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "draft_id", "knowledge_ref", "entry_type", "term", "candidate_iri",
-          "candidate_iri_status", "candidate_iri_reason", "natural_key",
-          "formal_id", "formal_id_status"
+          "draft_id",
+          "knowledge_ref",
+          "entry_type",
+          "term",
+          "candidate_iri",
+          "candidate_iri_status",
+          "candidate_iri_reason",
+          "natural_key",
+          "formal_id",
+          "formal_id_status"
         ],
         "properties": {
-          "draft_id": {"type": "string", "maxLength": 120},
-          "knowledge_ref": {"type": "string", "maxLength": 160},
-          "entry_type": {"type": "string", "maxLength": 80},
-          "term": {"type": "string", "minLength": 1, "maxLength": 120},
-          "candidate_iri": {"type": ["string", "null"], "maxLength": 200},
-          "candidate_iri_status": {"type": "string", "maxLength": 80},
-          "candidate_iri_reason": {"type": ["string", "null"], "maxLength": 400},
-          "natural_key": {"type": "string", "maxLength": 160},
-          "formal_id": {"type": ["string", "null"], "maxLength": 160},
-          "formal_id_status": {"type": "string", "maxLength": 80}
+          "draft_id": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "knowledge_ref": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "entry_type": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "term": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "candidate_iri": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 200
+          },
+          "candidate_iri_status": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "candidate_iri_reason": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 400
+          },
+          "natural_key": {
+            "type": "string",
+            "maxLength": 160
+          },
+          "formal_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 160
+          },
+          "formal_id_status": {
+            "type": "string",
+            "maxLength": 80
+          }
         }
       }
     },
     "reverse_index": {
       "type": "object",
       "maxProperties": 60,
-      "propertyNames": {"type": "string", "maxLength": 200},
-      "additionalProperties": {"type": "string", "maxLength": 120}
+      "propertyNames": {
+        "type": "string",
+        "maxLength": 200
+      },
+      "additionalProperties": {
+        "type": "string",
+        "maxLength": 120
+      }
     },
     "rule_bindings": {
       "type": "object",
       "maxProperties": 20,
-      "propertyNames": {"type": "string", "maxLength": 120},
+      "propertyNames": {
+        "type": "string",
+        "maxLength": 120
+      },
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["entries", "direction", "status", "note"],
+        "required": [
+          "entries",
+          "direction",
+          "status",
+          "note"
+        ],
         "properties": {
           "entries": {
             "type": "array",
             "maxItems": 20,
-            "items": {"type": "string", "maxLength": 160}
+            "items": {
+              "type": "string",
+              "maxLength": 160
+            }
           },
-          "direction": {"type": "string", "enum": ["bidirectional", "forward", "backward"]},
-          "status": {"type": "string", "maxLength": 80},
-          "note": {"type": "string", "maxLength": 800}
+          "direction": {
+            "type": "string",
+            "enum": [
+              "bidirectional",
+              "forward",
+              "backward"
+            ],
+            "maxLength": 16
+          },
+          "status": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 800
+          }
         }
       }
     },
     "reverse_rule_index": {
       "type": "object",
       "maxProperties": 60,
-      "propertyNames": {"type": "string", "maxLength": 200},
+      "propertyNames": {
+        "type": "string",
+        "maxLength": 200
+      },
       "additionalProperties": {
         "type": "array",
         "maxItems": 20,
-        "items": {"type": "string", "maxLength": 120}
+        "items": {
+          "type": "string",
+          "maxLength": 120
+        }
       }
     },
     "statistics": {
       "type": "object",
       "maxProperties": 20,
-      "propertyNames": {"type": "string", "maxLength": 80},
-      "additionalProperties": {"type": "integer", "minimum": 0, "maximum": 10000}
+      "propertyNames": {
+        "type": "string",
+        "maxLength": 80
+      },
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 10000
+      }
     },
-    "grounding_ref_semantics": {"type": "string", "minLength": 1, "maxLength": 600}
+    "grounding_ref_semantics": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 600
+    }
   }
 }

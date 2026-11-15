@@ -105,13 +105,13 @@ def digest(path: Path) -> str:
 
 
 def discover_schema_files(root: Path) -> list[str]:
-    """`contracts/schema/` 下全部文件；任何一个未登记为区段即视为漏钉。"""
+    """`contracts/schema/` 下全部文件（含子目录）；未登记为区段即视为漏钉。"""
     directory = root / SCHEMA_DIR
     if not directory.is_dir():
         return []
     return sorted(
-        f"{SCHEMA_DIR}/{path.name}"
-        for path in directory.iterdir()
+        path.relative_to(root).as_posix()
+        for path in directory.rglob("*")
         if path.is_file()
     )
 

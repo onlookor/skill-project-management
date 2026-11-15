@@ -11,7 +11,7 @@
 
 `CONSTITUTION.md` 13.3 要求数据区文件按 `contracts/schema/*.schema.json` 校验。该能力由 `scripts/check_no_raw_material.py` 内的自写 `validate()` 承担，只覆盖仓库当时用到的关键字。
 
-第三、四轮外部复核（基线 `3664b64`、`f049f28`）证明自写子集存在结构性失真：
+第三、四轮外部复核（基线 `3664b64`、`11c5d92`）证明自写子集存在结构性失真：
 
 - `items: true` 与元组 `items` 让数组元素绕过值约束；
 - `enum` / `const` 命中时提前返回，同级的 `maxLength` 被跳过；

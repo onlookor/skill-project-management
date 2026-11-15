@@ -147,8 +147,24 @@ def main() -> int:
             test_root=fake_root,
         )
 
+        sub_root = Path(tmp) / "fake-sub"
+        (sub_root / "contracts/schema/sub").mkdir(parents=True)
+        (sub_root / "contracts/schema/sub/deep.schema.json").write_text(
+            '{"$schema": "x", "type": "object"}\n', encoding="utf-8"
+        )
+        run(
+            "SP08",
+            "contracts/schema 子目录中的 schema 未登记",
+            current,
+            current,
+            pins,
+            [record],
+            "未登记为规格区段",
+            test_root=sub_root,
+        )
+
     print()
-    print(f"规格区段绑定测试 8 条，符合预期 {8 - failures} 条。")
+    print(f"规格区段绑定测试 9 条，符合预期 {9 - failures} 条。")
     return 0 if not failures else 1
 
 

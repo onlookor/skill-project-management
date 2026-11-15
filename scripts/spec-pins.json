@@ -38,24 +38,24 @@
       "basis": "初始登记"
     },
     "contracts/schema/knowledge-entry.schema.json": {
-      "sha256": "33ce626c986920b021a59885a1288ec96503aa4bd3d0ed00c4c2db8b5dc68c99",
+      "sha256": "aa3e9dc79e205679a397bda8f165b71846c367c882375b7f12086cdf2e1369a0",
       "path": "contracts/schema/knowledge-entry.schema.json",
-      "basis": "非同源复核：G-019 r3（基线 3664b64）要求 schema 全量入指纹、补完整性 lint 与按路径配额。 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r3/REPORT.md sha256：877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0 复核基线：3664b64"
+      "basis": "非同源复核：G-019 r4（基线 11c5d92）指出自写子集语义失真与配额外溢；本批按用户 2026-11-15 裁定接入成熟实现。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md；sha256：47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb；复核基线：11c5d92"
     },
     "contracts/schema/pilot-conflict.schema.json": {
-      "sha256": "41ab52a2e7f4f7c782f0b5c483250247ce7e9217b67641514bfc1e206fe0ea3c",
+      "sha256": "13fe4b408241de468fa6314741cca1f53d1238c10f375485a586b42005e06c9d",
       "path": "contracts/schema/pilot-conflict.schema.json",
-      "basis": "非同源复核：G-019 r3（基线 3664b64）要求 schema 全量入指纹、补完整性 lint 与按路径配额。 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r3/REPORT.md sha256：877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0 复核基线：3664b64"
+      "basis": "非同源复核：G-019 r4（基线 11c5d92）指出自写子集语义失真与配额外溢；本批按用户 2026-11-15 裁定接入成熟实现。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md；sha256：47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb；复核基线：11c5d92"
     },
     "contracts/schema/pm-slot-contract.schema.json": {
-      "sha256": "94fb46e1731d7ba5304dda4eb66f8d9bdff867cc77603d6178ef94771f997129",
+      "sha256": "35fd40f33ed4e406f10336f1d5b1850416a0b581c017b36aab125f520717e5db",
       "path": "contracts/schema/pm-slot-contract.schema.json",
-      "basis": "非同源复核：G-019 r3（基线 3664b64）要求 schema 全量入指纹、补完整性 lint 与按路径配额。 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r3/REPORT.md sha256：877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0 复核基线：3664b64"
+      "basis": "非同源复核：G-019 r4（基线 11c5d92）指出自写子集语义失真与配额外溢；本批按用户 2026-11-15 裁定接入成熟实现。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md；sha256：47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb；复核基线：11c5d92"
     },
     "contracts/schema/package-manifest.schema.json": {
-      "sha256": "ef262e49fe599fbe73ec6c63d6a6f6692ea51770f89fbb292103f9af9e3b6bd1",
+      "sha256": "080134fb89036e0bda1a0dcbcca7f5b57d011e54d3d26f8d265140c2b1a1994c",
       "path": "contracts/schema/package-manifest.schema.json",
-      "basis": "非同源复核：G-019 r3（基线 3664b64）要求 schema 全量入指纹、补完整性 lint 与按路径配额。 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r3/REPORT.md sha256：877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0 复核基线：3664b64"
+      "basis": "非同源复核：G-019 r4（基线 11c5d92）指出自写子集语义失真与配额外溢；本批按用户 2026-11-15 裁定接入成熟实现。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md；sha256：47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb；复核基线：11c5d92"
     },
     "contracts/schema/ontology-fixtures-manifest.schema.json": {
       "sha256": "b0dbdd2b2b35f78c21138b572a2b33a2778f0512b63aceffcfc072f6b7b4f882",
@@ -63,19 +63,19 @@
       "basis": "非同源复核：G-019 r3（基线 3664b64）要求 schema 全量入指纹、补完整性 lint 与按路径配额。 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r3/REPORT.md sha256：877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0 复核基线：3664b64"
     },
     "contracts/schema/pilot-artifact.schema.json": {
-      "sha256": "a33cf4a6448e0a0cb5626a6fa9f49f7130b71ab9760bb215957d310a5607f733",
+      "sha256": "3afeeeb3e7f573da6b3dd40868afa6f606b8387d14f5cdf80fd4477fc30c4411",
       "path": "contracts/schema/pilot-artifact.schema.json",
-      "basis": "非同源复核：G-019 r3（基线 3664b64）要求 schema 全量入指纹、补完整性 lint 与按路径配额。 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r3/REPORT.md sha256：877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0 复核基线：3664b64"
+      "basis": "非同源复核：G-019 r4（基线 11c5d92）指出自写子集语义失真与配额外溢；本批按用户 2026-11-15 裁定接入成熟实现。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md；sha256：47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb；复核基线：11c5d92"
     },
     "contracts/schema/pilot-id-map.schema.json": {
-      "sha256": "1e5c2aa00741def9e5c06b2d6a3d27961ea0f6e97926de07e558cff7f1035fe8",
+      "sha256": "cd41e8124cf58c2ad0b777185a6ed3f023b39b4f213a8f55fe145d7555e5bcd3",
       "path": "contracts/schema/pilot-id-map.schema.json",
-      "basis": "非同源复核：G-019 r3（基线 3664b64）要求 schema 全量入指纹、补完整性 lint 与按路径配额。 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r3/REPORT.md sha256：877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0 复核基线：3664b64"
+      "basis": "非同源复核：G-019 r4（基线 11c5d92）指出自写子集语义失真与配额外溢；本批按用户 2026-11-15 裁定接入成熟实现。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md；sha256：47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb；复核基线：11c5d92"
     },
     "spec/ACCESS_ZONES.md": {
-      "sha256": "ce70a2185a5c200284cc89dbbc84609530b38a2c2bf8b20c2e7d3e9fb3993915",
+      "sha256": "6fe5d874f928b6087dec47187f3508a8ad69848ca3bf51f6dba73fe515e40f6e",
       "path": "spec/ACCESS_ZONES.md",
-      "basis": "非同源复核：G-019 r4（基线 f049f28）指出自写子集语义失真；成熟实现与依赖指纹按用户 2026-11-15 裁定。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md；sha256：47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb；复核基线：f049f28"
+      "basis": "非同源复核：G-019 r4（基线 11c5d92）指出自写子集语义失真与配额外溢；本批按用户 2026-11-15 裁定接入成熟实现。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md；sha256：47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb；复核基线：11c5d92"
     }
   }
 }

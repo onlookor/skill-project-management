@@ -4,13 +4,23 @@
   "title": "Project Management Slot Contract",
   "description": "领域技能向项目管理接地编译技能填充槽位的契约文件 schema。契约文件只声明槽位填充，不声明上游/下游关系。",
   "type": "object",
-  "required": ["skill_id", "pm_contract_version", "slots"],
+  "required": [
+    "skill_id",
+    "pm_contract_version",
+    "slots"
+  ],
   "additionalProperties": false,
   "x-prose-fields": [
-    {"path": "assumption_refs[].statement", "maxChars": 3200},
-    {"path": "assumption_refs[].verification.alignment_criterion", "maxChars": 2400}
+    {
+      "path": "assumption_refs[].statement",
+      "maxChars": 3200
+    },
+    {
+      "path": "assumption_refs[].verification.alignment_criterion",
+      "maxChars": 2400
+    }
   ],
-  "x-prose-budget": 5600,
+  "x-prose-budget": 28000,
   "properties": {
     "skill_id": {
       "type": "string",
@@ -30,7 +40,12 @@
     },
     "slots": {
       "type": "object",
-      "required": ["subject_type", "deliverable_forms", "constraint_domains", "assertion_vocabulary"],
+      "required": [
+        "subject_type",
+        "deliverable_forms",
+        "constraint_domains",
+        "assertion_vocabulary"
+      ],
       "additionalProperties": false,
       "properties": {
         "subject_type": {
@@ -43,7 +58,11 @@
           "type": "array",
           "minItems": 1,
           "maxItems": 40,
-          "items": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
           "description": "领域交付物形态名列表"
         },
         "constraint_domains": {
@@ -52,27 +71,55 @@
           "maxItems": 30,
           "items": {
             "type": "object",
-            "required": ["name", "relation_to_generic"],
+            "required": [
+              "name",
+              "relation_to_generic"
+            ],
             "additionalProperties": false,
             "properties": {
-              "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
               "relation_to_generic": {
-                "enum": ["specializes", "cross_cuts", "orthogonal_to"]
+                "enum": [
+                  "specializes",
+                  "cross_cuts",
+                  "orthogonal_to"
+                ]
               },
               "generic_class": {
-                "enum": ["goal", "environment", "solution"],
+                "enum": [
+                  "goal",
+                  "environment",
+                  "solution"
+                ],
                 "description": "relation_to_generic 为 specializes 时必填"
               },
               "grounding_ref": {
-                "type": ["string", "null"],
+                "type": [
+                  "string",
+                  "null"
+                ],
                 "maxLength": 120,
                 "description": "该约束域的外部来源依据（若有）"
               }
             },
             "allOf": [
               {
-                "if": { "properties": { "relation_to_generic": { "const": "specializes" } } },
-                "then": { "required": ["generic_class"] }
+                "if": {
+                  "properties": {
+                    "relation_to_generic": {
+                      "const": "specializes"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "generic_class"
+                  ]
+                }
               }
             ]
           }
@@ -83,12 +130,23 @@
           "maxItems": 40,
           "items": {
             "type": "object",
-            "required": ["name", "maps_to"],
+            "required": [
+              "name",
+              "maps_to"
+            ],
             "additionalProperties": false,
             "properties": {
-              "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
               "maps_to": {
-                "enum": ["what_is", "what_state", "what_condition"]
+                "enum": [
+                  "what_is",
+                  "what_state",
+                  "what_condition"
+                ]
               },
               "grounding_ref": {
                 "type": "string",
@@ -101,7 +159,11 @@
         "evidence_forms": {
           "type": "array",
           "maxItems": 20,
-          "items": { "type": "string", "minLength": 1, "maxLength": 120 },
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 120
+          },
           "description": "试点契约声明的证据形态；示例契约缺省"
         },
         "actor_roles": {
@@ -109,11 +171,20 @@
           "maxItems": 30,
           "items": {
             "type": "object",
-            "required": ["name", "can_be_accountable"],
+            "required": [
+              "name",
+              "can_be_accountable"
+            ],
             "additionalProperties": false,
             "properties": {
-              "name": { "type": "string", "minLength": 1, "maxLength": 120 },
-              "can_be_accountable": { "type": "boolean" }
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
+              "can_be_accountable": {
+                "type": "boolean"
+              }
             }
           },
           "description": "缺省时不扩展；本技能使用通用角色"
@@ -123,12 +194,23 @@
           "maxItems": 30,
           "items": {
             "type": "object",
-            "required": ["name", "relation_to_base"],
+            "required": [
+              "name",
+              "relation_to_base"
+            ],
             "additionalProperties": false,
             "properties": {
-              "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 120
+              },
               "relation_to_base": {
-                "enum": ["specializes", "cross_cuts", "orthogonal_to"]
+                "enum": [
+                  "specializes",
+                  "cross_cuts",
+                  "orthogonal_to"
+                ]
               },
               "base_subject_group": {
                 "type": "string",
@@ -138,8 +220,21 @@
             },
             "allOf": [
               {
-                "if": { "properties": { "relation_to_base": { "enum": ["specializes", "cross_cuts"] } } },
-                "then": { "required": ["base_subject_group"] }
+                "if": {
+                  "properties": {
+                    "relation_to_base": {
+                      "enum": [
+                        "specializes",
+                        "cross_cuts"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "base_subject_group"
+                  ]
+                }
               }
             ]
           },
@@ -156,21 +251,56 @@
       "maxItems": 20,
       "items": {
         "type": "object",
-        "required": ["id", "statement", "verification"],
+        "required": [
+          "id",
+          "statement",
+          "verification"
+        ],
         "additionalProperties": false,
         "properties": {
-          "id": { "type": "string", "pattern": "^A-CONTRACT-[A-Za-z0-9-]+$", "maxLength": 120 },
-          "statement": { "type": "string", "minLength": 1, "maxLength": 800 },
+          "id": {
+            "type": "string",
+            "pattern": "^A-CONTRACT-[A-Za-z0-9-]+$",
+            "maxLength": 120
+          },
+          "statement": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 800
+          },
           "verification": {
             "type": "object",
-            "required": ["type", "target_document", "alignment_criterion"],
+            "required": [
+              "type",
+              "target_document",
+              "alignment_criterion"
+            ],
             "additionalProperties": false,
             "properties": {
-              "type": { "enum": ["alignment_check"] },
-              "target_document": { "type": "string", "minLength": 1, "maxLength": 300 },
-              "target_section": { "type": "string", "maxLength": 200 },
-              "alignment_criterion": { "type": "string", "minLength": 1, "maxLength": 600 },
-              "on_mismatch": { "type": "string", "minLength": 1, "maxLength": 400 }
+              "type": {
+                "enum": [
+                  "alignment_check"
+                ]
+              },
+              "target_document": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 300
+              },
+              "target_section": {
+                "type": "string",
+                "maxLength": 200
+              },
+              "alignment_criterion": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 600
+              },
+              "on_mismatch": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 400
+              }
             }
           }
         }

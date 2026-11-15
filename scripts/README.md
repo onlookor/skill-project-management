@@ -76,9 +76,9 @@ JSONSCHEMA_WHEEL=<jsonschema-4.26.0-py3-none-any.whl> python3 scripts/check_depe
 | `RM-CONTROL` | 出现除制表符/换行外的 C0 控制字符 |
 | `RM-MOJIBAKE` | 出现 U+FFFD 替换字符 |
 | `RM-BASE64` | 出现 256 字符以上的 base64 形态长串，或 64 字符以上且解码后是已知二进制魔数（全区分） |
-| `RM-SCHEMA` | 数据区文件未在准入登记表登记；解析失败；未知键、必填/类型/枚举不通过；schema 文件缺 `$schema`/`type` |
-| `RM-FIELD` | 数据区字段超长或模式不符；按 schema 的 `x-prose-fields` 逐路径计量超上限；单条散文字段总和超过 `x-prose-budget`；单文件散文字段合计超过 20 KiB；集合字段超过 `maxItems`；`relations` 超过 `maxProperties` |
-| `RM-SCHEMA-LINT` | schema 自身不完整：数组缺 `maxItems`/`items`、字符串缺 `maxLength`、对象缺 `additionalProperties: false`（或 `maxProperties` + `propertyNames` 映射）、关键字不在支持白名单、使用未实现的关键字、`$ref` 与同级断言关键字并用 |
+| `RM-SCHEMA` | 数据区文件未在准入登记表登记；解析失败；未知键、必填/类型/枚举不通过；schema 文件缺 `$schema`/`type`；schema 未通过官方元 schema；缺少 `jsonschema` 依赖时按“无法评估”报本码并退出 2，不降级为跳过 |
+| `RM-FIELD` | 数据区字段超长或模式不符；按 schema 的 `x-prose-fields` 逐路径计量超上限（数组元素按出现值分别计量）；单条散文字段总和超过 `x-prose-budget`；单文件散文字段合计超过 32 KiB；集合字段超过 `maxItems`；`relations` 超过 `maxProperties` |
+| `RM-SCHEMA-LINT` | schema 自身不完整：数组缺 `maxItems`/`items`（`items` 不接受 `true`/`false` 或元组）、字符串缺 `maxLength`（`enum`/`const` 不豁免）、对象缺 `additionalProperties: false`（或 `maxProperties` + `propertyNames` 映射）、关键字不在支持白名单、使用未支持的关键字、`$ref` 与同级断言关键字并用、`x-prose-fields` 路径在 schema 结构中解析不到、未通过官方元 schema |
 | `RM-ONTO-HEADER` | 本体文件（`.ttl`/`.nt`/`.n3`/`.owl`/`.rdf`/`.jsonld`）前 40 行缺少 `self-authored`、`source_id:` 或 `source_pages:` 头注释（`source_pages` 取页码范围或 `n/a`；声明 `n/a` 时还须有 `source_pages_basis:`，缺该项同样按本码阻断） |
 | `RM-ONTO-LITERAL` | 本体文件的 `skos:definition`/`rdfs:comment`/`dcterms:description` 字面量超过 2000 字符，或其他字面量超过 400 字符 |
 | `RM-ONTO-COMMENT` | 本体文件的单行 `#` 注释超过 800 字符 |
@@ -88,13 +88,13 @@ JSONSCHEMA_WHEEL=<jsonschema-4.26.0-py3-none-any.whl> python3 scripts/check_depe
 | `RM-QUOTE` | P 区单条引用超过 400 字符，或连续引用块超过 800 字符 |
 | `RM-DOTLEADER` | P/O 区单行出现 30 个以上连续点（目录转储） |
 
-**分区与准入**：D 区（数据）只收 `ACCESS_ZONES.md` 第 2 节登记的结构化文件，按 `contracts/schema/*.schema.json` 校验，并把 schema 的 `x-prose-fields`（逐路径上限）与 `x-prose-budget`（单条总和兜底）用于配额；schema 自身先过完整性 lint，数组缺 `maxItems`/`items`、字符串缺 `maxLength`、对象缺 `additionalProperties: false`、出现白名单外或未实现的关键字、`$ref` 带同级断言关键字，均报 `RM-SCHEMA-LINT`。未登记的数据区文件直接 `RM-SCHEMA`，不降级为文本扫描（D-1）。O 区按 13.6 执行谓词分档字面量与注释上限。P 区只执行与 13.1/13.2 直接对应的硬约束，不做页形态推断。C 区执行同一组硬约束（不含引证与目录点线两项散文判据）。未归类路径一律 `RM-ZONE` 阻断；新增顶层目录不会获得默认放行。
+**分区与准入**：D 区（数据）只收 `ACCESS_ZONES.md` 第 2 节登记的结构化文件，按 `contracts/schema/*.schema.json` 校验（`jsonschema==4.26.0`，ADR-0019；依赖缺失即“无法评估”，不跳过），并把 schema 的 `x-prose-fields`（逐路径上限，按出现值计量）与 `x-prose-budget`（单条总和兜底）用于配额；schema 自身先过完整性 lint 与官方元 schema，数组缺 `maxItems`/`items`（`items` 不接受 `true`/元组）、字符串缺 `maxLength`（`enum`/`const` 不豁免）、对象缺 `additionalProperties: false`、出现白名单外或未支持的关键字、`$ref` 带同级断言关键字、`x-prose-fields` 路径解析不到，均报 `RM-SCHEMA-LINT`。`contracts/schema/` 的发现是**递归**的，子目录里的 schema 同样 lint、同样要求登记为规格区段。未登记的数据区文件直接 `RM-SCHEMA`，不降级为文本扫描（D-1）。O 区按 13.6 执行谓词分档字面量与注释上限。P 区只执行与 13.1/13.2 直接对应的硬约束，不做页形态推断。C 区执行同一组硬约束（不含引证与目录点线两项散文判据）。未归类路径一律 `RM-ZONE` 阻断；新增顶层目录不会获得默认放行。
 
 **已退役判据**：`RM-PROSEBLOCK`、`RM-PAGEDUMP`、`RM-PAGESEQ` 已删除，自测中也不保留依赖它们的样例。退役理由与实测数字见 `spec/RAW_MATERIAL_ADMISSION.md` 第 1 节；替代保护是数据区 schema + 配额、散文区硬约束、仓库外指纹与人工评审。**未命中不等于合规。**
 
 **结构化数据边界**：JSONL 逐行解析、JSON 数组逐元素过 schema；解析前先剥 UTF-8 BOM；`.yaml` 用安全加载后过同一份契约 schema。键白名单改由 schema 的 `additionalProperties: false` 表达，不再在检查器里维护手写键表。配额只挡“单条整页”与最明显的滥用，不证明来源；均分切块仍可能落在配额内，这是已登记的残余风险。
 
-**自测**：`python3 scripts/check_no_raw_material.py --self-test` 覆盖 65 项合成用例——合法 15 条 JSONL 与 BOM、退役启发式不再误杀长散文/硬换行/中文页/长定义、对象包裹的 `text`/`content`/`chunk` 被 schema 拦下、未知键/缺必填/超长字段/单文件配额、30 万字符单行、base64 PDF 头、单条长引用、PDF/gzip 魔数改名、禁止扩展名、未归类与未登记 fail-closed、本体定义分档与注释上限、页码序列与来源存在性、全本体扩展名头注释、归区最长前缀与全仓覆盖；复核补漏的 13 项覆盖 300 KB 散文塞 manifest、5 万字符契约字段与 statement、200 键 `relations`、100 条 `evidence`/`claim_mapping`、非法 `definitionStatus`、合法 2800 字符定义不被误杀、归区表与契约 schema 已在规格指纹内；r3 补漏的 12 项覆盖仓库内 7 份 schema 的完整性 lint、`package-manifest` 削弱为 `additionalProperties: true` 的 lint 与 fail-closed、三类缺上限各报一条、拼错与未实现关键字、`$ref` 同级关键字、`oneOf` 排他、3 条假设 × 1400 与 12 条 `notes`（6200）不被误杀、`positions` 300×400 与 `recorded_fields` 200×120 被拦；`source_pages: n/a` 的 7 项覆盖“只写 n/a 无依据”“依据为空串”“占位符”“指向不存在的 ADR”均阻断，附自写理由与仓库内 ADR 引用放行，`n/a` 与正文页码值矛盾仍阻断。全部用例不依赖外部资源。
+**自测**：`python3 scripts/check_no_raw_material.py --self-test` 覆盖 76 项合成用例——合法 15 条 JSONL 与 BOM、退役启发式不再误杀长散文/硬换行/中文页/长定义、对象包裹的 `text`/`content`/`chunk` 被 schema 拦下、未知键/缺必填/超长字段/单文件配额、30 万字符单行、base64 PDF 头、单条长引用、PDF/gzip 魔数改名、禁止扩展名、未归类与未登记 fail-closed、本体定义分档与注释上限、页码序列与来源存在性、全本体扩展名头注释、归区最长前缀与全仓覆盖；复核补漏的 13 项覆盖 300 KB 散文塞 manifest、5 万字符契约字段与 statement、200 键 `relations`、100 条 `evidence`/`claim_mapping`、非法 `definitionStatus`、合法 2800 字符定义不被误杀、归区表与契约 schema 已在规格指纹内；r3 补漏的 12 项覆盖仓库内 7 份 schema 的完整性 lint、`package-manifest` 削弱为 `additionalProperties: true` 的 lint 与 fail-closed、三类缺上限各报一条、拼错与未实现关键字、`$ref` 同级关键字、`oneOf` 排他、3 条假设 × 1400 与 12 条 `notes`（6200）不被误杀、`positions` 300×400 与 `recorded_fields` 200×120 被拦；`source_pages: n/a` 的 7 项覆盖“只写 n/a 无依据”“依据为空串”“占位符”“指向不存在的 ADR”均阻断，附自写理由与仓库内 ADR 引用放行，`n/a` 与正文页码值矛盾仍阻断；r4 补漏的 11 项覆盖 `items: true` 与元组 `items` 被 lint 拦下、`enum`/`const` 不跳过 `maxLength`、`x-prose-fields` 路径拼错即报错、子目录 schema 同样被 lint、schema 未过官方元 schema 即失败、依赖缺失 fail-closed 并给出安装命令、20 条假设（28,000）与 8 条 `positions`（3,200）不再被单文件配额与路径预算误杀。全部用例不依赖外部资源。
 
 提交前接入：每个克隆需自行执行 `git config core.hooksPath .githooks`（只对当前克隆生效）。钩子依次运行全套检查器、准入自测与原型快检，任一失败即阻断提交：
 

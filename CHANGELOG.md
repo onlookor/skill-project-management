@@ -1100,3 +1100,29 @@
 - **接线**：`spec/ACCESS_ZONES.md` §2 登记指纹文件；根 `README.md` 与 `scripts/README.md` 写安装与核对步骤；`.githooks/pre-commit` 增加依赖指纹与负例。
 - **涉及文件**：`adr/0019-mature-json-schema-validator.md`、`scripts/dependency-pins.json`、`scripts/check_dependency_pins.py`、`scripts/test_dependency_pins.py`、`spec/ACCESS_ZONES.md`、`README.md`、`scripts/README.md`、`.githooks/pre-commit`、`TODO.md`、`CHANGELOG.md`、`scripts/spec-pins.json`、`scripts/checker-pins.json`。
 - **状态**：第一段完成；第二段（接入与契约不变）与第三段（r4 验收）待做。G-019/G-021 仍 `open`。
+
+---
+
+### 批次 0065 — 2026-11-15 — 改用成熟 JSON Schema 实现（第二段：接入与契约不变）
+
+- **性质**：按用户裁定把 `validate()` 交给 `jsonschema==4.26.0`，对外契约不变。
+- **校验入口**：`validate()` 改为 `validator_for` + `check_schema` + `iter_errors`；返回仍是 `(keyword, pointer, message)`，`RM-FIELD`/`RM-SCHEMA` 分派、`required` 缺失键指针、`oneOf` 排他语义、`check_data` 行为与退出码保持。缺少依赖时抛 `SchemaDependencyError`，`main()` 预检打印“无法评估”并退出 2，不降级为跳过。
+- **元 schema**：仓库级 lint、`schema-doc` 与数据校验三处均先过官方 Draft 2020-12 元 schema；schema 自身不合规即失败。
+- **扩展关键字**：`x-prose-fields` 路径改由 `_resolve_prose_path` 按 schema 结构解析（`field`、`a.b`、`list[].field`、`map.*.field`），解析不到或终点非字符串/字符串数组即报 `RM-SCHEMA-LINT`；`x-prose-budget` 保留。
+- **递归发现**：`lint_schema_files` 与 `check_spec_pins.discover_schema_files` 改为 `rglob`，子目录 schema 同样 lint、同样要求登记为规格区段；新增 SP08。
+- **配额口径**：路径上限按出现值计量；`x-prose-budget` 上调至 schema 合法上限（`pm-slot-contract` 28,000、`pilot-conflict` 16,800、`pilot-id-map` 22,200）；单文件上限 20 KiB → 32 KiB；真实 schema 的枚举字符串补 `maxLength`（6 处）。
+- **自测**：65 → 76 项。新增覆盖 r4 四类攻击面、官方元 schema、依赖缺失 fail-closed、子目录 lint、20 条假设（28,000）与 8 条 `positions`（3,200）不被误杀。
+- **涉及文件**：`scripts/check_no_raw_material.py`、`scripts/check_spec_pins.py`、`scripts/test_spec_pins.py`、`contracts/schema/*.schema.json`（6 份）、`spec/ACCESS_ZONES.md`、`spec/RAW_MATERIAL_ADMISSION.md`、`CONSTITUTION.md`（13.5 配额数值）、`scripts/README.md`、`TODO.md`、`CHANGELOG.md`、`scripts/spec-pins.json`、`scripts/checker-pins.json`。
+- **状态**：第二段完成；第三段（r4 验收与 G-021 口径）同批收尾。G-019/G-021 仍 `open`。
+
+---
+
+### 批次 0066 — 2026-11-15 — 改用成熟 JSON Schema 实现（第三段：r4 攻击面验收）
+
+- **性质**：用 r4 复核报告（`/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md`，sha256 `47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb`）逐类验收，并改写 G-021 口径。
+- **四类缺陷复现与消除**：`items: true` / 元组 `items` → lint 拒绝非对象 `items`；`enum`/`const` 跳过 `maxLength` → 去掉豁免，同级断言必须同时成立；`x-prose-fields` 路径拼错 → 结构解析失败即报错；`contracts/schema/sub/` → 递归发现后同样 lint（`T-NRM-12[recursive-subdir]`）与钉扎（SP08）。
+- **自测**：76 项全部通过（新增 `T-NRM-12` 11 项），原有 65 项保留。
+- **G-021**：删除“`relations`/`evidence`/`positions` 均计入总量口径”的错误表述；按 r4 实测改写容量差额（knowledge-entry 45,136 − 2,800 = 42,336；pm-slot-contract 69,060 − 28,000 = 41,060；pilot-conflict 27,240 − 16,800 = 10,440；pilot-id-map 329,910 − 22,200 = 307,710；pilot-artifact 82,165；fixtures manifest 40,800；package-manifest 791），逐条列明 8 条未登记通道，并给出反向误杀（20 条假设合计 28,000、8 条 `positions` 合计 3,200）的处置。维持 `open`，待复核确认后再谈 `accepted`。
+- **G-019**：补记 0064–0066 落地（成熟实现、元 schema、递归、严格路径、依赖指纹），维持 `open`。G-020 未改动。
+- **涉及文件**：`GAP_LEDGER.md`、`scripts/check_no_raw_material.py`、`validation/reviews/2026-11-15-jsonschema-dependency.md`、`adr/0019-mature-json-schema-validator.md`、`TODO.md`、`CHANGELOG.md`、`scripts/spec-pins.json`、`scripts/checker-pins.json`。
+- **状态**：三段完成；G-019/G-021 仍 `open`。

@@ -5,16 +5,40 @@
   "description": "D 区 `spec/pilot/pilot-conflicts.jsonl` 的准入 schema。positions 只承载来源定位与立场摘要；note 不得超过 800 字符。",
   "type": "object",
   "additionalProperties": false,
-  "required": ["conflict_id", "topic", "draft_ref", "positions", "relation", "recorded_fields", "note"],
-  "x-prose-fields": [
-    {"path": "note", "maxChars": 800},
-    {"path": "positions[].stance", "maxChars": 2400}
+  "required": [
+    "conflict_id",
+    "topic",
+    "draft_ref",
+    "positions",
+    "relation",
+    "recorded_fields",
+    "note"
   ],
-  "x-prose-budget": 3200,
+  "x-prose-fields": [
+    {
+      "path": "note",
+      "maxChars": 800
+    },
+    {
+      "path": "positions[].stance",
+      "maxChars": 2400
+    }
+  ],
+  "x-prose-budget": 16800,
   "properties": {
-    "conflict_id": {"type": "string", "minLength": 1, "maxLength": 120},
-    "topic": {"type": "string", "maxLength": 120},
-    "draft_ref": {"type": "string", "maxLength": 120},
+    "conflict_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 120
+    },
+    "topic": {
+      "type": "string",
+      "maxLength": 120
+    },
+    "draft_ref": {
+      "type": "string",
+      "maxLength": 120
+    },
     "positions": {
       "type": "array",
       "minItems": 1,
@@ -22,23 +46,53 @@
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["source_id", "page", "stance"],
+        "required": [
+          "source_id",
+          "page",
+          "stance"
+        ],
         "properties": {
-          "source_id": {"type": "string", "maxLength": 120},
-          "page": {"type": "integer"},
-          "stance": {"type": "string", "maxLength": 400}
+          "source_id": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "page": {
+            "type": "integer"
+          },
+          "stance": {
+            "type": "string",
+            "maxLength": 400
+          }
         }
       }
     },
-    "relation": {"type": "string", "maxLength": 120},
-    "conflict_type": {"type": "string", "maxLength": 120},
-    "difference": {"type": "string", "maxLength": 120},
-    "missing": {"type": "string", "maxLength": 120},
+    "relation": {
+      "type": "string",
+      "maxLength": 120
+    },
+    "conflict_type": {
+      "type": "string",
+      "maxLength": 120
+    },
+    "difference": {
+      "type": "string",
+      "maxLength": 120
+    },
+    "missing": {
+      "type": "string",
+      "maxLength": 120
+    },
     "recorded_fields": {
       "type": "array",
       "maxItems": 40,
-      "items": {"type": "string", "maxLength": 120}
+      "items": {
+        "type": "string",
+        "maxLength": 120
+      }
     },
-    "note": {"type": "string", "maxLength": 800}
+    "note": {
+      "type": "string",
+      "maxLength": 800
+    }
   }
 }

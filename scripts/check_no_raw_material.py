@@ -18,11 +18,14 @@
     RM-MOJIBAKE 出现 U+FFFD 替换字符
     RM-BASE64   256 字符以上的 base64 长串，或 64 字符以上且解码后是二进制魔数
   数据区（D）
-    RM-SCHEMA-LINT schema 自身不完整：数组缺 maxItems/items、字符串缺 maxLength、
-                对象缺 additionalProperties:false（或受 maxProperties+propertyNames
-                约束的映射）、关键字不在支持白名单、使用了未实现的关键字、
-                `$ref` 与同级断言关键字并用
-    RM-SCHEMA   未在准入登记表、解析失败、未知键、必填/类型/枚举不通过
+    RM-SCHEMA-LINT schema 自身不完整：数组缺 maxItems/items（items 不接受 true/false
+                或元组）、字符串缺 maxLength（enum/const 不豁免）、对象缺
+                additionalProperties:false（或受 maxProperties+propertyNames
+                约束的映射）、关键字不在支持白名单、使用未纳入支持面的关键字、
+                `$ref` 与同级断言关键字并用、x-prose-fields 路径在 schema 中
+                解析不到、未通过官方元 schema
+    RM-SCHEMA   未在准入登记表、解析失败、未知键、必填/类型/枚举不通过；
+                缺少 jsonschema 依赖时按“无法评估”阻断，不降级为跳过
     RM-FIELD    字段超长或模式不符、按路径的散文字段合计超上限、单条总和超预算、
                 单文件散文字段合计超配额
   本体区（O）
@@ -59,6 +62,38 @@ import sys
 import tempfile
 from pathlib import Path
 
+try:  # ADR-0019：校验语义交给成熟实现，依赖缺失即无法评估。
+    import jsonschema as _jsonschema
+    from jsonschema import validators as _js_validators
+except ImportError as _exc:  # pragma: no cover - 环境缺失时走 fail-closed 分支
+    _jsonschema = None
+    _js_validators = None
+    JSONSCHEMA_ERROR = _exc
+else:
+    JSONSCHEMA_ERROR = None
+
+JSONSCHEMA_HINT = (
+    "python3 -m pip install --user jsonschema==4.26.0"
+)
+
+
+class SchemaDependencyError(RuntimeError):
+    """缺少 JSON Schema 实现：必须按“无法评估”处理，不得跳过校验。"""
+
+
+def _validator_for(schema):
+    if _jsonschema is None:
+        raise SchemaDependencyError(
+            f"缺少 jsonschema（{JSONSCHEMA_ERROR}）；安装：{JSONSCHEMA_HINT}；"
+            "依赖缺失不得跳过校验"
+        )
+    cls = _js_validators.validator_for(
+        schema, default=_js_validators.Draft202012Validator
+    )
+    cls.check_schema(schema)
+    return cls
+
+
 ZONES_FILE = "spec/ACCESS_ZONES.md"
 
 BANNED_EXTS = {
@@ -81,7 +116,7 @@ MAX_LITERAL_CHARS = 400
 MAX_DEFINITION_LITERAL_CHARS = 2000
 MAX_ONTO_COMMENT_CHARS = 800
 MAX_RECORD_PROSE_CHARS = 2800
-MAX_FILE_PROSE_CHARS = 20 * 1024
+MAX_FILE_PROSE_CHARS = 32 * 1024
 BASE64_RUN_CHARS = 256
 BASE64_PROBE_CHARS = 64
 
@@ -138,10 +173,6 @@ MAGIC_SIGNATURES = [
     (b"AT&TFORM", "DjVu"),
 ]
 
-SCHEMA_KEYWORDS = {
-    "type", "required", "additionalProperties", "enum", "const",
-    "anyOf", "oneOf", "allOf", "not",
-}
 FIELD_KEYWORDS = {
     "maxLength", "minLength", "pattern", "minItems", "maxItems",
     "maximum", "minimum", "maxProperties",
@@ -173,15 +204,6 @@ UNSUPPORTED_KEYWORDS = {
 COMBINATORS = ("anyOf", "oneOf", "allOf")
 CONDITIONALS = ("if", "then", "else", "not")
 JSON_TYPES = {"object", "array", "string", "integer", "number", "boolean", "null"}
-
-
-TYPE_MAP = {
-    "object": dict,
-    "array": list,
-    "string": str,
-    "boolean": bool,
-    "null": type(None),
-}
 
 
 class Finding:
@@ -290,120 +312,37 @@ def _load_schema(root, rel, findings):
         return None
 
 
-def _type_ok(value, expected):
-    if expected == "integer":
-        return isinstance(value, int) and not isinstance(value, bool)
-    if expected == "number":
-        return isinstance(value, (int, float)) and not isinstance(value, bool)
-    py = TYPE_MAP.get(expected)
-    return py is None or isinstance(value, py)
+def _pointer(path):
+    out = "$"
+    for part in path:
+        out += f"[{part}]" if isinstance(part, int) else f".{part}"
+    return out
 
 
 def validate(value, schema, pointer="$", root=None):
-    """校验本仓库用到的 JSON Schema 子集，返回 [(keyword, pointer, message)]。"""
+    """用 jsonschema 校验，返回 [(keyword, pointer, message)]。
+
+    输出契约与自写实现一致：reason code 由调用方按 keyword 分派，消息带 JSON
+    指针。`pointer`/`root` 仅为兼容既有调用保留；引用解析由实现负责。
+    """
+    try:
+        validator_cls = _validator_for(schema)
+    except SchemaDependencyError:
+        raise
+    except _jsonschema.exceptions.SchemaError as exc:
+        return [("schema", pointer, f"schema 未通过官方元 schema：{exc.message}")]
+
     errors = []
-    if not isinstance(schema, dict):
-        return errors
-    if root is None:
-        root = schema
-
-    ref = schema.get("$ref")
-    if isinstance(ref, str) and ref.startswith("#/$defs/"):
-        target = (root.get("$defs") or {}).get(ref.rsplit("/", 1)[-1])
-        if isinstance(target, dict):
-            # 同级关键字不能静默丢弃：先按被引用定义校验，再继续执行兄弟关键字。
-            errors.extend(validate(value, target, pointer, root))
-        else:
-            errors.append(("$ref", pointer, f"无法解析 {ref}"))
-            return errors
-
-    if "type" in schema:
-        expected = schema["type"]
-        options = expected if isinstance(expected, list) else [expected]
-        if not any(_type_ok(value, option) for option in options):
-            errors.append(("type", pointer, f"类型应为 {options}，实际 {type(value).__name__}"))
-            return errors
-
-    if "const" in schema and value != schema["const"]:
-        errors.append(("const", pointer, f"应为常量 {schema['const']!r}"))
-
-    if "enum" in schema and value not in schema["enum"]:
-        errors.append(("enum", pointer, f"取值 {value!r} 不在 {schema['enum']}"))
-
-    for key in COMBINATORS:
-        if key not in schema:
-            continue
-        matched = [
-            sub for sub in schema[key]
-            if not validate(value, sub, pointer, root)
-        ]
-        if key == "oneOf":
-            if len(matched) != 1:
-                errors.append(
-                    ("oneOf", pointer,
-                     f"oneOf 必须恰好命中 1 个分支，实际 {len(matched)} 个")
-                )
-        elif not matched:
-            errors.append((key, pointer, f"不满足 {key} 的任何分支"))
-
-    if "not" in schema and not validate(value, schema["not"], pointer, root):
-        errors.append(("not", pointer, "命中了禁止分支"))
-
-    if "if" in schema:
-        branch = "then" if not validate(value, schema["if"], pointer, root) else "else"
-        if branch in schema:
-            errors.extend(validate(value, schema[branch], pointer, root))
-
-    if isinstance(value, dict):
-        for key in schema.get("required", []):
-            if key not in value:
-                errors.append(("required", f"{pointer}.{key}", "缺少必填键"))
-        if "maxProperties" in schema and len(value) > schema["maxProperties"]:
-            errors.append(
-                ("maxProperties", pointer,
-                 f"键数 {len(value)} 多于 {schema['maxProperties']}")
-            )
-        if isinstance(schema.get("propertyNames"), dict):
-            for key in value:
-                errors.extend(
-                    validate(key, schema["propertyNames"], f"{pointer}.<键>", root)
-                )
-        properties = schema.get("properties", {})
-        for key, sub in properties.items():
-            if key in value:
-                errors.extend(validate(value[key], sub, f"{pointer}.{key}", root))
-        additional = schema.get("additionalProperties", True)
-        unknown = [k for k in value if k not in properties]
-        if additional is False:
-            for key in unknown:
-                errors.append(("additionalProperties", f"{pointer}.{key}", "schema 未登记的键"))
-        elif isinstance(additional, dict):
-            for key in unknown:
-                errors.extend(validate(value[key], additional, f"{pointer}.{key}", root))
-
-    if isinstance(value, list):
-        if "minItems" in schema and len(value) < schema["minItems"]:
-            errors.append(("minItems", pointer, f"元素数 {len(value)} 少于 {schema['minItems']}"))
-        if "maxItems" in schema and len(value) > schema["maxItems"]:
-            errors.append(("maxItems", pointer, f"元素数 {len(value)} 多于 {schema['maxItems']}"))
-        if isinstance(schema.get("items"), dict):
-            for index, item in enumerate(value):
-                errors.extend(validate(item, schema["items"], f"{pointer}[{index}]", root))
-
-    if isinstance(value, str):
-        if "minLength" in schema and len(value) < schema["minLength"]:
-            errors.append(("minLength", pointer, f"长度 {len(value)} 少于 {schema['minLength']}"))
-        if "maxLength" in schema and len(value) > schema["maxLength"]:
-            errors.append(("maxLength", pointer, f"长度 {len(value)} 超过 {schema['maxLength']}"))
-        if "pattern" in schema and re.search(schema["pattern"], value) is None:
-            errors.append(("pattern", pointer, f"不匹配模式 {schema['pattern']}"))
-
-    if isinstance(value, (int, float)) and not isinstance(value, bool):
-        if "minimum" in schema and value < schema["minimum"]:
-            errors.append(("minimum", pointer, f"小于 {schema['minimum']}"))
-        if "maximum" in schema and value > schema["maximum"]:
-            errors.append(("maximum", pointer, f"大于 {schema['maximum']}"))
-
+    for error in validator_cls(schema).iter_errors(value):
+        keyword = error.validator or "schema"
+        location = _pointer(error.absolute_path)
+        if keyword == "required":
+            missing = error.message.split("'")[1] if "'" in error.message else "?"
+            location = f"{location}.{missing}"
+        message = error.message
+        if keyword == "oneOf":
+            message = f"oneOf 必须恰好命中 1 个分支：{message}"
+        errors.append((keyword, location, message))
     return errors
 
 
@@ -421,7 +360,7 @@ def _lint_node(node, pointer, strict, errors):
     for key in node:
         if key in UNSUPPORTED_KEYWORDS:
             errors.append(
-                f"{pointer}：关键字 `{key}` 本校验器未实现，schema 不得使用"
+                f"{pointer}：关键字 `{key}` 未纳入本仓库支持面，schema 不得使用"
                 "（不支持就必须显式禁用，不能静默降级）"
             )
         elif key not in SUPPORTED_KEYWORDS:
@@ -446,7 +385,7 @@ def _lint_node(node, pointer, strict, errors):
         if siblings:
             errors.append(
                 f"{pointer}：`$ref` 与同级断言关键字并用（{', '.join(siblings)}）；"
-                "本校验器不做隐式合并，请把约束并入 $defs"
+                "本仓库不做隐式合并，请把约束并入 $defs"
             )
         ref = node["$ref"]
         if not (isinstance(ref, str) and ref.startswith("#/$defs/")):
@@ -460,26 +399,34 @@ def _lint_node(node, pointer, strict, errors):
                 f"{pointer}：缺少 `type`，无法证明该值受上限约束"
                 "（object/array/string 各有强制上限）"
             )
-        if not finite:
-            if "array" in types:
-                if "maxItems" not in node:
-                    errors.append(f"{pointer}：数组缺少 `maxItems`")
-                if "items" not in node:
-                    errors.append(f"{pointer}：数组缺少 `items`（元素值不受约束）")
-            if "string" in types and "maxLength" not in node:
-                errors.append(f"{pointer}：字符串缺少 `maxLength`")
-            if "object" in types:
-                additional = node.get("additionalProperties")
-                bounded_map = (
-                    isinstance(additional, dict)
-                    and "maxProperties" in node
-                    and isinstance(node.get("propertyNames"), dict)
+        if "array" in types:
+            if "maxItems" not in node:
+                errors.append(f"{pointer}：数组缺少 `maxItems`")
+            if "items" not in node:
+                errors.append(f"{pointer}：数组缺少 `items`（元素值不受约束）")
+        if "string" in types and "maxLength" not in node:
+            errors.append(
+                f"{pointer}：字符串缺少 `maxLength`"
+                + ("（`enum`/`const` 不豁免：同级断言必须同时成立）" if finite else "")
+            )
+        if "object" in types:
+            additional = node.get("additionalProperties")
+            bounded_map = (
+                isinstance(additional, dict)
+                and "maxProperties" in node
+                and isinstance(node.get("propertyNames"), dict)
+            )
+            if additional is not False and not bounded_map:
+                errors.append(
+                    f"{pointer}：对象必须是 `additionalProperties: false`，"
+                    "或受 `maxProperties` + `propertyNames` 约束的映射"
                 )
-                if additional is not False and not bounded_map:
-                    errors.append(
-                        f"{pointer}：对象必须是 `additionalProperties: false`，"
-                        "或受 `maxProperties` + `propertyNames` 约束的映射"
-                    )
+
+    if "items" in node and not isinstance(node["items"], dict):
+        errors.append(
+            f"{pointer}：`items` 必须是单个 schema 对象；"
+            "不接受 `true`/`false` 或元组形式（元素约束不得为空或按位置失效）"
+        )
 
     for name, sub in (node.get("properties") or {}).items():
         _lint_node(sub, f"{pointer}.properties.{name}", True, errors)
@@ -497,6 +444,48 @@ def _lint_node(node, pointer, strict, errors):
     for key in CONDITIONALS:
         if key in node:
             _lint_node(node[key], f"{pointer}.{key}", False, errors)
+
+
+def _resolve_prose_path(schema, path):
+    """按 schema 结构解析散文路径；解析不到返回 None。
+
+    支持 `field`、`a.b`、`list[].field`、`map.*.field`。每一步都必须命中
+    `properties`（或映射的 `additionalProperties`）；`[]` 只接受 `items` 为对象的
+    数组。拼错即返回 None，由调用方报错，不允许静默失效。
+    """
+    nodes = [schema]
+    for part in str(path).split("."):
+        if not part:
+            return None
+        list_step = part.endswith("[]")
+        key = part[:-2] if list_step else part
+        nxt = []
+        for node in nodes:
+            if not isinstance(node, dict):
+                return None
+            if key == "*":
+                sub = node.get("additionalProperties")
+            else:
+                sub = (node.get("properties") or {}).get(key)
+            if not isinstance(sub, dict):
+                return None
+            if list_step:
+                if sub.get("type") != "array" or not isinstance(sub.get("items"), dict):
+                    return None
+                sub = sub["items"]
+            nxt.append(sub)
+        nodes = nxt
+    return nodes
+
+
+def _prose_terminal_ok(node):
+    if node.get("type") == "string":
+        return True
+    return (
+        node.get("type") == "array"
+        and isinstance(node.get("items"), dict)
+        and node["items"].get("type") == "string"
+    )
 
 
 def lint_schema_doc(rel, schema):
@@ -522,7 +511,18 @@ def lint_schema_doc(rel, schema):
                 if not isinstance(limit, int) or isinstance(limit, bool) or limit <= 0:
                     errors.append(f"{pointer}：`maxChars` 必须是正整数")
                 if isinstance(path, str) and path and isinstance(limit, int) and limit > 0:
-                    prose.append((path, limit))
+                    terminals = _resolve_prose_path(schema, path)
+                    if terminals is None:
+                        errors.append(
+                            f"{pointer}：路径 `{path}` 在 schema 结构中解析不到"
+                            "（拼写错误或节点未声明），配额会静默失效"
+                        )
+                    elif not all(_prose_terminal_ok(node) for node in terminals):
+                        errors.append(
+                            f"{pointer}：路径 `{path}` 的终点必须是字符串或字符串数组"
+                        )
+                    else:
+                        prose.append((path, limit))
         budget = schema.get("x-prose-budget")
         if not isinstance(budget, int) or isinstance(budget, bool) or budget <= 0:
             errors.append("$：声明 `x-prose-fields` 时必须给出正整数 `x-prose-budget`（单条总和兜底）")
@@ -537,7 +537,7 @@ def lint_schema_doc(rel, schema):
 
 
 def lint_schema_files(root, schema_root=None):
-    """对 `contracts/schema/` 下全部文件做完整性 lint，返回 Findings。"""
+    """对 `contracts/schema/` 下全部文件（递归）做完整性 lint 与元 schema 校验。"""
     base = Path(schema_root) if schema_root else root
     findings = []
     directory = base / "contracts/schema"
@@ -546,10 +546,10 @@ def lint_schema_files(root, schema_root=None):
             Finding("RM-SCHEMA-LINT", "contracts/schema", None, "schema 目录缺失，无法评估")
         )
         return findings
-    for path in sorted(directory.iterdir()):
+    for path in sorted(directory.rglob("*")):
         if not path.is_file():
             continue
-        rel = f"contracts/schema/{path.name}"
+        rel = path.relative_to(base).as_posix()
         try:
             schema = json.loads(path.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError) as exc:
@@ -561,6 +561,14 @@ def lint_schema_files(root, schema_root=None):
         errors, _ = lint_schema_doc(rel, schema)
         for message in errors:
             findings.append(Finding("RM-SCHEMA-LINT", rel, None, message))
+        try:
+            _validator_for(schema)
+        except SchemaDependencyError as exc:
+            findings.append(Finding("RM-SCHEMA-LINT", rel, None, f"无法评估：{exc}"))
+        except _jsonschema.exceptions.SchemaError as exc:
+            findings.append(
+                Finding("RM-SCHEMA-LINT", rel, None, f"未通过官方元 schema：{exc.message}")
+            )
     return findings
 
 
@@ -665,11 +673,37 @@ def check_data(rel, text, suffix, entry, schema_root, findings):
                         "schema 文件缺少 $schema 或 type",
                     )
                 )
+            try:
+                _validator_for(record)
+            except SchemaDependencyError as exc:
+                findings.append(
+                    Finding("RM-SCHEMA", rel, None, f"无法评估：{exc}（不得跳过校验）")
+                )
+                return
+            except _jsonschema.exceptions.SchemaError as exc:
+                findings.append(
+                    Finding(
+                        "RM-SCHEMA", rel, lines[index],
+                        f"未通过官方元 schema：{exc.message}",
+                    )
+                )
         return
 
     if target.startswith("contracts/schema/"):
         schema = _load_schema(schema_root, target, findings)
         if schema is None:
+            return
+        try:
+            _validator_for(schema)
+        except SchemaDependencyError as exc:
+            findings.append(
+                Finding("RM-SCHEMA", rel, None, f"无法评估：{exc}（不得跳过校验）")
+            )
+            return
+        except _jsonschema.exceptions.SchemaError as exc:
+            findings.append(
+                Finding("RM-SCHEMA", rel, None, f"schema 未通过官方元 schema：{exc.message}")
+            )
             return
         lint_errors, prose_fields = lint_schema_doc(rel, schema)
         if lint_errors:
@@ -695,14 +729,15 @@ def check_data(rel, text, suffix, entry, schema_root, findings):
                     break
             if prose_fields:
                 for path, limit in prose_fields:
-                    chars = sum(len(v) for v in _prose_values(record, path))
-                    if chars > limit:
-                        findings.append(
-                            Finding(
-                                "RM-FIELD", rel, lines[index],
-                                f"路径 {path} 散文字段合计 {chars} 字符，超过 {limit}",
+                    # 路径上限按“每个出现值”计；数组元素不再合并成一个额度。
+                    for value in _prose_values(record, path):
+                        if len(value) > limit:
+                            findings.append(
+                                Finding(
+                                    "RM-FIELD", rel, lines[index],
+                                    f"路径 {path} 的散文字段 {len(value)} 字符，超过 {limit}",
+                                )
                             )
-                        )
                 total = _prose_total(record, prose_fields)
                 file_prose += total
                 if isinstance(budget, int) and total > budget:
@@ -1253,13 +1288,14 @@ def run_self_test():
                    f"期望 {expected}（命中 {sorted(codes) or '无'}）")
         file_quota = [
             {"term": f"ProbeF{i}", "definition": "自写" * 700}
-            for i in range(15)
+            for i in range(30)
         ]
         _write(root, "knowledge/file-quota.jsonl",
                "\n".join(json.dumps(r, ensure_ascii=False) for r in file_quota) + "\n")
         codes = _codes(root, "knowledge/file-quota.jsonl", zones, data_table, schema_root)
         report("T-NRM-04[file-quota]", "RM-FIELD" in codes,
-               f"单文件散文字段合计超 20 KiB 被拦（命中 {sorted(codes) or '无'}）")
+               f"单文件散文字段合计超 {MAX_FILE_PROSE_CHARS // 1024} KiB 被拦"
+               f"（命中 {sorted(codes) or '无'}）")
 
         # T-NRM-05：单行、base64、引用
         _write(root, "spec/huge.txt", "A" * 300000 + "\n")
@@ -1574,8 +1610,8 @@ def run_self_test():
                        "patternProperties": {"^x": {"type": "string", "maxLength": 10}}}
         lint_errors, _ = lint_schema_doc("unsupported", unsupported)
         report("T-NRM-11[lint-unsupported]",
-               any("未实现" in message for message in lint_errors),
-               f"未实现关键字 `patternProperties` 被拦（{lint_errors[:1]}）")
+               any("未纳入本仓库支持面" in message for message in lint_errors),
+               f"未启用关键字 `patternProperties` 被拦（{lint_errors[:1]}）")
 
         ref_sibling = {
             "type": "object",
@@ -1593,6 +1629,78 @@ def run_self_test():
         report("T-NRM-11[oneof-exclusive]",
                any("恰好命中 1 个分支" in message for _, _, message in collisions),
                f"oneOf 命中 2 个分支即失败，不再退化为 anyOf（{len(collisions)} 条）")
+
+        # T-NRM-12：r4 攻击面——成熟实现的结构性消除
+        for label, items in (("true", True), ("tuple", [{"type": "string", "maxLength": 3}])):
+            loose = {
+                "type": "object", "additionalProperties": False,
+                "properties": {
+                    "tags": {"type": "array", "maxItems": 3, "items": items},
+                },
+            }
+            lint_errors, _ = lint_schema_doc(f"items-{label}", loose)
+            report(f"T-NRM-12[items-{label}]",
+                   any("`items` 必须是单个 schema 对象" in message for message in lint_errors),
+                   f"`items: {label}` 被 lint 拦下（{lint_errors[:1]}）")
+
+        enum_skip = {"type": "string", "maxLength": 5, "enum": ["aaaaaa"]}
+        enum_hits = validate("aaaaaa", enum_skip, root=enum_skip)
+        report("T-NRM-12[enum-maxlength]",
+               any(keyword == "maxLength" for keyword, _, _ in enum_hits),
+               f"enum 命中不跳过 maxLength（命中 {enum_hits[:1]}）")
+        lint_errors, _ = lint_schema_doc("enum-no-max", {"type": "string", "enum": ["aaaaaa"]})
+        report("T-NRM-12[enum-no-max]",
+               any("`enum`/`const` 不豁免" in message for message in lint_errors),
+               f"带 enum 的字符串仍须 maxLength（{lint_errors[:1]}）")
+
+        typo_schema = {
+            "type": "object", "additionalProperties": False,
+            "properties": {"definition": {"type": "string", "maxLength": 100}},
+            "x-prose-fields": [{"path": "definiton", "maxChars": 100}],
+            "x-prose-budget": 100,
+        }
+        lint_errors, prose = lint_schema_doc("typo", typo_schema)
+        report("T-NRM-12[prose-path-typo]",
+               any("解析不到" in message for message in lint_errors) and not prose,
+               f"散文路径拼错即失败，不静默失效（{lint_errors[:1]}）")
+        good_schema = dict(typo_schema)
+        good_schema["x-prose-fields"] = [{"path": "definition", "maxChars": 100}]
+        lint_errors, prose = lint_schema_doc("good", good_schema)
+        report("T-NRM-12[prose-path-ok]",
+               not lint_errors and prose == [("definition", 100)],
+               f"可解析路径正常登记（{prose}；{lint_errors[:1]}）")
+
+        try:
+            _validator_for({"$schema": "https://json-schema.org/draft/2020-12/schema",
+                            "type": "strin"})
+            meta_ok = False
+        except _jsonschema.exceptions.SchemaError:
+            meta_ok = True
+        report("T-NRM-12[meta-schema]", meta_ok,
+               "schema 自身过官方元 schema，写错类型即失败")
+
+        saved = globals().get("_jsonschema")
+        globals()["_jsonschema"] = None
+        try:
+            _validator_for({"type": "object"})
+            fail_closed = False
+        except SchemaDependencyError as exc:
+            fail_closed = "不得跳过" in str(exc) and "pip install" in str(exc)
+        finally:
+            globals()["_jsonschema"] = saved
+        report("T-NRM-12[dependency-fail-closed]", fail_closed,
+               "依赖缺失时 fail-closed 并给出安装命令，不降级为跳过")
+
+        with tempfile.TemporaryDirectory() as sub_root:
+            sub_dir = Path(sub_root) / "contracts" / "schema" / "sub"
+            sub_dir.mkdir(parents=True)
+            (sub_dir / "leak.schema.json").write_text(
+                json.dumps({"type": "object"}), encoding="utf-8"
+            )
+            sub_findings = lint_schema_files(Path(sub_root), schema_root=sub_root)
+            report("T-NRM-12[recursive-subdir]",
+                   any("schema/sub/leak.schema.json" in item.path for item in sub_findings),
+                   f"子目录 schema 同样被 lint（{sub_findings[:1]}）")
 
         contract_many = json.loads(json.dumps(contract))
         contract_many["assumption_refs"] = [
@@ -1614,6 +1722,45 @@ def run_self_test():
         report("T-NRM-11[assumptions-3]",
                "RM-FIELD" not in codes,
                f"3 条假设 × 1400（合计 4200）不被误杀（命中 {sorted(codes) or '无'}）")
+
+        # r4 Q04：schema 合法的 20 条假设（合计 28,000）不得被路径预算误杀
+        contract_max = json.loads(json.dumps(contract))
+        contract_max["assumption_refs"] = [
+            {
+                "id": f"A-CONTRACT-{i}",
+                "statement": "假" * 800,
+                "verification": {
+                    "type": "alignment_check",
+                    "target_document": "AGENTS.md",
+                    "alignment_criterion": "判" * 600,
+                },
+            }
+            for i in range(1, 21)
+        ]
+        _write(root, "contracts/examples/twenty-assumptions.yaml",
+               json.dumps(contract_max, ensure_ascii=False) + "\n")
+        codes = _codes(root, "contracts/examples/twenty-assumptions.yaml",
+                       zones, data_table, schema_root)
+        report("T-NRM-12[assumptions-20]",
+               "RM-FIELD" not in codes,
+               f"20 条假设（合计 28,000）按出现次数计量，不被误杀（命中 {sorted(codes) or '无'}）")
+
+        small_conflict = {
+            "conflict_id": "C-2", "topic": "探针", "draft_ref": "K-1",
+            "positions": [
+                {"source_id": "PMBOK8-2025", "page": 10, "stance": "场" * 400}
+                for _ in range(8)
+            ],
+            "relation": "contradicts", "recorded_fields": ["stance"],
+            "note": "自写说明。",
+        }
+        _write(root, "spec/pilot/pilot-conflicts.jsonl",
+               json.dumps(small_conflict, ensure_ascii=False) + "\n")
+        codes = _codes(root, "spec/pilot/pilot-conflicts.jsonl",
+                       zones, data_table, schema_root)
+        report("T-NRM-12[positions-8]",
+               "RM-FIELD" not in codes,
+               f"8 条 positions（合计 3,200）不被路径预算误杀（命中 {sorted(codes) or '无'}）")
 
         id_map = {
             "authoritative": False,
@@ -1731,6 +1878,14 @@ def main():
         print(
             f"[错误] 无法解析 {ZONES_FILE} 的归区表或准入登记表；"
             "无法评估不等于通过。",
+            file=sys.stderr,
+        )
+        return 2
+
+    if _jsonschema is None:
+        print(
+            f"[无法评估] 缺少 jsonschema（{JSONSCHEMA_ERROR}）；安装：{JSONSCHEMA_HINT}；"
+            "依赖缺失不得视为通过，也不得跳过校验。",
             file=sys.stderr,
         )
         return 2
