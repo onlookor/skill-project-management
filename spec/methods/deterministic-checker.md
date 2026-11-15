@@ -311,7 +311,6 @@
 
 > 用途：解决“一规则一句导致子条件被压缩”（ADR-0013 的问题 P1）。每条规则正文的规范性条件拆为 clause id；A 表每个 `check_id` 的“判定（子句 id）”列只列它覆盖的 clause，**不再写叙述性短语**；条件的自然语言表述与原因码统一放在本表。一个 `check_id` 可承载多个子句，逐子句独立求值、聚合为单一 verdict（任一 `fail` → `fail`；否则任一 `cannot_evaluate` → `cannot_evaluate`；否则 `pass`）。未覆盖的子句必须标 `not-checked` 并写理由，`scripts/check_three_table.py` 机械核对覆盖完整性与“A 表不含叙述性短语”。
 >
-> 复核签收：外部复核基线 `a9ff5bb`（产物 `/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md`，sha256 `2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6`；r3 逐条核对 `missing_input` 登记、`G-F1#2` 撤回与覆盖闸门，判 G-018 可关闭） / 2026-11-15 / A.2 指纹 `b14854847668`
 
 | clause | 规则 | 子句（判定条件） | 原因码 | 承接 check_id | 子句 severity | 覆盖状态 | 规则状态 |
 |---|---|---|---|---|---|---|---|
@@ -375,6 +374,8 @@
 | 其他 `check_id` | 无子句承接 | 2bis.1 中剩余引用 | `dangling_reference`（全局兜底） |
 
 **G-A2#2 可达性**：schema 第 2、3 节已为 `commitments[]` / `deliverables[]` 声明可选 `node_type`。提供且不在 `management_node_type` 内 → `cannot_evaluate` / `undefined_object_type`；未提供视为“未断言节点类型”，不触发本子句，也不影响 `G-A2#1`。这样该子句在声明输入域内可达，且不需要把 `node_type` 变成所有样例的必填键。
+
+> 复核签收：外部复核基线 `a9ff5bb`；2026-11-15；A.2 指纹 `b14854847668`
 
 ### A.1 参考样例（T-011）
 

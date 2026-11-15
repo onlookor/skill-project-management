@@ -13,8 +13,10 @@
 6. 引用标注：§2 声明的每个字段必须出现在 §2bis.1（引用）或 §2bis.2（非引用），
    新增字段未标注即报错。
 7. 输入域闭包：样例中实际出现的引用目标集合必须在 §3 的必需顶层键中声明。
-8. A.2 复核签收：A.2 区头的“复核签收”行必须携带当前 A.2 区段指纹；只改 A.2 再
-   跑 `--write` 会使 A 表自洽，本条是唯一能阻断该绕过的机械检查（AGENTS 3.6.7）。
+8. A.2 复核签收：A.2 区段内的“复核签收”行（应为区段最后一条非空行）必须携带当前
+   A.2 区段指纹；只改 A.2 再跑 `--write` 会使 A 表自洽，本条是唯一能阻断该绕过的机械检查（AGENTS 3.6.7）。
+   签收行只接受固定模板整行匹配：`> 复核签收：外部复核基线 `<7–40 hex>`；`
+   `<YYYY-MM-DD>；A.2 指纹 `<12 hex>``，行内不得含自由文本（批次 0088 甲方案）。
 
 用法：python3 scripts/check_three_table.py [--root DIR] [--method PATH] [--write]
 退出码：0 = 通过；1 = 存在错误；2 = 结构无法解析。
@@ -140,7 +142,8 @@ def clause_fingerprint(clause_id: str, item: dict) -> str:
 
 
 A2_SIGNOFF_RE = re.compile(
-    r"复核签收：(.+?)\s*/\s*(\d{4}-\d{2}-\d{2})\s*/\s*A\.2 指纹\s*`([0-9a-f]{12})`"
+    r"> 复核签收：外部复核基线 `(?P<baseline>[0-9a-f]{7,40})`；"
+    r"(?P<date>\d{4}-\d{2}-\d{2})；A\.2 指纹 `(?P<fingerprint>[0-9a-f]{12})`"
 )
 
 
@@ -154,7 +157,11 @@ def a2_block_fingerprint(clauses: dict[str, dict]) -> str:
 
 
 def parse_a2_signoff(text: str) -> tuple[str, str, str] | None:
-    """解析 A.2 区头的复核签收行，返回 (签收人, 日期, 指纹)。"""
+    """解析 A.2 区段内的复核签收行，返回 (复核基线, 日期, 指纹)。
+
+    只接受固定模板整行匹配（批次 0088 甲方案），行内不得含自由文本；
+    任何不符合模板的行都不算签收行。
+    """
     in_section = False
     for line in text.splitlines():
         if line.startswith("### A.2"):
@@ -163,9 +170,9 @@ def parse_a2_signoff(text: str) -> tuple[str, str, str] | None:
         if in_section and line.startswith("### "):
             break
         if in_section:
-            match = A2_SIGNOFF_RE.search(line)
+            match = A2_SIGNOFF_RE.fullmatch(line)
             if match:
-                return match.group(1).strip(), match.group(2), match.group(3)
+                return match.group("baseline"), match.group("date"), match.group("fingerprint")
     return None
 
 
@@ -518,8 +525,9 @@ def main() -> int:
     current_a2 = a2_block_fingerprint(clauses)
     if signoff is None:
         errors.append(
-            "[错误] A.2 区头缺少复核签收行；格式："
-            "“复核签收：<签收人> / <YYYY-MM-DD> / A.2 指纹 `<12位>`”"
+            "[错误] A.2 区段缺少复核签收行（应为区段最后一条非空行）；格式固定为"
+            "“> 复核签收：外部复核基线 `<7–40 hex>`；<YYYY-MM-DD>；A.2 指纹 `<12位>`”，"
+            "行内不得含自由文本"
         )
     else:
         reviewer, signed_at, signed_fingerprint = signoff

@@ -34,7 +34,7 @@
       "basis": "非同源复核：G-019 r6（基线 bafcb04）要求撤掉 pattern 嵌套量词启发式只留 512 字符上限、退出码表述与实现对齐、替换范围表述与实测对齐。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r6/REPORT.md；sha256：1db2586ee7f5614920fc6a6ab3f2afc34c4445ff997df8b0aaec48327d6bd1db；复核基线：bafcb04 区段：scripts/check_no_raw_material.py 结论：认可"
     },
     "scripts/check_spec_pins.py": {
-      "sha256": "871314dd8d34f61b76d794d94aaa6f9a075651753868916951536293e636068c",
+      "sha256": "b20914eceb56e471fa3309c10fc6b3d2f040ca001fca6625d9f770927088554d",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/check_state.py": {
@@ -42,11 +42,11 @@
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/check_three_table.py": {
-      "sha256": "7381d82673a074784ff42d60969ba95c9dd7d4ccef76a2f8a4ad53b41f11ce2c",
+      "sha256": "1452f5a281a9d46d802102284c3682256016a7bceeb4bd73fb5640c9e2553fcb",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/test_check_table_mutations.py": {
-      "sha256": "22930a9aa0684a0454ed67aa6940d6cf035b847ea783476bbc533b94519c31f4",
+      "sha256": "90b08d7325497fdda6ab6e8fa39166df532573ca5b5e45a29ad5df53df8b98da",
       "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：scripts/test_check_table_mutations.py 结论：认可"
     },
     "scripts/test_checker_pins.py": {
@@ -58,7 +58,7 @@
       "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：scripts/test_coverage_gate.py 结论：认可"
     },
     "scripts/test_spec_pins.py": {
-      "sha256": "b19680e6c99e1da14162b3f17ccb3ce1d8aad83cb3decc2a65af75e8df17527a",
+      "sha256": "92fb80c40f8a6b51f2e53d1e5cc2bd3d83ff3a13782db7cc8d93761323cb3309",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/validate_ontology.py": {
@@ -78,7 +78,7 @@
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/no-review-declarations.json": {
-      "sha256": "73d2f23a72a9da25e96d436da105eb635343d37afb007b3d5d1f507d68fc8eba",
+      "sha256": "43152d135b8e533468181a547f221a7fb1c73b9f43f642929f3fb797f3c544e4",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "validation/pinned/checker.py": {

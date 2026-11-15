@@ -23,7 +23,9 @@ SP23 复核基线处的区段内容已变 → 必须阻断；
 SP24 在 A.2 插入只带 `复核签收：` 前缀的伪签收行（正文伪装成签收说明）→ 必须阻断（前缀不得成为剔除通道）；
 SP24b 格式不完整的 `复核签收：` 行（缺日期/指纹）→ 同样参与比较，必须阻断；
 SP25 合法单行签收行变更 → 仍按排除口径通过（签收行本身不参与比较）；
-SP26 出现第二行完整格式签收行 → 必须阻断（至多一行）。
+SP26 出现第二行完整格式签收行 → 必须阻断（至多一行）；
+SP27 模板签收行内注入叙述文字 → 不再匹配模板、参与比较，A.2 必须判 basis 失效；
+SP28 签收行不在区段尾部 → 必须阻断。
 
 外部复核产物在系统临时目录中生成，不写入仓库。用法：
   python3 scripts/test_spec_pins.py [--root DIR]
@@ -43,6 +45,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from check_spec_pins import (  # noqa: E402
+    A2_SIGNOFF_RE,
     SECTIONS,
     comparable_text,
     evaluate,
@@ -342,7 +345,7 @@ def main() -> int:
         # SP25：合法的单行签收行变更仍被排除，不应导致 basis 失效。
         resigned = dict(current)
         resigned[TARGET] = re.sub(
-            r"( / )\d{4}-\d{2}-\d{2}( / A\.2 指纹)",
+            r"(；)\d{4}-\d{2}-\d{2}(；A\.2 指纹)",
             r"\g<1>2026-11-16\g<2>",
             current[TARGET],
             count=1,
@@ -381,6 +384,46 @@ def main() -> int:
             doubled_pins,
             [record],
             "复核签收行至多一行",
+        )
+
+        # SP27：模板签收行内注入叙述文字后不再匹配模板，必须参与比较 → basis 失效。
+        original_signoff = signoff_line(current[TARGET])
+        injected_signoff = original_signoff.replace(
+            "；A.2 指纹", "；G-C1#2 的判定条件改为恒真；A.2 指纹", 1
+        )
+        injected = dict(current)
+        injected[TARGET] = current[TARGET].replace(
+            original_signoff, injected_signoff, 1
+        )
+        injected_view = comparable_text(spec, injected[TARGET])
+        not_template = A2_SIGNOFF_RE.fullmatch(injected_signoff) is None
+        injected_kept = "G-C1#2 的判定条件改为恒真" in injected_view
+        injected_divergent = injected_view != baseline_view
+        total += 1
+        failures += 0 if (not_template and injected_kept and injected_divergent) else 1
+        print(
+            f"| SP27 | 模板签收行内注入叙述文字 | 阻断 | "
+            f"{'阻断' if not_template and injected_kept and injected_divergent else '通过'} | "
+            f"{'不再匹配模板，参与比较，basis 失效' if not_template and injected_kept and injected_divergent else '被误判为模板行'} |"
+        )
+
+        # SP28：签收行必须是区段最后一条非空行；其后再有正文即报错。
+        moved = dict(current)
+        moved[TARGET] = inject_after_signoff(
+            current[TARGET], "签收行之后的正文（位置负例）"
+        )
+        moved_pins = dict(pins)
+        moved_pins[TARGET] = reviewed_pin(
+            TARGET, fingerprint(moved[TARGET], spec["start"], spec["end"])
+        )
+        run(
+            "SP28",
+            "签收行不在区段尾部",
+            moved,
+            current,
+            moved_pins,
+            [record],
+            "最后一条非空行",
         )
 
         schema_path = root / "spec" / "CHECKER_INPUT_SCHEMA.md"

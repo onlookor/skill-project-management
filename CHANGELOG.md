@@ -1437,3 +1437,23 @@
 - **验证**：`test_spec_pins.py` 28/28（含 SP24/SP24b/SP25/SP26）、`test_checker_pins.py` 21/21、`check_gap_ledger --self-test` 关闭依据 5/5 + RG 结构 5/5 + RG 解析 4/4、变异集与覆盖闸门全过；九个常规检查器 rc=0。`check_checker_pins` rc=1（问题 21，提交后回落 18）、`check_spec_pins` rc=1（问题 13），均为下一轮外复核前的预期债务。
 - **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`。
 - **关联 ADR**：无
+
+---
+
+### 批次 0088 — 2026-11-16 — A.2 签收行改固定模板（甲方案）、修 0087 转义缺陷、登记三项残余
+
+- **授权依据**：第四轮外复核（基线 `be974fe`，原仓库零改动、51 例探针）6 项认可、`scripts/check_spec_pins.py` 不认可；责任方裁定 A.2 签收行采用甲方案，其余按建议。**本批不自行认定合格**，须另跑一轮外复核。
+- **涉及文件**：
+  - 修改：`scripts/check_spec_pins.py`、`scripts/test_spec_pins.py`、`scripts/check_three_table.py`、`scripts/test_check_table_mutations.py`（S02 签收变异改为固定模板）、`spec/methods/deterministic-checker.md`（仅签收行位置与形式）、`AGENTS.md`（§3.6.7 签收落点、§3.6.8/§4 测试范围）、`validation/reviews/2026-11-15-a2-comparison-scope.md`、`scripts/no-review-declarations.json`、`TODO.md`、`knowledge/glossary-usage.json`、`scripts/spec-pins.json`、`scripts/checker-pins.json`
+  - 新建：`validation/reviews/2026-11-15-a2-signoff-record.md`
+- **变更摘要**：
+  1. **A.2 签收行改固定模板（甲方案）**：签收行改为 `> 复核签收：外部复核基线 \`<7–40 hex>\`；<YYYY-MM-DD>；A.2 指纹 \`<12 hex>\``，行内不得含任何自由文本；`fullmatch` 整行匹配，A.2 内至多一条且必须是区段最后一条非空行；不符合模板的行一律不排除、参与比较，从而该死判 basis 失效。原 217 字括号叙述移入 `validation/reviews/2026-11-15-a2-signoff-record.md`（含原行逐字保存）。`check_three_table.py` 的 `parse_a2_signoff` 同步改为模板 `fullmatch`；`check_spec_pins --write` 明确只登记指纹、不生成也不改写签收行。
+  2. **修 0087 引入的非法转义**：`check_spec_pins.py` docstring 中的 `\`` 去掉，`python3 -W error -m py_compile` 通过（0087 的 `be974fe` 无此问题，缺陷由 0087 引入）。
+  3. **回归用例**：SP27——在模板签收行内注入“G-C1#2 的判定条件改为恒真”，断言该行不再匹配模板、留在参与比较的文本中、使 A.2 判 basis 失效；SP28——签收行不在区段尾部即阻断；SP26（第二行完整格式签收行）保留。SP25 的正例正则同步改为新分隔符。`test_check_table_mutations.py` 的 S02 改为写固定模板。测试 30 条：提交前 28 条符合预期，SP03/SP25 依赖 HEAD 已含新格式签收行，提交后恢复 30/30。
+  4. **第四批复核残余（本批不修，仅登记）**：① `parse_rg()` 对 `RG-1`、`**RG-01**` 等非法编号仍静默跳过（T-160）；② AGENTS 的“当前 16 个区段”位于 §3.6.8/§4，不在 `#3.5` 钉扎窗口内，仍可能漂移（T-161）；③ `section_text()` 逐行 `rstrip()` 并裁尾部空行，“逐字比较”的归一化范围未写明（T-162）。
+- **边界遵守**：未改 `CONSTITUTION.md`、未改 `spec/D6_REBASELINE_PROPOSAL.md`；未为任何对象写入“认可”依据；T-149 对象数仍为 22，未新增登记项、未新增绕过方式。
+- **A.2 basis 与新增债务**：签收行格式收紧后，A.2 旧 basis（G-018 r3，基线 `a9ff5bb`）因基线处那条旧格式括号叙述签收行按新规则参与比较而结构性失效——这正是甲方案的预期效果。按 0085 先例**保留原 basis 文本、只刷新指纹**，由 `check_spec_pins.py` 报“basis 失效”，不改为无复核字面量（否则对象数增至 23）。`scripts/test_check_table_mutations.py` 本批被迫修改（S02 写旧格式签收行），其原复核 basis（G-018 r3）同样失效，同样保留原文本、只更新哈希。两者均待重新取证。
+- **“尚未经外复核”的登记位置**：`scripts/no-review-declarations.json` 中 `scripts/check_spec_pins.py`、`scripts/test_spec_pins.py`、`scripts/check_three_table.py` 三项的 `reason`/`missing_review`；`TODO.md` T-149 的“批次 0088 追记”（含 A.2 与 `test_check_table_mutations.py` 的 basis 失效说明）；本节。
+- **验证**：`-W error` 编译通过（`\`` 转义已清，全仓 `scripts/*.py` 计数 0）；`test_spec_pins.py` 30 条（提交后复跑 30/30；提交前 SP03/SP25 因基线 HEAD 仍含旧格式签收行而失败 2 条）；`test_check_table_mutations.py` 11 变异全抓到、S01/S02 符合预期；`check_three_table.py` 通过；`test_checker_pins.py` 21/21；九个常规检查器 rc=0；`check_checker_pins` rc=1（问题 19：16 项无复核声明 + 3 项 basis 失效）、`check_spec_pins` rc=1（提交前 15：A.2 的“指纹未更新/缺少复核记录”两条与 basis 失效；提交后 14，仅余 A.2 basis 失效），均为下一轮外复核前的预期债务。
+- **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`。
+- **关联 ADR**：无

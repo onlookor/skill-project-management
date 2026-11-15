@@ -8,7 +8,7 @@
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "spec/methods/deterministic-checker.md#A.2": {
-      "sha256": "09002dd23b761b763557f8ba334959a856e9cd54e1aff9df92c4450b24d2a25c",
+      "sha256": "9c8e7de6b90eae7f04829e7327fabcb5c3b024f02e29ca3fa865381602085def",
       "path": "spec/methods/deterministic-checker.md",
       "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：spec/methods/deterministic-checker.md#A.2 结论：认可"
     },

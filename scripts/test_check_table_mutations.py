@@ -258,9 +258,12 @@ def main() -> int:
                 else:
                     after_write = target.read_text(encoding="utf-8")
                     updated = re.sub(
-                        r"复核签收：[^\n]*",
-                        f"复核签收：测试复核者 / 2026-11-14 / A.2 指纹 `{match.group(1)}`",
+                        r"^> 复核签收：[^\n]*$",
+                        f"> 复核签收：外部复核基线 `a9ff5bb`；2026-11-16；"
+                        f"A.2 指纹 `{match.group(1)}`",
                         after_write,
+                        count=1,
+                        flags=re.M,
                     )
                     target.write_text(updated, encoding="utf-8")
                     positive = run_checker(root, target)

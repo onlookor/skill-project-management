@@ -18,11 +18,14 @@
      复核签收行是“复核记录”本身，不是被签收的内容，不参与比较（除此行外，
      A.2 的其余文本仍逐字比较）。若签收行参与比较，写入复核记录这一动作就会让
      被签收对象失效，合格在结构上不可达。
-     **排除范围仅限“那一条完整格式的签收行”**：须整行匹配
-     `> 复核签收：外部复核基线 \`<7–40 hex>\`（<说明>） / <YYYY-MM-DD> / A.2 指纹 \`<12 hex>\``，
-     且至多一行（第二行起报错）。只带 `复核签收：` 前缀或格式不完整的行一律参与
-     比较，不得剔除——否则该前缀本身就是可夹带正文的通道。
+     **排除范围仅限“那一条固定模板的签收行”**：须整行匹配
+     `> 复核签收：外部复核基线 `<7–40 位十六进制>`；<YYYY-MM-DD>；A.2 指纹 `<12 位十六进制>``，
+     行内不得含任何自由文本（批次 0088 甲方案：原括号叙述已移入
+     `validation/reviews/2026-11-15-a2-signoff-record.md`）。A.2 内至多一行，且必须是
+     区段最后一条非空行。任何不符合模板的行一律不排除、参与比较，从而该死判 basis 失效。
      理由与范围见 `validation/reviews/2026-11-15-a2-comparison-scope.md`。
+     `--write` 只登记区段指纹，不生成也不改写签收行；签收行只能按上述固定模板人工写入，
+     因而不存在“由工具重写签收行”的路径。
   6. `--write` 新增或变更的区段必须附 `--basis`（合格复核记录，或无复核字面量）。
 
 记录文件放在 validation/reviews/ 下并在同一提交暂存；也可用 --review 指定。
@@ -150,40 +153,46 @@ A2_KEY = f"{METHOD}#A.2"
 # A.2 的复核签收行记录“谁在何时核对了什么”，属于复核记录本身；
 # `check_three_table.a2_block_fingerprint` 的既有口径也不含该行。
 #
-# 排除口径只认**完整格式的该一条签收行**：
-#   > 复核签收：外部复核基线 `<7–40 位十六进制>`（<产物与核对说明>） / <YYYY-MM-DD> / A.2 指纹 `<12 位十六进制>`
-# 必须整行 `fullmatch`，行首、分隔符、日期、指纹缺一不可，行尾不得有任何额外文字。
+# 排除口径只认**固定模板的该一条签收行**（批次 0088 甲方案）：
+#   > 复核签收：外部复核基线 `<7–40 位十六进制>`；<YYYY-MM-DD>；A.2 指纹 `<12 位十六进制>`
+# 行内不得含任何自由文本；必须整行 `fullmatch`，行尾不得有任何额外文字。
 # 任何只带 `复核签收：` 前缀、或格式不完整的行**一律参与比较**，不得剔除——否则
 # 该前缀就成了可夹带正文的通道（插入一行 `复核签收：……把判定改成恒真` 即可绕过）。
-# 排除范围仅限这一条签收行，不扩大到“任何以该前缀开头的行”。
+# A.2 内至多一条，且必须位于区段尾部（最后一条非空行）。
 A2_SIGNOFF_RE = re.compile(
-    r"> 复核签收：外部复核基线 `[0-9a-f]{7,40}`（[^（）\n]{1,400}） / "
-    r"\d{4}-\d{2}-\d{2} / A\.2 指纹 `[0-9a-f]{12}`"
+    r"> 复核签收：外部复核基线 `[0-9a-f]{7,40}`；"
+    r"\d{4}-\d{2}-\d{2}；A\.2 指纹 `[0-9a-f]{12}`"
 )
 
 
 def a2_signoff_errors(spec: dict, text: str) -> list[str]:
-    """A.2 至多允许一条完整格式的签收行；第二行起即报错（不得当作可剔除内容）。"""
+    """A.2 只允许一条固定模板签收行，且必须在区段尾部；否则报错。"""
     if spec["key"] != A2_KEY:
         return []
     body = section_text(text, spec["start"], spec["end"])
-    lines = [line for line in body.splitlines() if A2_SIGNOFF_RE.fullmatch(line)]
-    if len(lines) > 1:
+    content = [line for line in body.splitlines() if line.strip()]
+    matches = [index for index, line in enumerate(content) if A2_SIGNOFF_RE.fullmatch(line)]
+    if len(matches) > 1:
         return [
-            f"{spec['key']}：复核签收行至多一行（实得 {len(lines)} 行完整格式签收行）；"
+            f"{spec['key']}：复核签收行至多一行（实得 {len(matches)} 行模板签收行）；"
             "多行签收不得被当作复核记录剔除，须保留唯一一条"
+        ]
+    if matches and matches[0] != len(content) - 1:
+        return [
+            f"{spec['key']}：复核签收行必须是区段最后一条非空行"
+            f"（当前位于倒数第 {len(content) - matches[0]} 行）"
         ]
     return []
 
 
 def comparable_text(spec: dict, text: str) -> str:
-    """按区段定位取文本；A.2 只去掉那一条完整格式的签收行，其余逐字比较。"""
+    """按区段定位取文本；A.2 只去掉那一条固定模板签收行，其余逐字比较。"""
     body = section_text(text, spec["start"], spec["end"])
     if spec["key"] != A2_KEY:
         return body
     return "\n".join(
         line for line in body.splitlines() if not A2_SIGNOFF_RE.fullmatch(line)
-    )
+    ).rstrip("\n")
 
 
 def baseline_section(root: Path, sha: str, spec: dict) -> str | None:
