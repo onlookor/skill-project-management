@@ -7,7 +7,10 @@
   - validation/checker-prototype/checker.py（验收用原型）。
 
 改动任何一个都必须 `--write --basis "<非同源复核记录>"` 更新登记。basis 不是自由文本：
-必须含 `非同源复核：`、`复核产物：<存在的文件>`、`复核基线：<提交号>`，否则拒绝写入。
+必须含 `非同源复核：`、`复核产物：<仓库外存在的文件>`、`sha256：<64 位>`、`复核基线：<提交号>`、
+`区段：<所绑对象>` 与结论词，否则拒绝写入。**默认读取模式同样校验这些字段**，只改 basis
+文本（例如把“未审查本批”改成“结论：认可”）会被阻断；`初始登记` 前缀表示无复核声明的
+历史登记项，不参与复核字段校验。
 
 附带漂移检测：validation/pinned/checker.py 是验收原型的只读快照，默认模式校验字节一致。
 注意：这只是**漂移检测**，不是权限分离——文件都在同一工作区，同一方可以同改；
@@ -33,6 +36,7 @@ CHECKER_GLOBS = ("check_*.py", "test_*.py", "validate_*.py")
 EXTRA_PATHS = (".githooks/pre-commit", "validation/checker-prototype/checker.py")
 SNAPSHOT = Path("validation/pinned/checker.py")
 SOURCE = Path("validation/checker-prototype/checker.py")
+CONCLUSIONS = ("实质收敛", "认可", "通过")
 
 
 def digest(path: Path) -> str:
@@ -64,8 +68,15 @@ def write_pins(path: Path, pins: dict) -> None:
     )
 
 
-def valid_basis(root: Path, text: str) -> tuple[bool, str]:
-    """basis 必须指向仓库外的复核产物，并与其 sha256 一致；转录件只作索引。"""
+def valid_basis(root: Path, text: str, key: str) -> tuple[bool, str]:
+    """默认模式与 --write 共用：basis 必须指向仓库外产物、sha256 一致且区段正确。
+
+    `初始登记`（含 `初始登记：...`）明确表示“无复核声明”，只保留历史指针，
+    不参与复核字段校验；除此之外一律按完整字段核对。
+    """
+    text = text.strip()
+    if text == "初始登记" or text.startswith("初始登记："):
+        return True, ""
     if "非同源复核：" not in text:
         return False, "缺少 `非同源复核：` 前缀"
     artifact = re.search(r"复核产物：`?([^`\s；，、]+)`?", text)
@@ -87,6 +98,10 @@ def valid_basis(root: Path, text: str) -> tuple[bool, str]:
         return False, "缺少 `sha256：<64 位十六进制>`"
     if digest(artifact_path) != recorded.group(1):
         return False, "`sha256` 与复核产物不一致"
+    if re.search(rf"区段：`?{re.escape(key)}`?", text) is None:
+        return False, f"缺少 `区段：{key}` 或与所绑对象不一致"
+    if not any(word in text for word in CONCLUSIONS):
+        return False, f"缺少结论词（{'/'.join(CONCLUSIONS)}）"
     return True, ""
 
 
@@ -97,7 +112,12 @@ def main() -> int:
     parser.add_argument("--snapshot", help="验收检查器快照；默认 validation/pinned/checker.py")
     parser.add_argument("--source", help="工作区验收检查器；默认 validation/checker-prototype/checker.py")
     parser.add_argument("--write", action="store_true", help="按当前哈希重写登记")
-    parser.add_argument("--basis", default="", help="非同源复核记录（--write 且哈希有变化时必填）")
+    parser.add_argument(
+        "--basis",
+        action="append",
+        default=[],
+        help="非同源复核记录（--write 且哈希有变化时必填；可重复，按 `区段：` 匹配对应对象）",
+    )
     args = parser.parse_args()
     root = Path(args.root).resolve() if args.root else Path(__file__).resolve().parents[1]
     pins_path = Path(args.pins) if args.pins else root / PINS
@@ -108,30 +128,41 @@ def main() -> int:
     entries = pins.setdefault("scripts", {})
     names = discover(root)
     changed: list[str] = []
+    changed_keys: list[str] = []
     for name in names:
         actual = digest(root / name)
         entry = entries.get(name)
         if entry is None:
             changed.append(f"{name}：未登记")
+            changed_keys.append(name)
         elif entry.get("sha256") != actual:
             changed.append(
                 f"{name}：哈希不一致（登记 {entry.get('sha256', '')[:12]}，工作区 {actual[:12]}）"
             )
+            changed_keys.append(name)
 
     if args.write:
-        if changed:
-            ok, why = valid_basis(root, args.basis)
-            if not ok:
-                print(f"[错误] 检查器有改动，但 --basis 不合格：{why}")
-                for item in changed:
-                    print(f"  - {item}")
+        if changed and not args.basis:
+            print("[错误] 检查器有改动，但未提供 --basis")
+            for item in changed:
+                print(f"  - {item}")
+            return 2
+        chosen: dict[str, str] = {}
+        for key in changed_keys:
+            match = next(
+                (text for text in args.basis if valid_basis(root, text, key)[0]), None
+            )
+            if match is None:
+                why = valid_basis(root, args.basis[0], key)[1] if args.basis else "缺少 --basis"
+                print(f"[错误] {key} 的 --basis 不合格：{why}")
                 return 2
+            chosen[key] = match.strip()
         for name in names:
             actual = digest(root / name)
             entry = entries.setdefault(name, {})
             if entry.get("sha256") != actual:
                 entry["sha256"] = actual
-                entry["basis"] = args.basis.strip()
+                entry["basis"] = chosen[name]
             else:
                 entry.setdefault("sha256", actual)
                 entry.setdefault("basis", "初始登记")
@@ -154,8 +185,13 @@ def main() -> int:
     for name in sorted(set(entries) - set(names)):
         errors.append(f"{name}：登记项指向不存在的脚本")
     for name, entry in sorted(entries.items()):
-        if not entry.get("basis"):
+        basis = entry.get("basis")
+        if not basis:
             errors.append(f"{name}：登记项缺少 basis 裁定依据")
+            continue
+        ok, why = valid_basis(root, basis, name)
+        if not ok:
+            errors.append(f"{name}：basis 不合格：{why}")
 
     if source.exists() and snapshot.exists():
         if digest(source) != digest(snapshot):

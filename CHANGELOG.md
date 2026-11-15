@@ -1222,3 +1222,17 @@
 - **文档**：`scripts/README.md` 新增“测试脚本与执行入口”一节，写明自批次 0074 起接入；并列出仍未接入的 `test_coverage_gate.py`、`test_check_table_mutations.py`，以及 `AGENTS.md` 要求提交前运行但未接入的 `validate_ontology.py --matrix`（均未在本批修改）。
 - **pins**：`scripts/test_checker_pins.py`、`.githooks/pre-commit` 哈希按 `--write` 重冻，basis 标为“未审查本批（批次 0074）”，待后续非同源复核统一重冻。
 - **验证**：`test_checker_pins.py` 7/7、`test_spec_pins.py` 9/9、`test_dependency_pins.py` 13/13；pre-commit 全套 rc=0。
+
+---
+
+### 批次 0075 — 2026-11-15 — G-018 关闭（r3）、pins 重冻与三项治理收紧
+
+- **背景**：r3 非同源复核（产物 `/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md`，sha256 `2ce810…9602c6`，基线 `a9ff5bb`）判 G-018 可关闭，附两条 caveat：`global_normalization` 不限制无子句原因码集合；`G-A1#1`/`G-E2#1` 的 `missing_input` 无专用样例（分支由 A.1.5-5 间接守卫）。
+- **关闭 G-018**：`GAP_LEDGER.md` 的 G-018 改 `status=closed`、处置出口 `check-change`，关闭依据按 3.6.6 写入 r3 报告路径/sha256/基线/章节与两条 caveat；说明列同步记录 caveat；核查矩阵三行移除 G-018，矩阵说明删去其锚定句；`TODO.md` T-137 改 `done`。
+- **pins 重冻（10 条）**：`spec-pins.json` 的 `#A.1`、`#A.2`、`#3`、`coverage.json`，`checker-pins.json` 的 `pre-commit`、`checker.py`、`check_coverage_gate.py`、`test_coverage_gate.py`、`test_check_table_mutations.py`、`test_checker_pins.py`，basis 统一为 r3 模板（仓库外产物 + sha256 + 基线 + `区段：` + `结论：认可`）；`spec/CHECKER_INPUT_SCHEMA.md#4` 保持 r2 重冻不动。
+- **A.2 签收**：`spec/methods/deterministic-checker.md` A.2 签收行改指 r3；子句表指纹保持 `b14854847668`（签收行不参与 `a2_block_fingerprint`）。
+- **doc-only**：`adr/0014-validation-chain-self-attestation.md` §4 的 `expected_failed_clauses` 更正为 `expected_clause`；CHANGELOG/GAP_LEDGER 中的历史批次叙述不改写。
+- **basis 默认校验**：`check_spec_pins.py` 与 `check_checker_pins.py` 在默认读取模式即校验 basis——`复核产物：` 必须是仓库外真实文件、`sha256：` 与实算一致、含 `复核基线：`、`区段：` 与所绑对象一致、结论词在允许集合内；`初始登记` 前缀表示无复核声明的历史登记项。新增负例 CP08–CP11 / SP09–SP12（只把 basis 改成“结论：认可”、sha256 改一字符、产物改仓库内文件、区段写错）。
+- **pre-commit 接入**：`test_coverage_gate.py` 紧随 `check_coverage_gate.py`、`test_check_table_mutations.py` 紧随 `check_three_table.py`、`validate_ontology.py --matrix` 紧随 `test_dependency_pins.py`。自批次 0075 起三者由钩子执行。
+- **本体依赖钉扎**：`dependency-pins.json` 扩展为 `jsonschema`、`rdflib==7.6.0`、`pyshacl==0.40.2`，沿用同一登记表与同一判定轴（版本、wheel sha256、按 RECORD 逐文件安装树）；`check_dependency_pins.py` 支持 `--artifact <包名>=<wheel>` 可重复；`validate_ontology.py --matrix` 缺依赖仍以退出码 2 报“无法评估”。新增负例 DP-T14–T16（缺依赖、版本不符、安装树被改）。
+- **验证**：检查器全套、`test_coverage_gate.py`、`test_check_table_mutations.py`、`test_checker_pins.py` 11/11、`test_spec_pins.py` 13/13、`test_dependency_pins.py` 16/16；`--matrix` 单次耗时约 0.46s；pre-commit 全套 rc=0。

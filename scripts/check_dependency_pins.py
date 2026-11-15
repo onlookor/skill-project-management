@@ -2,7 +2,9 @@
 """外部校验依赖指纹：锁定版本、分发产物 sha256，并按 wheel RECORD 逐文件核对安装树。
 
 依据：ADR-0019。`scripts/check_no_raw_material.py` 的数据区校验改用成熟实现
-`jsonschema`；本检查器保证“依赖被替换能被发现”，而不是只锁版本号。
+`jsonschema`，`scripts/validate_ontology.py --matrix` 的本体校验改用 `rdflib` 与
+`pyshacl`；本检查器保证“依赖被替换能被发现”，而不是只锁版本号。三个包共用同一
+登记表与同一套判定轴，避免两个同构检查器各自漂移。
 
 判定轴（任一命中即非零退出）：
   DP-VERSION   已安装版本与登记不符（未安装按“无法评估”退出 2）
@@ -12,7 +14,7 @@
   DP-REGISTRY  登记表缺项、多项或结构非法
 
 三重核对都是强制项：版本、安装树逐文件内容哈希、分发产物 wheel 的 sha256。
-wheel 默认从持久路径 `~/.local/share/pm-governance/wheels/` 读取（`JSONSCHEMA_WHEEL`
+wheel 默认从持久路径 `~/.local/share/pm-governance/wheels/` 读取（`<PACKAGE>_WHEEL`
 或 `--artifact` 可覆盖）。找不到产物即“无法评估”退出 2，不降级为只核对安装树——
 永远只报警的检查等于没有。依赖缺失同样按“无法评估”处理，绝不降级为通过。
 
@@ -22,11 +24,12 @@ wheel 默认从持久路径 `~/.local/share/pm-governance/wheels/` 读取（`JSO
 
 获取 wheel（放在仓库外，不提交进 git）：
   python3 -m pip download --no-deps --no-cache-dir \
-      jsonschema==4.26.0 -d ~/.local/share/pm-governance/wheels
+      jsonschema==4.26.0 rdflib==7.6.0 pyshacl==0.40.2 -d ~/.local/share/pm-governance/wheels
 
 用法：
   python3 scripts/check_dependency_pins.py
-  python3 scripts/check_dependency_pins.py --write --artifact <wheel 路径>
+  python3 scripts/check_dependency_pins.py --write --artifact jsonschema=<wheel> \
+      --artifact rdflib=<wheel> --artifact pyshacl=<wheel>
   JSONSCHEMA_WHEEL=<wheel 路径> python3 scripts/check_dependency_pins.py
 退出码：0 = 通过；1 = 指纹不符；2 = 依赖缺失、分发产物缺失、分发产物存在但不可读取或逐文件数据不可核对、登记表不可解析（无法评估，不得视为通过；同时命中指纹不符与无法核对时按 2）。
 """
@@ -43,9 +46,12 @@ import zipfile
 from pathlib import Path
 
 PINS_FILE = "scripts/dependency-pins.json"
-PACKAGES = ("jsonschema",)
-ARTIFACT_ENV = "JSONSCHEMA_WHEEL"
+PACKAGES = ("jsonschema", "rdflib", "pyshacl")
 ARTIFACT_DIR = Path.home() / ".local" / "share" / "pm-governance" / "wheels"
+
+
+def artifact_env(name):
+    return f"{name.upper().replace('-', '_')}_WHEEL"
 
 
 def sha256_file(path):
@@ -177,10 +183,10 @@ def tree_errors(entries, root, import_file, package="jsonschema"):
     return errors
 
 
-def artifact_candidates(pin, override):
+def artifact_candidates(pin, override, name="jsonschema"):
     if override:
         return [Path(override)]
-    env = os.environ.get(ARTIFACT_ENV)
+    env = os.environ.get(artifact_env(name))
     if env:
         return [Path(env)]
     filename = (pin.get("artifact") or {}).get("filename")
@@ -193,24 +199,26 @@ def artifact_candidates(pin, override):
     return candidates
 
 
-def evaluate(pins, states, artifacts, trees=None):
+def evaluate(pins, states, artifacts, trees=None, packages=None):
     """返回 (errors, warnings)。纯函数，供自测调用。
 
     `trees` 为 {包名: (wheel RECORD 条目, 分发根, 导入文件)}；缺少逐文件数据即
-    “无法评估”，不允许退化成只比较 RECORD 文本。
+    “无法评估”，不允许退化成只比较 RECORD 文本。`artifacts` 是候选 wheel 路径列表，
+    按文件名匹配到各包的登记项；`packages` 默认取模块级 PACKAGES，测试可收窄。
     """
     errors, warnings = [], []
     trees = trees or {}
+    packages = tuple(packages) if packages is not None else PACKAGES
     registry = pins.get("packages")
     if not isinstance(registry, dict):
         return ["[错误] DP-REGISTRY 登记表缺少 packages 对象"], warnings
-    for name in PACKAGES:
+    for name in packages:
         if name not in registry:
             errors.append(f"[错误] DP-REGISTRY 登记表缺少 {name}")
     for name in registry:
-        if name not in PACKAGES:
+        if name not in packages:
             errors.append(f"[错误] DP-REGISTRY 登记表含未使用依赖 {name}")
-    for name in PACKAGES:
+    for name in packages:
         pin = registry.get(name)
         if not isinstance(pin, dict):
             continue
@@ -249,16 +257,19 @@ def evaluate(pins, states, artifacts, trees=None):
             entries, root, import_file = tree
             errors.extend(tree_errors(entries, root, import_file, name))
         artifact = pin.get("artifact") or {}
-        if not artifacts:
+        candidates = [
+            Path(path) for path in artifacts if Path(path).name == artifact.get("filename")
+        ]
+        if not candidates:
             errors.append(
                 f"[无法评估] DP-ARTIFACT 未找到 {name} 的分发产物"
                 f"（{artifact.get('filename')}）；分发产物核对是强制项，"
-                f"请放到 {ARTIFACT_DIR} 或设置 {ARTIFACT_ENV}=<wheel 路径>："
+                f"请放到 {ARTIFACT_DIR} 或设置 {artifact_env(name)}=<wheel 路径>："
                 "python3 -m pip download --no-deps --no-cache-dir "
                 f"{name}=={pin.get('version')} -d {ARTIFACT_DIR}"
             )
             continue
-        for path in artifacts:
+        for path in candidates:
             actual = sha256_file(path)
             if actual != artifact.get("sha256"):
                 errors.append(
@@ -291,14 +302,36 @@ def build_trees(pins, artifacts):
     return trees
 
 
+def parse_artifact_args(values):
+    """`--artifact name=path`（可重复）；裸路径仅允许单包场景。"""
+    overrides = {}
+    for value in values:
+        if "=" in value:
+            name, path = value.split("=", 1)
+        else:
+            if len(PACKAGES) != 1:
+                raise SystemExit("[无法评估] 多依赖场景请用 --artifact <包名>=<wheel 路径>")
+            name, path = PACKAGES[0], value
+        if name not in PACKAGES:
+            raise SystemExit(f"[无法评估] --artifact 指定了未登记的依赖 {name}")
+        overrides[name] = path
+    return overrides
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--root", default=".")
     parser.add_argument("--write", action="store_true")
-    parser.add_argument("--artifact", default=None)
+    parser.add_argument(
+        "--artifact",
+        action="append",
+        default=[],
+        help="分发包路径，可重复；格式 <包名>=<wheel 路径>",
+    )
     args = parser.parse_args()
     root = Path(args.root)
     pins_path = root / PINS_FILE
+    overrides = parse_artifact_args(args.artifact)
 
     states = {name: installed_state(name) for name in PACKAGES}
     if args.write:
@@ -315,12 +348,13 @@ def main():
         for name in PACKAGES:
             previous = (old.get("packages") or {}).get(name) or {}
             artifact = previous.get("artifact") or {}
-            if args.artifact:
-                wheel = Path(args.artifact)
+            if name in overrides:
+                wheel = Path(overrides[name])
                 artifact = {"filename": wheel.name, "sha256": sha256_file(wheel)}
             if not artifact.get("sha256"):
                 print(
-                    f"[无法评估] 缺少 {name} 的分发产物 sha256；请用 --artifact <wheel> 登记",
+                    f"[无法评估] 缺少 {name} 的分发产物 sha256；请用 "
+                    f"--artifact {name}=<wheel> 登记",
                     file=sys.stderr,
                 )
                 return 2
@@ -359,7 +393,11 @@ def main():
     artifacts = []
     for name in PACKAGES:
         pin = (pins.get("packages") or {}).get(name) or {}
-        artifacts.extend(path for path in artifact_candidates(pin, args.artifact) if path.is_file())
+        artifacts.extend(
+            path
+            for path in artifact_candidates(pin, overrides.get(name), name)
+            if path.is_file()
+        )
 
     trees = build_trees(pins, artifacts)
     errors, warnings = evaluate(pins, states, artifacts, trees)

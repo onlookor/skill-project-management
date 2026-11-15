@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Validate the self-authored ontology and its negative fixtures with pyshacl.
 
-This script is optional tooling.  It is not a runtime prerequisite of the
-project: missing dependencies are reported as "无法评估" (exit 2) rather than
-silently passing.
+This script is required by `.githooks/pre-commit` (AGENTS.md 7bis), but its
+Python dependencies are not vendored: missing dependencies are reported as
+"无法评估" (exit 2) rather than silently passing.
 
 Exit codes: 0 all expected results, 1 unexpected result, 2 cannot evaluate.
 """

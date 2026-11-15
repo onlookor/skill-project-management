@@ -6,7 +6,9 @@
   2. `contracts/schema/` 下任何文件未登记为区段 → 阻断（自动发现，取代人工清单）；
   3. 区段相对 HEAD 有改动时，同一提交必须附合格的非同源复核记录，否则阻断；
   4. 复核标准与 `check_checker_pins.py` 对齐：依据必须指向**仓库外**的复核产物，
-     并给出 `sha256：<64 位>` 与 `复核基线：<提交号>`；仓库内转录件只作索引，不作依据。
+     并给出 `sha256：<64 位>`、`复核基线：<提交号>`、`区段：<所绑区段>` 与结论词；
+     仓库内转录件只作索引，不作依据。**默认读取模式同样校验这些字段**，只改 basis
+     文本会被阻断；`初始登记` 前缀表示无复核声明的历史登记项，不参与字段校验。
   5. `--write` 新增或变更的区段必须附 `--basis`（同样要求外部产物 + sha256），
      登记项逐区段保存 basis；未变更的旧登记项保留原值或标为“初始登记”。
 
@@ -116,8 +118,15 @@ def discover_schema_files(root: Path) -> list[str]:
     )
 
 
-def valid_basis(root: Path, text: str) -> tuple[bool, str]:
-    """basis 必须指向仓库外的复核产物，并与其 sha256 一致；转录件只作索引。"""
+def valid_basis(root: Path, text: str, key: str) -> tuple[bool, str]:
+    """默认模式与 --write 共用：basis 必须指向仓库外产物、sha256 一致且区段正确。
+
+    `初始登记`（含 `初始登记：...`）明确表示“无复核声明”，只保留历史指针，
+    不参与复核字段校验；除此之外一律按完整字段核对。
+    """
+    text = text.strip()
+    if text == "初始登记" or text.startswith("初始登记："):
+        return True, ""
     if "非同源复核：" not in text:
         return False, "缺少 `非同源复核：` 前缀"
     artifact = re.search(r"复核产物：`?([^`\s；，、]+)`?", text)
@@ -139,6 +148,10 @@ def valid_basis(root: Path, text: str) -> tuple[bool, str]:
         return False, "缺少 `sha256：<64 位十六进制>`"
     if digest(artifact_path) != recorded.group(1):
         return False, "`sha256` 与复核产物不一致"
+    if re.search(rf"区段：`?{re.escape(key)}`?", text) is None:
+        return False, f"缺少 `区段：{key}` 或与所绑区段不一致"
+    if not any(word in text for word in CONCLUSIONS):
+        return False, f"缺少结论词（{'/'.join(CONCLUSIONS)}）"
     return True, ""
 
 
@@ -178,7 +191,7 @@ def valid_review(root: Path, reviews: list[str], key: str) -> bool:
             continue
         if not any(word in text for word in CONCLUSIONS):
             continue
-        ok, _ = valid_basis(root, text)
+        ok, _ = valid_basis(root, text, key)
         if ok:
             return True
     return False
@@ -208,8 +221,14 @@ def evaluate(
             errors.append(
                 f"{key}：指纹未更新（当前 {actual[:12]}，登记 {registered[:12]}）"
             )
-        if isinstance(entry, dict) and not entry.get("basis"):
-            errors.append(f"{key}：登记项缺少 basis 裁定依据")
+        if isinstance(entry, dict):
+            basis = entry.get("basis")
+            if not basis:
+                errors.append(f"{key}：登记项缺少 basis 裁定依据")
+            else:
+                ok, why = valid_basis(root, basis, key)
+                if not ok:
+                    errors.append(f"{key}：basis 不合格：{why}")
         head_text = head.get(key)
         changed = head_text is None or fingerprint(head_text, spec["start"], spec["end"]) != actual
         if changed and not valid_review(root, reviews, key):
@@ -261,8 +280,9 @@ def main() -> int:
     parser.add_argument("--write", action="store_true", help="按当前内容重写区段指纹")
     parser.add_argument(
         "--basis",
-        default="",
-        help="非同源复核记录（新增或变更区段时必填；须指向仓库外产物并给出 sha256 与基线）",
+        action="append",
+        default=[],
+        help="非同源复核记录（新增或变更区段时必填；可重复，按 `区段：` 匹配对应区段）",
     )
     args = parser.parse_args()
     root = Path(args.root).resolve() if args.root else Path(__file__).resolve().parents[1]
@@ -278,6 +298,7 @@ def main() -> int:
         if args.write:
             sections = {}
             changed: list[str] = []
+            chosen: dict[str, str] = {}
             for spec in SECTIONS:
                 key = spec["key"]
                 actual = fingerprint(current[key], spec["start"], spec["end"])
@@ -287,22 +308,28 @@ def main() -> int:
                 old_sha = old.get("sha256") if isinstance(old, dict) else None
                 if old_sha != actual:
                     changed.append(key)
+                    match = next(
+                        (text for text in args.basis if valid_basis(root, text, key)[0]),
+                        None,
+                    )
+                    if match is None:
+                        why = (
+                            valid_basis(root, args.basis[0], key)[1]
+                            if args.basis
+                            else "缺少 --basis"
+                        )
+                        print(f"[错误] 区段 {key} 有新增或变更，但 --basis 不合格：{why}")
+                        return 2
+                    chosen[key] = match.strip()
                 sections[key] = {
                     "sha256": actual,
                     "path": spec["path"],
                     "basis": (
-                        args.basis.strip()
+                        chosen[key]
                         if old_sha != actual
                         else (old or {}).get("basis") or "初始登记"
                     ),
                 }
-            if changed:
-                ok, why = valid_basis(root, args.basis)
-                if not ok:
-                    print(f"[错误] 区段有新增或变更，但 --basis 不合格：{why}")
-                    for key in changed:
-                        print(f"  - {key}")
-                    return 2
             pins = {
                 "version": 1,
                 "note": (

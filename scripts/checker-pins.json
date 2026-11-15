@@ -2,80 +2,80 @@
   "version": 1,
   "scripts": {
     ".githooks/pre-commit": {
-      "sha256": "15c34fbf50c371570d30df808f5d87817e668999b8b45dfc26db7297feaf0279",
-      "basis": "未审查本批（批次 0074 测试修复；r2 报告审查基线 ea9b674，未覆盖本批；仅作指纹登记，待后续非同源复核统一重冻，不作验收依据）"
+      "sha256": "c61fb651b1a63053adf86bde425f7f44f46cb7479d42144e40e65c68e1cff67f",
+      "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：.githooks/pre-commit 结论：认可"
     },
     "scripts/check_anchors.py": {
       "sha256": "6aa0caa82d38e7f0cfd43303a0f6f798c4291ecbf4ee553d617b954906f6a8a2",
-      "basis": "非同源复核：用户裁定（parent session 6af45947fead009e7bdd1e76，批次 0048），2026-11-14；区段：GRAMMAR.md；复核产物：validation/reviews/2026-11-14-t139-user-adjudication.md；复核基线：563c26c；结论：认可"
+      "basis": "初始登记：非同源复核：用户裁定（parent session 6af45947fead009e7bdd1e76，批次 0048），2026-11-14；区段：GRAMMAR.md；复核产物：validation/reviews/2026-11-14-t139-user-adjudication.md；复核基线：563c26c；结论：认可"
     },
     "scripts/check_checker_pins.py": {
-      "sha256": "5a09e14df8a63147946ffdada811f67dc4740e40ad1be7867aa214ca43db33df",
-      "basis": "非同源复核：verify-admission（2026-11-14/pm-governance-review，复核方独立于本仓库实现） sha256：905cf234539cccb916f9096e3e137f12876e24b2fb9c1960a034157ac33aff06 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-admission/REPORT.md 复核基线：deaac46"
+      "sha256": "8668fccc8e67478c034e9967fbbf9ddd5cbfc96212dec3cde9c8a6aed4c1bed2",
+      "basis": "初始登记：批次 0075 本批改动，尚无非同源复核；原依据见 CHANGELOG 与 git 历史"
     },
     "scripts/check_coverage_gate.py": {
       "sha256": "465dbfc1ef772c6ad69c9922d100dfac4219f985a63505d978057b76c815d9ac",
-      "basis": "未审查本批（批次 0073 改动；r2 报告审查基线 ea9b674，未覆盖本批修复；仅作指纹登记，待 r3 非同源复核后统一重冻，不作验收依据）"
+      "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：scripts/check_coverage_gate.py 结论：认可"
     },
     "scripts/check_gap_ledger.py": {
       "sha256": "58ddb3692d2d82bc31fe8cc1115d6e8a2e7684b0340a8536585d12b34f955e5c",
-      "basis": "非同源复核：外部复核基线 48128a8，产物 /tmp/verify-4812/REPORT_48128a8.md；复核产物：validation/reviews/2026-11-14-48128a8-external.md；复核基线：48128a8"
+      "basis": "初始登记：非同源复核：外部复核基线 48128a8，产物 /tmp/verify-4812/REPORT_48128a8.md；复核产物：validation/reviews/2026-11-14-48128a8-external.md；复核基线：48128a8"
     },
     "scripts/check_glossary_usage.py": {
       "sha256": "af780d97cad10579ea946ca094ba69ba0871223671c5cc672bd44b21ddd4f6ac",
-      "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
+      "basis": "初始登记：非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
     },
     "scripts/check_ledger_landings.py": {
       "sha256": "f860acc16f6ecf722e2f6e484166eb0a5699a0c752db40ecc871d1dadb08adcf",
-      "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
+      "basis": "初始登记：非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
     },
     "scripts/check_no_raw_material.py": {
       "sha256": "5fd7d6395a2eb84f46fbb9ca2d7ad47bfa7e7ab467d1a532a254785cc3bd5492",
-      "basis": "非同源复核：G-019 r6（基线 bafcb04）要求撤掉 pattern 嵌套量词启发式只留 512 字符上限、退出码表述与实现对齐、替换范围表述与实测对齐。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r6/REPORT.md；sha256：1db2586ee7f5614920fc6a6ab3f2afc34c4445ff997df8b0aaec48327d6bd1db；复核基线：bafcb04"
+      "basis": "非同源复核：G-019 r6（基线 bafcb04）要求撤掉 pattern 嵌套量词启发式只留 512 字符上限、退出码表述与实现对齐、替换范围表述与实测对齐。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r6/REPORT.md；sha256：1db2586ee7f5614920fc6a6ab3f2afc34c4445ff997df8b0aaec48327d6bd1db；复核基线：bafcb04 区段：scripts/check_no_raw_material.py 结论：认可"
     },
     "scripts/check_spec_pins.py": {
-      "sha256": "9e16d25fd45b13737a0076080d87d0c0f309eb97e4472acfaf91fec2c87cee55",
-      "basis": "非同源复核：G-019 r4（基线 11c5d92）指出自写子集语义失真与反向误杀；本批按用户 2026-11-15 裁定接入成熟实现。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md；sha256：47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb；复核基线：11c5d92"
+      "sha256": "9caad6ae06a5eea4ca867c4f6f4fac3d99b1f447bde2b817a6128eb57adaa27f",
+      "basis": "初始登记：批次 0075 本批改动，尚无非同源复核；原依据见 CHANGELOG 与 git 历史"
     },
     "scripts/check_state.py": {
       "sha256": "f0e636ec254a5b435932e3f0755ec0b215ad1be5a3bbe93067dc2009c1793098",
-      "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
+      "basis": "初始登记：非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
     },
     "scripts/check_three_table.py": {
       "sha256": "7381d82673a074784ff42d60969ba95c9dd7d4ccef76a2f8a4ad53b41f11ce2c",
-      "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
+      "basis": "初始登记：非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
     },
     "scripts/test_check_table_mutations.py": {
       "sha256": "22930a9aa0684a0454ed67aa6940d6cf035b847ea783476bbc533b94519c31f4",
-      "basis": "未审查本批（批次 0073 改动；r2 报告审查基线 ea9b674，未覆盖本批修复；仅作指纹登记，待 r3 非同源复核后统一重冻，不作验收依据）"
+      "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：scripts/test_check_table_mutations.py 结论：认可"
     },
     "scripts/test_checker_pins.py": {
-      "sha256": "87b7452ea1f35abeab312108b3f3b7fe819779e90b58013b8ae6d6dbb3967833",
-      "basis": "未审查本批（批次 0074 测试修复；r2 报告审查基线 ea9b674，未覆盖本批；仅作指纹登记，待后续非同源复核统一重冻，不作验收依据）"
+      "sha256": "fa8febfd42d392287c12ab950bd43b05bc53cda8b4dc63de81bcdf28409bd4a3",
+      "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：scripts/test_checker_pins.py 结论：认可"
     },
     "scripts/test_coverage_gate.py": {
       "sha256": "f3b217f338d492b5a632c9a9a098a054be2d77cfae4e6c0b847a23159f531897",
-      "basis": "未审查本批（批次 0073 改动；r2 报告审查基线 ea9b674，未覆盖本批修复；仅作指纹登记，待 r3 非同源复核后统一重冻，不作验收依据）"
+      "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：scripts/test_coverage_gate.py 结论：认可"
     },
     "scripts/test_spec_pins.py": {
-      "sha256": "66dd27f828d149cddcfb7400c87d58a85cdd080291f6fc1068529c73c4d0df7b",
-      "basis": "非同源复核：G-019 r4（基线 11c5d92）指出自写子集语义失真与反向误杀；本批按用户 2026-11-15 裁定接入成熟实现。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md；sha256：47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb；复核基线：11c5d92"
+      "sha256": "28602703ee6ecd7a3f2110720bb860b307e775e0cd3dab126f02e6cb68057251",
+      "basis": "初始登记：批次 0075 本批改动，尚无非同源复核；原依据见 CHANGELOG 与 git 历史"
     },
     "scripts/validate_ontology.py": {
-      "sha256": "132e579e6b411eb781db8230895bdaec1bbdd547f2a74188031fbfe1d7dcd92f",
-      "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
+      "sha256": "e2a19ab00a0b81ede5eec545d4cbab6797b8ae9d85aa6db3cd02d9cc26bb9cb2",
+      "basis": "初始登记：批次 0075 本批改动，尚无非同源复核；原依据见 CHANGELOG 与 git 历史"
     },
     "validation/checker-prototype/checker.py": {
       "sha256": "b457a7a6160d71b250fd76e8e47993cee0dbe9395fb79b413e131a060ad3bae3",
-      "basis": "未审查本批（批次 0073 改动；r2 报告审查基线 ea9b674，未覆盖本批修复；仅作指纹登记，待 r3 非同源复核后统一重冻，不作验收依据）"
+      "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：validation/checker-prototype/checker.py 结论：认可"
     },
     "scripts/check_dependency_pins.py": {
-      "sha256": "648a93a7161478ad1ebcdaf0b48cb05aa4fa48d98f15825e8f737e4441ae428b",
-      "basis": "非同源复核：G-019 r7（基线 7300283）要求把“分发产物存在但不可读取/逐文件数据不可核对”补进退出码文档，并据此关闭 G-019。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r7/REPORT.md；sha256：65e319da5b5e3a511b5d8dbf6b3f45f1ddbc9f86e8a4a86c17b4121cea20dacb；复核基线：7300283"
+      "sha256": "11307121c4513f1e35a4dae42e94bad225cd90168bf142320ff52da82bda8f50",
+      "basis": "初始登记：批次 0075 本批改动，尚无非同源复核；原依据见 CHANGELOG 与 git 历史"
     },
     "scripts/test_dependency_pins.py": {
-      "sha256": "c7baa471fc7347d2012b63136502394b1b8b7a8d4afa4caec0988f3a2e9e2f4a",
-      "basis": "非同源复核：G-019 r5（基线 3d7211c）要求逐文件核对安装树、恢复契约指针、把缺失 $ref 与深嵌套/灾难性 pattern 转为可诊断失败；用户 2026-11-15 裁定按“收紧威胁模型 + 修可机械修的部分”执行。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r5/REPORT.md；sha256：5373a537d05870dcf4f52756bf7e0012bc0128879e22df92cb85d86007258108；复核基线：3d7211c"
+      "sha256": "3a3a28c329a84585bc1a9e981520cba0f819a94ba8143e5ed2e6153677ea8fea",
+      "basis": "初始登记：批次 0075 本批改动，尚无非同源复核；原依据见 CHANGELOG 与 git 历史"
     }
   },
   "note": "受保护脚本的哈希登记：scripts/ 下检查器（含本脚本）、.githooks/pre-commit、validation/checker-prototype/checker.py。改动必须 --write --basis 并附非同源复核记录；本文件与快照检测都不提供权限分离。"

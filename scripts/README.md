@@ -30,8 +30,11 @@
 | `test_checker_pins.py` | `check_checker_pins.py` | 批次 0074 接入（此前从未被钩子或 CI 执行） |
 | `test_dependency_pins.py` | `check_dependency_pins.py` | 批次 0074 之前已接入 |
 | `test_spec_pins.py` | `check_spec_pins.py` | 批次 0074 接入（此前从未被钩子或 CI 执行） |
+| `test_coverage_gate.py` | `check_coverage_gate.py` | 批次 0075 接入 |
+| `test_check_table_mutations.py` | `check_three_table.py` | 批次 0075 接入 |
+| `validate_ontology.py --matrix` | 本体与负例样例 | 批次 0075 接入（缺 `rdflib`/`pyshacl` 时退出 2，按“无法评估”阻断） |
 
-**尚未接入**：`test_coverage_gate.py`、`test_check_table_mutations.py` 仍只能手工运行；本仓库无 CI 配置，因此它们当前不会自动执行。`validate_ontology.py --matrix` 在 `AGENTS.md` 第 7bis 条被要求于提交前运行，但未接入 pre-commit（可选依赖，缺 `rdflib`/`pyshacl` 时按“无法评估”处理）。
+**尚未接入**：无。本仓库无 CI 配置，钩子是唯一的自动执行入口。`validate_ontology.py --matrix` 的依赖按 `scripts/dependency-pins.json` 登记版本、wheel sha256 与逐文件安装树；缺依赖不是“跳过”，而是阻断。
 
 ### 运行方式
 

@@ -7,7 +7,12 @@ SP03 更新指纹并附合格复核记录（依据指向仓库外产物 + sha256
 SP04 复核记录的结论词不合格 → 必须阻断；
 SP05 只改 coverage.json 的引用关系、不改 A.1 样例 → 必须按指纹阻断；
 SP06 复核记录把仓库内转录件当依据 → 必须阻断（与 checker-pins 同一标准）；
-SP07 `contracts/schema/` 下出现未登记的文件 → 必须阻断（自动发现）。
+SP07 `contracts/schema/` 下出现未登记的文件 → 必须阻断（自动发现）；
+SP08 子目录中的 schema 未登记 → 必须阻断；
+SP09 仅把 basis 改成“结论：认可” → 必须阻断（默认模式校验 basis）；
+SP10 basis 的 sha256 改一个字符 → 必须阻断；
+SP11 basis 的复核产物改成仓库内文件 → 必须阻断；
+SP12 basis 的区段写错 → 必须阻断。
 
 外部复核产物在系统临时目录中生成，不写入仓库。用法：
   python3 scripts/test_spec_pins.py [--root DIR]
@@ -124,7 +129,7 @@ def main() -> int:
             [in_repo_record],
             "缺少合格的非同源复核记录",
         )
-        ok, why = valid_basis(root, in_repo_record)
+        ok, why = valid_basis(root, in_repo_record, TARGET)
         rejected = not ok and "转录件只作索引" in why
         failures += 0 if rejected else 1
         print(
@@ -163,8 +168,33 @@ def main() -> int:
             test_root=sub_root,
         )
 
+        def bad_basis(case_id: str, label: str, basis_text: str, expected: str) -> None:
+            bad_pins = dict(mutated_pins)
+            bad_pins[TARGET] = {**mutated_pins[TARGET], "basis": basis_text}
+            run(case_id, label, mutated, current, bad_pins, [record], expected)
+
+        bad_basis("SP09", "仅把 basis 改成“结论：认可”", "结论：认可", "缺少 `非同源复核：` 前缀")
+        bad_basis(
+            "SP10",
+            "basis 的 sha256 改一个字符",
+            record.replace(sha, ("1" if sha[0] == "0" else "0") + sha[1:]),
+            "`sha256` 与复核产物不一致",
+        )
+        bad_basis(
+            "SP11",
+            "basis 的复核产物改成仓库内文件",
+            in_repo_record,
+            "复核产物位于本仓库内",
+        )
+        bad_basis(
+            "SP12",
+            "basis 的区段写错",
+            record.replace(f"区段：{TARGET}", "区段：spec/methods/deterministic-checker.md#A.1"),
+            f"缺少 `区段：{TARGET}`",
+        )
+
     print()
-    print(f"规格区段绑定测试 9 条，符合预期 {9 - failures} 条。")
+    print(f"规格区段绑定测试 13 条，符合预期 {13 - failures} 条。")
     return 0 if not failures else 1
 
 

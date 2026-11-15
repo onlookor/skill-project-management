@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "外部校验依赖指纹；版本、分发产物 sha256 与安装树摘要须同时匹配",
+  "note": "外部校验依赖指纹；版本、wheel sha256 与按 RECORD 逐文件核对的安装树须同时匹配",
   "packages": {
     "jsonschema": {
       "version": "4.26.0",
@@ -11,6 +11,30 @@
       "installed": {
         "record_sha256": "9dde6b87861f51e76f8ce1a5d5b559d03793ce6e900eb28ce54ee32bc998f7aa",
         "files": 45
+      },
+      "reason": "ADR-0019"
+    },
+    "rdflib": {
+      "version": "7.6.0",
+      "artifact": {
+        "filename": "rdflib-7.6.0-py3-none-any.whl",
+        "sha256": "30c0a3ebf4c0e09215f066be7246794b6492e054e782d7ac2a34c9f70a15e0dd"
+      },
+      "installed": {
+        "record_sha256": "ad6f60816a3ed1d8cbb48813c27aa4bc764cab7879653e34d3d1e9e11ba4bf22",
+        "files": 149
+      },
+      "reason": "ADR-0019"
+    },
+    "pyshacl": {
+      "version": "0.40.2",
+      "artifact": {
+        "filename": "pyshacl-0.40.2-py3-none-any.whl",
+        "sha256": "edf0a7c15074902a1a420e8cfb89a764a9eed990b6ea15b8c30c40f2220eef61"
+      },
+      "installed": {
+        "record_sha256": "5471c82a651285c7b26f64e869fdcbb34b832eecc08828c2ca5cad7a50dc9bc0",
+        "files": 85
       },
       "reason": "ADR-0019"
     }

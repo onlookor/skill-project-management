@@ -311,7 +311,7 @@
 
 > 用途：解决“一规则一句导致子条件被压缩”（ADR-0013 的问题 P1）。每条规则正文的规范性条件拆为 clause id；A 表每个 `check_id` 的“判定（子句 id）”列只列它覆盖的 clause，**不再写叙述性短语**；条件的自然语言表述与原因码统一放在本表。一个 `check_id` 可承载多个子句，逐子句独立求值、聚合为单一 verdict（任一 `fail` → `fail`；否则任一 `cannot_evaluate` → `cannot_evaluate`；否则 `pass`）。未覆盖的子句必须标 `not-checked` 并写理由，`scripts/check_three_table.py` 机械核对覆盖完整性与“A 表不含叙述性短语”。
 >
-> 复核签收：外部复核基线 `ea9b674`（产物 `/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r2/REPORT.md`，sha256 `17f631140bc700bf5826a7468f6919e7fc7f65da56302aef9d152b7fd1c1232d`；本批按其 §2.2 为 `G-A1#1`/`G-E1#1`/`G-E2#1` 补 `missing_input`，按其 §3.2 撤回 `G-F1#2` 归属，按其 §3.3 改造覆盖闸门；修订后版本待 r3 复核） / 2026-11-15 / A.2 指纹 `b14854847668`
+> 复核签收：外部复核基线 `a9ff5bb`（产物 `/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md`，sha256 `2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6`；r3 逐条核对 `missing_input` 登记、`G-F1#2` 撤回与覆盖闸门，判 G-018 可关闭） / 2026-11-15 / A.2 指纹 `b14854847668`
 
 | clause | 规则 | 子句（判定条件） | 原因码 | 承接 check_id | 子句 severity | 覆盖状态 | 规则状态 |
 |---|---|---|---|---|---|---|---|

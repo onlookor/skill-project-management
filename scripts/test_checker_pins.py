@@ -7,7 +7,11 @@ CP03 `--write --basis "测试"`（自由文本）→ 拒绝（退出 2）；
 CP04 更新登记并给出合格的非同源复核记录 → 通过；
 CP05 把根检查器（验收原型）换成空壳 → 阻断；
 CP06 删除 pre-commit 里的一条检查行 → 阻断；
-CP07 验收检查器与快照不一致 → 阻断（漂移检测）。
+CP07 验收检查器与快照不一致 → 阻断（漂移检测）；
+CP08 仅把 basis 改成“结论：认可” → 阻断（默认模式校验 basis）；
+CP09 basis 的 sha256 改一个字符 → 阻断；
+CP10 basis 的复核产物改成仓库内文件 → 阻断；
+CP11 basis 的区段写错 → 阻断。
 
 用法：python3 scripts/test_checker_pins.py [--root DIR]
 退出码：0 = 全部符合预期；1 = 至少一例不符。
@@ -17,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import subprocess
 import sys
 import tempfile
@@ -81,14 +86,28 @@ def main() -> int:
         # basis 必须指向仓库外产物并与 sha256 一致；复核记录放在 base 之外。
         artifact = outer / "review.md"
         artifact.write_text("非同源复核：基线 d8bf413\n", encoding="utf-8")
-        valid_basis = (
-            "非同源复核：基线 d8bf413；"
-            f"复核产物：{artifact}；"
-            f"sha256：{hashlib.sha256(artifact.read_bytes()).hexdigest()}；"
-            "复核基线：d8bf413；区段：scripts/check_sample.py；结论：认可"
-        )
+        digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
 
-        baseline = run(root, base, "--write", "--basis", valid_basis)
+        def basis_for(key: str) -> str:
+            return (
+                "非同源复核：基线 d8bf413；"
+                f"复核产物：{artifact}；"
+                f"sha256：{digest}；"
+                f"复核基线：d8bf413；区段：{key}；结论：认可"
+            )
+
+        valid_basis = basis_for("scripts/check_sample.py")
+        baseline = run(
+            root,
+            base,
+            "--write",
+            "--basis",
+            basis_for("scripts/check_sample.py"),
+            "--basis",
+            basis_for(".githooks/pre-commit"),
+            "--basis",
+            basis_for("validation/checker-prototype/checker.py"),
+        )
         if baseline.returncode != 0:
             print("[错误] 绑定基线未建立。")
             print(baseline.stdout + baseline.stderr)
@@ -103,13 +122,14 @@ def main() -> int:
                      str(result.returncode), evidence(result.stdout, expected)))
 
         result = run(root, base, "--write")
-        expected = "缺少 `非同源复核：` 前缀"
+        expected = "未提供 --basis"
         ok = result.returncode == 2 and expected in result.stdout
         failures += 0 if ok else 1
         rows.append(("CP02", "更新登记但不给 basis", "拒绝" if ok else "未拒绝",
                      str(result.returncode), evidence(result.stdout, expected)))
 
         result = run(root, base, "--write", "--basis", "测试")
+        expected = "缺少 `非同源复核：` 前缀"
         ok = result.returncode == 2 and expected in result.stdout
         failures += 0 if ok else 1
         rows.append(("CP03", "basis 写成自由文本“测试”", "拒绝" if ok else "未拒绝",
@@ -123,6 +143,49 @@ def main() -> int:
         failures += 0 if ok else 1
         rows.append(("CP04", "合格复核记录更新登记", "通过" if ok else "未通过",
                      str(result.returncode), "登记与工作区一致" if ok else result.stdout.strip()))
+
+        # 默认读取模式也必须校验 basis 内容（CP08–CP11 只改 basis 文本，不动哈希）。
+        pins_path = base / "scripts" / "checker-pins.json"
+
+        def mutate_basis(text: str) -> None:
+            pins = json.loads(pins_path.read_text(encoding="utf-8"))
+            pins["scripts"]["scripts/check_sample.py"]["basis"] = text
+            pins_path.write_text(
+                json.dumps(pins, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+            )
+
+        recorded_sha = hashlib.sha256(artifact.read_bytes()).hexdigest()
+        inside = base / "review.md"
+        inside.write_text("仓库内转录件\n", encoding="utf-8")
+        basis_cases = [
+            ("CP08", "仅把 basis 改成“结论：认可”", "结论：认可", "缺少 `非同源复核：` 前缀"),
+            (
+                "CP09",
+                "basis 的 sha256 改一个字符",
+                valid_basis.replace(recorded_sha, ("1" if recorded_sha[0] == "0" else "0") + recorded_sha[1:]),
+                "`sha256` 与复核产物不一致",
+            ),
+            (
+                "CP10",
+                "basis 的复核产物改成仓库内文件",
+                valid_basis.replace(str(artifact), str(inside)),
+                "复核产物位于本仓库内",
+            ),
+            (
+                "CP11",
+                "basis 的区段写错",
+                valid_basis.replace("区段：scripts/check_sample.py", "区段：scripts/other.py"),
+                "缺少 `区段：scripts/check_sample.py`",
+            ),
+        ]
+        for number, scene, basis_text, expected in basis_cases:
+            mutate_basis(basis_text)
+            result = run(root, base)
+            ok = result.returncode == 1 and expected in result.stdout
+            failures += 0 if ok else 1
+            rows.append((number, scene, "阻断" if ok else "未阻断",
+                         str(result.returncode), evidence(result.stdout, expected)))
+        mutate_basis(valid_basis)
 
         source.write_text("# empty shell\n", encoding="utf-8")
         result = run(root, base)
