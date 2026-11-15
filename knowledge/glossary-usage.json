@@ -4119,6 +4119,11 @@
           "file": "spec/methods/deterministic-checker.md",
           "line": 1544,
           "form": "code"
+        },
+        {
+          "file": "validation/reviews/2026-11-15-a2-comparison-scope.md",
+          "line": 4,
+          "form": "code"
         }
       ]
     },
