@@ -945,3 +945,17 @@
 - **涉及文件**：`spec/ACCESS_ZONES.md`（新增）、`contracts/schema/knowledge-entry.schema.json`（新增）、`contracts/schema/pilot-conflict.schema.json`（新增）、`scripts/check_no_raw_material.py`、`scripts/check_spec_pins.py`、`scripts/checker-pins.json`、`scripts/spec-pins.json`、`validation/pinned/checker.py`、`.githooks/pre-commit`、`scripts/README.md`、`GLOSSARY.md`、`knowledge/glossary-usage.json`、`validation/reviews/2026-11-15-admission-axis-implementation.md`（新增）、`TODO.md`、`CHANGELOG.md`。
 - **未改动**：`manifest.json`（未发布，版本与 tag 保持 `0.5.1` / `v0.5.1`）、D4、放量、判据 7 外部抽样。
 - **状态**：生效（阶段三一次性过检与豁免判定待批次 0054；G-019/G-020 仍 `open`）
+
+---
+
+### 批次 0054 — 2026-11-15 — 准入制落地（阶段三：一次性过检与豁免判定）
+
+- **性质**：对全仓跟踪文件执行阶段二的新检查器，逐文件确认归区与准入；按 D-6 判定是否设豁免期。D4 未动、未放量、未碰判据 7 外部抽样；G-019/G-020/G-021 均不自行关闭。
+- **过检对象**：`git ls-files` 的 138 个跟踪文件。
+- **归区分布**：D 18 / O 30 / P 71（P0 16、P1 42、P2 13）/ C 19；未归类 0。
+- **违规**：0。数据区 18 个文件全部在 `spec/ACCESS_ZONES.md` 第 2 节登记并通过 schema；本体区 30 个文件全部通过第 13.6 条与字面量分档；散文区与代码区全部通过硬约束。逐文件核对方式为对每个跟踪文件解析区与准入登记后调用 `check_file()`，复跑命令 `python3 scripts/check_no_raw_material.py`。
+- **豁免判定（D-6）**：0 违规，收敛为**不设豁免期**。依据：准入制要求“存量先合规、再切闸门”，存量已全部合规；此时开豁免窗口只会把已合规存量重新放入无复核的例外通道。未创建 `validation/exemptions/`。将来若出现暂时无法修正的合法文件，按方案第 10.3 节登记，且不得用于原始资料或提取产物。
+- **记录位置**：`spec/ACCESS_ZONES.md` 第 6 节。
+- **涉及文件**：`spec/ACCESS_ZONES.md`、`TODO.md`、`CHANGELOG.md`。
+- **未改动**：`manifest.json`（未发布，版本与 tag 保持 `0.5.1` / `v0.5.1`）、`STATE.md`（新文件均由目录默认值覆盖，无新增例外）、D4、放量、判据 7 外部抽样。
+- **状态**：生效（阶段四台账改写与 G-021 登记待批次 0055；G-019/G-020 仍 `open`）
