@@ -1322,3 +1322,22 @@
 - **验证**：全套检查器复跑见提交信息；`check_checker_pins.py` / `check_spec_pins.py` 仍因既有 15 + 3 个无复核对象 rc=1（T-149），本批未新增钉扎对象。
 - **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`（沿用既有到期项，本批未新增无复核登记）。
 - **关联 ADR**：ADR-0020
+---
+
+### 批次 0082 — 2026-11-15 — 缺口台账 RG 节：8 条缺口按第 9 节改判为配置
+
+- **涉及文件**：`GAP_LEDGER.md`、`TODO.md`（T-157）、`CHANGELOG.md`。
+- **变更摘要**：以 `spec/D6_REBASELINE_PROPOSAL.md` 第 9 节（配置层设计）与 9.6 反向审查为基准，`GAP_LEDGER.md` 新增“需求缺口（RG）与配置改判”一节，逐条写明**被配置吸收的部分 / 仍是缺口的部分 / 剩余关闭出口 / 关联**：
+  - **RG-10 偏差阈值**：全量改判 → CFG-01/02/03；剩余缺口是“数值该取多少无权威来源”，出口 `doc-only` 或非同源复核，**明确禁止以“已改为配置”关闭**。
+  - **RG-09 状态采集**：部分 → CFG-04/05/06/07/08；数据字典本身与“缺数不得默认通过”仍为判据。
+  - **RG-08 风险刻度、RG-07 成本科目表**：部分 → 配置项，但 9.2 未给出 CFG 编号，**不擅自扩号**，登记 T-157 待责任方指定编号。
+  - **RG-05 关口证据**：`approver_role` 映射 → CFG-12；`must_see` 清单仍是判据。
+  - **RG-04 口径判定规则**：阈值类 → CFG-01/02/03/13；定义、枚举、区间、优先级仍缺。
+  - **RG-02 工件字段集**：命名与版本 → CFG-11；字段集与必填性仍是判据。
+  - **RG-11 挣值口径**：计量规则 → CFG-13；公式、EAC 三法与术语别名仍是判据（T-155）。
+  - **未改判的 8 条**（RG-01/03/06/12/13/14/15/16）：不满足 C2，保持原判。
+- **关闭数**：**0**。16 条中 8 条改判（1 全量 + 7 部分），全部保持 `open`；“改判不等于解决”写入本节规则。
+- **新增 TODO**：T-157（RG-08 / RG-07 的 CFG 编号补录与 schema 扩展）。
+- **验证**：`check_no_raw_material` / `check_anchors` / `check_ledger_landings` / `check_three_table` / `check_coverage_gate` / `check_gap_ledger` / `check_dependency_pins` / `check_glossary_usage` / `check_state` 均 rc=0；`check_checker_pins` rc=1（15 个既有无复核对象）、`check_spec_pins` rc=1（3 个既有无复核区段），均为本批之前已登记的 T-149 债务，本批未新增钉扎对象。
+- **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`（沿用既有到期项，本提交未新增钉扎对象）。
+- **关联 ADR**：无（改判依据为已批准的提案第 9 节，非新治理决定）
