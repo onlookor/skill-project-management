@@ -537,6 +537,63 @@ verdict: fail
 reason: constraint_not_applied
 ```
 
+**样例 8（`actors[].type` 非法值 → `cannot_evaluate`）**：`Actor` 类型不在 `actor_type` 枚举内，其余条件齐备。
+
+```yaml
+project: { id: "P-8" }
+actors: [{ id: "A-1", type: "Bogus" }]
+outcomes: [{ id: "O-1" }]
+commitments: [{ id: "C-1", by: "A-1", to: "O-1" }]
+constraints: [{ id: "K-1", constrains: "O-1" }]
+```
+
+期望输出：
+
+```yaml
+check_id: PROJECT_MINIMAL_EXISTENCE
+source_rule: G-A1
+verdict: cannot_evaluate
+reason: undefined_enum_value
+```
+
+**样例 9（`actors[].type` 大小写变体 → `cannot_evaluate`）**：枚举值区分大小写，`humanactor` 不是 `HumanActor`。
+
+```yaml
+project: { id: "P-9" }
+actors: [{ id: "A-1", type: "humanactor" }]
+outcomes: [{ id: "O-1" }]
+commitments: [{ id: "C-1", by: "A-1", to: "O-1" }]
+constraints: [{ id: "K-1", constrains: "O-1" }]
+```
+
+期望输出：
+
+```yaml
+check_id: PROJECT_MINIMAL_EXISTENCE
+source_rule: G-A1
+verdict: cannot_evaluate
+reason: undefined_enum_value
+```
+
+**样例 10（`actors[].type` 空字符串 → `cannot_evaluate`）**：键存在但取值为空，不满足封闭枚举。
+
+```yaml
+project: { id: "P-10" }
+actors: [{ id: "A-1", type: "" }]
+outcomes: [{ id: "O-1" }]
+commitments: [{ id: "C-1", by: "A-1", to: "O-1" }]
+constraints: [{ id: "K-1", constrains: "O-1" }]
+```
+
+期望输出：
+
+```yaml
+check_id: PROJECT_MINIMAL_EXISTENCE
+source_rule: G-A1
+verdict: cannot_evaluate
+reason: undefined_enum_value
+```
+
 #### A.1.2 `CONSTRAINT_ANCHOR_REQUIRED`（G-A2，`block`）
 
 **判定依据**：A 表“每个管理活动/产物至少有一条 `constrained_by` 边指向已登记 `Constraint`”。
@@ -835,6 +892,27 @@ source_rule: G-E1
 severity: warn
 verdict: fail
 reason: missing_role_merge_declaration
+```
+
+**样例 5（`actors[].type` 缺失 → `cannot_evaluate`）**：`Accountable` 的 `Actor` 没有 `type` 键，无法判定其是否可承担问责。
+
+```yaml
+actors: [
+  { id: "A-1", accountable: true },
+  { id: "A-2", type: "AIActor" }
+]
+commitments: [
+  { id: "C-1", accountable_by: "A-1", responsible_by: ["A-2"] }
+]
+```
+
+期望输出：
+
+```yaml
+check_id: ROLE_MINIMAL_COMPLETENESS
+source_rule: G-E1
+verdict: cannot_evaluate
+reason: missing_input
 ```
 
 #### A.1.6 `DUAL_DIMENSION_ANNOTATION`（G-B1，`advisory` / `active`）
@@ -1321,6 +1399,39 @@ severity: warn
 rule_status: active
 verdict: fail
 reason: accountable_not_human
+```
+
+**样例 6（`actors[].type` 为 `null` → `cannot_evaluate`）**：链终点的 `type` 键存在但取值为 `null`，按第 1.2 条由入口归一化为 `missing_input`。
+
+```yaml
+actors:
+  - { id: "A-1", type: "AIActor" }
+  - { id: "A-2", type: null, accountable: true }
+autonomy_grants:
+  - id: "AG-1"
+    actor: "A-1"
+    delegated_from:
+      start: "A-1"
+      steps:
+        - { relation: "delegated_from", direction: "out", target_type: "Actor", target_id: "A-2" }
+      reach: "accountable"
+    assertions: ["S-1"]
+assertions:
+  - id: "S-1"
+    covers: ["scope", "boundary", "revocation"]
+    kind: "assumption"
+    verification_condition: "季度审计确认委托边界未被突破"
+```
+
+期望输出：
+
+```yaml
+check_id: AI_AUTONOMY_DELEGATION_AUDITABLE
+source_rule: G-E2
+severity: warn
+rule_status: active
+verdict: cannot_evaluate
+reason: missing_input
 ```
 
 #### A.1.11 `PROJECT_CHARTER_EXISTENCE`（G-F1，`advisory` / `assumption`）

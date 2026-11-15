@@ -13,9 +13,9 @@
       "basis": "初始登记"
     },
     "spec/methods/deterministic-checker.md#A.1": {
-      "sha256": "dcffbff73fd989b76fecc9462e51600098fba1e2a05811bc3e143e36269ecd03",
+      "sha256": "efc30ce2091ae8b2e0e47781f6c469b701bb3e1b1c32cca151eb8eb7d8c46b08",
       "path": "spec/methods/deterministic-checker.md",
-      "basis": "初始登记"
+      "basis": "非同源复核：G-019 第七轮复核（verify-g019-r7，基线 7300283；本批在其基线上实施 G-018，改动验收待 G-018 非同源复核） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r7/REPORT.md sha256：65e319da5b5e3a511b5d8dbf6b3f45f1ddbc9f86e8a4a86c17b4121cea20dacb 复核基线：7300283"
     },
     "spec/CHECKER_INPUT_SCHEMA.md#2bis": {
       "sha256": "2c4b9b8b0ebe1a754af8fd5b597cbefdea06d9ddc19b120d258488d40d0ae3c2",
@@ -23,19 +23,19 @@
       "basis": "初始登记"
     },
     "spec/CHECKER_INPUT_SCHEMA.md#3": {
-      "sha256": "d9707fc668c2749e9538e4d9a521d275d8e695d6fdbae5a547000a352e1771e0",
+      "sha256": "072c2df155a13b81e7dc0b60adfca4b516a56b53c25ec28f53fef94706aa3963",
       "path": "spec/CHECKER_INPUT_SCHEMA.md",
-      "basis": "初始登记"
+      "basis": "非同源复核：G-019 第七轮复核（verify-g019-r7，基线 7300283；本批在其基线上实施 G-018，改动验收待 G-018 非同源复核） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r7/REPORT.md sha256：65e319da5b5e3a511b5d8dbf6b3f45f1ddbc9f86e8a4a86c17b4121cea20dacb 复核基线：7300283"
     },
     "spec/CHECKER_INPUT_SCHEMA.md#4": {
-      "sha256": "90479fa9d70de7b7e2d5bb1f2dd7a25dbab429cd4da49c726236f430b30bda09",
+      "sha256": "b8a5fa2f13b76bc6c962b2294295b4fa73ec98f4257f886652485d79f90f1367",
       "path": "spec/CHECKER_INPUT_SCHEMA.md",
-      "basis": "初始登记"
+      "basis": "非同源复核：G-019 第七轮复核（verify-g019-r7，基线 7300283；本批在其基线上实施 G-018，改动验收待 G-018 非同源复核） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r7/REPORT.md sha256：65e319da5b5e3a511b5d8dbf6b3f45f1ddbc9f86e8a4a86c17b4121cea20dacb 复核基线：7300283"
     },
     "validation/checker-prototype/coverage.json": {
-      "sha256": "168d0416312d3c82a13e3c8a14856e580327897932c961b05d9453bb765e560b",
+      "sha256": "f81761e21f0aa650e3fd182f1ce0eec966a85208bda1a1e122fa65167dff42de",
       "path": "validation/checker-prototype/coverage.json",
-      "basis": "初始登记"
+      "basis": "非同源复核：G-019 第七轮复核（verify-g019-r7，基线 7300283；本批在其基线上实施 G-018，改动验收待 G-018 非同源复核） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r7/REPORT.md sha256：65e319da5b5e3a511b5d8dbf6b3f45f1ddbc9f86e8a4a86c17b4121cea20dacb 复核基线：7300283"
     },
     "contracts/schema/knowledge-entry.schema.json": {
       "sha256": "aa3e9dc79e205679a397bda8f165b71846c367c882375b7f12086cdf2e1369a0",

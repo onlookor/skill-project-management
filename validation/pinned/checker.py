@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""T-107 最小原型：按附录 A 判定列执行 A.1 的 60 个样例。
+"""T-107 最小原型：按附录 A 判定列执行 A.1 的 66 个样例。
 
 只使用标准库。输入为 spec/methods/deterministic-checker.md 中 A.1 的
 YAML 谓词快照；输出 check_id / source_rule / severity / rule_status /
@@ -700,7 +700,12 @@ def check_role_minimal(data: dict) -> list[tuple]:
             actor = actors.get(accountable)
             if actor is None:
                 results.append(("fail", "unknown_accountable", "G-E1#1"))
-            elif actor.get("type") not in ("HumanActor", "LegalEntity"):
+            elif actor.get("type") in ACTOR_TYPES and actor.get("type") not in (
+                "HumanActor",
+                "LegalEntity",
+            ):
+                # 未定义的类型由封闭枚举层报 cannot_evaluate/undefined_enum_value；
+                # 只有已知类型才能判 accountable_not_human，否则 fail 会盖掉 cannot。
                 results.append(("fail", "accountable_not_human", "G-E1#1"))
         responsible = commitment.get("responsible_by") or []
         if not responsible:
@@ -855,8 +860,12 @@ def check_ai_autonomy(data: dict) -> list[tuple]:
                     terminal = actors[cursor]
                     if terminal.get("accountable") is not True:
                         results.append(("fail", "delegation_chain_not_accountable", "G-E2#1"))
-                    elif terminal.get("type") not in ("HumanActor", "LegalEntity"):
+                    elif terminal.get("type") in ACTOR_TYPES and terminal.get("type") not in (
+                        "HumanActor",
+                        "LegalEntity",
+                    ):
                         # 链终点必须能承担问责：AI 节点即使标 accountable 也不能作为终点。
+                        # 未定义的类型留给封闭枚举层报 cannot_evaluate，不在此判 fail。
                         results.append(("fail", "accountable_not_human", "G-E2#1"))
         covers: set = set()
         for assertion_id in grant.get("assertions") or []:
@@ -1063,6 +1072,13 @@ ENTITY_COLLECTIONS = (
 APPLICABILITY_STATES = {"applicable", "inapplicable", "pending"}
 ASSUMPTION_STATUSES = {"pending", "satisfied", "expired"}
 MANAGEMENT_NODE_TYPES = {"ManagementActivity", "ManagementArtifact"}
+ACTOR_TYPES = {"HumanActor", "LegalEntity", "AIActor"}
+# `actors[].type` 非法/缺失归属到该 check 的 Actor 子句；其余 check 无独立子句。
+ACTOR_TYPE_CLAUSES = {
+    "PROJECT_MINIMAL_EXISTENCE": "G-A1#1",
+    "ROLE_MINIMAL_COMPLETENESS": "G-E1#1",
+    "AI_AUTONOMY_DELEGATION_AUDITABLE": "G-E2#1",
+}
 
 
 def nested_missing(data: dict) -> str | None:
@@ -1137,6 +1153,14 @@ def enum_results(check_id: str, data: dict) -> list[tuple]:
         relation = entry.get("relation")
         if relation is not None and relation not in EXTENSION_RELATIONS:
             add("undefined_enum_value", "G-B2#2")
+    actor_clause = ACTOR_TYPE_CLAUSES.get(check_id)
+    for actor in data.get("actors") or []:
+        if not isinstance(actor, dict):
+            continue
+        if "type" not in actor or actor["type"] is None:
+            add("missing_input", actor_clause)
+        elif actor["type"] not in ACTOR_TYPES:
+            add("undefined_enum_value", actor_clause)
     return found
 
 
@@ -1315,7 +1339,7 @@ def nested_missing_sweep(root: Path, quiet: bool = False) -> int:
 
 
 def enum_sweep(quiet: bool = False) -> int:
-    """封闭枚举负例：四个受控字段的非法值统一 cannot_evaluate/undefined_enum_value。"""
+    """封闭枚举负例：五个受控字段的非法值统一 cannot_evaluate/undefined_enum_value。"""
     cases = [
         (
             "applicability.state",
@@ -1382,6 +1406,17 @@ def enum_sweep(quiet: bool = False) -> int:
                     {"id": "M-1", "process_group": "initiating", "subject_group": "planning"}
                 ],
                 "subject_group_extension": [{"value": "innovation", "relation": "sideways"}],
+            },
+        ),
+        (
+            "actors[].type",
+            "PROJECT_MINIMAL_EXISTENCE",
+            {
+                "project": {"id": "P-1"},
+                "actors": [{"id": "A-1", "type": "Bogus"}],
+                "outcomes": [{"id": "O-1"}],
+                "commitments": [{"id": "C-1", "by": "A-1", "to": "O-1"}],
+                "constraints": [{"id": "K-1", "constrains": "O-1"}],
             },
         ),
     ]

@@ -28,7 +28,9 @@
 8. **值域封闭（P2）**：判定列中出现的枚举集合必须引用第 4 节的具名枚举；不得出现自然语言值（如“已验收或已移交”须写成枚举名 `acceptance_statement`）。
 9. **assumption 时效与批准资格（P5）**：`assumption` 表示为对象 `{verification_condition, status, verified_at, expires_at, approved_by, approval_basis}`；`status ∈ {pending, satisfied, expired}`。`expired`、或 `pending` 且缺 `approved_by` → `cannot_evaluate` / `assumption_unclosed`，不得判 `pass`。
 10. **路径与可达性（P6）**：链式条件表示为 `{start, steps: [{relation, direction, target_type, target_id}], reach}`。`steps[]` 必须带 `target_id`，它是路径解析到下一节点的唯一依据；`direction` 当前只允许 `out`。判定列写路径表达式，不得写“终至”“链上有”这类自然语言，也不得再使用 `delegated_from: "<id>"` 的扁平字符串写法（该写法已删除）。
-11. **封闭枚举全局归一化**：`applicability.state`、`assumption.status`、`node_type`、`subject_group_extension[].relation` 的取值必须在第 4 节具名枚举内。出现非法值一律以子句结果参与聚合（`("cannot_evaluate", "undefined_enum_value", <clause>)`），不得判 `pass` 或 `fail`。**不做入口短路**：枚举结果与各 `check` 函数的结果一并交给 `aggregate()`，按第 15 条的 `fail > cannot_evaluate > pass` 与 A.2 行序判定，保证结论与违规被发现顺序无关。`node_type` 非法归属 `G-A2#2`、`relation` 非法归属 `G-B2#2`，`assumption.status` 归属 `G-D2#3` / `G-E2#3`，`applicability.state` 与 `management_items[].node_type` 无独立 A.2 子句。
+11. **封闭枚举全局归一化**：`applicability.state`、`assumption.status`、`node_type`、`subject_group_extension[].relation`、`actors[].type` 的取值必须在第 4 节具名枚举内。出现非法值一律以子句结果参与聚合（`("cannot_evaluate", "undefined_enum_value", <clause>)`），不得判 `pass` 或 `fail`。**不做入口短路**：枚举结果与各 `check` 函数的结果一并交给 `aggregate()`，按第 15 条的 `fail > cannot_evaluate > pass` 与 A.2 行序判定，保证结论与违规被发现顺序无关。`node_type` 非法归属 `G-A2#2`、`relation` 非法归属 `G-B2#2`，`assumption.status` 归属 `G-D2#3` / `G-E2#3`，`applicability.state` 与 `management_items[].node_type` 无独立 A.2 子句。
+
+    `actors[].type` 是**必填**封闭枚举（`actor_type`，第 4 节），缺失值与非法值分属两个出口：键缺失 → 子句级 `cannot_evaluate` / `missing_input`；值为 `null` → 按第 1.2 条由入口归一化为 `cannot_evaluate` / `missing_input`；键存在但不在枚举内（含大小写变体、空字符串）→ 子句级 `cannot_evaluate` / `undefined_enum_value`。子句归属：`PROJECT_MINIMAL_EXISTENCE` → `G-A1#1`，`ROLE_MINIMAL_COMPLETENESS` → `G-E1#1`，`AI_AUTONOMY_DELEGATION_AUDITABLE` → `G-E2#1`；其余 `check_id` 只做全局校验，无独立 A.2 子句。类型未定义时，各 `check` 函数不得再用该值推导 `fail`（例如 `accountable_not_human`），否则 `fail` 会盖掉 `cannot_evaluate`。
 12. **适用性（P7）**：输入可携带 `applicability: {state}`，`state ∈ {applicable, inapplicable, pending}`。`inapplicable` → `not_applicable`；`pending` → `cannot_evaluate` / `applicability_pending`；`applicable` 或未提供 → 正常判定。
 13. **结论与原因**：`verdict ∈ {pass, fail, cannot_evaluate, not_applicable}`；`reason` 为稳定原因码，`pass` / `not_applicable` 时为 `null`。原因码只用于样例断言，不是新的规范词汇。
 14. **severity / rule_status**：由附录 A 与 `validation/CHECKLIST.md` 决定，不由输入携带；`assumption` 组按 P6 输出 `advisory`。子句级 severity 覆盖见附录 A.2。
@@ -40,7 +42,7 @@
 | 对象 | 键 | 类型 | 说明 |
 |---|---|---|---|
 | `project` / `projects[]` | `id`, `stage` | 字符串 | `stage` 至少识别 `executing` |
-| `actors[]` | `id`, `type`, `accountable`, `delegated_from` | 字符串 / 布尔 | `type ∈ {HumanActor, LegalEntity, AIActor}`；`accountable: true` 表示委托链终点 |
+| `actors[]` | `id`, `type`, `accountable`, `delegated_from` | 字符串 / 布尔 | `type` 必填且 ∈ `actor_type`（第 4 节）；缺失 → `cannot_evaluate` / `missing_input`，非法值 → `cannot_evaluate` / `undefined_enum_value`（第 1.11 条）；`accountable: true` 表示委托链终点 |
 | `outcomes[]` | `id` | 字符串 | |
 | `commitments[]` | `id`, `by`, `to`, `constrained_by`, `accountable_by`, `responsible_by`, `role_merge_declaration`, `procurement`, `contract`, `deadline`, `milestone`, `evidence_assertions`, `decision_class`, `node_type` | 见各 `check_id` | `responsible_by` 为字符串列表；`decision_class: true` 标识决策类承诺（G-E1 输入已按此筛选）；`node_type` 可选，提供时须 ∈ `management_node_type`（G-A2#2） |
 | `constraints[]` | `id`, `constrains` | 字符串 | `constrains` 指向 `outcomes[].id` 或 `commitments[].id`；`{}` 视为未填 → `fail` |
@@ -179,7 +181,7 @@
 
 | check_id | 必需顶层键 | 判定所需字段 | 失败原因码 |
 |---|---|---|---|
-| `PROJECT_MINIMAL_EXISTENCE` | `project`, `actors`, `outcomes`, `commitments`, `constraints` | `commitments[].by/to`、`constraints[].constrains` | `missing_actor` / `missing_outcome` / `missing_commitment` / `missing_constraint` / `broken_commitment_endpoint` / `constraint_not_applied` |
+| `PROJECT_MINIMAL_EXISTENCE` | `project`, `actors`, `outcomes`, `commitments`, `constraints` | `commitments[].by/to`、`constraints[].constrains`、`actors[].type`（必填） | `missing_actor` / `missing_outcome` / `missing_commitment` / `missing_constraint` / `broken_commitment_endpoint` / `constraint_not_applied` / `undefined_enum_value` |
 | `CONSTRAINT_ANCHOR_REQUIRED` | `commitments`, `deliverables`, `constraints` | 每项的 `constrained_by`；可选 `node_type`（提供时须 ∈ `management_node_type`，否则 G-A2#2 不可达） | `unanchored_management_item` / `undefined_enum_value` |
 | `DUAL_DIMENSION_ANNOTATION` | `management_items` | `process_group`, `subject_group` | `missing_dimension` |
 | `DIMENSION_VALUE_CLOSED` | `management_items`（可选 `subject_group_extension`） | `process_group`、`subject_group`、`subject_group_extension[].value/relation/base` | `dimension_value_out_of_enum` / `invalid_subject_group_extension` / `undefined_enum_value` |
@@ -187,8 +189,8 @@
 | `ASSERTION_MUTUAL_EXCLUSION` | `assertions`, `deliverables` | `subject`, `property`, `value`, `state` | `mutually_exclusive_active_assertions` |
 | `CHANGE_CONSTRAINT_LINK` | `changes`, `constraints`, `commitments`, `deliverables` | `constraint`, `relation`, `target.type/id` | `missing_constraint_link` / `invalid_change_relation` / `missing_change_target` / `invalid_change_target` |
 | `ALL_IMPROVEMENT_ASSUMPTION` | `changes`, `actors` | `relations`, `assumption`, `verification_condition`, `approval_basis` | `all_improvement_without_verification` / `approval_basis_before_verification` / `assumption_unclosed` |
-| `ROLE_MINIMAL_COMPLETENESS` | `actors`, `commitments` | `accountable_by`, `responsible_by`, `role_merge_declaration` | `missing_accountable` / `multiple_accountable` / `unknown_accountable` / `accountable_not_human` / `missing_responsible` / `missing_role_merge_declaration` |
-| `AI_AUTONOMY_DELEGATION_AUDITABLE` | `actors`, `autonomy_grants`, `assertions` | `delegated_from` 路径（第 1.10 条）、`accountable`、`covers`, `kind`, `verification_condition` | `delegation_chain_not_accountable` / `accountable_not_human` / `assertion_incomplete` / `assumption_unclosed` / `invalid_path` / `dangling_reference` |
+| `ROLE_MINIMAL_COMPLETENESS` | `actors`, `commitments` | `accountable_by`, `responsible_by`, `role_merge_declaration`、`actors[].type`（必填） | `missing_accountable` / `multiple_accountable` / `unknown_accountable` / `accountable_not_human` / `missing_responsible` / `missing_role_merge_declaration` / `undefined_enum_value` |
+| `AI_AUTONOMY_DELEGATION_AUDITABLE` | `actors`, `autonomy_grants`, `assertions` | `delegated_from` 路径（第 1.10 条）、`actors[].type`（必填）、`accountable`、`covers`, `kind`, `verification_condition` | `delegation_chain_not_accountable` / `accountable_not_human` / `assertion_incomplete` / `assumption_unclosed` / `invalid_path` / `dangling_reference` / `undefined_enum_value` |
 | `PROJECT_CHARTER_EXISTENCE` | `projects`, `charters`, `outcomes`, `constraints`, `actors`, `assertions` | `stage`, `project`, 四项声明 | `missing_charter` / `incomplete_charter` |
 | `CLOSURE_ACCEPTANCE_LINK` | `deliverables`, `actors` | 内嵌 `assertions[].statement/accountable_confirmation` | `missing_acceptance_assertion` |
 | `PROCUREMENT_CONTRACT_ANCHOR` | `commitments`, `contracts`, `constraints`, `actors` | `procurement`, `contract`, 四项声明 | `missing_contract` / `incomplete_contract` |
@@ -223,6 +225,7 @@
 | `assumption.status` | `pending`、`satisfied`、`expired` |
 | `applicability.state` | `applicable`、`inapplicable`、`pending` |
 | `management_node_type` | `ManagementActivity`、`ManagementArtifact` |
+| `actor_type` | `HumanActor`、`LegalEntity`、`AIActor` |
 | `subject_group_extension_relation` | `specializes`、`cross_cuts`、`orthogonal_to` |
 | 不可裁剪规则 | `G-A1`、`G-A2`、`G-C1`、`G-D1`、`G-E1` |
 | 验收/移交陈述 | `acceptance_statement`：`已验收`、`已移交` |

@@ -1173,3 +1173,15 @@
 - **文档补同一情形（不改实现）**：`scripts/README.md`、ADR-0019 两处（wheel 段与“不改变失败方向”）与 `scripts/check_dependency_pins.py` docstring 均写明“分发产物存在但不可读取 / 逐文件数据不可核对”按“无法评估”退出 2，且与指纹不符同时命中时按 2 处理。实测：同名 `not a wheel` 文件命中 `DP-ARTIFACT` sha256 不符且 `DP-TREE` 无逐文件数据，退出 2；可读但 sha 不符退 1。
 - **台账**：G-019 说明改为“r6 三处已完成；r7 另有一处退出码文档缺口，已同批勘误”，并补记 r7 的 `pattern` 与退出码矩阵结论；按 3.6.6 以 r7 报告 §1 / §2 / §4 为依据，改 `closed` / `check-change`。G-021、G-022 未动；G-020 未改。台账 22 条：`open` 2（G-017、G-018）/ `closed` 20。
 - **涉及文件**：`scripts/check_dependency_pins.py`、`adr/0019-mature-json-schema-validator.md`、`scripts/README.md`、`GAP_LEDGER.md`、`CHANGELOG.md`、`scripts/checker-pins.json`。
+
+---
+
+### 批次 0071 — 2026-11-15 — G-018：`actors[].type` 纳入封闭枚举归一化
+
+- **依据**：`GAP_LEDGER.md` G-018（`open`，`representation-defect`，L1，关联 T-137）与用户 2026-11-15 指令；实施按台账建议出口 `check-change`，缺口状态不自行关闭。
+- **规格**：`spec/CHECKER_INPUT_SCHEMA.md` §1.11 增列 `actors[].type`，写明必填性与三个出口——键缺失 → 子句级 `missing_input`；值为 `null` → 入口 `missing_input`（第 1.2 条）；非法值、大小写变体、空字符串 → 子句级 `undefined_enum_value`；归属 `G-A1#1` / `G-E1#1` / `G-E2#1`，其余 `check_id` 只做全局校验。§2 `actors[]` 行同步必填性，§3 三行补 `undefined_enum_value`，§4 新增 `actor_type` 具名枚举行。
+- **原型**：`enum_results()` 对每个 `actors[]` 元素校验 `type`，结果以子句级形式与各 `check` 函数结果一并交给 `aggregate()`，不做入口短路（G-014 的教训）。`ROLE_MINIMAL_COMPLETENESS` 与 `AI_AUTONOMY_DELEGATION_AUDITABLE` 改为“仅对已知类型判 `accountable_not_human`”，避免未定义类型产生的 `fail` 盖掉 `cannot_evaluate`。`--enum-sweep` 4 → 5 项。
+- **样例与覆盖**：新增 A.1.1-8（非法值）、A.1.1-9（大小写变体 `humanactor`）、A.1.1-10（空字符串）、A.1.5-5（缺失 `type` 键）、A.1.10-6（`type: null`），期望分别为 `cannot_evaluate/undefined_enum_value` 与 `cannot_evaluate/missing_input`；`coverage.json` 对应 5 条 `expected_failed_clauses` 指向 `G-A1#1` / `G-E1#1` / `G-E2#1`。A.1 样例 61 → 66，`validation/pinned/checker.py` 同步。
+- **reason code**：无新增。复用 `missing_input`（缺失/`null`）与 `undefined_enum_value`（非法值），与 G-001/G-003/G-007 的既有口径一致。
+- **台账**：G-018 维持 `open`，说明补本轮实现与负例，关闭依据留空，等非同源复核；核查记录追加批次 0071。台账 22 条：`open` 2（G-017、G-018）/ `closed` 20。
+- **涉及文件**：`spec/CHECKER_INPUT_SCHEMA.md`、`spec/methods/deterministic-checker.md`、`validation/checker-prototype/checker.py`、`validation/checker-prototype/coverage.json`、`validation/pinned/checker.py`、`AGENTS.md`、`.githooks/pre-commit`、`GAP_LEDGER.md`、`CHANGELOG.md`、`validation/reviews/2026-11-15-g018-actor-type-enum.md`、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`spec/GLOSSARY.md`（位置刷新）。

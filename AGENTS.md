@@ -198,7 +198,7 @@ Hook-Bypass-Verified: <tag 名；十个检查器的复跑结果>
 - **验收快照**：`validation/pinned/checker.py` 是工作区 `validation/checker-prototype/checker.py` 的只读快照；`check_checker_pins.py` 检测两者是否漂移。**这是漂移检测，不是权限分离**：两份文件仍在同一工作区，同一方可以同改；真正的分离需要 CI/受保护分支，本机无 CI 时做不到，ADR-0014 已记录该限制与残余风险。
 - **不可机械化部分**：签收人身份、签收人与改动人是否同源、复核记录是否真实执行，机器都无法验证；只能靠 3.6.6/3.6.7 的评审流程与提交评审约束。**残余风险明确外置**：伪造复核记录、同一方持有写权限，均由外部控制（真 CI + 受保护分支 + 复核方独立持有工具链）承接，不以“打不穿”作为关闭条件。
 - **正负例**：`scripts/test_checker_pins.py`（CP01–CP07）与 `scripts/test_spec_pins.py`（SP01–SP05）固定验证阻断与放行。
-- **pre-commit 额外执行**：A.1 全部 60 条样例、聚合顺序无关性、缺键快检（43 键）、`null` 快检子集、嵌套缺键快检（53 项）、封闭枚举快检（4 项）。改 `aggregate()` 或入口归一化后，仅靠原有十个检查器无法全绿。
+- **pre-commit 额外执行**：A.1 全部 66 条样例、聚合顺序无关性、缺键快检（43 键）、`null` 快检子集、嵌套缺键快检（53 项）、封闭枚举快检（5 项）。改 `aggregate()` 或入口归一化后，仅靠原有十个检查器无法全绿。
 
 ### 4. 目录结构（唯一权威）
 
@@ -324,7 +324,7 @@ project-management-grounding/
     ├── CHECKLIST.md                # CM-DET-CHECKER 的产物：检查清单（生成依据见正文）
     ├── independent-review-package.md  # T-133 只读验收包（不含原型源码）
     ├── checker-prototype/
-    │   ├── checker.py              # T-107 最小原型：执行附录 A 的 60 个样例（纯标准库）
+    │   ├── checker.py              # T-107 最小原型：执行附录 A 的 66 个样例（纯标准库）
     │   └── coverage.json           # 41 子句 × 正负例的覆盖矩阵（check_coverage_gate.py 核对）
     ├── pinned/
     │   └── checker.py              # 验收检查器的只读快照（漂移检测，不等于权限分离）
@@ -448,7 +448,7 @@ project-management-grounding/
 1. **提取产物一律落在仓库外**。约定目录为 `/tmp/pm-extract-<source-id>-<date>/`，存放 `pdftotext` 文本层输出、`pdftoppm` 渲染图、Tesseract OCR 结果与任何逐页转储。**不得**落在仓库目录内，也不得放进 `resources/`。
 2. **`resources/` 只在本地只读使用**。不复制、不打包、不 `git add`；`.gitignore` 已忽略 `resources/` 与文档类扩展名，但忽略规则不是许可。
 3. **引用外部文献只写可复核的定位与自己的话**。默认写法是“页码定位 + 自述摘要”；确需引证术语或条款措辞时，单条不超过一行或一句，并附来源 `id` 与页码（见 `CONSTITUTION.md` 第 13.2 条）。
-4. **提交前必须运行十个检查器与原型快检**：`check_no_raw_material.py`、`check_anchors.py`、`check_ledger_landings.py`、`check_gap_ledger.py --staged`、`check_three_table.py`、`check_coverage_gate.py`、`check_checker_pins.py`、`check_spec_pins.py`、`check_glossary_usage.py`、`check_state.py`；外加 `validation/checker-prototype/checker.py` 的 60 条样例、`--aggregation-order`、`--missing-key-sweep`、`--null-sweep --quick`、`--nested-missing-sweep`、`--enum-sweep`。本仓库已提供 `.githooks/pre-commit`，每个克隆需自行执行 `git config core.hooksPath .githooks` 启用；未启用钩子的部署必须在 `git add` 前手工逐个运行，等价命令见 `scripts/README.md`。
+4. **提交前必须运行十个检查器与原型快检**：`check_no_raw_material.py`、`check_anchors.py`、`check_ledger_landings.py`、`check_gap_ledger.py --staged`、`check_three_table.py`、`check_coverage_gate.py`、`check_checker_pins.py`、`check_spec_pins.py`、`check_glossary_usage.py`、`check_state.py`；外加 `validation/checker-prototype/checker.py` 的 66 条样例、`--aggregation-order`、`--missing-key-sweep`、`--null-sweep --quick`、`--nested-missing-sweep`、`--enum-sweep`。本仓库已提供 `.githooks/pre-commit`，每个克隆需自行执行 `git config core.hooksPath .githooks` 启用；未启用钩子的部署必须在 `git add` 前手工逐个运行，等价命令见 `scripts/README.md`。
 5. **检查器命中即停止提交**，不得用 `--no-verify` 绕过。唯一例外是第 3.5 条规定的发布引导提交（`release_state` 改为 `released` 并递增版本），该提交必须携带 3.5.1 的三项 `Hook-Bypass` trailer，并紧接 annotated tag 与十个检查器的复跑；该通道按 3.5.2 的撤除条件关闭（`TODO.md` T-129）。确需新增其他例外（例如将来要提交一张合法图片资产），走 ADR 并在检查器中登记路径豁免，而不是删除规则或放宽阈值。
 6. **发现已跟踪内容违规时**：先报告文件与位置，再改为“页码定位 + 自述摘要”或移出仓库，并在 `ERRATA.md` 登记；不静默删除他人的内容。
 7. **自建本体（`CONSTITUTION.md` 第 13.6 条）**：

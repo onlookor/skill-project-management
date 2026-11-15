@@ -13,6 +13,24 @@
           "expected_failed_clauses": [
             "G-A1#1"
           ]
+        },
+        {
+          "sample": "A.1.1-8",
+          "expected_failed_clauses": [
+            "G-A1#1"
+          ]
+        },
+        {
+          "sample": "A.1.1-9",
+          "expected_failed_clauses": [
+            "G-A1#1"
+          ]
+        },
+        {
+          "sample": "A.1.1-10",
+          "expected_failed_clauses": [
+            "G-A1#1"
+          ]
         }
       ]
     },
@@ -337,6 +355,12 @@
           "expected_failed_clauses": [
             "G-E1#1"
           ]
+        },
+        {
+          "sample": "A.1.5-5",
+          "expected_failed_clauses": [
+            "G-E1#1"
+          ]
         }
       ]
     },
@@ -382,6 +406,12 @@
         },
         {
           "sample": "A.1.10-5",
+          "expected_failed_clauses": [
+            "G-E2#1"
+          ]
+        },
+        {
+          "sample": "A.1.10-6",
           "expected_failed_clauses": [
             "G-E2#1"
           ]
