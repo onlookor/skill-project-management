@@ -235,7 +235,7 @@ Hook-Bypass-Items: <T-xxx[,T-yyy]>                      # 仅 pin-review-debt，
 验证链不能自证：检查器、规格与样例都在同一工作区，同一方可以同时改“判定”和“被判定”。本条把可机械化的部分做成显式留痕，把不能机械化的部分写清边界（完整论证见 ADR-0014）。
 
 - **检查器绑定**：`scripts/checker-pins.json` 登记**全仓 `.py`（`git ls-files` 含未跟踪未忽略者，减去 `PY_EXCLUDE`）**的 sha256 与 `basis`，**包含 `check_checker_pins.py` 自身**，并包含 `.githooks/pre-commit`、`validation/checker-prototype/checker.py` 与例外登记表 `scripts/no-review-declarations.json`。不匹配既有 glob 的新 helper 脚本默认受保护。工作区哈希与登记不一致 → `scripts/check_checker_pins.py` 退出 1。改动检查器必须 `--write --basis "<非同源复核记录>"`；`basis` 只接受五要素齐全的复核记录（`非同源复核：`、`复核产物：<仓库外存在的路径>`、`sha256：<64 位小写十六进制>`、`复核基线：<HEAD 的祖先提交>`、唯一精确等值的 `区段：<key>`、行尾结论词），或固定字面量 `无复核声明（不构成认可，不放行）`。后者可写入但**不放行**；其他自由文本一律拒绝（退出 2）。
-- **规格区段绑定**：`scripts/spec-pins.json` 登记 14 个区段：`GRAMMAR.md` 全文、方法文件 A.2、方法文件 A.1 样例区段、`spec/CHECKER_INPUT_SCHEMA.md` **整文件**、**`AGENTS.md` §3.5（发布态声明、3.5.1–3.5.3 绕过规则、撤除条件）**、`validation/checker-prototype/coverage.json` 全文等。schema 不再只钉 §1.11/§2bis/§3/§4，文件末尾追加一行同样命中；`AGENTS.md` §3.5 纳入后，改宽 `--no-verify` 通道与改检查器同等受约束。区段相对 HEAD 有改动时，同一提交必须附合格复核记录（要素同上一款，结论词后只能是行尾或 `；`/`。`，不得跟 `（…）` 补充），否则 `scripts/check_spec_pins.py` 退出 1。
+- **规格区段绑定**：`scripts/spec-pins.json` 登记 16 个区段：`GRAMMAR.md` 全文、方法文件 A.2、方法文件 A.1 样例区段、`spec/CHECKER_INPUT_SCHEMA.md` **整文件**、**`AGENTS.md` §3.5（发布态声明、3.5.1–3.5.3 绕过规则、撤除条件）**、`contracts/schema/runtime-config.schema.json` 与 `contracts/schema/runtime-config-lock.schema.json` 全文、`validation/checker-prototype/coverage.json` 全文等。schema 不再只钉 §1.11/§2bis/§3/§4，文件末尾追加一行同样命中；`AGENTS.md` §3.5 纳入后，改宽 `--no-verify` 通道与改检查器同等受约束。区段相对 HEAD 有改动时，同一提交必须附合格复核记录（要素同上一款，结论词后只能是行尾或 `；`/`。`，不得跟 `（…）` 补充），否则 `scripts/check_spec_pins.py` 退出 1。
 - **无复核例外的登记**：钉扎面改动缺复核时，`basis` 写无复核字面量，并在 `scripts/no-review-declarations.json` 逐对象登记 `reason` / `missing_review` / `due` / `owner` / `todo`。检查器交叉校验：登记项必须是受保护对象、字段齐全、已存在合格复核却仍登记即报错。该文件本身纳入 pins，改表与改检查器同等受约束。通道规则见 3.5.3。
 - **验收快照**：`validation/pinned/checker.py` 是工作区 `validation/checker-prototype/checker.py` 的只读快照；`check_checker_pins.py` 检测两者是否漂移。**这是漂移检测，不是权限分离**：两份文件仍在同一工作区，同一方可以同改；真正的分离需要 CI/受保护分支，本机无 CI 时做不到，ADR-0014 已记录该限制与残余风险。
 - **不可机械化部分**：签收人身份、签收人与改动人是否同源、复核记录是否真实执行，机器都无法验证；只能靠 3.6.6/3.6.7 的评审流程与提交评审约束。**残余风险明确外置**：伪造复核记录、同一方持有写权限，均由外部控制（真 CI + 受保护分支 + 复核方独立持有工具链）承接，不以“打不穿”作为关闭条件。
@@ -297,7 +297,9 @@ project-management-grounding/
 │   │   ├── package-manifest.schema.json   # 根目录 manifest.json 的准入 schema
 │   │   ├── ontology-fixtures-manifest.schema.json  # 本体负例清单的准入 schema
 │   │   ├── pilot-artifact.schema.json     # 试点检查单投影的准入 schema
-│   │   └── pilot-id-map.schema.json       # 试点 ID 映射的准入 schema
+│   │   ├── pilot-id-map.schema.json       # 试点 ID 映射的准入 schema
+│   │   ├── runtime-config.schema.json     # 运行期配置实例（CFG-01～CFG-13）的准入 schema
+│   │   └── runtime-config-lock.schema.json # 配置摘要与变更历史（config.digest/item_digests）的准入 schema
 │   ├── resolver.md                 # 单层解析规则 + 多层合并语义（定义但不启用）+ PACT 适配节
 │   └── examples/
 │       ├── construction.pm-contract.yaml
@@ -352,8 +354,9 @@ project-management-grounding/
 │   ├── check_coverage_gate.py      # A.2 每子句 1 正 1 负的覆盖矩阵闸门（子句级取证，可运行）
 │   ├── check_checker_pins.py       # 检查器哈希登记（全仓 .py + 自身 + pre-commit + 登记表）与验收快照漂移检测（可运行）
 │   ├── check_spec_pins.py          # GRAMMAR/A.2/A.1/schema 整文件/coverage 指纹与复核记录绑定（可运行）
+│   ├── config_codes.py             # 配置层错误分类、配置摘要与配置 schema 自检（可运行）
 │   ├── checker-pins.json           # 检查器脚本 sha256 与 basis 登记
-│   ├── spec-pins.json              # 规格区段指纹登记（13 区段）
+│   ├── spec-pins.json              # 规格区段指纹登记（16 区段）
 │   ├── no-review-declarations.json # 钉扎面无复核例外登记（受 pins 保护；见 3.5.3）
 │   ├── test_check_table_mutations.py   # A.2 固定变异集 + 签收正负例（可运行）
 │   ├── test_coverage_gate.py       # 覆盖闸门四条负例（可运行）

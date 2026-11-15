@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-management-grounding/contracts/schema/runtime-config-lock.schema.json",
+  "title": "配置摘要与变更历史（<project>/config.lock.json）",
+  "description": "配置的锚定与留痕 schema，依据 spec/D6_REBASELINE_PROPOSAL.md 9.3 与 9.4。它固定 config.digest、item_digests、defaulted、schema_version 与 history 五个字段：digest 与 item_digests 供“跨配置不可比”判定使用，defaulted 记录哪些非判定性项取了默认值，history 记录每次变更的 actor / role / reason / before_digest / after_digest / ts。配置实例与 lock 的摘要不一致即 config_drift（退出码 1），阻断判定。",
+  "$comment": "digest 算法：对配置实例做按键排序、无空白分隔的规范化 JSON（UTF-8），再取 sha256，写作 sha256:<64 位小写十六进制>；item_digests 对每个 CFG 项的取值单独取同一算法。schema_version 必须与 runtime-config.schema.json 的 const 一致。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "config_digest",
+    "item_digests",
+    "defaulted",
+    "history"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "config.schema/1",
+      "maxLength": 40,
+      "description": "配置 schema 版本，必须与 runtime-config.schema.json 的 schema_version 一致。"
+    },
+    "config_digest": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "maxLength": 71,
+      "description": "全量配置的规范化 JSON 摘要。digest 不同即结果不可比，结果表须标 incomparable: true。"
+    },
+    "item_digests": {
+      "type": "object",
+      "additionalProperties": false,
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^CFG-(0[1-9]|1[0-3])$",
+        "maxLength": 8
+      },
+      "maxProperties": 13,
+      "description": "逐项摘要，用于诊断“是哪一项变了导致不可比”。",
+      "properties": {
+        "CFG-01": {
+          "$ref": "#/$defs/item_digest"
+        },
+        "CFG-02": {
+          "$ref": "#/$defs/item_digest"
+        },
+        "CFG-03": {
+          "$ref": "#/$defs/item_digest"
+        },
+        "CFG-04": {
+          "$ref": "#/$defs/item_digest"
+        },
+        "CFG-05": {
+          "$ref": "#/$defs/item_digest"
+        },
+        "CFG-06": {
+          "$ref": "#/$defs/item_digest"
+        },
+        "CFG-07": {
+          "$ref": "#/$defs/item_digest"
+        },
+        "CFG-08": {
+          "$ref": "#/$defs/item_digest"
+        },
+        "CFG-09": {
+          "$ref": "#/$defs/item_digest"
+        },
+        "CFG-10": {
+          "$ref": "#/$defs/item_digest"
+        },
+        "CFG-11": {
+          "$ref": "#/$defs/item_digest"
+        },
+        "CFG-12": {
+          "$ref": "#/$defs/item_digest"
+        },
+        "CFG-13": {
+          "$ref": "#/$defs/item_digest"
+        }
+      }
+    },
+    "defaulted": {
+      "type": "array",
+      "maxItems": 13,
+      "description": "取过默认值的非判定性配置项编号；判定性项不得出现在此列表。",
+      "items": {
+        "type": "string",
+        "enum": [
+          "CFG-01",
+          "CFG-02",
+          "CFG-03",
+          "CFG-04",
+          "CFG-05",
+          "CFG-06",
+          "CFG-07",
+          "CFG-08",
+          "CFG-09",
+          "CFG-10",
+          "CFG-11",
+          "CFG-12",
+          "CFG-13"
+        ],
+        "maxLength": 8
+      }
+    },
+    "history": {
+      "type": "array",
+      "maxItems": 500,
+      "description": "配置变更历史。变更阈值、采样口径、日历属高影响变更（high_impact=true），必须经 CFG-12 的 approver_role 人审，否则后续判定结论无据。",
+      "items": {
+        "$ref": "#/$defs/history_entry"
+      }
+    }
+  },
+  "$defs": {
+    "item_digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "maxLength": 64,
+      "description": "单个配置项取值的规范化 JSON 摘要（不含 sha256: 前缀）。"
+    },
+    "history_entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ts",
+        "actor",
+        "role",
+        "reason",
+        "before_digest",
+        "after_digest"
+      ],
+      "properties": {
+        "ts": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+          "maxLength": 20
+        },
+        "actor": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "role": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 500
+        },
+        "before_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "maxLength": 71
+        },
+        "after_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "maxLength": 71
+        },
+        "high_impact": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

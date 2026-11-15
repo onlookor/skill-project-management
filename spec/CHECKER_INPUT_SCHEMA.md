@@ -251,3 +251,35 @@
 3. 样例必须声明它覆盖的子句（附录 A.2 的 clause id）；一个子句至少被一个样例覆盖，未覆盖须在 A.2 记 `not-checked` 并写理由。
 4. 判定列中的枚举、关系路径、量词必须能在本文件找到定义；`scripts/check_three_table.py` 负责机械对照，失败即阻断提交。
 5. 修改后必须运行 `python3 validation/checker-prototype/checker.py`，全部样例通过才可提交；失败时按 `AGENTS.md` 3.6 判断是否新增缺口。
+
+## 7. 配置错误分类与退出码（批次 0083）
+
+本节固定**配置层错误分类与退出码**，供检查器按退出码分流。它不定义配置求值：阈值解释、采样与工件判定属解释器（下一批）。设计基准为 `spec/D6_REBASELINE_PROPOSAL.md` 第 9 节。
+
+### 7.1 四类结果与退出码
+
+| 类别 | 含义 | 退出码 | 与既有语义的关系 |
+|---|---|---|---|
+| `cannot_evaluate` | 判定性配置项缺失或无法判定 | 3 | 新增：无法机械判定，**不得回落为通过** |
+| `config_invalid` | 取值越界、类型错误、引用了未注册配置项 | 2 | 沿用“输入不合法” |
+| `config_incomplete` | 项存在但相互矛盾（采样口径与采样集/日历不匹配、档数与标签不等长、自定义口径缺名称） | 2 | 沿用“输入不合法” |
+| `config_drift` | 配置实例与配置锁文件（config 自身摘要 + 变更历史）不一致 | 1 | 沿用“违规/阻断” |
+
+`0` 仍表示通过，`1` 仍表示违规，`2` 仍表示输入不合法，`3` 为新增的“不可判定”。四类同时出现时按 `config_invalid` → `config_incomplete` → `config_drift` → `cannot_evaluate` 的顺序取退出码：先解决结构问题，再谈能不能判定。
+
+### 7.2 固定入口与常量
+
+- 分类与摘要：`scripts/config_codes.py`（`EXIT_BY_CLASS`、`classify()`、`config_findings()`、`overall_exit_code()`）。
+- 配置实例 schema：`contracts/schema/runtime-config.schema.json`（CFG-01～CFG-13）。
+- 配置摘要与历史 schema：`contracts/schema/runtime-config-lock.schema.json`（`config_digest`、`item_digests`、`defaulted`、`schema_version`、`history`）。
+- 自检：`python3 scripts/config_codes.py --self-check`（约束一至约束四的机械核验）。
+- 结构分类：`python3 scripts/config_codes.py --check <项目配置实例路径> [--lock <项目配置锁路径>]`。
+
+### 7.3 配置快照与可比性
+
+配置快照为 `schema_version` + `config_digest` + `item_digests` + `defaulted`。`config_digest` 是规范化 JSON（键排序、无空白分隔、UTF-8）的 sha256，形如 `sha256:<64 位小写十六进制>`；`item_digests` 对每个 CFG 项单独取同一算法。摘要不同即判定结果**跨配置不可比**，结果须标 `incomparable: true`，不得把两次不同配置的通过率放在同一组里比较。
+
+### 7.4 不得回落为通过
+
+判定性项（CFG-01～CFG-09，CFG-13）无默认值，缺失即 `cannot_evaluate`（退出码 3）；只有非判定性项（CFG-10、CFG-11）允许默认值，取默认时把项编号登记进 `defaulted`。CFG-12 缺失等价于“不额外放宽”，任务卡声明的 mandatory gate 仍全量启用，因此也不构成通过。
+

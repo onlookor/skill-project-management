@@ -1341,3 +1341,23 @@
 - **验证**：`check_no_raw_material` / `check_anchors` / `check_ledger_landings` / `check_three_table` / `check_coverage_gate` / `check_gap_ledger` / `check_dependency_pins` / `check_glossary_usage` / `check_state` 均 rc=0；`check_checker_pins` rc=1（15 个既有无复核对象）、`check_spec_pins` rc=1（3 个既有无复核区段），均为本批之前已登记的 T-149 债务，本批未新增钉扎对象。
 - **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`（沿用既有到期项，本提交未新增钉扎对象）。
 - **关联 ADR**：无（改判依据为已批准的提案第 9 节，非新治理决定）
+
+---
+
+### 批次 0083 — 2026-11-15 — 配置层 schema 落盘（CFG-01～CFG-13）与四类退出码
+
+- **涉及文件**：
+  - 新建：`contracts/schema/runtime-config.schema.json`、`contracts/schema/runtime-config-lock.schema.json`、`scripts/config_codes.py`
+  - 修改：`spec/CHECKER_INPUT_SCHEMA.md`（新增第 7 节）、`AGENTS.md`（目录树与区段计数 14→16）、`scripts/README.md`（脚本清单与运行方式）、`TODO.md`（T-158）、`scripts/no-review-declarations.json`、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`CHANGELOG.md`
+- **变更摘要**：按第 9 节落配置层结构，**不实现求值**。
+  1. **配置实例 schema**：13 项 CFG 全覆盖，键只能取 `CFG-01`～`CFG-13`（`propertyNames` + `additionalProperties: false`），故技能判据、验收参数、能力开关的键在本文件中结构上不可出现；每项以 `$comment` 登记 `cfg=/class=/defaultable=/absent=`，`--self-check` 机械核验。
+  2. **默认值规则**：仅 CFG-10（舍入口径）、CFG-11（命名与版本）标 `defaultable=true`；CFG-01～09、CFG-13 无默认，缺失即 `cannot_evaluate`；CFG-12 无默认且 `absent=conservative_no_relaxation`（缺失只是不额外加关口，任务卡 mandatory gate 仍全量启用）。
+  3. **四条安全边界**：B1 缺配置不得默认通过（无默认 + 退出码 3）；B2 人审关口不可删除（CFG-12 无删除表达）；B3 检查项不可关闭（schema 内无 enable/disable/skip/ignore/waive 类字段，`config_codes.py` 递归扫描并阻断）；B4 配置不改写工件必填字段集合（schema 只约束取值）。
+  4. **配置摘要**：`config_digest`（`sha256:<64hex>`，规范化 JSON）、`item_digests`、`defaulted`、`schema_version` 落在 `runtime-config-lock.schema.json`，供“跨配置不可比”判定。
+  5. **四类退出码**：`cannot_evaluate=3`、`config_invalid=2`、`config_incomplete=2`、`config_drift=1`，优先顺序 `config_invalid → config_incomplete → config_drift → cannot_evaluate`；写入 `spec/CHECKER_INPUT_SCHEMA.md` 第 7 节与 `config_codes.py`，检查器可按退出码分流。
+- **边界遵守**：未改 `CONSTITUTION.md`、未改 `spec/D6_REBASELINE_PROPOSAL.md`、未动任何判定逻辑。
+- **新增 TODO**：T-158（配置解释器与 9.5 的 A1–A6 工件契约接入，下一批）。
+- **钉扎面变化**：新增 2 个规格区段（两份配置 schema，`contracts/schema/` 自动发现）与 1 个受保护检查器对象（`config_codes.py`）。规格区段 14→16、检查器对象 21→22；无复核项规格 3→5、检查器 15→16，逐对象登记入 `scripts/no-review-declarations.json`，全部指向 T-149。
+- **验证**：`config_codes.py --self-check` rc=0；四类场景实测 `ok=0`、`config_incomplete=2`、`cannot_evaluate=3`、`config_invalid=2`、`config_drift=1`；其余检查器结果见提交信息。
+- **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`（新增 3 个无复核对象，均已登记）。
+- **关联 ADR**：无（结构依据为已批准的提案第 9 节）

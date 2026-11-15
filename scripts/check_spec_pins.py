@@ -109,6 +109,18 @@ SECTIONS = (
         "end": None,
     },
     {
+        "key": "contracts/schema/runtime-config.schema.json",
+        "path": "contracts/schema/runtime-config.schema.json",
+        "start": None,
+        "end": None,
+    },
+    {
+        "key": "contracts/schema/runtime-config-lock.schema.json",
+        "path": "contracts/schema/runtime-config-lock.schema.json",
+        "start": None,
+        "end": None,
+    },
+    {
         "key": "spec/ACCESS_ZONES.md",
         "path": "spec/ACCESS_ZONES.md",
         "start": None,

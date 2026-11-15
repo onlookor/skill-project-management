@@ -586,7 +586,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 463,
+          "line": 466,
           "form": "code"
         },
         {
@@ -766,7 +766,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 463,
+          "line": 466,
           "form": "code"
         },
         {
@@ -1176,7 +1176,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 463,
+          "line": 466,
           "form": "code"
         },
         {
@@ -1556,7 +1556,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 463,
+          "line": 466,
           "form": "code"
         },
         {
@@ -1906,17 +1906,17 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 421,
-          "form": "code"
-        },
-        {
-          "file": "AGENTS.md",
           "line": 424,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 467,
+          "line": 427,
+          "form": "code"
+        },
+        {
+          "file": "AGENTS.md",
+          "line": 470,
           "form": "code"
         },
         {
@@ -2026,17 +2026,12 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 422,
+          "line": 425,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 424,
-          "form": "code"
-        },
-        {
-          "file": "AGENTS.md",
-          "line": 464,
+          "line": 427,
           "form": "code"
         },
         {
@@ -2046,12 +2041,17 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 482,
+          "line": 470,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 484,
+          "line": 485,
+          "form": "code"
+        },
+        {
+          "file": "AGENTS.md",
+          "line": 487,
           "form": "code"
         },
         {
@@ -2726,17 +2726,17 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 421,
+          "line": 424,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 501,
+          "line": 504,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 506,
+          "line": 509,
           "form": "code"
         },
         {
@@ -3922,7 +3922,7 @@
         },
         {
           "file": "scripts/README.md",
-          "line": 70,
+          "line": 72,
           "form": "code"
         },
         {
@@ -4112,7 +4112,7 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 467,
+          "line": 470,
           "form": "code"
         },
         {
@@ -4600,7 +4600,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 446,
+          "line": 449,
           "form": "code"
         },
         {
@@ -4660,7 +4660,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 446,
+          "line": 449,
           "form": "code"
         },
         {

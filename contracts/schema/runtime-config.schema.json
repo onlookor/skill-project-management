@@ -1,0 +1,518 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-management-grounding/contracts/schema/runtime-config.schema.json",
+  "title": "运行期配置实例（<project>/config.json）",
+  "description": "配置层的结构 schema，依据 spec/D6_REBASELINE_PROPOSAL.md 第 9 节（9.1 位置与边界、9.2 配置项清单、9.3 缺失与非法值、9.4 配置快照）。它约束的是**项目参数的取值形状**，不执行任何判定求值。四类归属只有 project_parameter 能出现在本文件：skill_criterion、acceptance_parameter、capability_switch 由 propertyNames 与 additionalProperties 双重拒绝，不得混写。默认值规则：只有非判定性项允许默认值（CFG-10、CFG-11），判定性项一律无默认，缺失即 cannot_evaluate（退出码 3），不得回落为通过。四条安全边界见顶层 $comment，其中“配置只能调严或调宽、不得关闭检查”的机械落点是本 schema 不含任何 enable/disable/skip/ignore/waive 类字段，且每一层 additionalProperties 均为 false——没有字段可以关闭某个 check。",
+  "$comment": "schema_version=config.schema/1; classes=project_parameter|skill_criterion|acceptance_parameter|capability_switch; present_class=project_parameter; 每个 CFG 属性的 $comment 以 cfg=/class=/defaultable=/absent= 元数据登记，另可用 sub_defaults= 声明子字段默认值。安全边界：B1 缺配置不得默认通过（defaultable=false ⇒ 无 default ⇒ absent=cannot_evaluate）；B2 人审关口不可删除（CFG-12 只有 additional_gates 与 approver_role_map，删除表达不存在）；B3 检查项不可关闭（无任何开关字段）；B4 配置不可改变工件必填字段集合（本文件只约束取值，不出现 required 列表注入工件）。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "config"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "config.schema/1",
+      "maxLength": 40,
+      "description": "配置 schema 版本。与 config.lock.json 的 schema_version 必须一致；不一致按 config_drift（退出码 1）处理。"
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+      "maxLength": 64,
+      "description": "项目标识。用于工件命名与配置快照归属；不参与判定语义。"
+    },
+    "config": {
+      "type": "object",
+      "additionalProperties": false,
+      "propertyNames": {
+        "type": "string",
+        "pattern": "^CFG-(0[1-9]|1[0-3])$",
+        "maxLength": 8
+      },
+      "required": [
+        "CFG-01",
+        "CFG-02",
+        "CFG-03",
+        "CFG-04",
+        "CFG-09"
+      ],
+      "description": "配置项集合。键只允许 CFG-01～CFG-13；任何未注册键（含 SKILL-*、ACCEPT-*、SWITCH-* 前缀）按 config_invalid（退出码 2）处理，防止拼写错误被当成新参数。",
+      "properties": {
+        "CFG-01": {
+          "$comment": "cfg=CFG-01; class=project_parameter; defaultable=false; absent=cannot_evaluate",
+          "title": "偏差分档维度",
+          "description": "偏差按哪些对象维度分档。至少 1 项，取值必须来自封闭枚举。判定性：缺失即 cannot_evaluate（退出码 3），不取默认。",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 4,
+          "items": {
+            "type": "string",
+            "enum": [
+              "cost_account",
+              "wbs_node",
+              "deliverable",
+              "work_package"
+            ],
+            "maxLength": 40
+          }
+        },
+        "CFG-02": {
+          "$comment": "cfg=CFG-02; class=project_parameter; defaultable=false; absent=cannot_evaluate",
+          "title": "分档数与状态标签",
+          "description": "档数 3–5，标签与档数等长且取值封闭。判定性：缺失即 cannot_evaluate（退出码 3）。等长约束由下方 if/then 机械校验，不依赖实现判断。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "levels",
+            "labels"
+          ],
+          "properties": {
+            "levels": {
+              "type": "integer",
+              "minimum": 3,
+              "maximum": 5
+            },
+            "labels": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 5,
+              "items": {
+                "type": "string",
+                "enum": [
+                  "green",
+                  "yellow",
+                  "amber",
+                  "red",
+                  "blue"
+                ],
+                "maxLength": 16
+              }
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "levels": {
+                    "const": 3
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "labels": {
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "green",
+                        "yellow",
+                        "amber",
+                        "red",
+                        "blue"
+                      ],
+                      "maxLength": 16
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "levels": {
+                    "const": 4
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "labels": {
+                    "minItems": 4,
+                    "maxItems": 4,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "green",
+                        "yellow",
+                        "amber",
+                        "red",
+                        "blue"
+                      ],
+                      "maxLength": 16
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "if": {
+                "properties": {
+                  "levels": {
+                    "const": 5
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "labels": {
+                    "minItems": 5,
+                    "maxItems": 5,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "enum": [
+                        "green",
+                        "yellow",
+                        "amber",
+                        "red",
+                        "blue"
+                      ],
+                      "maxLength": 16
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "CFG-03": {
+          "$comment": "cfg=CFG-03; class=project_parameter; defaultable=false; absent=cannot_evaluate",
+          "title": "分档边界",
+          "description": "分档边界须升序、无重叠、覆盖声明区间，并写明偏差点定义（SPI / CPI / 自定义）。形状与枚举由本 schema 校验；升序与覆盖性由配置解释器在求值时判定（本批不实现）。判定性：缺失即 cannot_evaluate（退出码 3）。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "metric",
+            "boundaries"
+          ],
+          "properties": {
+            "metric": {
+              "type": "string",
+              "enum": [
+                "SPI",
+                "CPI",
+                "custom"
+              ],
+              "maxLength": 16
+            },
+            "custom_metric": {
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 80
+            },
+            "boundaries": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 5,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "label",
+                  "order",
+                  "lower",
+                  "upper"
+                ],
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "enum": [
+                      "green",
+                      "yellow",
+                      "amber",
+                      "red",
+                      "blue"
+                    ],
+                    "maxLength": 16
+                  },
+                  "order": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5
+                  },
+                  "lower": {
+                    "type": "number",
+                    "minimum": -1000000,
+                    "maximum": 1000000
+                  },
+                  "upper": {
+                    "type": "number",
+                    "minimum": -1000000,
+                    "maximum": 1000000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "CFG-04": {
+          "$comment": "cfg=CFG-04; class=project_parameter; defaultable=false; absent=cannot_evaluate",
+          "title": "采样口径",
+          "description": "状态按里程碑周期分数、自然日、周、月或小时采样。判定性：缺失即 cannot_evaluate（退出码 3）。口径决定 CFG-05/CFG-06 或 CFG-07 的必填性，约束见顶层 allOf。",
+          "type": "string",
+          "enum": [
+            "milestone_fraction",
+            "calendar_day",
+            "week",
+            "month",
+            "hour"
+          ],
+          "maxLength": 32
+        },
+        "CFG-05": {
+          "$comment": "cfg=CFG-05; class=project_parameter; defaultable=false; absent=cannot_evaluate; must_include=1",
+          "title": "里程碑周期分数采样集",
+          "description": "分数 ∈ (0,1]、分母 ≤10、去重升序，必含 1（周期末必采）。本 schema 用 minimum 0.1 落实分母 ≤10 的下界；“必含 1”与去重升序由配置解释器在求值时判定。仅当 CFG-04=milestone_fraction 时必填，缺失即 cannot_evaluate（退出码 3）。",
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10,
+          "items": {
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 1
+          }
+        },
+        "CFG-06": {
+          "$comment": "cfg=CFG-06; class=project_parameter; defaultable=false; absent=cannot_evaluate",
+          "title": "周期基准",
+          "description": "决定 1/3 的分母是 5（工作日）还是 7（自然日）。必须显式，不得由实现猜。仅当 CFG-04=milestone_fraction 时必填，缺失即 cannot_evaluate（退出码 3）。",
+          "type": "string",
+          "enum": [
+            "workday",
+            "calendar_day"
+          ],
+          "maxLength": 16
+        },
+        "CFG-07": {
+          "$comment": "cfg=CFG-07; class=project_parameter; defaultable=false; absent=cannot_evaluate",
+          "title": "固定间隔采样",
+          "description": "固定间隔采样的步长与单位。仅当 CFG-04 ∈ {calendar_day, week, month, hour} 时必填，缺失即 cannot_evaluate（退出码 3）。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "n",
+            "unit"
+          ],
+          "properties": {
+            "n": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 365
+            },
+            "unit": {
+              "type": "string",
+              "enum": [
+                "day",
+                "week",
+                "month",
+                "hour"
+              ],
+              "maxLength": 8
+            }
+          }
+        },
+        "CFG-08": {
+          "$comment": "cfg=CFG-08; class=project_parameter; defaultable=false; absent=cannot_evaluate; sub_defaults=timezone,workdays",
+          "title": "项目日历",
+          "description": "工作日集合、节假日清单与 IANA 时区。项本身为判定性配置，缺失即 cannot_evaluate（退出码 3）；项内字段 timezone 与 workdays 属非判定性取值，允许子字段默认值（Asia/Shanghai；周一至周五）。",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "timezone": {
+              "type": "string",
+              "pattern": "^[A-Za-z][A-Za-z0-9_+-]{0,63}(/[A-Za-z0-9_+-]{1,63}){0,2}$",
+              "maxLength": 64,
+              "default": "Asia/Shanghai"
+            },
+            "workdays": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 7,
+              "default": [
+                "Mon",
+                "Tue",
+                "Wed",
+                "Thu",
+                "Fri"
+              ],
+              "items": {
+                "type": "string",
+                "enum": [
+                  "Mon",
+                  "Tue",
+                  "Wed",
+                  "Thu",
+                  "Fri",
+                  "Sat",
+                  "Sun"
+                ],
+                "maxLength": 3
+              }
+            },
+            "holidays": {
+              "type": "array",
+              "maxItems": 366,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "from",
+                  "to"
+                ],
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                    "maxLength": 10
+                  },
+                  "to": {
+                    "type": "string",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+                    "maxLength": 10
+                  }
+                }
+              }
+            }
+          }
+        },
+        "CFG-09": {
+          "$comment": "cfg=CFG-09; class=project_parameter; defaultable=false; absent=cannot_evaluate",
+          "title": "货币",
+          "description": "ISO 4217 三位币种码。判定性：缺失即 cannot_evaluate（退出码 3）。",
+          "type": "string",
+          "pattern": "^[A-Z]{3}$",
+          "maxLength": 3
+        },
+        "CFG-10": {
+          "$comment": "cfg=CFG-10; class=project_parameter; defaultable=true; absent=use_default; sub_defaults=decimals,rounding,intermediate",
+          "title": "舍入口径",
+          "description": "非判定性：缺失时取子字段默认值（2 位小数、half-even、中间计算不舍入），并在产物 config_used.defaulted 中登记 CFG-10。舍入会传导到 CPI/EAC，故跨配置不可比。",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "decimals": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 6,
+              "default": 2
+            },
+            "rounding": {
+              "type": "string",
+              "enum": [
+                "half_up",
+                "half_even"
+              ],
+              "maxLength": 16,
+              "default": "half_even"
+            },
+            "intermediate": {
+              "type": "string",
+              "enum": [
+                "none",
+                "4",
+                "6"
+              ],
+              "maxLength": 8,
+              "default": "none"
+            }
+          }
+        },
+        "CFG-11": {
+          "$comment": "cfg=CFG-11; class=project_parameter; defaultable=true; absent=use_default; sub_defaults=template",
+          "title": "工件命名与版本约定",
+          "description": "非判定性：缺失时取默认模板。模板必须含 <type> 段与 <major>/<minor> 版本段，由 pattern 机械校验。不影响任何可比性。",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "template": {
+              "type": "string",
+              "pattern": "^(?=.*<type>)(?=.*<major>)(?=.*<minor>)[^\\n]{1,200}$",
+              "maxLength": 200,
+              "default": "<type>-<project_id>-v<major>.<minor>"
+            }
+          }
+        },
+        "CFG-12": {
+          "$comment": "cfg=CFG-12; class=project_parameter; defaultable=false; absent=conservative_no_relaxation",
+          "title": "人审关口",
+          "description": "只能增加关口或映射 approver_role，不可移除任务卡声明的 mandatory gate——本 schema 不含任何删除表达，additionalProperties=false，故“删除关口”在结构上不可能。缺失时不增加额外关口（任务卡的 mandatory gate 仍全启用），角色未解析则 blocked；因此不取默认值、也不回落为通过。",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "additional_gates": {
+              "type": "array",
+              "maxItems": 20,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "gate_id",
+                  "approver_role"
+                ],
+                "properties": {
+                  "gate_id": {
+                    "type": "string",
+                    "pattern": "^GATE-[A-Z0-9_-]{1,40}$",
+                    "maxLength": 48
+                  },
+                  "approver_role": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  }
+                }
+              }
+            },
+            "approver_role_map": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "maxProperties": 40,
+              "propertyNames": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9_.-]{1,80}$",
+                "maxLength": 80
+              }
+            }
+          }
+        },
+        "CFG-13": {
+          "$comment": "cfg=CFG-13; class=project_parameter; defaultable=false; absent=cannot_evaluate",
+          "title": "挣值计量规则",
+          "description": "挣值计量规则（0/100、50/50、百分比完成、加权里程碑）。判定性：用到挣值时必填，缺失即 cannot_evaluate（退出码 3）。公式、EAC 三法与术语别名属技能判据，不在本配置内。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "rule"
+          ],
+          "properties": {
+            "rule": {
+              "type": "string",
+              "enum": [
+                "0/100",
+                "50/50",
+                "percent_complete",
+                "weighted_milestone"
+              ],
+              "maxLength": 24
+            },
+            "weighted_milestone_ref": {
+              "type": "string",
+              "minLength": 0,
+              "maxLength": 120
+            }
+          }
+        }
+      }
+    }
+  }
+}

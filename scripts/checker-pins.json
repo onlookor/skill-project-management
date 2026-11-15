@@ -34,7 +34,7 @@
       "basis": "非同源复核：G-019 r6（基线 bafcb04）要求撤掉 pattern 嵌套量词启发式只留 512 字符上限、退出码表述与实现对齐、替换范围表述与实测对齐。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r6/REPORT.md；sha256：1db2586ee7f5614920fc6a6ab3f2afc34c4445ff997df8b0aaec48327d6bd1db；复核基线：bafcb04 区段：scripts/check_no_raw_material.py 结论：认可"
     },
     "scripts/check_spec_pins.py": {
-      "sha256": "a73bcf5e7b674646a258b1461a1f2cb8060a5f44785ab3d75d71a7e4722a160a",
+      "sha256": "9c120d4710d9a860d23239e971e897d53f0c6f2f04a32fccf560e9d91734d3a5",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/check_state.py": {
@@ -78,11 +78,15 @@
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/no-review-declarations.json": {
-      "sha256": "aa3d2208af88e12b4d4179d7a1997886e4267b59e3009746cf5b9e2f484df81e",
+      "sha256": "3bc81f07093a46fbbeab294d11b91b9f2cffc1aa6ded069fc1e7ba8068160fb9",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "validation/pinned/checker.py": {
       "sha256": "b457a7a6160d71b250fd76e8e47993cee0dbe9395fb79b413e131a060ad3bae3",
+      "basis": "无复核声明（不构成认可，不放行）"
+    },
+    "scripts/config_codes.py": {
+      "sha256": "7e5dca43025f3f1a6853592bd291879bb899979ac58b4f4ddd544ad180740835",
       "basis": "无复核声明（不构成认可，不放行）"
     }
   },
