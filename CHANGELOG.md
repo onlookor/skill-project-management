@@ -1065,3 +1065,15 @@
 - **全仓复跑**：145 个跟踪文件 0 命中；自测 58/58；`checker-pins` 17/17；`spec-pins` 15/15；pre-commit 全绿。
 - **涉及文件**：`scripts/check_no_raw_material.py`、5 份 `ontology/*.ttl`、25 份 `ontology/fixtures/*.ttl`、`spec/ACCESS_ZONES.md`、`scripts/README.md`、`validation/reviews/2026-11-15-ontology-rules-r3.md`、两份 pins JSON、`CHANGELOG.md`。
 - **状态**：生效（G-019/G-021 仍 `open`，待非同源复核）
+
+---
+
+### 批次 0062 — 2026-11-15 — 结构性修法（第四批：台账按 r3 复核改写）
+
+- **性质**：按非同源复核 `verify-g019-r3`（sha256 `877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0`，基线 `3664b64`）改写 G-019/G-021 并同步台账。D4 未动、未放量、未碰判据 7 外部抽样。
+- **G-021 按真实量级改写**：旧的“每份 10 × 2000 字符”改为按字段路径口径——`relations` 12 键 × 20 值 × 120 字符 = 28,800，`evidence` 12 条 × 6 字段 ≈ 9,000，`pilot-conflicts` 的 `positions` 修复前 300 × 400 = 120,000 / `recorded_fields` 200 × 120 = 24,000（批次 0060 加 `maxItems: 40` 后为 16,000 与 4,800），`pilot-id-map` 的 12 条 `notes` 与 `rule_bindings.*.note` 合计上限 9,400。三类字符量均计入**总量口径**，明确“通过检查只证明结构合规”。
+- **G-019 补记落地**：说明补入批次 0059–0061 的结构性修法（schema 目录自动发现、`basis` 抬到检查器绑定同一标准、`RM-SCHEMA-LINT` 与关键字白名单、`oneOf` 排他、`$ref` 同级拒绝、按路径配额、`positions`/`recorded_fields` 加 `maxItems`、两条本体规则按真实 TTL 形态重写及召回统计），并写明自测 58 项覆盖 r3 全部攻击输入。维持 `open`。
+- **G-020 不动**：三条关闭备注与关闭依据原文未改；仅确认本批改动未触及该条的声明式排除口径。
+- **台账同步**：G-021 影响面由 `prose_fields` 改为 `x-prose-fields` / `x-prose-budget`；G-019 影响面补 `scripts/check_spec_pins.py` 与 `contracts/schema/` 全部 schema；核查记录表补批次 0052–0062 共九行。台账 21 条：`open` 4（G-017、G-018、G-019、G-021）/ `closed` 17。
+- **涉及文件**：`GAP_LEDGER.md`、`TODO.md`、`CHANGELOG.md`。
+- **状态**：生效（G-019/G-021 仍 `open`，待非同源复核）
