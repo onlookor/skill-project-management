@@ -1309,3 +1309,16 @@
 - **验证**：`test_checker_pins.py` 20/20、`test_spec_pins.py` 23/23；`check_checker_pins.py` rc=1（15 个无复核对象）、`check_spec_pins.py` rc=1（3 个无复核区段，含新增的 `AGENTS.md#3.5`），均为预期。
 - **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`（新增 `AGENTS.md#3.5` 无复核项与检查器哈希刷新，仍 rc≠0）。
 - **关联 ADR**：无（本批为口径落地；7.6/7.7 的机制变更按其自身条目走 ADR，见 T-152/T-153）
+---
+
+### 批次 0081 — 2026-11-15 — 可配置元规则；EVM 五条来源入表；案例素材处置 ADR
+
+- **涉及文件**：`AGENTS.md`、`ROADMAP.md`、`TODO.md`、`SOURCE_LEDGER.md`、`adr/0020-case-material-handling.md`（新建）、`CHANGELOG.md`。
+- **变更摘要**：
+  1. **可配置优先（新元规则）**：`AGENTS.md` 新增 §1bis，顺序固定为“先判可配置性 → 再定归属（运行契约层，挂载时与项目用户约定）→ 只有确实不可配置才请人裁定”。偏差按科目分档、状态采样按里程碑计划进度周期的分数（1/2、1/3、1/5）或自然日/周/月/小时等一律为配置项；**不得写成技能常量、不设默认值**；未配置即 `cannot_evaluate`，不得回落为通过；跨配置不得比较，结果须带配置快照指纹。`ROADMAP.md` D6 验收要件新增第 5 条并把阈值改为“配置项”，`TODO.md` T-150 改为“配置随任务集记录、双臂锁同一配置快照”，不再写死阈值数字。
+  2. **EVM 来源登记**：`SOURCE_LEDGER.md` 新增 `GAO-20-195G`、`NASA-NTRS-20200000301`、`NASA-NTRS-20180001499`、`DOE-G-413.3-10A`、`AACE-RP-82R-13` 五条，均标“仅章节级可用”、`verification_method: authority_page`、`claim_mapping` 暂空、`compilation_landing: pending:T-151`。并写明三条使用条件（以章节为对象；一项能力只固定一个主源、EAC 三法不得跨源混用；`provenance_note` 记录 EIA-748 准则映射并声明原文未核验）与新旧指标名差异（BCWP/BCWS/ACWP ↔ EV/PV/AC）。
+  3. **案例素材处置**：新增 ADR-0020——素材**不入**登记表，放 `validation/cases/` 并附 MANIFEST（来源、许可、日期、改造说明）；只有由案例抽象出的评分判据入表；解释第 2.3 条“本地副本应入表”不适用于数据素材，并说明“另立类别”与“逐份挂 pending”两条替代路径为何否决。**宪法正文未改**。
+- **新增 TODO**：T-155（EVM 规则与落点）、T-156（案例素材库与 MANIFEST）；T-147、T-150 判据同步。
+- **验证**：全套检查器复跑见提交信息；`check_checker_pins.py` / `check_spec_pins.py` 仍因既有 15 + 3 个无复核对象 rc=1（T-149），本批未新增钉扎对象。
+- **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`（沿用既有到期项，本批未新增无复核登记）。
+- **关联 ADR**：ADR-0020

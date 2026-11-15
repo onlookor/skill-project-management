@@ -144,6 +144,103 @@
 | `compilation_landing` | `pending:T-112`（正文未获取，暂无落点；落点补齐前不得被任何 `grounding_ref` 引用） |
 | **核验状态** | **元数据核验，正文未获取**。摘要确认其构建了表示项目管理标准/指南的 OWL 本体；具体类、属性、公理与验证结果均未核对。 |
 
+#### GAO-20-195G
+
+| 字段 | 内容 |
+|---|---|
+| `id` | `GAO-20-195G` |
+| `citation` | U.S. Government Accountability Office. *GAO Cost Estimating and Assessment Guide: Best Practices for Developing and Managing Program Costs* (GAO-20-195G). 2020-03. |
+| `version` | GAO-20-195G（2020-03） |
+| `local_path` | 无（在线 PDF，未下载到本地 `resources/`） |
+| `status` | `active`（**仅章节级可用**） |
+| `authority_tier` | `national_standard` |
+| `verified_date` | 2026-11-15 |
+| `verification_method` | `authority_page`（GAO 官网目录页与章节页可访问，题名、编号、日期可核）；**EVM 公式与对 EIA-748 的转述未逐条核对** |
+| `allowed_uses` | **以章节为对象**：EVM 定义与指标、成本估算可靠性、WBS—成本映射。**明确排除**政府采购条款、合同条款、机构内部流程（属特定领域实践，不过 `CONSTITUTION.md` 第 2.6 条领域测试） |
+| `claim_mapping` | 无规则直接映射（EVM 规则与术语尚未落地，见 T-155） |
+| `compilation_landing` | `pending:T-151`（EVM 规则与 `compute` 算子落地前无落点；**落点补齐前不得被任何 `grounding_ref` 引用**） |
+| **核验状态** | **元数据与章节页已核，正文公式未核**。可作为“上游来源名”出现在 `provenance_note`，不得作为公式唯一依据 |
+
+#### NASA-NTRS-20200000301
+
+| 字段 | 内容 |
+|---|---|
+| `id` | `NASA-NTRS-20200000301` |
+| `citation` | National Aeronautics and Space Administration. *EVM Reference Guide for Project-Control Account Managers*. NASA Technical Reports Server，文档 ID 20200000301. |
+| `version` | NTRS 20200000301 |
+| `local_path` | 无（公开 PDF，未下载到本地 `resources/`） |
+| `status` | `active`（**仅章节级可用**） |
+| `authority_tier` | `official_doc` |
+| `verified_date` | 2026-11-15 |
+| `verification_method` | `authority_page`（NTRS 记录页可访问：题名、机构、文档 ID）；**正文与 EIA-748 32 条准则映射未核对** |
+| `allowed_uses` | **以章节为对象**：EIA-748 准则映射、WBS 与挣值关系、EVM 术语。排除 NASA 采购与合同条款、中心内部流程 |
+| `claim_mapping` | 无规则直接映射（见 T-155） |
+| `compilation_landing` | `pending:T-151`（同上；落点前不得被 `grounding_ref` 引用） |
+| **核验状态** | **元数据已核，正文未核** |
+
+#### NASA-NTRS-20180001499
+
+| 字段 | 内容 |
+|---|---|
+| `id` | `NASA-NTRS-20180001499` |
+| `citation` | National Aeronautics and Space Administration. *EVM Implementation Handbook*. NASA Technical Reports Server，文档 ID 20180001499. |
+| `version` | NTRS 20180001499 |
+| `local_path` | 无（公开 PDF，未下载到本地 `resources/`） |
+| `status` | `active`（**仅章节级可用**） |
+| `authority_tier` | `official_doc` |
+| `verified_date` | 2026-11-15 |
+| `verification_method` | `authority_page`（NTRS 记录页可访问）；**正文未核对** |
+| `allowed_uses` | **以章节为对象**：EVM 实施要求、与 EIA-748 的合规路径、审计留痕要求。排除采购与合同条款 |
+| `claim_mapping` | 无规则直接映射（见 T-155） |
+| `compilation_landing` | `pending:T-151`（同上；落点前不得被 `grounding_ref` 引用） |
+| **核验状态** | **元数据已核，正文未核** |
+
+#### DOE-G-413.3-10A
+
+| 字段 | 内容 |
+|---|---|
+| `id` | `DOE-G-413.3-10A` |
+| `citation` | U.S. Department of Energy. *Earned Value Management System* (DOE G 413.3-10A). Office of Project Management. |
+| `version` | DOE G 413.3-10A |
+| `local_path` | 无（公开 PDF，未下载到本地 `resources/`） |
+| `status` | `active`（**仅章节级可用**） |
+| `authority_tier` | `national_standard` |
+| `verified_date` | 2026-11-15 |
+| `verification_method` | `authority_page`（DOE 指令页面可访问，编号与版本可核）；**正文未核对** |
+| `allowed_uses` | **以章节为对象**：以 ANSI/EIA-748-B 为认证基准的 EVMS 实施与审查要求、EVM 数据有效性检查。排除 DOE 合同条款与特定项目门槛 |
+| `claim_mapping` | 无规则直接映射（见 T-155） |
+| `compilation_landing` | `pending:T-151`（同上；落点前不得被 `grounding_ref` 引用） |
+| **核验状态** | **元数据已核，正文未核** |
+
+#### AACE-RP-82R-13
+
+| 字段 | 内容 |
+|---|---|
+| `id` | `AACE-RP-82R-13` |
+| `citation` | AACE International. *Earned Value Management Overview and Recommended Practices Consistent with EIA-748-C* (Recommended Practice 82R-13). |
+| `version` | RP 82R-13 |
+| `local_path` | 无（公开 PDF，未下载到本地 `resources/`） |
+| `status` | `active`（**仅章节级可用**） |
+| `authority_tier` | `peer_reviewed`（行业协会推荐实践，经共识评审；非同行评议期刊。枚举中最接近项，特此注明） |
+| `verified_date` | 2026-11-15 |
+| `verification_method` | `authority_page`（AACE 目录页可访问，编号与题名可核）；**正文未核对，使用许可待核**（公开 PDF 不等于可再分发） |
+| `allowed_uses` | **以章节为对象**：与 EIA-748-C 对齐的实践、EVM 输出物清单、术语。排除商业培训材料与认证考试内容 |
+| `claim_mapping` | 无规则直接映射（见 T-155） |
+| `compilation_landing` | `pending:T-151`（同上；落点前不得被 `grounding_ref` 引用） |
+| **核验状态** | **元数据已核，正文与许可未核** |
+
+#### EVM 来源的使用条件（批次 0081，用户已批）
+
+上述五条（`GAO-20-195G`、`NASA-NTRS-20200000301`、`NASA-NTRS-20180001499`、`DOE-G-413.3-10A`、`AACE-RP-82R-13`）**只在以下三条同时成立时才可使用**；缺一条即不得被 `claim_mapping` 或 `grounding_ref` 使用：
+
+1. **以章节为对象，不以整份文件为对象**。`allowed_uses` 已按此写死；引用时必须写明章节（如“第 3 章 §3.4”），不得以“该指南要求……”概括整份文件。
+2. **一项能力只固定一个主源**。EAC 的三种算法（底向上、公式法、外推法）在不同文件中并存；本技能必须指定“采用哪一源的第几式”，其余只作对照。**跨源混用即为口径分叉**，判定为不可接受。
+3. **`provenance_note` 记录与 EIA-748 准则编号的映射**，并显式声明：**“EIA-748 原文未核验（付费），仅核验其公开转述”**。这满足 `CONSTITUTION.md` 第 2.5 条的诚实义务，不构成对未核验内容的引用。
+
+**已知口径差异**：政府文件惯用 `BCWP` / `BCWS` / `ACWP`，PMI 体系用 `EV` / `PV` / `AC`。技能只固定一套主名并给出别名映射（T-155），同一工件不得出现两套指标名。
+
+**落地警告**：五条目前全部为 `pending:T-151`，**不得被任何 `grounding_ref` 引用**；正文（至少是所引章节）核对并回填 `verification_method` 后，方可把 `compilation_landing` 从 `pending:` 改为真实落点。
+
 ---
 
 ### 废止与重新锚定记录
