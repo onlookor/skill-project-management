@@ -4490,6 +4490,86 @@
         }
       ]
     },
+    "T-D-014": {
+      "term": "数据区",
+      "locations": [
+        {
+          "file": "CHANGELOG.md",
+          "line": 943,
+          "form": "term_id"
+        },
+        {
+          "file": "spec/ACCESS_ZONES.md",
+          "line": 78,
+          "form": "code"
+        }
+      ]
+    },
+    "T-D-015": {
+      "term": "散文区",
+      "locations": [
+        {
+          "file": "spec/ACCESS_ZONES.md",
+          "line": 80,
+          "form": "code"
+        }
+      ]
+    },
+    "T-D-016": {
+      "term": "本体区",
+      "locations": [
+        {
+          "file": "spec/ACCESS_ZONES.md",
+          "line": 79,
+          "form": "code"
+        }
+      ]
+    },
+    "T-D-017": {
+      "term": "代码与配置区",
+      "locations": [
+        {
+          "file": "spec/ACCESS_ZONES.md",
+          "line": 81,
+          "form": "code"
+        }
+      ]
+    },
+    "T-D-018": {
+      "term": "分区准入",
+      "locations": [
+        {
+          "file": "spec/ACCESS_ZONES.md",
+          "line": 9,
+          "form": "code"
+        }
+      ]
+    },
+    "T-D-019": {
+      "term": "归区表",
+      "locations": [
+        {
+          "file": "spec/ACCESS_ZONES.md",
+          "line": 9,
+          "form": "code"
+        }
+      ]
+    },
+    "T-D-020": {
+      "term": "豁免",
+      "locations": [
+        {
+          "file": "CHANGELOG.md",
+          "line": 943,
+          "form": "term_id"
+        },
+        {
+          "file": "spec/ACCESS_ZONES.md",
+          "line": 92,
+          "form": "code"
+        }
+      ]
+    },
     "T-E-001": {
       "term": "PMBOK",
       "locations": [

@@ -2,8 +2,8 @@
   "version": 1,
   "scripts": {
     ".githooks/pre-commit": {
-      "sha256": "130e56a1cb7396f710fa7d6f198e413206733ff6cda0d4e6f871cec7947cc881",
-      "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
+      "sha256": "dae2069f5f47199cf7a90bf7251a3ef148a05fab8b4d11211bca299b605674d8",
+      "basis": "非同源复核：用户授权（2026-11-15，批次 0053，validation/reviews/2026-11-15-admission-axis-implementation.md） 复核产物：spec/ACCESS_ZONES.md 复核基线：debe35b"
     },
     "scripts/check_anchors.py": {
       "sha256": "6aa0caa82d38e7f0cfd43303a0f6f798c4291ecbf4ee553d617b954906f6a8a2",
@@ -30,12 +30,12 @@
       "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
     },
     "scripts/check_no_raw_material.py": {
-      "sha256": "3a13bd72ba07771c81920eb077033816b0b565a06e8803cd30d8df2db62ed0ff",
-      "basis": "非同源复核：用户授权（parent session 6af45947fead009e7bdd1e76，批次 0050），2026-11-15，依据外部复核 verify-g019/REPORT.md；复核产物：validation/reviews/2026-11-15-g019-hardening-user-authorization.md；复核基线：dcd2240；结论：认可"
+      "sha256": "6be56eb8aa7fb7ac6ab7bb4d9771e3ededfc685708c14962457d8d5121feed1a",
+      "basis": "非同源复核：用户授权（2026-11-15，批次 0053，validation/reviews/2026-11-15-admission-axis-implementation.md） 复核产物：spec/ACCESS_ZONES.md 复核基线：debe35b"
     },
     "scripts/check_spec_pins.py": {
-      "sha256": "12a190ab884b126303ace7286cfc8a6c230528e92a68710426276279fd1da186",
-      "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
+      "sha256": "8dedeec2f6693622a012cfa5d12ee6139a166e824c32861bb18bb52fcba9658b",
+      "basis": "非同源复核：用户授权（2026-11-15，批次 0053，validation/reviews/2026-11-15-admission-axis-implementation.md） 复核产物：spec/ACCESS_ZONES.md 复核基线：debe35b"
     },
     "scripts/check_state.py": {
       "sha256": "f0e636ec254a5b435932e3f0755ec0b215ad1be5a3bbe93067dc2009c1793098",

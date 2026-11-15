@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# 提交前检查：十个检查器 + 原型样例与关键扫描全部通过才允许提交（AGENTS.md 3.5、3.6、5bis.1、7bis）
+# 提交前检查：全套检查器、准入自测 + 原型样例与关键扫描全部通过才允许提交（AGENTS.md 3.5、3.6、5bis.1、7bis）
 # 每个克隆需自行启用：git config core.hooksPath .githooks
 set -u
 root=$(git rev-parse --show-toplevel) || exit 1
@@ -16,6 +16,7 @@ run_check() {
 }
 
 run_check "scripts/check_no_raw_material.py" python3 scripts/check_no_raw_material.py
+run_check "scripts/check_no_raw_material.py --self-test" python3 scripts/check_no_raw_material.py --self-test
 run_check "scripts/check_anchors.py" python3 scripts/check_anchors.py
 run_check "scripts/check_ledger_landings.py" python3 scripts/check_ledger_landings.py
 run_check "scripts/check_gap_ledger.py --staged" python3 scripts/check_gap_ledger.py --staged
@@ -32,4 +33,4 @@ run_check "scripts/check_spec_pins.py" python3 scripts/check_spec_pins.py
 run_check "scripts/check_glossary_usage.py" python3 scripts/check_glossary_usage.py
 run_check "scripts/check_state.py" python3 scripts/check_state.py
 
-echo "[pre-commit] 十个检查器与原型样例/关键扫描全部通过。"
+echo "[pre-commit] 全套检查器、准入自测与原型样例/关键扫描全部通过。"

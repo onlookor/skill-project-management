@@ -930,3 +930,18 @@
 - **涉及文件**：`CONSTITUTION.md`、`adr/0018-raw-material-admission-control.md`、`validation/reviews/2026-11-15-admission-axis-authorization.md`（新增）、`STATE.md`、`TODO.md`、`CHANGELOG.md`。
 - **未改动**：`scripts/check_no_raw_material.py`、`scripts/README.md`、`checker-pins.json`、`spec-pins.json`、`manifest.json`（未发布，版本与 tag 保持 `0.5.1` / `v0.5.1`）、D4、放量、判据 7 外部抽样。
 - **状态**：生效（阶段二实现与阶段三过检待后续批次；G-019/G-020 仍 `open`）
+
+---
+
+### 批次 0053 — 2026-11-15 — 准入制落地（阶段二：检查器与 schema）
+
+- **性质**：按批次 0052 的授权落地 D-1、D-4、D-5、D-9 与 §7 规则变更。D4 未动、未放量、未碰判据 7 外部抽样；G-019/G-020/G-021 均不自行关闭。
+- **归区表**：新增 `spec/ACCESS_ZONES.md`。路径前缀表覆盖 D/O/P/C 四区与 P0–P2 分级；数据区准入登记表覆盖 16 个结构化文件；未归类路径 fail-closed（`RM-ZONE`），数据区未登记文件报 `RM-SCHEMA`，不降级为文本扫描（D-1）。`ontology/` 归 O，`ontology/fixtures/manifest.json` 归 D（D-9）。
+- **schema**：新增 `contracts/schema/knowledge-entry.schema.json`（anchored 与 pilot 共用，含 D2/D3/D7/M3-E1 字段与 `x-prose-fields`）与 `contracts/schema/pilot-conflict.schema.json`；两者纳入 `scripts/spec-pins.json`（D-5）。配额按方案 §4.3：`definition` 2000 / `provenance_note` 800 / 单条散文字段 2500 / 单文件 20 KiB / 身份键 120 / `relations` 120 / `evidence` 200 / `candidate_iri_reason` 400（D-4）。
+- **检查器重写**（`scripts/check_no_raw_material.py`）：按区执行硬约束、schema 与字段配额；删除 `RM-PROSEBLOCK`、`RM-PAGEDUMP`、`RM-PAGESEQ`；新增 `RM-ZONE`、`RM-SCHEMA`、`RM-FIELD`；`RM-ONTO-LITERAL` 对 `skos:definition`/`rdfs:comment`/`dcterms:description` 放宽到 2000，其他字面量维持 400；`RM-ONTO-COMMENT` 400 → 800。退出码重定为 0/1/2，其中 2 仅表示归区表或准入登记不可解析；`--self-test` 只返回 0/1，全部为合成用例，不依赖本地 PDF 资源。
+- **自测**：按新轴重建为 30 项（T-NRM-01–T-NRM-09），覆盖合法 15 条 JSONL 与 BOM、退役启发式不再误杀长散文/硬换行/中文页/长定义、对象包裹 `text`/`content`/`chunk`、未知键/缺必填/超长字段/单文件配额、30 万字符单行、base64 PDF 头、长引用、PDF/gzip 魔数改名、禁止扩展名、未归类与未登记 fail-closed、本体字面量分档与注释上限、归区最长前缀与全仓覆盖；不保留已退役启发式的样例。
+- **同步**：`.githooks/pre-commit` 增加 `--self-test`；`scripts/README.md` 更新规则表、退出码、分区与自测说明；`GLOSSARY.md` 新增 T-D-014–T-D-020（数据区、散文区、本体区、代码与配置区、分区准入、归区表、豁免）并生成使用位置；重冻 `scripts/checker-pins.json`（17 个受保护对象）与 `scripts/spec-pins.json`（9 个区段）。
+- **实测**：全仓 134 个跟踪文件 0 违规（D 16 / O 30 / P 69 / C 19 / 未归类 0）；自测 30/30；全套检查器、pre-commit 与原型快检全绿。
+- **涉及文件**：`spec/ACCESS_ZONES.md`（新增）、`contracts/schema/knowledge-entry.schema.json`（新增）、`contracts/schema/pilot-conflict.schema.json`（新增）、`scripts/check_no_raw_material.py`、`scripts/check_spec_pins.py`、`scripts/checker-pins.json`、`scripts/spec-pins.json`、`validation/pinned/checker.py`、`.githooks/pre-commit`、`scripts/README.md`、`GLOSSARY.md`、`knowledge/glossary-usage.json`、`validation/reviews/2026-11-15-admission-axis-implementation.md`（新增）、`TODO.md`、`CHANGELOG.md`。
+- **未改动**：`manifest.json`（未发布，版本与 tag 保持 `0.5.1` / `v0.5.1`）、D4、放量、判据 7 外部抽样。
+- **状态**：生效（阶段三一次性过检与豁免判定待批次 0054；G-019/G-020 仍 `open`）

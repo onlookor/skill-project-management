@@ -44,6 +44,18 @@ SECTIONS = (
         "start": None,
         "end": None,
     },
+    {
+        "key": "contracts/schema/knowledge-entry.schema.json",
+        "path": "contracts/schema/knowledge-entry.schema.json",
+        "start": None,
+        "end": None,
+    },
+    {
+        "key": "contracts/schema/pilot-conflict.schema.json",
+        "path": "contracts/schema/pilot-conflict.schema.json",
+        "start": None,
+        "end": None,
+    },
 )
 
 

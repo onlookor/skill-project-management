@@ -11,7 +11,7 @@
 | `check_anchors.py` | 解析并校验全仓锚点：禁止行号 locator、文件/稳定 ID/章节号/标题路径可解析、规则 `grounding_ref` 与知识条目 `evidence.source_id` 指向 active 来源、规则与来源文本块指纹未漂移 | `spec/ANCHOR_SPEC.md` | 已实现 |
 | `anchor_baseline.json` | `check_anchors.py` 的指纹基线（`rule:*` 与 `source:*`），内容变更后重冻 | `spec/ANCHOR_SPEC.md` 第 5 节 | 数据文件 |
 | `check_glossary_sync` | 检查 `GLOSSARY.md` 的 A 类条目与 `knowledge/anchored-entries.jsonl` 的定义一致性 | `check_glossary_sync.md` | 未实现（T-090） |
-| `check_no_raw_material.py` | 阻断式检查：已跟踪文件中不得出现原始资料（PDF/EPUB/扫描件等）、文本层/OCR 转储与成段原文；允许受控的自建本体（`CONSTITUTION.md` 第 13.6 条） | `CONSTITUTION.md` 第 13 条 | 已实现 |
+| `check_no_raw_material.py` | 按目录分区执行原始资料准入（`CONSTITUTION.md` 第 13.3 条）：未归类路径 fail-closed；数据区必须过 schema 与字段配额；散文区只执行硬约束；本体区按 13.6 的谓词分档。形态推断判据（行长/行数/句末标点/空格比例）已退役 | `CONSTITUTION.md` 第 13 条、`spec/ACCESS_ZONES.md` | 已实现 |
 | `check_gap_ledger.py` | 核查 `GAP_LEDGER.md`：字段枚举、核查矩阵与附录 A 全覆盖、`open` 缺口被矩阵引用、TODO 交叉引用、按里程碑计算到期；`closed` 的关闭依据必须是 `外部复核：<路径>；sha256：<64hex>`，机械核对路径存在、是文件、哈希一致（`--self-test` 的 E01–E05 为正负例）；`--staged` 要求规则/判定文件与台账同批更新。到期未裁定退出 1 | `AGENTS.md` 3.6 / 3.6.6、`adr/0012-gap-ledger-and-adjudication.md` | 已实现 |
 | `check_three_table.py` | 三表机械对照：正文（规则 → 条款与子句范围）、判定列（`check_id` → 子句与原因码）、输入 schema（`check_id` → 输入域、具名枚举、原因码）。覆盖“正文 ↔ 判定列”“判定列 ↔ schema”“正文 ↔ schema”三对关系，核对子句闭合、枚举封闭、判定列不含叙述性短语、G-B1/G-B2 条件归属、原因码与子句映射。**深度边界**：它保证结构一致与已列举的语义短语规则，不保证规则正文与子句表的全文语义等价 | `adr/0013-unified-adjudication-of-check-semantics.md`、`spec/CHECKER_INPUT_SCHEMA.md` | 已实现 |
 | `check_coverage_gate.py` | 覆盖闸门：`validation/checker-prototype/coverage.json` 登记 A.2 每个子句的正例与负例，负例必须显式声明**非空** `expected_failed_clauses`，闸门用原型实际求值核对“声明的子句真的被触发”；缺正/负例、负例改成正例、负例指错子句、**空声明**、样例未被引用均阻断。不存在守卫豁免：`expected_failed_clauses: []` 不算负例。负例测试见 `test_coverage_gate.py` | `adr/0014-validation-chain-self-attestation.md` | 已实现 |
@@ -53,37 +53,40 @@ python3 scripts/validate_ontology.py --matrix
 
 `check_anchors.py` 退出码：`0` 通过（可有警告/提示）；`1` 存在错误；`2` 结构或基线无法解析。规则/来源被有意修改后，用 `--write-baseline` 重冻基线，并把基线变更与内容变更同批提交。`--root` 可指向副本，用于插行负例演练。
 
-`check_no_raw_material.py` 退出码：`0` 通过；`1` 发现违规（逐条列出规则码与位置，提交应被阻断）；`2` 不在 git 仓库中，或 `--self-test` 缺少真实 PDF 样本而无法完整评估（非 PDF 用例已全部执行，**2 不等于通过**）。判定规则：
+`check_no_raw_material.py` 退出码：`0` 通过；`1` 发现违规（逐条列出规则码与位置，提交应被阻断）；`2` 无法评估——不在 git 仓库中，或 `spec/ACCESS_ZONES.md` 的归区表/准入登记表缺失、不可解析。`--self-test` 只返回 `0/1`：全部用例为合成数据，不依赖本地 PDF 资源，不存在“无法评估”分支，也不存在把“无法评估”当成通过的路径。判定按目录分区执行（`CONSTITUTION.md` 13.3，归区表 `spec/ACCESS_ZONES.md`）：
 
 | 规则码 | 判定 |
 |---|---|
+| `RM-ZONE` | 路径未归区（fail-closed，D-1）；或区的扩展名与文件形态不符（O 区非本体序列化、P 区非散文、C 区非代码/配置） |
 | `RM-MAGIC` | 文件头是 PDF/ZIP/GZIP/PNG/JPEG/GIF/TIFF/RAR/7Z/PostScript/OLE/DjVu（先于扩展名判断，改名无效） |
 | `RM-EXT` | 被跟踪文件扩展名属于文档/电子书/扫描件/压缩包 |
-| `RM-BINARY` | 文本文件（含未知扩展名）出现 NUL 字节或无法按 UTF-8 解码 |
+| `RM-BINARY` | 出现 NUL 字节或无法按 UTF-8 解码 |
 | `RM-SIZE` | 单文件超过 512 KiB |
-| `RM-LONGLINE` | 单行超过 8192 字符（含单行整段原文） |
-| `RM-BASE64` | 出现 256 字符以上的 base64 形态长串，或 64 字符以上且解码后是已知二进制魔数 |
-| `RM-QUOTE` | 单条引用超过 400 字符，或连续引用块超过 800 字符 |
-| `RM-PROSEBLOCK` | 连续 15 行以上每行不少于 100 字符（PDF 文本转储的行形态），空行不重置计数；仅“每行一个合法记录”的结构化 JSONL 不适用 |
-| `RM-PAGEDUMP` | 正文页形态：非空行 ≥20 且 ≥60% 是 60–115 字符、无 Markdown 标记的连续正文行，其中 ≥50% 不以句末标点结尾 |
-| `RM-PAGESEQ` | 连续 5 行以上为页码或纯数字 |
-| `RM-DOTLEADER` | 单行出现 30 个以上连续点（目录转储） |
-| `RM-MOJIBAKE` | 出现 U+FFFD 替换字符 |
 | `RM-CONTROL` | 出现除制表符/换行外的 C0 控制字符 |
+| `RM-MOJIBAKE` | 出现 U+FFFD 替换字符 |
+| `RM-BASE64` | 出现 256 字符以上的 base64 形态长串，或 64 字符以上且解码后是已知二进制魔数（全区分） |
+| `RM-SCHEMA` | 数据区文件未在准入登记表登记；解析失败；未知键、必填/类型/枚举不通过；schema 文件缺 `$schema`/`type` |
+| `RM-FIELD` | 数据区字段超长或模式不符；单条散文字段合计超过 2500 字符；单文件散文字段合计超过 20 KiB |
 | `RM-ONTO-HEADER` | `.ttl` 前 40 行缺少 `self-authored` 或 `source_id` 头注释 |
-| `RM-ONTO-LITERAL` | 本体文件中的字符串/三引号字面量超过 400 字符 |
-| `RM-ONTO-COMMENT` | 本体文件中的单行 `#` 注释超过 400 字符 |
+| `RM-ONTO-LITERAL` | 本体文件的 `skos:definition`/`rdfs:comment`/`dcterms:description` 字面量超过 2000 字符，或其他字面量超过 400 字符 |
+| `RM-ONTO-COMMENT` | 本体文件的单行 `#` 注释超过 800 字符 |
+| `RM-LONGLINE` | P/C 区单行超过 8192 字符 |
+| `RM-QUOTE` | P 区单条引用超过 400 字符，或连续引用块超过 800 字符 |
+| `RM-DOTLEADER` | P/O 区单行出现 30 个以上连续点（目录转储） |
 
-**扫描面**：扫描对象是 `git ls-files` 的全部已跟踪文件。`.log`、`.csv`、`.html`、`.htm`、`.xml`、`.tex`、`.rst`、`.tsv`、`.svg`、`.dat` 与未知/无扩展名文件均按文本扫描（fail-closed）；二进制由 `RM-MAGIC` 与 `RM-BINARY` 拦截。覆盖范围与准入口径的剩余缺口见 `GAP_LEDGER.md` G-020（未跟踪文件、子模块不扫）。
+**分区与准入**：D 区（数据）只收 `ACCESS_ZONES.md` 第 2 节登记的结构化文件，按 `contracts/schema/*.schema.json` 校验，并把 schema 的 `x-prose-fields` 用于单条与单文件配额；未登记的数据区文件直接 `RM-SCHEMA`，不降级为文本扫描（D-1）。O 区按 13.6 执行谓词分档字面量与注释上限。P 区只执行与 13.1/13.2 直接对应的硬约束，不做页形态推断。C 区执行同一组硬约束（不含引证与目录点线两项散文判据）。未归类路径一律 `RM-ZONE` 阻断；新增顶层目录不会获得默认放行。
 
-**本体的受控放行**（`CONSTITUTION.md` 第 13.6 条）：`.ttl`、`.shacl.ttl`、`.owl`、`.rdf`、`.nt`、`.n3`、`.jsonld` 允许入库，但**不豁免**体积、二进制、乱码、控制字符、点线、页码序列与长文本检查。本体文件的连续长注释行按 `RM-PROSEBLOCK` 处理（本体适用更严阈值：连续 12 行、每行 80 字符，以覆盖 PDF 换行后的段落形态）；头注释与 provenance 要求见 `ontology/README.md`。放行只针对“自写定义 + 标准术语标签”的本体，不针对原文转录。
+**已退役判据**：`RM-PROSEBLOCK`、`RM-PAGEDUMP`、`RM-PAGESEQ` 已删除，自测中也不保留依赖它们的样例。退役理由与实测数字见 `spec/RAW_MATERIAL_ADMISSION.md` 第 1 节；替代保护是数据区 schema + 配额、散文区硬约束、仓库外指纹与人工评审。**未命中不等于合规。**
 
-**结构化 JSONL 的边界**：`RM-PROSEBLOCK` 的豁免不是“每行是 JSON 对象”即放行，而是按语料 schema 校验：顶层键白名单（不含 `text`/`content`/`body`/`page`/`chunk`/`payload`/`raw`）、字符串值上限（身份键 120 / 一般值 400 / `evidence` 200 字符）、`relations` 与 `evidence` 子结构与子值上限；任一未知键、超长值或异常结构即不豁免。另有跨记录判据：连续 15 条记录的主文本值都是 60 字符以上、无句末标点的片段时按 `RM-PROSEBLOCK` 处理。解析前先剥 UTF-8 BOM。双向覆盖用 `python3 scripts/check_no_raw_material.py --self-test` 验证（T-NRM-01 合法 JSONL、01b BOM、02 JSON 字符串行、03 真实正文第 6 页、04 对象包裹正文、05 对象包裹/超长/base64/30 万字符单行、06 `.log/.csv/.html/.dat` 与 PDF/gzip 魔数、07 长行夹空行/未知扩展名，共 18 项）；缺少本地 PDF 样本时返回 `2`（非 PDF 用例已执行，2 不等于通过），可用 `PM_RESOURCE_DIR` 指定资源目录。
+**结构化数据边界**：JSONL 逐行解析、JSON 数组逐元素过 schema；解析前先剥 UTF-8 BOM；`.yaml` 用安全加载后过同一份契约 schema。键白名单改由 schema 的 `additionalProperties: false` 表达，不再在检查器里维护手写键表。配额只挡“单条整页”与最明显的滥用，不证明来源；均分切块仍可能落在配额内，这是已登记的残余风险。
 
-提交前接入：每个克隆需自行执行 `git config core.hooksPath .githooks`（只对当前克隆生效）。钩子依次运行十个检查器与原型快检，任一失败即阻断提交：
+**自测**：`python3 scripts/check_no_raw_material.py --self-test` 覆盖 30 项合成用例——合法 15 条 JSONL 与 BOM、退役启发式不再误杀长散文/硬换行/中文页/长定义、对象包裹的 `text`/`content`/`chunk` 被 schema 拦下、未知键/缺必填/超长字段/单文件配额、30 万字符单行、base64 PDF 头、单条长引用、PDF/gzip 魔数改名、禁止扩展名、未归类与未登记 fail-closed、本体定义分档与注释上限、归区最长前缀与全仓覆盖。全部用例不依赖外部资源。
+
+提交前接入：每个克隆需自行执行 `git config core.hooksPath .githooks`（只对当前克隆生效）。钩子依次运行全套检查器、准入自测与原型快检，任一失败即阻断提交：
 
 ```
 python3 scripts/check_no_raw_material.py
+python3 scripts/check_no_raw_material.py --self-test
 python3 scripts/check_anchors.py
 python3 scripts/check_ledger_landings.py
 python3 scripts/check_gap_ledger.py --staged
@@ -101,7 +104,7 @@ python3 scripts/check_glossary_usage.py
 python3 scripts/check_state.py
 ```
 
-未启用钩子时，在 `git add` 前手工按上述顺序运行，效果等价。检查器命中时不得用 `--no-verify` 绕过；唯一例外是 `AGENTS.md` 第 3.5 条规定的发布引导提交（tag 只能指向已存在提交），该提交后必须立即打 tag 并复跑十个检查器。新增其他例外须走 ADR 并在脚本中登记路径豁免。
+未启用钩子时，在 `git add` 前手工按上述顺序运行，效果等价。检查器命中时不得用 `--no-verify` 绕过；唯一例外是 `AGENTS.md` 第 3.5 条规定的发布引导提交（tag 只能指向已存在提交），该提交后必须立即打 tag 并复跑全套检查器。新增其他例外须走 ADR 并在脚本中登记路径豁免。
 
 ### 脚本的定位
 

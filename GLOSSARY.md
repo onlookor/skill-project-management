@@ -404,6 +404,41 @@
 - `first_used_in`：`CONSTITUTION.md` 第 4 条
 - `status`：`active`
 
+**T-D-014 数据区**
+- 定义：按目录角色划分的准入单元（data zone），只允许已登记的结构化文件；文件必须可解析、通过登记的 schema 并满足字段配额，散文只能出现在 schema 声明的 `prose_fields` 中。
+- `first_used_in`：`CONSTITUTION.md` 第 13.3 条
+- `status`：`active`
+
+**T-D-015 散文区**
+- 定义：按目录角色划分的准入单元（prose zone），允许自然语言散文；只执行与第 13.1/13.2 条直接对应的硬约束，不以行长、行数、句末标点或空格比例推断内容是否原文。
+- `first_used_in`：`CONSTITUTION.md` 第 13.3 条
+- `status`：`active`
+
+**T-D-016 本体区**
+- 定义：按目录角色划分的准入单元（ontology zone），只允许 RDF 序列化文件；按 `CONSTITUTION.md` 第 13.6 条与本体专用字面量上限检查。
+- `first_used_in`：`CONSTITUTION.md` 第 13.3 条
+- `status`：`active`
+
+**T-D-017 代码与配置区**
+- 定义：按目录角色划分的准入单元（code and config zone），承载检查器、工具与配置登记；执行与散文区相同的硬约束，但不做引证长度与目录点线判据。
+- `first_used_in`：`CONSTITUTION.md` 第 13.3 条
+- `status`：`active`
+
+**T-D-018 分区准入**
+- 定义：以路径所属的区决定允许的文件形态与检查强度的合规判定方式（zone admission）；未归区路径默认阻断，数据区未登记文件不降级为文本扫描。
+- `first_used_in`：`CONSTITUTION.md` 第 13.3 条
+- `status`：`active`
+
+**T-D-019 归区表**
+- 定义：`spec/ACCESS_ZONES.md` 中的“路径前缀 → 区/级别”封闭表与“数据区文件 → schema 或生成器”准入登记（zone registry）；它是准入检查器的唯一归区来源。
+- `first_used_in`：`CONSTITUTION.md` 第 13.3 条
+- `status`：`active`
+
+**T-D-020 豁免**
+- 定义：对暂时无法满足准入条件的已跟踪文件登记的例外（exemption）；须记录路径、原因、责任人、到期里程碑与复核人，检查器输出警告并计数，到期未移除即阻断，且不得用于原始资料或提取产物。
+- `first_used_in`：`CONSTITUTION.md` 第 13.3 条；`spec/RAW_MATERIAL_ADMISSION.md` 第 10.3 节
+- `status`：`active`
+
 #### E. 行业缩写与标准术语
 
 > 本类条目是描述性的，不是规范性锚点（规范性锚点在 `SOURCE_LEDGER.md`）。首次出现必须内联展开。
@@ -603,6 +638,13 @@
 | T-D-011 | pending_reanchor | [`AGENTS.md`](AGENTS.md)、[`CHANGELOG.md`](CHANGELOG.md)、[`CHARTER.md`](CHARTER.md)、[`CONSTITUTION.md`](CONSTITUTION.md)、[`GRAMMAR.md`](GRAMMAR.md)、[`ROADMAP.md`](ROADMAP.md)、[`SOURCE_LEDGER.md`](SOURCE_LEDGER.md)、[`TODO.md`](TODO.md)、[`adr/0005-source-ledger-scope.md`](adr/0005-source-ledger-scope.md)、[`adr/0008-reanchor-dimension-rules.md`](adr/0008-reanchor-dimension-rules.md)、[`adr/0011-schedule-layer-and-plan.md`](adr/0011-schedule-layer-and-plan.md)、[`spec/COMPILATION_META.md`](spec/COMPILATION_META.md)、[`spec/GROUNDING_CRITERIA.md`](spec/GROUNDING_CRITERIA.md)、[`spec/M3_M4_PLAN.md`](spec/M3_M4_PLAN.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md)、[`validation/CHECKLIST.md`](validation/CHECKLIST.md) |
 | T-D-012 | deprecated | [`AGENTS.md`](AGENTS.md)、[`CHANGELOG.md`](CHANGELOG.md)、[`CONSTITUTION.md`](CONSTITUTION.md)、[`SOURCE_LEDGER.md`](SOURCE_LEDGER.md)、[`adr/0005-source-ledger-scope.md`](adr/0005-source-ledger-scope.md)、[`adr/README.md`](adr/README.md)、[`spec/COMPILATION_META.md`](spec/COMPILATION_META.md) |
 | T-D-013 | superseded | [`AGENTS.md`](AGENTS.md)、[`CONSTITUTION.md`](CONSTITUTION.md)、[`SOURCE_LEDGER.md`](SOURCE_LEDGER.md)、[`adr/README.md`](adr/README.md) |
+| T-D-014 | 数据区 | [`CHANGELOG.md`](CHANGELOG.md)、[`spec/ACCESS_ZONES.md`](spec/ACCESS_ZONES.md) |
+| T-D-015 | 散文区 | [`spec/ACCESS_ZONES.md`](spec/ACCESS_ZONES.md) |
+| T-D-016 | 本体区 | [`spec/ACCESS_ZONES.md`](spec/ACCESS_ZONES.md) |
+| T-D-017 | 代码与配置区 | [`spec/ACCESS_ZONES.md`](spec/ACCESS_ZONES.md) |
+| T-D-018 | 分区准入 | [`spec/ACCESS_ZONES.md`](spec/ACCESS_ZONES.md) |
+| T-D-019 | 归区表 | [`spec/ACCESS_ZONES.md`](spec/ACCESS_ZONES.md) |
+| T-D-020 | 豁免 | [`CHANGELOG.md`](CHANGELOG.md)、[`spec/ACCESS_ZONES.md`](spec/ACCESS_ZONES.md) |
 | T-E-001 | PMBOK | [`CHANGELOG.md`](CHANGELOG.md) |
 | T-E-002 | PRINCE2 | （无） |
 | T-E-003 | ISO 21502:2020 | [`CHANGELOG.md`](CHANGELOG.md) |

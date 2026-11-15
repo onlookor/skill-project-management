@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-management-grounding/contracts/schema/knowledge-entry.schema.json",
+  "title": "知识条目（anchored 与 pilot 共用）",
+  "description": "D 区知识条目的准入 schema。字段集合并 D2 已定字段、D3 的 evidence、D7 的 claim 映射与 M3-E1 的 pending_reason 预留位。未知键、类型不符属 RM-SCHEMA；超长或模式不符属 RM-FIELD。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["term", "definition"],
+  "x-prose-fields": ["definition", "provenance_note"],
+  "properties": {
+    "id": {"type": "string", "maxLength": 120},
+    "draft_id": {"type": "string", "maxLength": 120},
+    "term": {"type": "string", "minLength": 1, "maxLength": 120},
+    "label_zh": {"type": "string", "maxLength": 120},
+    "label_en": {"type": "string", "maxLength": 120},
+    "entry_type": {"type": "string", "maxLength": 120},
+    "status": {"type": "string", "maxLength": 120},
+    "definition": {"type": "string", "minLength": 1, "maxLength": 2000},
+    "definitionStatus": {"type": "string", "maxLength": 120},
+    "relations": {
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {"type": "string", "maxLength": 120},
+          {"type": "array", "items": {"type": "string", "maxLength": 120}},
+          {"type": "boolean"}
+        ]
+      }
+    },
+    "provenance_note": {"type": "string", "maxLength": 800},
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "source_id": {"type": "string", "maxLength": 120},
+          "locator": {"type": "string", "maxLength": 200},
+          "page": {"type": ["integer", "null"]},
+          "precision": {"type": "string", "maxLength": 120},
+          "verification": {"type": "string", "maxLength": 120},
+          "use_gate": {"type": "string", "maxLength": 200}
+        }
+      }
+    },
+    "natural_key": {"type": "string", "maxLength": 120},
+    "candidate_iri": {"type": ["string", "null"], "maxLength": 120},
+    "candidate_iri_status": {"type": "string", "maxLength": 120},
+    "candidate_iri_reason": {"type": "string", "maxLength": 400},
+    "pending_reason": {"type": "string", "maxLength": 400},
+    "claim_mapping": {
+      "type": "array",
+      "items": {"type": "string", "maxLength": 120}
+    },
+    "sourcePage": {"type": "integer"},
+    "authoritative": {"type": "boolean"}
+  }
+}
