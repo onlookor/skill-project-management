@@ -16,27 +16,69 @@
     "entry_type": {"type": "string", "maxLength": 120},
     "status": {"type": "string", "maxLength": 120},
     "definition": {"type": "string", "minLength": 1, "maxLength": 2000},
-    "definitionStatus": {"type": "string", "maxLength": 120},
+    "definitionStatus": {
+      "type": "string",
+      "enum": ["defined", "taxonomy-only", "pending", "disputed", "blocked-external"]
+    },
     "relations": {
       "type": "object",
-      "additionalProperties": {
-        "oneOf": [
-          {"type": "string", "maxLength": 120},
-          {"type": "array", "items": {"type": "string", "maxLength": 120}},
-          {"type": "boolean"}
-        ]
+      "maxProperties": 12,
+      "additionalProperties": false,
+      "properties": {
+        "about": {"$ref": "#/$defs/relation_value"},
+        "accountable_by": {"$ref": "#/$defs/relation_value"},
+        "accountable_for": {"$ref": "#/$defs/relation_value"},
+        "asserted_about_by": {"$ref": "#/$defs/relation_value"},
+        "asserted_by": {"$ref": "#/$defs/relation_value"},
+        "asserts": {"$ref": "#/$defs/relation_value"},
+        "authorizes": {"$ref": "#/$defs/relation_value"},
+        "belongs_to_domain": {"$ref": "#/$defs/relation_value"},
+        "by": {"$ref": "#/$defs/relation_value"},
+        "committed_by": {"$ref": "#/$defs/relation_value"},
+        "constrained_by": {"$ref": "#/$defs/relation_value"},
+        "constrains": {"$ref": "#/$defs/relation_value"},
+        "delegates_autonomy_to": {"$ref": "#/$defs/relation_value"},
+        "delegates_to": {"$ref": "#/$defs/relation_value"},
+        "has_actor": {"$ref": "#/$defs/relation_value"},
+        "has_commitment": {"$ref": "#/$defs/relation_value"},
+        "has_focus_area": {"$ref": "#/$defs/relation_value"},
+        "has_outcome": {"$ref": "#/$defs/relation_value"},
+        "has_output": {"$ref": "#/$defs/relation_value"},
+        "includes_process": {"$ref": "#/$defs/relation_value"},
+        "input_to": {"$ref": "#/$defs/relation_value"},
+        "instance_of": {"$ref": "#/$defs/relation_value"},
+        "may_coincide_with": {"$ref": "#/$defs/relation_value"},
+        "measures": {"$ref": "#/$defs/relation_value"},
+        "nearest_ontology_individual": {"$ref": "#/$defs/relation_value"},
+        "output_of": {"$ref": "#/$defs/relation_value"},
+        "outside_project": {"$ref": "#/$defs/relation_value"},
+        "owned_by": {"$ref": "#/$defs/relation_value"},
+        "paired_with": {"$ref": "#/$defs/relation_value"},
+        "produced_by": {"$ref": "#/$defs/relation_value"},
+        "records_state": {"$ref": "#/$defs/relation_value"},
+        "reports_on": {"$ref": "#/$defs/relation_value"},
+        "responsible_by": {"$ref": "#/$defs/relation_value"},
+        "responsible_for": {"$ref": "#/$defs/relation_value"},
+        "specialized_by": {"$ref": "#/$defs/relation_value"},
+        "supports": {"$ref": "#/$defs/relation_value"},
+        "technique_category": {"$ref": "#/$defs/relation_value"},
+        "to": {"$ref": "#/$defs/relation_value"},
+        "typed_by": {"$ref": "#/$defs/relation_value"},
+        "used_in": {"$ref": "#/$defs/relation_value"},
+        "verified_by": {"$ref": "#/$defs/relation_value"}
       }
     },
     "provenance_note": {"type": "string", "maxLength": 800},
     "evidence": {
       "type": "array",
+      "maxItems": 12,
       "items": {
         "type": "object",
         "additionalProperties": false,
         "properties": {
           "source_id": {"type": "string", "maxLength": 120},
           "locator": {"type": "string", "maxLength": 200},
-          "page": {"type": ["integer", "null"]},
+          "page": {"type": ["integer", "null"], "minimum": 1},
           "precision": {"type": "string", "maxLength": 120},
           "verification": {"type": "string", "maxLength": 120},
           "use_gate": {"type": "string", "maxLength": 200}
@@ -50,9 +92,19 @@
     "pending_reason": {"type": "string", "maxLength": 400},
     "claim_mapping": {
       "type": "array",
+      "maxItems": 20,
       "items": {"type": "string", "maxLength": 120}
     },
-    "sourcePage": {"type": "integer"},
+    "sourcePage": {"type": "integer", "minimum": 1},
     "authoritative": {"type": "boolean"}
+  },
+  "$defs": {
+    "relation_value": {
+      "oneOf": [
+        {"type": "string", "maxLength": 120},
+        {"type": "array", "maxItems": 20, "items": {"type": "string", "maxLength": 120}},
+        {"type": "boolean"}
+      ]
+    }
   }
 }

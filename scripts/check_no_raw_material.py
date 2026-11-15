@@ -21,9 +21,11 @@
     RM-SCHEMA   未在准入登记表、解析失败、未知键、必填/类型/枚举不通过
     RM-FIELD    字段超长或模式不符、单条/单文件散文字段合计超配额
   本体区（O）
-    RM-ONTO-HEADER   缺少 self-authored / source_id 头注释
-    RM-ONTO-LITERAL  定义类谓词字面量超过 2000 字符，其他字面量超过 400 字符
-    RM-ONTO-COMMENT  单行注释超过 800 字符
+    RM-ONTO-HEADER     缺少 self-authored / source_id 头注释（覆盖全部本体扩展名）
+    RM-ONTO-LITERAL    定义类谓词字面量超过 2000 字符，其他字面量超过 400 字符
+    RM-ONTO-COMMENT    单行注释超过 800 字符
+    RM-ONTO-PAGESEQ    出现 12 个以上连续页码数字（页码序列转储）
+    RM-ONTO-PROVENANCE 带 skos:definition 的文件缺少 dcterms:source / pm:sourcePage
   散文区（P）与代码区（C）
     RM-LONGLINE  单行超过 8192 字符
     RM-QUOTE     P 区单条引用超过 400 字符，或连续引用块超过 800 字符
@@ -71,7 +73,7 @@ MAX_QUOTE_BLOCK_CHARS = 800
 MAX_LITERAL_CHARS = 400
 MAX_DEFINITION_LITERAL_CHARS = 2000
 MAX_ONTO_COMMENT_CHARS = 800
-MAX_RECORD_PROSE_CHARS = 2500
+MAX_RECORD_PROSE_CHARS = 2800
 MAX_FILE_PROSE_CHARS = 20 * 1024
 BASE64_RUN_CHARS = 256
 BASE64_PROBE_CHARS = 64
@@ -80,6 +82,7 @@ DEFINITION_PREDICATES = {
     "skos:definition", "rdfs:comment", "dcterms:description",
 }
 
+PAGESEQ_RE = re.compile(r"(?:\b\d{1,4}\b[\s,;]{0,2}){12,}")
 DOTLEADER_RE = re.compile(r"\.{30,}")
 CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
 B64_STD_RE = re.compile(r"[A-Za-z0-9+/]{%d,}={0,2}" % BASE64_RUN_CHARS)
@@ -114,7 +117,7 @@ SCHEMA_KEYWORDS = {
 }
 FIELD_KEYWORDS = {
     "maxLength", "minLength", "pattern", "minItems", "maxItems",
-    "minimum", "maximum",
+    "maximum", "minimum", "maxProperties",
 }
 
 TYPE_MAP = {
@@ -241,10 +244,20 @@ def _type_ok(value, expected):
     return py is None or isinstance(value, py)
 
 
-def validate(value, schema, pointer="$"):
+def validate(value, schema, pointer="$", root=None):
     """校验本仓库用到的 JSON Schema 子集，返回 [(keyword, pointer, message)]。"""
     errors = []
     if not isinstance(schema, dict):
+        return errors
+    if root is None:
+        root = schema
+
+    ref = schema.get("$ref")
+    if isinstance(ref, str) and ref.startswith("#/$defs/"):
+        target = (root.get("$defs") or {}).get(ref.rsplit("/", 1)[-1])
+        if isinstance(target, dict):
+            return validate(value, target, pointer, root)
+        errors.append(("$ref", pointer, f"无法解析 {ref}"))
         return errors
 
     if "type" in schema:
@@ -262,28 +275,38 @@ def validate(value, schema, pointer="$"):
 
     for key in ("anyOf", "oneOf"):
         if key in schema:
-            if not any(not validate(value, sub, pointer) for sub in schema[key]):
+            if not any(not validate(value, sub, pointer, root) for sub in schema[key]):
                 errors.append((key, pointer, f"不满足 {key} 的任何分支"))
 
-    if "not" in schema and not validate(value, schema["not"], pointer):
+    if "not" in schema and not validate(value, schema["not"], pointer, root):
         errors.append(("not", pointer, "命中了禁止分支"))
 
     for sub in schema.get("allOf", []):
-        errors.extend(validate(value, sub, pointer))
+        errors.extend(validate(value, sub, pointer, root))
 
     if "if" in schema:
-        branch = "then" if not validate(value, schema["if"], pointer) else "else"
+        branch = "then" if not validate(value, schema["if"], pointer, root) else "else"
         if branch in schema:
-            errors.extend(validate(value, schema[branch], pointer))
+            errors.extend(validate(value, schema[branch], pointer, root))
 
     if isinstance(value, dict):
         for key in schema.get("required", []):
             if key not in value:
                 errors.append(("required", f"{pointer}.{key}", "缺少必填键"))
+        if "maxProperties" in schema and len(value) > schema["maxProperties"]:
+            errors.append(
+                ("maxProperties", pointer,
+                 f"键数 {len(value)} 多于 {schema['maxProperties']}")
+            )
+        if isinstance(schema.get("propertyNames"), dict):
+            for key in value:
+                errors.extend(
+                    validate(key, schema["propertyNames"], f"{pointer}.<键>", root)
+                )
         properties = schema.get("properties", {})
         for key, sub in properties.items():
             if key in value:
-                errors.extend(validate(value[key], sub, f"{pointer}.{key}"))
+                errors.extend(validate(value[key], sub, f"{pointer}.{key}", root))
         additional = schema.get("additionalProperties", True)
         unknown = [k for k in value if k not in properties]
         if additional is False:
@@ -291,7 +314,7 @@ def validate(value, schema, pointer="$"):
                 errors.append(("additionalProperties", f"{pointer}.{key}", "schema 未登记的键"))
         elif isinstance(additional, dict):
             for key in unknown:
-                errors.extend(validate(value[key], additional, f"{pointer}.{key}"))
+                errors.extend(validate(value[key], additional, f"{pointer}.{key}", root))
 
     if isinstance(value, list):
         if "minItems" in schema and len(value) < schema["minItems"]:
@@ -300,7 +323,7 @@ def validate(value, schema, pointer="$"):
             errors.append(("maxItems", pointer, f"元素数 {len(value)} 多于 {schema['maxItems']}"))
         if isinstance(schema.get("items"), dict):
             for index, item in enumerate(value):
-                errors.extend(validate(item, schema["items"], f"{pointer}[{index}]"))
+                errors.extend(validate(item, schema["items"], f"{pointer}[{index}]", root))
 
     if isinstance(value, str):
         if "minLength" in schema and len(value) < schema["minLength"]:
@@ -364,11 +387,31 @@ def _parse_records(text, kind):
     raise ValueError(f"未登记的形态 {kind}")
 
 
+def _prose_values(value, spec):
+    """按 `field`、`field.sub`、`list[].field` 三种写法取出散文字段。"""
+    parts = spec.split(".")
+    current = [value]
+    for part in parts:
+        nxt = []
+        for item in current:
+            if part.endswith("[]"):
+                key = part[:-2]
+                if isinstance(item, dict):
+                    seq = item.get(key)
+                    if isinstance(seq, list):
+                        nxt.extend(seq)
+            elif isinstance(item, dict) and part in item:
+                found = item[part]
+                if isinstance(found, list):
+                    nxt.extend([x for x in found if isinstance(x, str)])
+                else:
+                    nxt.append(found)
+        current = nxt
+    return [v for v in current if isinstance(v, str)]
+
+
 def _prose_total(record, fields):
-    return sum(
-        len(record[field]) for field in fields
-        if isinstance(record.get(field), str)
-    )
+    return sum(len(v) for spec in fields for v in _prose_values(record, spec))
 
 
 def check_data(rel, text, suffix, entry, schema_root, findings):
@@ -438,7 +481,7 @@ def check_data(rel, text, suffix, entry, schema_root, findings):
 
 def check_ontology(rel, text, suffix, findings):
     lines = text.splitlines()
-    if suffix in TURTLE_EXTS:
+    if suffix in ONTOLOGY_EXTS:
         head = "\n".join(lines[:40]).lower()
         if "self-authored" not in head or "source_id" not in head:
             findings.append(
@@ -447,6 +490,32 @@ def check_ontology(rel, text, suffix, findings):
                     "缺少 self-authored / source_id 头注释（CONSTITUTION 13.6）",
                 )
             )
+
+    if PAGESEQ_RE.search(text):
+        position = PAGESEQ_RE.search(text).start()
+        findings.append(
+            Finding(
+                "RM-ONTO-PAGESEQ", rel, text[:position].count("\n") + 1,
+                "出现 12 个以上连续页码数字，疑似页码序列转储（CONSTITUTION 13.6 第 3 项）",
+            )
+        )
+
+    if "pm:sourcePage" in text and "dcterms:source" not in text:
+        head_lower = "\n".join(lines[:40]).lower()
+        if "source_id:" not in head_lower:
+            findings.append(
+                Finding(
+                    "RM-ONTO-PROVENANCE", rel, None,
+                    "术语带页码定位，但既无 dcterms:source 也无文件头 source_id（CONSTITUTION 13.6 第 5 项）",
+                )
+            )
+    elif "dcterms:source" in text and "pm:sourcePage" not in text:
+        findings.append(
+            Finding(
+                "RM-ONTO-PROVENANCE", rel, None,
+                "术语声明 dcterms:source 但缺少 pm:sourcePage（CONSTITUTION 13.6 第 5 项）",
+            )
+        )
 
     literal_spans = []
     for match in LITERAL_RE.finditer(text):
@@ -693,10 +762,17 @@ def run_self_test():
     schema_root = Path(__file__).resolve().parent.parent
     zones = [
         {"path": "./", "zone": "P", "level": "P0"},
-        {"path": "spec/", "zone": "P", "level": "P1"},
+        {"path": "manifest.json", "zone": "D", "level": "—"},
+        {"path": "contracts/examples/", "zone": "D", "level": "—"},
+        {"path": "contracts/schema/", "zone": "D", "level": "—"},
         {"path": "knowledge/", "zone": "D", "level": "—"},
+        {"path": "ontology/fixtures/manifest.json", "zone": "D", "level": "—"},
         {"path": "ontology/", "zone": "O", "level": "—"},
         {"path": "scripts/", "zone": "C", "level": "—"},
+        {"path": "spec/pilot/pilot-artifact.json", "zone": "D", "level": "—"},
+        {"path": "spec/pilot/pilot-id-map.json", "zone": "D", "level": "—"},
+        {"path": "spec/pilot/pilot-contract.yaml", "zone": "D", "level": "—"},
+        {"path": "spec/", "zone": "P", "level": "P1"},
     ]
     data_table = [
         {"path": "knowledge/anchored.jsonl", "kind": "jsonl",
@@ -719,6 +795,22 @@ def run_self_test():
          "target": "contracts/schema/knowledge-entry.schema.json"},
         {"path": "knowledge/missing.jsonl", "kind": "jsonl",
          "target": "contracts/schema/knowledge-entry.schema.json"},
+        {"path": "knowledge/sets.jsonl", "kind": "jsonl",
+         "target": "contracts/schema/knowledge-entry.schema.json"},
+        {"path": "knowledge/long-def.jsonl", "kind": "jsonl",
+         "target": "contracts/schema/knowledge-entry.schema.json"},
+        {"path": "manifest.json", "kind": "json-object",
+         "target": "contracts/schema/package-manifest.schema.json"},
+        {"path": "ontology/fixtures/manifest.json", "kind": "json-object",
+         "target": "contracts/schema/ontology-fixtures-manifest.schema.json"},
+        {"path": "spec/pilot/pilot-artifact.json", "kind": "json-object",
+         "target": "contracts/schema/pilot-artifact.schema.json"},
+        {"path": "spec/pilot/pilot-id-map.json", "kind": "json-object",
+         "target": "contracts/schema/pilot-id-map.schema.json"},
+        {"path": "spec/pilot/pilot-contract.yaml", "kind": "yaml-object",
+         "target": "contracts/schema/pm-slot-contract.schema.json"},
+        {"path": "contracts/examples/", "kind": "yaml-object",
+         "target": "contracts/schema/pm-slot-contract.schema.json"},
     ]
 
     filler = "自写结构化探针条目用于验证数据区准入。"
@@ -883,6 +975,137 @@ def run_self_test():
         codes = _codes(root, "ontology/noheader.ttl", zones, data_table, schema_root)
         report("T-NRM-08[header]", "RM-ONTO-HEADER" in codes,
                f"缺少头注释被拦（命中 {sorted(codes) or '无'}）")
+
+        # T-NRM-10：复核补漏——人工维护 D 文件、集合字段、配额边界与归区表指纹
+        manifest = {
+            "package": "probe-package",
+            "package_version": "1.0.0",
+            "release_tag": "v1.0.0",
+            "release_state": "development",
+            "entrypoint": "AGENTS.md",
+            "state_ledger": "STATE.md",
+            "contract_schema": "contracts/schema/pm-slot-contract.schema.json",
+            "pm_contract_version": "0.1",
+        }
+        _write(
+            root, "manifest.json",
+            json.dumps({**manifest, "notes": "A" * 300000}, ensure_ascii=False) + "\n",
+        )
+        codes = _codes(root, "manifest.json", zones, data_table, schema_root)
+        report("T-NRM-10[manifest-prose]", "RM-SCHEMA" in codes,
+               f"300 KB 散文塞入 manifest 被未知键拦下（命中 {sorted(codes) or '无'}）")
+        _write(root, "manifest.json", json.dumps(manifest, ensure_ascii=False) + "\n")
+        codes = _codes(root, "manifest.json", zones, data_table, schema_root)
+        report("T-NRM-10[manifest-ok]", not codes,
+               f"合法 manifest 放行（实际 {sorted(codes) or '无'}）")
+
+        contract = {
+            "skill_id": "probe-skill",
+            "pm_contract_version": "0.1",
+            "authoritative": False,
+            "slots": {
+                "subject_type": "ProbeSubject",
+                "deliverable_forms": ["Document"],
+                "constraint_domains": [{
+                    "name": "goal",
+                    "relation_to_generic": "specializes",
+                    "generic_class": "goal",
+                    "grounding_ref": None,
+                }],
+                "assertion_vocabulary": [{"name": "what_is", "maps_to": "what_is"}],
+                "evidence_forms": ["document"],
+            },
+        }
+        huge_contract = json.loads(json.dumps(contract))
+        huge_contract["slots"]["subject_type"] = "长" * 50000
+        _write(
+            root, "spec/pilot/pilot-contract.yaml",
+            json.dumps(huge_contract, ensure_ascii=False) + "\n",
+        )
+        codes = _codes(root, "spec/pilot/pilot-contract.yaml", zones, data_table, schema_root)
+        report("T-NRM-10[pilot-contract]", "RM-FIELD" in codes,
+               f"5 万字符契约字段被 maxLength 拦下（命中 {sorted(codes) or '无'}）")
+
+        huge_statement = json.loads(json.dumps(contract))
+        huge_statement["assumption_refs"] = [{
+            "id": "A-CONTRACT-X",
+            "statement": "长" * 50000,
+            "verification": {
+                "type": "alignment_check",
+                "target_document": "AGENTS.md",
+                "alignment_criterion": "自写判据",
+            },
+        }]
+        _write(
+            root, "contracts/examples/contract.yaml",
+            json.dumps(huge_statement, ensure_ascii=False) + "\n",
+        )
+        codes = _codes(root, "contracts/examples/contract.yaml", zones, data_table, schema_root)
+        report("T-NRM-10[examples-statement]", "RM-FIELD" in codes,
+               f"5 万字符 statement 被 maxLength 与散文字段配额拦下（命中 {sorted(codes) or '无'}）")
+
+        set_records = {
+            "knowledge/sets.jsonl": [
+                {"term": "ProbeR", "definition": "自写定义。",
+                 "relations": {f"k{i}": "v" for i in range(200)}},
+                {"term": "ProbeE", "definition": "自写定义。",
+                 "evidence": [{"source_id": "PMBOK8-2025", "locator": "Glossary"} for _ in range(100)]},
+                {"term": "ProbeC", "definition": "自写定义。",
+                 "claim_mapping": ["claim"] * 100},
+                {"term": "ProbeS", "definition": "自写定义。", "definitionStatus": "compleat"},
+            ],
+            "knowledge/long-def.jsonl": [
+                {"term": "ProbeL", "definition": "自" * 2000, "provenance_note": "注" * 800},
+            ],
+        }
+        for name, records in set_records.items():
+            _write(root, name, "\n".join(json.dumps(r, ensure_ascii=False) for r in records) + "\n")
+        codes = _codes(root, "knowledge/sets.jsonl", zones, data_table, schema_root)
+        report("T-NRM-10[relations-200]", "RM-FIELD" in codes,
+               f"200 键 relations 被键白名单与 maxProperties 拦下（命中 {sorted(codes) or '无'}）")
+        _write(root, "knowledge/sets.jsonl",
+               json.dumps(set_records["knowledge/sets.jsonl"][1], ensure_ascii=False) + "\n")
+        codes = _codes(root, "knowledge/sets.jsonl", zones, data_table, schema_root)
+        report("T-NRM-10[evidence-100]", "RM-FIELD" in codes,
+               f"100 条 evidence 被 maxItems 拦下（命中 {sorted(codes) or '无'}）")
+        _write(root, "knowledge/sets.jsonl",
+               json.dumps(set_records["knowledge/sets.jsonl"][2], ensure_ascii=False) + "\n")
+        codes = _codes(root, "knowledge/sets.jsonl", zones, data_table, schema_root)
+        report("T-NRM-10[claim-100]", "RM-FIELD" in codes,
+               f"100 条 claim_mapping 被 maxItems 拦下（命中 {sorted(codes) or '无'}）")
+        _write(root, "knowledge/sets.jsonl",
+               json.dumps(set_records["knowledge/sets.jsonl"][3], ensure_ascii=False) + "\n")
+        codes = _codes(root, "knowledge/sets.jsonl", zones, data_table, schema_root)
+        report("T-NRM-10[definition-status]", "RM-SCHEMA" in codes,
+               f"非法 definitionStatus 被枚举拦下（命中 {sorted(codes) or '无'}）")
+        codes = _codes(root, "knowledge/long-def.jsonl", zones, data_table, schema_root)
+        report("T-NRM-10[long-def-ok]", "RM-FIELD" not in codes,
+               f"2000 定义 + 800 说明（共 2800）不被单条配额误杀（命中 {sorted(codes) or '无'}）")
+
+        pinned = json.loads(
+            (schema_root / "scripts/spec-pins.json").read_text(encoding="utf-8")
+        ).get("sections", {})
+        pinned_ok = (
+            "spec/ACCESS_ZONES.md" in pinned
+            and "contracts/schema/pm-slot-contract.schema.json" in pinned
+        )
+        report("T-NRM-10[zone-pin]", pinned_ok,
+               "归区表与契约 schema 已纳入规格指纹（插行换区需复核记录）")
+
+        pageseq = header + "# " + " ".join(str(i) for i in range(1, 200)) + "\n"
+        _write(root, "ontology/pageseq.ttl", pageseq)
+        codes = _codes(root, "ontology/pageseq.ttl", zones, data_table, schema_root)
+        report("T-NRM-10[pageseq]", "RM-ONTO-PAGESEQ" in codes,
+               f"页码序列被拦下（命中 {sorted(codes) or '无'}）")
+        provenance = header + 'ex:x a skos:Concept ;\n  dcterms:source "PMBOK8-2025" .\n'
+        _write(root, "ontology/provenance.ttl", provenance)
+        codes = _codes(root, "ontology/provenance.ttl", zones, data_table, schema_root)
+        report("T-NRM-10[provenance]", "RM-ONTO-PROVENANCE" in codes,
+               f"有来源无页码被拦下（命中 {sorted(codes) or '无'}）")
+        _write(root, "ontology/noheader.jsonld", '{"@id": "ex:x"}\n')
+        codes = _codes(root, "ontology/noheader.jsonld", zones, data_table, schema_root)
+        report("T-NRM-10[header-ext]", "RM-ONTO-HEADER" in codes,
+               f"非 .ttl 本体扩展名同样要求头注释（命中 {sorted(codes) or '无'}）")
 
         # T-NRM-09：归区表最长前缀与全仓覆盖
         real_zones = load_zone_table(schema_root)

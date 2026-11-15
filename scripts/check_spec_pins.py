@@ -56,6 +56,18 @@ SECTIONS = (
         "start": None,
         "end": None,
     },
+    {
+        "key": "contracts/schema/pm-slot-contract.schema.json",
+        "path": "contracts/schema/pm-slot-contract.schema.json",
+        "start": None,
+        "end": None,
+    },
+    {
+        "key": "spec/ACCESS_ZONES.md",
+        "path": "spec/ACCESS_ZONES.md",
+        "start": None,
+        "end": None,
+    },
 )
 
 

@@ -566,7 +566,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 416,
+          "line": 420,
           "form": "code"
         },
         {
@@ -741,7 +741,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 416,
+          "line": 420,
           "form": "code"
         },
         {
@@ -1146,7 +1146,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 416,
+          "line": 420,
           "form": "code"
         },
         {
@@ -1516,7 +1516,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 416,
+          "line": 420,
           "form": "code"
         },
         {
@@ -1846,17 +1846,17 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 374,
+          "line": 378,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 377,
+          "line": 381,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 420,
+          "line": 424,
           "form": "code"
         },
         {
@@ -1966,32 +1966,32 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 375,
+          "line": 379,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 377,
+          "line": 381,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 417,
+          "line": 421,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 420,
+          "line": 424,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 435,
+          "line": 439,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 437,
+          "line": 441,
           "form": "code"
         },
         {
@@ -2666,17 +2666,17 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 374,
+          "line": 378,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 454,
+          "line": 458,
           "form": "code"
         },
         {
           "file": "AGENTS.md",
-          "line": 459,
+          "line": 463,
           "form": "code"
         },
         {
@@ -2732,6 +2732,11 @@
         {
           "file": "CHANGELOG.md",
           "line": 864,
+          "form": "code"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 998,
           "form": "code"
         },
         {
@@ -3287,6 +3292,11 @@
         {
           "file": "validation/reviews/2026-11-14-t139-user-adjudication.md",
           "line": 16,
+          "form": "code"
+        },
+        {
+          "file": "validation/reviews/2026-11-15-admission-r2-review.md",
+          "line": 19,
           "form": "code"
         }
       ]
@@ -3947,7 +3957,7 @@
         },
         {
           "file": "AGENTS.md",
-          "line": 420,
+          "line": 424,
           "form": "code"
         },
         {
@@ -4430,7 +4440,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 399,
+          "line": 403,
           "form": "code"
         },
         {
@@ -4490,7 +4500,7 @@
       "locations": [
         {
           "file": "AGENTS.md",
-          "line": 399,
+          "line": 403,
           "form": "code"
         },
         {
@@ -4530,7 +4540,7 @@
         },
         {
           "file": "spec/ACCESS_ZONES.md",
-          "line": 78,
+          "line": 82,
           "form": "code"
         }
       ]
@@ -4540,7 +4550,7 @@
       "locations": [
         {
           "file": "spec/ACCESS_ZONES.md",
-          "line": 80,
+          "line": 84,
           "form": "code"
         }
       ]
@@ -4550,7 +4560,7 @@
       "locations": [
         {
           "file": "spec/ACCESS_ZONES.md",
-          "line": 79,
+          "line": 83,
           "form": "code"
         }
       ]
@@ -4560,7 +4570,7 @@
       "locations": [
         {
           "file": "spec/ACCESS_ZONES.md",
-          "line": 81,
+          "line": 85,
           "form": "code"
         }
       ]
@@ -4595,10 +4605,14 @@
         },
         {
           "file": "spec/ACCESS_ZONES.md",
-          "line": 92,
+          "line": 96,
           "form": "code"
         }
       ]
+    },
+    "T-D-021": {
+      "term": "补偿控制",
+      "locations": []
     },
     "T-E-001": {
       "term": "PMBOK",

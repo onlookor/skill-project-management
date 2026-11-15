@@ -30,12 +30,12 @@
       "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
     },
     "scripts/check_no_raw_material.py": {
-      "sha256": "6be56eb8aa7fb7ac6ab7bb4d9771e3ededfc685708c14962457d8d5121feed1a",
-      "basis": "非同源复核：用户授权（2026-11-15，批次 0053，validation/reviews/2026-11-15-admission-axis-implementation.md） 复核产物：spec/ACCESS_ZONES.md 复核基线：debe35b"
+      "sha256": "2417b60b19e21b4730a40c071d8aaef02d078ceed897a89a5aa60136c30a7f26",
+      "basis": "非同源复核：verify-admission（2026-11-14/pm-governance-review，sha256 905cf234，基线 deaac46） 复核产物：validation/reviews/2026-11-15-admission-r2-review.md 复核基线：deaac46"
     },
     "scripts/check_spec_pins.py": {
-      "sha256": "8dedeec2f6693622a012cfa5d12ee6139a166e824c32861bb18bb52fcba9658b",
-      "basis": "非同源复核：用户授权（2026-11-15，批次 0053，validation/reviews/2026-11-15-admission-axis-implementation.md） 复核产物：spec/ACCESS_ZONES.md 复核基线：debe35b"
+      "sha256": "66ab4861f88e46fe5ec6179558778f9fcdf8af7ab5cc3ae14f5b35e763cfd0a6",
+      "basis": "非同源复核：verify-admission（2026-11-14/pm-governance-review，sha256 905cf234，基线 deaac46） 复核产物：validation/reviews/2026-11-15-admission-r2-review.md 复核基线：deaac46"
     },
     "scripts/check_state.py": {
       "sha256": "f0e636ec254a5b435932e3f0755ec0b215ad1be5a3bbe93067dc2009c1793098",

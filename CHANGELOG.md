@@ -989,3 +989,19 @@
 - **T-145**：改为有承接方、有时点的交付项——外部指纹由维护方在 M4 来源收口前交付；人工评审由人类责任方在来源/知识/规则变更同批执行；干净克隆缺 `resources/` 时降级为“不执行”并显式声明，结论按 `assumption` 处理。
 - **涉及文件**：`CONSTITUTION.md`、`adr/0018-raw-material-admission-control.md`、`TODO.md`、`CHANGELOG.md`。
 - **状态**：生效（八项实现修复待批次 0057；台账处置待批次 0058）
+
+---
+
+### 批次 0057 — 2026-11-15 — 复核修复（第二批：八项实现修复）
+
+- **性质**：按非同源复核 `verify-admission`（sha256 `905cf234539cccb916f9096e3e137f12876e24b2fb9c1960a034157ac33aff06`，基线 `deaac46`）第三件修复。D4 未动、未放量、未碰判据 7 外部抽样。
+- **人工维护文件补 schema**：新增 `package-manifest`、`ontology-fixtures-manifest`、`pilot-artifact`、`pilot-id-map` 四份内容 schema；`pilot-contract.yaml` 改用 `pm-slot-contract.schema.json`（新增可选 `authoritative`、`evidence_forms` 与条目级 `grounding_ref`）。数据区由 18 个文件升至 22 个：10 个受内容 schema 约束、7 个 schema 自身、5 个生成器。
+- **`knowledge-entry` 收紧**：`relations` 改为 41 键白名单并加 `maxProperties: 12`；`evidence` 加 `maxItems: 12` 与 `page` 下界 1；`claim_mapping` 加 `maxItems: 20`；`definitionStatus` 按 D8 落枚举（`defined`/`taxonomy-only`/`pending`/`disputed`/`blocked-external`）；`sourcePage` 加下界 1。顺带为检查器补 `$ref`、`propertyNames`、`maxProperties` 支持，并把 `maxProperties` 归入字段配额。
+- **契约 schema 值级上限**：`pm-slot-contract` 全部字段补 `maxLength`、数组补 `maxItems`，新增 `x-prose-fields`（`assumption_refs[].statement` 与 `verification.alignment_criterion`），检查器相应支持 `a[].b` 形式的散文字段路径。
+- **配额矛盾修正**：单条散文字段上限由 2500 改为 2800，与 `definition` 2000 + `provenance_note` 800 的 schema 上限一致；自测新增“合法 2800 不被误杀”正向例。
+- **13.6 三项检查落地**：本体区新增 `RM-ONTO-PAGESEQ`（连续 12 个以上页码数字）与 `RM-ONTO-PROVENANCE`（页码无来源承接、来源无页码），头注释检查由 `.ttl` 扩到全部本体扩展名；13.6 结尾“行形态检查继续执行”已在批次 0056 改为实际检查项。
+- **指纹重冻**：`spec/ACCESS_ZONES.md` 与 `contracts/schema/pm-slot-contract.schema.json` 纳入 `spec-pins`（现 11 区段）；`checker-pins` 17 个受保护对象重冻，basis 指向批次 0056–0057 的复核转录记录。归区表从此“插行换区”必须同批复核记录，否则 `check_spec_pins.py` 退出 1。
+- **自测**：30 → 43 项，新增 13 项负例/正向例：300 KB 散文塞 `manifest.json`、5 万字符契约字段、5 万字符 `statement`、200 键 `relations`、100 条 `evidence`、100 条 `claim_mapping`、非法 `definitionStatus`、合法 2800 字符定义、归区表与契约 schema 的指纹存在性、页码序列、有来源无页码、非 `.ttl` 扩展名头注释。自测 43/43 通过。
+- **全仓复跑**：143 个跟踪文件（D 22 / O 30 / P 72 / C 19 / 未归类 0），0 命中。
+- **涉及文件**：`scripts/check_no_raw_material.py`、`scripts/check_spec_pins.py`、`scripts/checker-pins.json`、`scripts/spec-pins.json`、`scripts/README.md`、`spec/ACCESS_ZONES.md`、`contracts/schema/`（4 新增 + 2 修改）、`validation/reviews/2026-11-15-admission-r2-review.md`、`AGENTS.md`、`GLOSSARY.md`、`knowledge/glossary-usage.json`、`CHANGELOG.md`。
+- **状态**：生效（台账处置待批次 0058）

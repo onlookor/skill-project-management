@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-management-grounding/contracts/schema/package-manifest.schema.json",
+  "title": "包清单（manifest.json）",
+  "description": "根目录 manifest.json 的准入 schema。只允许登记字段；任何自由文本键或超长值按 RM-SCHEMA / RM-FIELD 阻断。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "package",
+    "package_version",
+    "release_tag",
+    "release_state",
+    "entrypoint",
+    "state_ledger",
+    "contract_schema",
+    "pm_contract_version"
+  ],
+  "properties": {
+    "package": {"type": "string", "minLength": 1, "maxLength": 120},
+    "package_version": {"type": "string", "pattern": "^\\d+\\.\\d+\\.\\d+$"},
+    "release_tag": {"type": "string", "pattern": "^v\\d+\\.\\d+\\.\\d+$"},
+    "release_state": {"type": "string", "enum": ["development", "released"]},
+    "entrypoint": {"type": "string", "minLength": 1, "maxLength": 200},
+    "state_ledger": {"type": "string", "minLength": 1, "maxLength": 200},
+    "contract_schema": {"type": "string", "minLength": 1, "maxLength": 200},
+    "pm_contract_version": {"type": "string", "pattern": "^0\\.[0-9]+$"}
+  }
+}

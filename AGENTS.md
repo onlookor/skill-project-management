@@ -251,7 +251,11 @@ project-management-grounding/
 │   ├── schema/
 │   │   ├── pm-slot-contract.schema.json   # 接口契约的 JSON Schema
 │   │   ├── knowledge-entry.schema.json    # 数据区条目（knowledge/*.jsonl）的准入 schema
-│   │   └── pilot-conflict.schema.json     # 数据区冲突样例（spec/pilot/pilot-conflicts.jsonl）的准入 schema
+│   │   ├── pilot-conflict.schema.json     # 数据区冲突样例（spec/pilot/pilot-conflicts.jsonl）的准入 schema
+│   │   ├── package-manifest.schema.json   # 根目录 manifest.json 的准入 schema
+│   │   ├── ontology-fixtures-manifest.schema.json  # 本体负例清单的准入 schema
+│   │   ├── pilot-artifact.schema.json     # 试点检查单投影的准入 schema
+│   │   └── pilot-id-map.schema.json       # 试点 ID 映射的准入 schema
 │   ├── resolver.md                 # 单层解析规则 + 多层合并语义（定义但不启用）+ PACT 适配节
 │   └── examples/
 │       ├── construction.pm-contract.yaml

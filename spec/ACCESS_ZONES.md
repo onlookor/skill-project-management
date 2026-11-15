@@ -55,17 +55,21 @@
 |---|---|---|
 | `knowledge/anchored-entries.jsonl` | jsonl | `contracts/schema/knowledge-entry.schema.json` |
 | `knowledge/glossary-usage.json` | json-object | 生成器 `scripts/check_glossary_usage.py` |
-| `manifest.json` | json-object | 结构化登记（发布元数据，由 `scripts/check_state.py` 核对一致性） |
+| `manifest.json` | json-object | `contracts/schema/package-manifest.schema.json` |
 | `spec/pilot/pilot-entries.json` | json-array | `contracts/schema/knowledge-entry.schema.json` |
 | `spec/pilot/pilot-conflicts.jsonl` | jsonl | `contracts/schema/pilot-conflict.schema.json` |
-| `spec/pilot/pilot-artifact.json` | json-object | 结构化登记（试点工件，人工维护） |
-| `spec/pilot/pilot-id-map.json` | json-object | 结构化登记（试点 ID 映射，人工维护） |
-| `spec/pilot/pilot-contract.yaml` | yaml-object | 结构化登记（试点契约样例，人工维护） |
+| `spec/pilot/pilot-artifact.json` | json-object | `contracts/schema/pilot-artifact.schema.json` |
+| `spec/pilot/pilot-id-map.json` | json-object | `contracts/schema/pilot-id-map.schema.json` |
+| `spec/pilot/pilot-contract.yaml` | yaml-object | `contracts/schema/pm-slot-contract.schema.json` |
 | `contracts/examples/` | yaml-object | `contracts/schema/pm-slot-contract.schema.json` |
 | `contracts/schema/pm-slot-contract.schema.json` | schema-doc | — |
 | `contracts/schema/knowledge-entry.schema.json` | schema-doc | — |
 | `contracts/schema/pilot-conflict.schema.json` | schema-doc | — |
-| `ontology/fixtures/manifest.json` | json-object | 结构化登记（夹具清单，人工维护） |
+| `contracts/schema/package-manifest.schema.json` | schema-doc | — |
+| `contracts/schema/ontology-fixtures-manifest.schema.json` | schema-doc | — |
+| `contracts/schema/pilot-artifact.schema.json` | schema-doc | — |
+| `contracts/schema/pilot-id-map.schema.json` | schema-doc | — |
+| `ontology/fixtures/manifest.json` | json-object | `contracts/schema/ontology-fixtures-manifest.schema.json` |
 | `scripts/anchor_baseline.json` | json-object | 生成器 `scripts/check_anchors.py --write` |
 | `scripts/checker-pins.json` | json-object | 生成器 `scripts/check_checker_pins.py --write` |
 | `scripts/spec-pins.json` | json-object | 生成器 `scripts/check_spec_pins.py --write` |
@@ -75,8 +79,8 @@
 
 | 区 | 允许形态 | 检查 |
 |---|---|---|
-| `数据区` | 本表登记的结构化文件 | 解析 + schema + 字段配额（`RM-SCHEMA` / `RM-FIELD`） |
-| `本体区` | `.ttl`、`.nt`、`.n3`、`.owl`、`.rdf`、`.jsonld` | 13.6 头注释、谓词分档字面量、注释上限、目录点线 |
+| `数据区` | 本表登记的结构化文件 | 解析 + schema + 字段配额与集合上限（`RM-SCHEMA` / `RM-FIELD`）；`prose_fields` 单条 2800 字符、单文件 20 KiB |
+| `本体区` | `.ttl`、`.nt`、`.n3`、`.owl`、`.rdf`、`.jsonld` | 头注释（全部本体扩展名）、谓词分档字面量、注释上限、目录点线、页码序列、`dcterms:source`/`pm:sourcePage` 存在性 |
 | `散文区` | 散文与说明文档 | 原始文件扩展名与文件头、体积、二进制、乱码、控制字符、目录点线、引证长度、单行上限 |
 | `代码与配置区` | 代码与配置 | 与散文区相同的硬约束（不含引证与目录点线两项散文判据） |
 
@@ -106,12 +110,14 @@
 - **基线**：`4c060fe`（阶段二完成、新检查器与 schema 生效）
 - **对象**：`git ls-files` 的全部 138 个跟踪文件
 - **归区分布**：D 18 / O 30 / P 71（P0 16、P1 42、P2 13）/ C 19；未归类 0
-- **违规**：0。数据区 18 个文件全部在准入登记表中且通过 schema；本体区 30 个文件全部通过 13.6 与字面量分档；散文区与代码区全部通过硬约束。
+- **违规**：0 次检查器命中。**更正（批次 0057）**：原文写“数据区 18 个文件全部通过 schema”不成立——当时只有 1 个 JSONL、2 个试点数据文件与 2 个示例受内容 schema 约束，5 个人工维护文件仅做“结构化登记”、5 个生成器文件靠生成器自证、3 个 schema 文件只校验自身形态，合计 13/18 不受内容 schema 或字段配额约束。批次 0057 已为 5 个人工维护文件补内容 schema（D 区升至 22 个文件：10 个受 schema 约束、7 个 schema 自身、5 个生成器）。
 - **逐文件核对方式**：对每个跟踪文件调用本表解析出的区与准入登记，再执行 `check_file()`；结果按区计数并列出全部违规。复跑命令：
 
 ```
 python3 scripts/check_no_raw_material.py
 ```
+
+- **复核后补检（批次 0057，基线 `deaac46`）**：复核报告（`/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-admission/REPORT.md`，sha256 `905cf234539cccb916f9096e3e137f12876e24b2fb9c1960a034157ac33aff06`）指出五类缺口——人工维护数据文件无内容 schema、`relations` 键无白名单、`prose_fields` 单条 2500 与 schema 允许的 2800 矛盾、归区表未进指纹、13.6 三项检查无人承接。本批已全部修正并重跑：全仓 0 命中，自测 43 项通过。
 
 - **豁免判定（D-6）**：0 违规，收敛为**不设豁免期**。依据：准入制要求“存量先合规、再切闸门”；存量已全部合规，若仍开豁免窗口，只会把已合规的存量重新暴露在无复核的例外通道下。未创建 `validation/exemptions/`；将来若出现暂时无法修正的合法文件，按第 4 节与方案第 10.3 节登记，且不得用于原始资料或提取产物。
 - **边界**：本次过检证明“已登记的区与结构条件成立”，不证明内容不是原文。**未命中不等于合规**；来源层比对仍由仓库外指纹方案与人工评审承接。

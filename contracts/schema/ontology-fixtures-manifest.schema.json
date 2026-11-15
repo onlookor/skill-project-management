@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://project-management-grounding/contracts/schema/ontology-fixtures-manifest.schema.json",
+  "title": "本体负例清单（ontology/fixtures/manifest.json）",
+  "description": "形状编号到负例文件与期望消息的映射。键必须形如 sNN_xxx；值只允许 fixture 与 message。",
+  "type": "object",
+  "maxProperties": 60,
+  "propertyNames": {"pattern": "^s\\d{2}_[a-z0-9_]+$"},
+  "additionalProperties": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["fixture", "message"],
+    "properties": {
+      "fixture": {
+        "type": "string",
+        "pattern": "^invalid-s\\d{2}_[a-z0-9_]+\\.ttl$",
+        "maxLength": 200
+      },
+      "message": {"type": "string", "minLength": 1, "maxLength": 400}
+    }
+  }
+}

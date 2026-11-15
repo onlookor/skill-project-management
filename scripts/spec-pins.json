@@ -31,12 +31,20 @@
       "path": "validation/checker-prototype/coverage.json"
     },
     "contracts/schema/knowledge-entry.schema.json": {
-      "sha256": "992c5cf8cf30e420866aaaf9f7c960460995f738b837d072274f66992665bfa8",
+      "sha256": "3570c88d921d3775140c648cf9593524e2bfd323c60925e375ed4987fe1c74b8",
       "path": "contracts/schema/knowledge-entry.schema.json"
     },
     "contracts/schema/pilot-conflict.schema.json": {
       "sha256": "7cb450d5808515463504d97ca637b13539ad312cf5fd5f71bd690a11e78b54ea",
       "path": "contracts/schema/pilot-conflict.schema.json"
+    },
+    "contracts/schema/pm-slot-contract.schema.json": {
+      "sha256": "c2ad4334598b6c4572c9337535a344b31ef592e0a9c68cbd548abcab02c69a17",
+      "path": "contracts/schema/pm-slot-contract.schema.json"
+    },
+    "spec/ACCESS_ZONES.md": {
+      "sha256": "51b57d665e8b801a924ed294060a329006aa13bb761d0f6dcc7e506867a60219",
+      "path": "spec/ACCESS_ZONES.md"
     }
   }
 }
