@@ -6,7 +6,11 @@
   "type": "object",
   "required": ["skill_id", "pm_contract_version", "slots"],
   "additionalProperties": false,
-  "x-prose-fields": ["assumption_refs[].statement", "assumption_refs[].verification.alignment_criterion"],
+  "x-prose-fields": [
+    {"path": "assumption_refs[].statement", "maxChars": 3200},
+    {"path": "assumption_refs[].verification.alignment_criterion", "maxChars": 2400}
+  ],
+  "x-prose-budget": 5600,
   "properties": {
     "skill_id": {
       "type": "string",
@@ -17,6 +21,7 @@
     "pm_contract_version": {
       "type": "string",
       "pattern": "^0\\.[0-9]+$",
+      "maxLength": 20,
       "description": "契约所遵循的 PM 接口契约规范版本"
     },
     "authoritative": {

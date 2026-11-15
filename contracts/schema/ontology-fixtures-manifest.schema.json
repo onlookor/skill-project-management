@@ -5,7 +5,7 @@
   "description": "形状编号到负例文件与期望消息的映射。键必须形如 sNN_xxx；值只允许 fixture 与 message。",
   "type": "object",
   "maxProperties": 60,
-  "propertyNames": {"pattern": "^s\\d{2}_[a-z0-9_]+$"},
+  "propertyNames": {"type": "string", "pattern": "^s\\d{2}_[a-z0-9_]+$", "maxLength": 80},
   "additionalProperties": {
     "type": "object",
     "additionalProperties": false,

@@ -4539,6 +4539,11 @@
           "form": "term_id"
         },
         {
+          "file": "CHANGELOG.md",
+          "line": 1048,
+          "form": "term_id"
+        },
+        {
           "file": "spec/ACCESS_ZONES.md",
           "line": 82,
           "form": "code"

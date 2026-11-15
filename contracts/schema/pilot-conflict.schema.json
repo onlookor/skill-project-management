@@ -6,7 +6,11 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["conflict_id", "topic", "draft_ref", "positions", "relation", "recorded_fields", "note"],
-  "x-prose-fields": ["note"],
+  "x-prose-fields": [
+    {"path": "note", "maxChars": 800},
+    {"path": "positions[].stance", "maxChars": 2400}
+  ],
+  "x-prose-budget": 3200,
   "properties": {
     "conflict_id": {"type": "string", "minLength": 1, "maxLength": 120},
     "topic": {"type": "string", "maxLength": 120},
@@ -14,6 +18,7 @@
     "positions": {
       "type": "array",
       "minItems": 1,
+      "maxItems": 40,
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -31,6 +36,7 @@
     "missing": {"type": "string", "maxLength": 120},
     "recorded_fields": {
       "type": "array",
+      "maxItems": 40,
       "items": {"type": "string", "maxLength": 120}
     },
     "note": {"type": "string", "maxLength": 800}

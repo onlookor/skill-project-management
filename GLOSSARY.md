@@ -405,7 +405,7 @@
 - `status`：`active`
 
 **T-D-014 数据区**
-- 定义：按目录角色划分的准入单元（data zone），只允许已登记的结构化文件；文件必须可解析、通过登记的 schema 并满足字段配额，散文只能出现在 schema 声明的 `prose_fields` 中。
+- 定义：按目录角色划分的准入单元（data zone），只允许已登记的结构化文件；文件必须可解析、通过登记的 schema 并满足字段配额，散文只能出现在 schema 声明的 `x-prose-fields` 路径中。
 - `first_used_in`：`CONSTITUTION.md` 第 13.3 条
 - `status`：`active`
 

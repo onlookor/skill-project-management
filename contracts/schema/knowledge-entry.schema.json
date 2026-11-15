@@ -6,7 +6,11 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["term", "definition"],
-  "x-prose-fields": ["definition", "provenance_note"],
+  "x-prose-fields": [
+    {"path": "definition", "maxChars": 2000},
+    {"path": "provenance_note", "maxChars": 800}
+  ],
+  "x-prose-budget": 2800,
   "properties": {
     "id": {"type": "string", "maxLength": 120},
     "draft_id": {"type": "string", "maxLength": 120},

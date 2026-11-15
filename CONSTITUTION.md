@@ -332,7 +332,7 @@ ADR 的状态取值：`proposed` / `accepted` / `deprecated` / `superseded`。�
 
 **补偿控制与承接（裁定生效的前提，缺一即失效）**：
 
-1. **数据区**：每个文件绑定 schema 或生成器；人工维护文件必须有内容 schema；`prose_fields` 单条 2800 字符、单文件 20 KiB；`relations`、`evidence`、`claim_mapping` 等集合字段设键白名单、`maxProperties` 与 `maxItems`。本项在实现中缺失时，本裁定自动失效，13.3 退回阻断。
+1. **数据区**：每个文件绑定 schema 或生成器；人工维护文件必须有内容 schema；散文字段按 schema 的 `x-prose-fields` **逐路径**计量（每个路径单条合计有上限），另设 `x-prose-budget` 作为单条所有散文字段总和的兜底；单文件散文字段 20 KiB；`relations`、`evidence`、`claim_mapping` 等集合字段设键白名单、`maxProperties` 与 `maxItems`。schema 自身必须通过完整性 lint（数组须 `maxItems` 与 `items`、字符串须 `maxLength`、对象须 `additionalProperties: false` 或受 `maxProperties` + `propertyNames` 约束；白名单外的关键字、未实现的关键字、`$ref` 同级断言关键字一律报错）。本项在实现中缺失时，本裁定自动失效，13.3 退回阻断。
 2. **本体区**：13.6 第 3/5 项的全部条件均须有机械承接——页码序列、`dcterms:source`/`pm:sourcePage`、覆盖全部本体扩展名的文件头注释。
 3. **散文区**：只保留 13.1 第 1 项与 13.2 第 3 项的硬约束；不得把“未命中”表述为内容层合规。
 4. **外部指纹**：承接方为维护方，时点为 M4 来源收口前（T-145）；比对已登记来源的整段、整章与大段改写。干净克隆拿不到 `resources/` 时降级为“不执行”，降级须在发布说明中显式声明，相关结论按 `assumption` 处理。

@@ -14,9 +14,9 @@
     "artifact_id": {"type": "string", "minLength": 1, "maxLength": 120},
     "artifact_type": {"type": "string", "minLength": 1, "maxLength": 80},
     "authoritative": {"type": "boolean", "const": false},
-    "generated": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
-    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{7,40}$"},
-    "checklist_source_commit": {"type": "string", "pattern": "^[0-9a-f]{7,40}$"},
+    "generated": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$", "maxLength": 10},
+    "source_commit": {"type": "string", "pattern": "^[0-9a-f]{7,40}$", "maxLength": 40},
+    "checklist_source_commit": {"type": "string", "pattern": "^[0-9a-f]{7,40}$", "maxLength": 40},
     "not_execution_result": {"type": "boolean", "const": true},
     "clauses": {
       "type": "array",
@@ -28,7 +28,7 @@
         "required": ["check_id", "rule", "severity", "rule_status", "clause", "verdict", "reason"],
         "properties": {
           "check_id": {"type": "string", "maxLength": 120},
-          "rule": {"type": "string", "pattern": "^G-[A-G]\\d$"},
+          "rule": {"type": "string", "pattern": "^G-[A-G]\\d$", "maxLength": 10},
           "severity": {"type": "string", "enum": ["block", "warn", "advisory"]},
           "rule_status": {"type": "string", "enum": ["active", "assumption", "pending_reanchor"]},
           "clause": {"type": "string", "maxLength": 120},

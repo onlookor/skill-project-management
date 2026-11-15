@@ -1033,3 +1033,20 @@
 - **全仓复跑**：143 个跟踪文件 0 命中；`checker-pins` 17/17；`spec-pins` 15/15；`test_spec_pins` 8/8。
 - **涉及文件**：`scripts/check_spec_pins.py`、`scripts/test_spec_pins.py`、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`scripts/README.md`、`CHANGELOG.md`。
 - **状态**：生效（G-019/G-021 仍 `open`，待非同源复核）
+
+---
+
+### 批次 0060 — 2026-11-15 — 结构性修法（第二批：schema 完整性 lint 与按路径配额）
+
+- **性质**：按非同源复核 `verify-g019-r3`（sha256 `877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0`，基线 `3664b64`）第三节 P0-1、P0-2、P1 修复。D4 未动、未放量、未碰判据 7 外部抽样。
+- **schema 完整性 lint**：新增 `RM-SCHEMA-LINT`，对 `contracts/schema/` 下全部 7 份 schema 强制——数组须有 `maxItems` 与 `items`、字符串须有 `maxLength`、对象须 `additionalProperties: false`（或受 `maxProperties` + `propertyNames` 约束的映射）；`enum`/`const` 视为有限值集，不重复要求长度。报错带文件与 JSON 指针。lint 同时校验 `x-prose-fields` 条目形状与 `x-prose-budget`。
+- **关键字白名单与显式失败**：新增 `SUPPORTED_KEYWORDS` / `UNSUPPORTED_KEYWORDS`；白名单外的拼写（`mxLength`）与未实现的标准关键字（`patternProperties`、`prefixItems`、`dependentSchemas` 等）一律报错。`oneOf` 改为**恰好命中 1 个分支**，不再退化为 `anyOf`；`$ref` 带同级断言关键字被 lint 拒绝，运行时不静默丢弃。
+- **配额按字段路径**：`x-prose-fields` 由字符串列表改为 `{"path", "maxChars"}`，逐路径计量；新增 `x-prose-budget` 作为单条所有散文字段总和的兜底。两道都保留，单文件 20 KiB 不变。路径语法新增 `map.*.field`。具体值：`knowledge-entry` 2000/800（预算 2800）、试点契约 3200/2400（预算 5600）、`pilot-id-map` 800/600/4800 + `rule_bindings.*.note` 3200（预算 9400）、`pilot-conflict` 800/2400（预算 3200）。
+- **r3 硬缺陷**：`pilot-conflict` 的 `positions` 加 `maxItems: 40`、`recorded_fields` 加 `maxItems: 40`；四份漏钉 schema 已在批次 0059 由自动发现兜住；`pilot-id-map` 四处映射补 `propertyNames`；pattern-only 字符串补 `maxLength`（`package-manifest`、`pilot-artifact`、`pm-slot-contract`、`pilot-id-map`）。
+- **正向例（上一轮误杀）**：自测固定 3 条假设 × 1400（合计 4200）与 12 条 `notes` 的 id-map（合计 6200）必须放行，且不再受整条求和影响。
+- **负例**：`positions` 300×400、`recorded_fields` 200×120、`package-manifest` 削弱为 `additionalProperties: true`（lint 与数据文件 fail-closed 各一条）、三类缺上限、拼错关键字、未实现关键字、`$ref` 同级关键字、`oneOf` 排他。自测 43 → 55 项，55/55 通过。
+- **文档同步**：`CONSTITUTION.md` 13.3 补偿控制第 1 项、`spec/ACCESS_ZONES.md` 第 3 节、`spec/RAW_MATERIAL_ADMISSION.md` §4.3、`scripts/README.md`、`GLOSSARY.md` T-D-014 同步为新语义；`spec/RAW_MATERIAL_ADMISSION.md` 中残留的“2500”修正为按 schema 声明。
+- **指纹重冻**：`spec-pins` 15 区段（本次变更 8 个），`checker-pins` 17 个；basis 均指向上述仓库外复核报告 + sha256 + 基线 `3664b64`；新增 `validation/reviews/2026-11-15-admission-r3-structural.md` 作为**非权威索引**，不构成依据。
+- **全仓复跑**：144 个跟踪文件 0 命中；自测 55/55；`checker-pins` 17/17；`spec-pins` 15/15；`test_spec_pins` 8/8；pre-commit 全绿。
+- **涉及文件**：`scripts/check_no_raw_material.py`、`scripts/check_spec_pins.py`、7 份 `contracts/schema/*.schema.json`、`CONSTITUTION.md`、`spec/ACCESS_ZONES.md`、`spec/RAW_MATERIAL_ADMISSION.md`、`scripts/README.md`、`GLOSSARY.md`、`validation/reviews/2026-11-15-admission-r3-structural.md`、两份 pins JSON、`CHANGELOG.md`。
+- **状态**：生效（G-019/G-021 仍 `open`，待非同源复核）

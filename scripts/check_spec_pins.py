@@ -172,8 +172,9 @@ def load_pins(path: Path) -> dict:
 
 
 def valid_review(root: Path, reviews: list[str], key: str) -> bool:
+    pattern = re.compile(rf"区段：`?{re.escape(key)}`?")
     for text in reviews:
-        if f"区段：{key}" not in text:
+        if pattern.search(text) is None:
             continue
         if not any(word in text for word in CONCLUSIONS):
             continue

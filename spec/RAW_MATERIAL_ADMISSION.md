@@ -104,7 +104,8 @@ schema 文件本身纳入 `spec-pins` 指纹绑定；改 schema 必须同批更�
 | `definition` | 2000 字符 | 覆盖 1500 字符的真实定义，同时低于整页正文常见体量 |
 | `provenance_note` | 800 字符 | 形式化边界说明 |
 | `candidate_iri_reason` | 400 字符 | 解释性文本，不再按身份键 120 |
-| 单条记录散文字段合计 | 2500 字符 | `definition` + `provenance_note` 的组合上限 |
+| 单条记录单个散文字段路径合计 | 由 schema 的 `x-prose-fields` 逐路径声明 | 例：`definition` 2000 / `provenance_note` 800；`assumption_refs[].statement` 3200；`notes` 4800。数组路径按其 `maxItems` 内的合法组合定值 |
+| 单条记录散文字段总和 | 由 schema 的 `x-prose-budget` 声明 | 兜底闸门：各散文字段路径之和超过预算即阻断（`knowledge-entry` 2800、试点契约 5600、`pilot-id-map` 9400） |
 | 单文件散文字段合计 | 20 KiB | 粗粒度总量闸门；超出转人工裁定 |
 
 **配额不能证明来源。** 均分切块（15 × 390 字符）可以落在所有配额内。配额的作用是挡住“单条整页”和最明显的滥用，不承担“是否原文”的判定；后者交给第 8 节的外部指纹方案与人工评审。
