@@ -2,7 +2,7 @@
 """配置层错误分类、配置摘要与配置 schema 自检（批次 0083）。
 
 本模块只固定**分类与退出码**，不执行配置求值（求值属下一批的解释器）。
-依据：`spec/D6_REBASELINE_PROPOSAL.md` 9.1（四条安全边界）、9.2（13 项配置）、
+依据：`spec/D6_REBASELINE_PROPOSAL.md` 9.1（四条安全边界）、9.2（13 项配置，另有责任方批次 0084 裁定的 CFG-14/CFG-15）、
 9.3（缺失与非法值）、9.4（配置快照与可比性）。
 
 四类配置结果与退出码：
@@ -36,7 +36,7 @@ from pathlib import Path
 SCHEMA_PATH = Path("contracts/schema/runtime-config.schema.json")
 LOCK_SCHEMA_PATH = Path("contracts/schema/runtime-config-lock.schema.json")
 SCHEMA_VERSION = "config.schema/1"
-CONFIG_KEY_PATTERN = "^CFG-(0[1-9]|1[0-3])$"
+CONFIG_KEY_PATTERN = "^CFG-(0[1-9]|1[0-5])$"
 
 # 四类归属（9.1）。只有 project_parameter 能出现在 config.json：
 # 判据、验收参数与能力开关分别由 ADR、验收装置与技能级开关承载。
@@ -83,8 +83,11 @@ OFF_SWITCH = re.compile(
     r"(?i)(disable|enable|skip|ignore|waive|bypass|toggle|turn_?off)"
 )
 
-CFG_IDS = tuple(f"CFG-{index:02d}" for index in range(1, 14))
+CFG_IDS = tuple(f"CFG-{index:02d}" for index in range(1, 16))
 JUDGMENTAL_REQUIRED = ("CFG-01", "CFG-02", "CFG-03", "CFG-04", "CFG-09")
+# 条件必填的判定性项：CFG-15 在按 cost_account 分档/汇总时必填；
+# CFG-14 的触发条件在任务卡（是否执行风险方法），不在配置内部，故无结构规则。
+JUDGMENTAL_CONDITIONAL = ("CFG-05", "CFG-06", "CFG-07", "CFG-08", "CFG-13", "CFG-14", "CFG-15")
 
 COMMENT_KEYS = ("cfg", "class", "defaultable", "absent")
 
@@ -372,6 +375,30 @@ def config_findings(config: dict, lock: dict | None = None) -> list[dict]:
                 {"code": "config_incomplete", "detail": "CFG-03.metric=custom 缺少 custom_metric"}
             )
 
+    risk = config.get("CFG-14")
+    if isinstance(risk, dict):
+        expected = {"3x3": 3, "5x5": 5}.get(risk.get("scale"))
+        if expected is not None:
+            for field in ("probability_labels", "impact_labels"):
+                labels = risk.get(field)
+                if isinstance(labels, list) and len(labels) != expected:
+                    findings.append(
+                        {
+                            "code": "config_incomplete",
+                            "detail": f"CFG-14.scale={risk.get('scale')} 时 {field} 应为 {expected} 个标签，实得 {len(labels)}",
+                        }
+                    )
+
+    dimensions = config.get("CFG-01")
+    if isinstance(dimensions, list) and "cost_account" in dimensions:
+        if "CFG-15" not in config:
+            findings.append(
+                {
+                    "code": "config_incomplete",
+                    "detail": "CFG-01 含 cost_account 但缺少 CFG-15（成本科目表）",
+                }
+            )
+
     if lock is not None:
         expected = lock.get("config_digest")
         actual = config_digest(config)
@@ -456,7 +483,7 @@ def main(argv: list[str] | None = None) -> int:
 
     errors = policy_errors(schema) + lock_policy_errors(lock_schema)
     classes = " / ".join(f"{name}={EXIT_BY_CLASS[name]}" for name in ERROR_CLASSES)
-    print(f"配置 schema 自检：13 项，类别 {classes}")
+    print(f"配置 schema 自检：15 项，类别 {classes}")
     if errors:
         for message in errors:
             print(f"[错误] {message}")

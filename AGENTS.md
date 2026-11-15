@@ -298,7 +298,7 @@ project-management-grounding/
 │   │   ├── ontology-fixtures-manifest.schema.json  # 本体负例清单的准入 schema
 │   │   ├── pilot-artifact.schema.json     # 试点检查单投影的准入 schema
 │   │   ├── pilot-id-map.schema.json       # 试点 ID 映射的准入 schema
-│   │   ├── runtime-config.schema.json     # 运行期配置实例（CFG-01～CFG-13）的准入 schema
+│   │   ├── runtime-config.schema.json     # 运行期配置实例（CFG-01～CFG-15）的准入 schema
 │   │   └── runtime-config-lock.schema.json # 配置摘要与变更历史（config.digest/item_digests）的准入 schema
 │   ├── resolver.md                 # 单层解析规则 + 多层合并语义（定义但不启用）+ PACT 适配节
 │   └── examples/

@@ -18,7 +18,7 @@
       "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：spec/methods/deterministic-checker.md#A.1 结论：认可"
     },
     "spec/CHECKER_INPUT_SCHEMA.md": {
-      "sha256": "7ed93c83c6da073095b47bb5edacac22cf4f570b60aacb8ce683beb4ef43d1c0",
+      "sha256": "8c068f1676962dcd55c54edeafd49f5da0b3280da007256d89ed441b970264e4",
       "path": "spec/CHECKER_INPUT_SCHEMA.md",
       "basis": "无复核声明（不构成认可，不放行）"
     },
@@ -68,12 +68,12 @@
       "basis": "非同源复核：G-019 r4（基线 11c5d92）指出自写子集语义失真与配额外溢；本批按用户 2026-11-15 裁定接入成熟实现。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md；sha256：47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb；复核基线：11c5d92 区段：contracts/schema/pilot-id-map.schema.json 结论：认可"
     },
     "contracts/schema/runtime-config.schema.json": {
-      "sha256": "28589124817a60bdba4c3622fdde96dd1bb8f5ea950c8cb743620bbef7f95416",
+      "sha256": "5b4541be332f4486036837fdf5707c83f9f666f0b9ca0b157cfd3e7f67149e00",
       "path": "contracts/schema/runtime-config.schema.json",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "contracts/schema/runtime-config-lock.schema.json": {
-      "sha256": "32e241d86706c1c311b33f7a57eb6abeb9f19c5a6e2ac11a1601e8e28f5c468b",
+      "sha256": "ab9b024321469d945d3d7553385e6cb35d46fe23bb6924242ba9e3f0574ee46f",
       "path": "contracts/schema/runtime-config-lock.schema.json",
       "basis": "无复核声明（不构成认可，不放行）"
     },

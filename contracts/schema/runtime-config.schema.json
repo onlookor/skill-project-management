@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://project-management-grounding/contracts/schema/runtime-config.schema.json",
   "title": "运行期配置实例（<project>/config.json）",
-  "description": "配置层的结构 schema，依据 spec/D6_REBASELINE_PROPOSAL.md 第 9 节（9.1 位置与边界、9.2 配置项清单、9.3 缺失与非法值、9.4 配置快照）。它约束的是**项目参数的取值形状**，不执行任何判定求值。四类归属只有 project_parameter 能出现在本文件：skill_criterion、acceptance_parameter、capability_switch 由 propertyNames 与 additionalProperties 双重拒绝，不得混写。默认值规则：只有非判定性项允许默认值（CFG-10、CFG-11），判定性项一律无默认，缺失即 cannot_evaluate（退出码 3），不得回落为通过。四条安全边界见顶层 $comment，其中“配置只能调严或调宽、不得关闭检查”的机械落点是本 schema 不含任何 enable/disable/skip/ignore/waive 类字段，且每一层 additionalProperties 均为 false——没有字段可以关闭某个 check。",
+  "description": "配置层的结构 schema，依据 spec/D6_REBASELINE_PROPOSAL.md 第 9 节（9.1 位置与边界、9.2 配置项清单与责任方裁定的 CFG-14/CFG-15、9.3 缺失与非法值、9.4 配置快照）。它约束的是**项目参数的取值形状**，不执行任何判定求值。四类归属只有 project_parameter 能出现在本文件：skill_criterion、acceptance_parameter、capability_switch 由 propertyNames 与 additionalProperties 双重拒绝，不得混写。默认值规则：只有非判定性项允许默认值（CFG-10、CFG-11），判定性项一律无默认，缺失即 cannot_evaluate（退出码 3），不得回落为通过。四条安全边界见顶层 $comment，其中“配置只能调严或调宽、不得关闭检查”的机械落点是本 schema 不含任何 enable/disable/skip/ignore/waive 类字段，且每一层 additionalProperties 均为 false——没有字段可以关闭某个 check。",
   "$comment": "schema_version=config.schema/1; classes=project_parameter|skill_criterion|acceptance_parameter|capability_switch; present_class=project_parameter; 每个 CFG 属性的 $comment 以 cfg=/class=/defaultable=/absent= 元数据登记，另可用 sub_defaults= 声明子字段默认值。安全边界：B1 缺配置不得默认通过（defaultable=false ⇒ 无 default ⇒ absent=cannot_evaluate）；B2 人审关口不可删除（CFG-12 只有 additional_gates 与 approver_role_map，删除表达不存在）；B3 检查项不可关闭（无任何开关字段）；B4 配置不可改变工件必填字段集合（本文件只约束取值，不出现 required 列表注入工件）。",
   "type": "object",
   "additionalProperties": false,
@@ -28,7 +28,7 @@
       "additionalProperties": false,
       "propertyNames": {
         "type": "string",
-        "pattern": "^CFG-(0[1-9]|1[0-3])$",
+        "pattern": "^CFG-(0[1-9]|1[0-5])$",
         "maxLength": 8
       },
       "required": [
@@ -38,7 +38,7 @@
         "CFG-04",
         "CFG-09"
       ],
-      "description": "配置项集合。键只允许 CFG-01～CFG-13；任何未注册键（含 SKILL-*、ACCEPT-*、SWITCH-* 前缀）按 config_invalid（退出码 2）处理，防止拼写错误被当成新参数。",
+      "description": "配置项集合。键只允许 CFG-01～CFG-15；任何未注册键（含 SKILL-*、ACCEPT-*、SWITCH-* 前缀）按 config_invalid（退出码 2）处理，防止拼写错误被当成新参数。",
       "properties": {
         "CFG-01": {
           "$comment": "cfg=CFG-01; class=project_parameter; defaultable=false; absent=cannot_evaluate",
@@ -509,6 +509,149 @@
               "type": "string",
               "minLength": 0,
               "maxLength": 120
+            }
+          }
+        },
+        "CFG-14": {
+          "$comment": "cfg=CFG-14; class=project_parameter; defaultable=false; absent=cannot_evaluate",
+          "title": "风险刻度",
+          "description": "概率-影响刻度的尺寸、两维标签、评分规则与分档边界（批次 0084 由责任方裁定补号，承接 RG-08）。判定性：缺失即 cannot_evaluate（退出码 3），不取默认。标签数须与刻度尺寸一致（3x3 配 3 个标签，5x5 配 5 个）；分档边界的覆盖性与单调性由配置解释器在求值时判定。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "scale",
+            "probability_labels",
+            "impact_labels",
+            "score_rule",
+            "bands"
+          ],
+          "properties": {
+            "scale": {
+              "type": "string",
+              "enum": [
+                "3x3",
+                "5x5"
+              ],
+              "maxLength": 8
+            },
+            "probability_labels": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 5,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              }
+            },
+            "impact_labels": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 5,
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 40
+              }
+            },
+            "score_rule": {
+              "type": "string",
+              "enum": [
+                "product",
+                "matrix"
+              ],
+              "maxLength": 16
+            },
+            "bands": {
+              "type": "array",
+              "minItems": 3,
+              "maxItems": 5,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "label",
+                  "order",
+                  "lower",
+                  "upper"
+                ],
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "enum": [
+                      "green",
+                      "yellow",
+                      "amber",
+                      "red",
+                      "blue"
+                    ],
+                    "maxLength": 16
+                  },
+                  "order": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 5
+                  },
+                  "lower": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 25
+                  },
+                  "upper": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 25
+                  }
+                }
+              }
+            }
+          }
+        },
+        "CFG-15": {
+          "$comment": "cfg=CFG-15; class=project_parameter; defaultable=false; absent=cannot_evaluate",
+          "title": "成本科目表",
+          "description": "组织成本科目表（科目编码、名称、上级科目）（批次 0084 由责任方裁定补号，承接 RG-07）。判定性：按 cost_account 维度分档或做成本汇总时必填，缺失即 cannot_evaluate（退出码 3）。编码唯一、上级科目存在且无环、科目与 WBS 的守恒关系由配置解释器在求值时判定。",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "source",
+            "accounts"
+          ],
+          "properties": {
+            "source": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 120
+            },
+            "accounts": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 500,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "code",
+                  "name"
+                ],
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "pattern": "^[A-Z0-9][A-Z0-9._-]{0,31}$",
+                    "maxLength": 32
+                  },
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 80
+                  },
+                  "parent_code": {
+                    "type": "string",
+                    "pattern": "^[A-Z0-9][A-Z0-9._-]{0,31}$",
+                    "maxLength": 32
+                  }
+                }
+              }
             }
           }
         }

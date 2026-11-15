@@ -31,10 +31,10 @@
       "additionalProperties": false,
       "propertyNames": {
         "type": "string",
-        "pattern": "^CFG-(0[1-9]|1[0-3])$",
+        "pattern": "^CFG-(0[1-9]|1[0-5])$",
         "maxLength": 8
       },
-      "maxProperties": 13,
+      "maxProperties": 15,
       "description": "逐项摘要，用于诊断“是哪一项变了导致不可比”。",
       "properties": {
         "CFG-01": {
@@ -75,12 +75,18 @@
         },
         "CFG-13": {
           "$ref": "#/$defs/item_digest"
+        },
+        "CFG-14": {
+          "$ref": "#/$defs/item_digest"
+        },
+        "CFG-15": {
+          "$ref": "#/$defs/item_digest"
         }
       }
     },
     "defaulted": {
       "type": "array",
-      "maxItems": 13,
+      "maxItems": 15,
       "description": "取过默认值的非判定性配置项编号；判定性项不得出现在此列表。",
       "items": {
         "type": "string",
@@ -97,7 +103,9 @@
           "CFG-10",
           "CFG-11",
           "CFG-12",
-          "CFG-13"
+          "CFG-13",
+          "CFG-14",
+          "CFG-15"
         ],
         "maxLength": 8
       }

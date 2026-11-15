@@ -270,7 +270,7 @@
 ### 7.2 固定入口与常量
 
 - 分类与摘要：`scripts/config_codes.py`（`EXIT_BY_CLASS`、`classify()`、`config_findings()`、`overall_exit_code()`）。
-- 配置实例 schema：`contracts/schema/runtime-config.schema.json`（CFG-01～CFG-13）。
+- 配置实例 schema：`contracts/schema/runtime-config.schema.json`（CFG-01～CFG-15）。
 - 配置摘要与历史 schema：`contracts/schema/runtime-config-lock.schema.json`（`config_digest`、`item_digests`、`defaulted`、`schema_version`、`history`）。
 - 自检：`python3 scripts/config_codes.py --self-check`（约束一至约束四的机械核验）。
 - 结构分类：`python3 scripts/config_codes.py --check <项目配置实例路径> [--lock <项目配置锁路径>]`。
@@ -281,5 +281,5 @@
 
 ### 7.4 不得回落为通过
 
-判定性项（CFG-01～CFG-09，CFG-13）无默认值，缺失即 `cannot_evaluate`（退出码 3）；只有非判定性项（CFG-10、CFG-11）允许默认值，取默认时把项编号登记进 `defaulted`。CFG-12 缺失等价于“不额外放宽”，任务卡声明的 mandatory gate 仍全量启用，因此也不构成通过。
+判定性项（CFG-01～CFG-09、CFG-13～CFG-15）无默认值，缺失即 `cannot_evaluate`（退出码 3）；只有非判定性项（CFG-10、CFG-11）允许默认值，取默认时把项编号登记进 `defaulted`。CFG-12 缺失等价于“不额外放宽”，任务卡声明的 mandatory gate 仍全量启用，因此也不构成通过。CFG-14（风险刻度）与 CFG-15（成本科目表）由责任方于批次 0084 裁定补号：前者在执行风险方法时必填，后者在按 `cost_account` 分档或汇总时必填。
 

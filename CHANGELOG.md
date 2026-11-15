@@ -1362,3 +1362,21 @@
 - **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`（新增 3 个无复核对象，均已登记）。
 - **关联 ADR**：无（结构依据为已批准的提案第 9 节）
 - **收尾补正（同一批第三个提交）**：pre-commit 复核发现两份新 schema 未在 `spec/ACCESS_ZONES.md` 第 2 节（数据区准入登记）登记，按 D-1 不应降级为文本扫描。补登记两行 `schema-doc` 后，`check_no_raw_material.py` 由 2 个错误回到 0。**代价如实记录**：该区段此前按 G-019 r4 有合格复核记录，本次改动超出原复核范围，`spec-pins.json` 的 basis 只能降为无复核声明（原复核记录仍在 git 历史 `441218d` 中），并已登记入 `scripts/no-review-declarations.json` 与 T-149；这是本次改动的真实治理成本，不以旧复核顶新内容。
+
+---
+
+### 批次 0084 — 2026-11-15 — T-157 关闭：补 CFG-14（风险刻度）与 CFG-15（成本科目表）
+
+- **授权依据**：责任方裁定 T-157 的补号方式——不扩 `spec/D6_REBASELINE_PROPOSAL.md`（提案不改），而按既有体例在配置 schema 中新增 **CFG-14**、**CFG-15**，并回填台账。
+- **涉及文件**：`contracts/schema/runtime-config.schema.json`、`contracts/schema/runtime-config-lock.schema.json`、`scripts/config_codes.py`、`GAP_LEDGER.md`、`TODO.md`、`spec/CHECKER_INPUT_SCHEMA.md`、`AGENTS.md`（目录树注释）、`CHANGELOG.md`、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`knowledge/glossary-usage.json`。
+- **变更摘要**：
+  1. **CFG-14 风险刻度**：`scale`（3x3 / 5x5）、`probability_labels` / `impact_labels`（3–5 项，须与刻度尺寸一致）、`score_rule`（product / matrix）、`bands`（标签 + 顺序 + 1–25 分档区间）。项目参数、判定性、无默认，缺失即 `cannot_evaluate`。
+  2. **CFG-15 成本科目表**：`source` 与 `accounts[]`（`code` / `name` / `parent_code`，编码 `^[A-Z0-9][A-Z0-9._-]{0,31}$`，1–500 条）。项目参数、判定性、无默认；按 `cost_account` 分档或汇总时必填，缺失即 `cannot_evaluate`。
+  3. **机械约束同步**：配置键 `propertyNames` 与 `item_digests` 键由 `^CFG-(0[1-9]|1[0-3])$` 改为 `^CFG-(0[1-9]|1[0-5])$`，`item_digests.maxProperties` 与 `defaulted` 枚举同步到 15；`config_codes.py` 的 `CFG_IDS`、`CONFIG_KEY_PATTERN` 与自检项数同步。判据 / 验收参数 / 能力开关仍由 `additionalProperties: false` 与键模式双重拒绝，结构上仍不可混入。
+  4. **结构分类补两条**：CFG-14 标签数与 `scale` 不一致 → `config_incomplete`；CFG-01 含 `cost_account` 而缺 CFG-15 → `config_incomplete`。
+  5. **台账**：RG-08 / RG-07 的“被配置吸收的部分”改指 CFG-14 / CFG-15，删除“待指定、按 `config_invalid` 处理”的临时口径；两条状态仍为 `open`（字段集、守恒关系等判据部分仍是缺口）。T-157 置 `done` 并写明落盘位置。
+- **边界遵守**：未改 `CONSTITUTION.md`、未改 `spec/D6_REBASELINE_PROPOSAL.md`、未动判定逻辑。
+- **钉扎面变化**：无新增受保护对象（两份 schema 与 `config_codes.py` 均已在 T-149 名单内，仅刷新指纹）。规格区段 16、检查器对象 22；无复核项规格 6、检查器 16，均不变。
+- **验证**：`config_codes.py --self-check` rc=0（15 项）；样例 `ok=0`、CFG-14 标签数不足=2、缺 CFG-15=2、`SKILL-01` 混入=2（schema 两项违规）；`check_no_raw_material` rc=0。
+- **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`（仅刷新既有无复核对象的指纹，未新增对象）。
+- **关联 ADR**：无（编号扩展由责任方直接裁定）。
