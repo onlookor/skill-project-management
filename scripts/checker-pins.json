@@ -2,8 +2,8 @@
   "version": 1,
   "scripts": {
     ".githooks/pre-commit": {
-      "sha256": "430a80e9e5fe8f6bf78ac98cb469620f6f92b3c8f89deef658beb8f17d313edb",
-      "basis": "非同源复核：G-018 第一轮复核（覆盖范围缺失：报告基线 0b88547，未审查批次 0072 的修复；仅作指纹登记，不作验收依据） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018/REPORT.md sha256：4a72e5a12cfa8795342762e539a4b3108988a2411588a0f9056fc7497e59fb21 复核基线：0b88547"
+      "sha256": "15c34fbf50c371570d30df808f5d87817e668999b8b45dfc26db7297feaf0279",
+      "basis": "未审查本批（批次 0074 测试修复；r2 报告审查基线 ea9b674，未覆盖本批；仅作指纹登记，待后续非同源复核统一重冻，不作验收依据）"
     },
     "scripts/check_anchors.py": {
       "sha256": "6aa0caa82d38e7f0cfd43303a0f6f798c4291ecbf4ee553d617b954906f6a8a2",
@@ -50,8 +50,8 @@
       "basis": "未审查本批（批次 0073 改动；r2 报告审查基线 ea9b674，未覆盖本批修复；仅作指纹登记，待 r3 非同源复核后统一重冻，不作验收依据）"
     },
     "scripts/test_checker_pins.py": {
-      "sha256": "43ed4a0b3f172bb7a1a40706f5aa3e1110eff32f8ab99773e8c8a2f80e5a54df",
-      "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
+      "sha256": "87b7452ea1f35abeab312108b3f3b7fe819779e90b58013b8ae6d6dbb3967833",
+      "basis": "未审查本批（批次 0074 测试修复；r2 报告审查基线 ea9b674，未覆盖本批；仅作指纹登记，待后续非同源复核统一重冻，不作验收依据）"
     },
     "scripts/test_coverage_gate.py": {
       "sha256": "f3b217f338d492b5a632c9a9a098a054be2d77cfae4e6c0b847a23159f531897",

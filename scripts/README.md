@@ -21,6 +21,18 @@
 | `check_glossary_usage.py` | 从 `git ls-files` 的 Markdown / JSONL 生成每条术语的使用位置基线 `knowledge/glossary-usage.json`，并在 `GLOSSARY.md` 第 4 节生成位置表；默认模式校验位置存在、行号有效、该行含术语、生成块未被手改、术语集合一致。`--write` 重生成 | `AGENTS.md` 5bis.1 | 已实现 |
 | `validate_ontology.py` | 用 `rdflib` + `pyshacl` 校验 `ontology/` 本体与 24 条 SHACL 形状；`--matrix` 逐条运行违规 fixture，确认每条形状能判出违规 | 无独立规格（边界见 `CONSTITUTION.md` 第 13.6 条与 `ontology/README.md`） | 已实现（可选依赖） |
 
+### 测试脚本与执行入口
+
+`scripts/test_*.py` 是检查器的负例/正例测试。**自批次 0074（2026-11-15）起**，以下测试明确列入 `.githooks/pre-commit`，与对应检查器并列执行，任一失败即阻断提交：
+
+| 测试 | 对应检查器 | 接入情况 |
+|---|---|---|
+| `test_checker_pins.py` | `check_checker_pins.py` | 批次 0074 接入（此前从未被钩子或 CI 执行） |
+| `test_dependency_pins.py` | `check_dependency_pins.py` | 批次 0074 之前已接入 |
+| `test_spec_pins.py` | `check_spec_pins.py` | 批次 0074 接入（此前从未被钩子或 CI 执行） |
+
+**尚未接入**：`test_coverage_gate.py`、`test_check_table_mutations.py` 仍只能手工运行；本仓库无 CI 配置，因此它们当前不会自动执行。`validate_ontology.py --matrix` 在 `AGENTS.md` 第 7bis 条被要求于提交前运行，但未接入 pre-commit（可选依赖，缺 `rdflib`/`pyshacl` 时按“无法评估”处理）。
+
 ### 运行方式
 
 ```

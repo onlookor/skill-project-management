@@ -16,16 +16,13 @@ CP07 验收检查器与快照不一致 → 阻断（漂移检测）。
 from __future__ import annotations
 
 import argparse
+import hashlib
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
 
 CHECKER = Path("scripts/check_checker_pins.py")
-VALID_BASIS = (
-    "非同源复核：基线 d8bf413；复核产物：validation/reviews/review.md；"
-    "复核基线：d8bf413；结论：认可"
-)
 
 
 def run(root: Path, base: Path, *extra: str) -> subprocess.CompletedProcess:
@@ -62,7 +59,9 @@ def main() -> int:
     rows: list[tuple[str, str, str, str, str]] = []
     failures = 0
     with tempfile.TemporaryDirectory(prefix="pm-checker-pins-") as tmp:
-        base = Path(tmp)
+        outer = Path(tmp)
+        base = outer / "repo"
+        base.mkdir()
         (base / "scripts").mkdir()
         (base / ".githooks").mkdir()
         (base / "validation" / "checker-prototype").mkdir(parents=True)
@@ -79,11 +78,17 @@ def main() -> int:
         snapshot = base / "validation" / "pinned" / "checker.py"
         source.write_text("# acceptance checker v1\n", encoding="utf-8")
         snapshot.write_bytes(source.read_bytes())
-        (base / "validation" / "reviews" / "review.md").write_text(
-            "非同源复核：基线 d8bf413\n", encoding="utf-8"
+        # basis 必须指向仓库外产物并与 sha256 一致；复核记录放在 base 之外。
+        artifact = outer / "review.md"
+        artifact.write_text("非同源复核：基线 d8bf413\n", encoding="utf-8")
+        valid_basis = (
+            "非同源复核：基线 d8bf413；"
+            f"复核产物：{artifact}；"
+            f"sha256：{hashlib.sha256(artifact.read_bytes()).hexdigest()}；"
+            "复核基线：d8bf413；区段：scripts/check_sample.py；结论：认可"
         )
 
-        baseline = run(root, base, "--write", "--basis", VALID_BASIS)
+        baseline = run(root, base, "--write", "--basis", valid_basis)
         if baseline.returncode != 0:
             print("[错误] 绑定基线未建立。")
             print(baseline.stdout + baseline.stderr)
@@ -110,7 +115,7 @@ def main() -> int:
         rows.append(("CP03", "basis 写成自由文本“测试”", "拒绝" if ok else "未拒绝",
                      str(result.returncode), evidence(result.stdout, expected)))
 
-        result = run(root, base, "--write", "--basis", VALID_BASIS)
+        result = run(root, base, "--write", "--basis", valid_basis)
         ok = result.returncode == 0
         if ok:
             result = run(root, base)

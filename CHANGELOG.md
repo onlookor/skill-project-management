@@ -1211,3 +1211,14 @@
 - **pins**：`spec/CHECKER_INPUT_SCHEMA.md#4` 用 r2 报告重冻（basis 含 `非同源复核：`、`复核产物：`、`sha256：`、`复核基线：ea9b674`、`区段：spec/CHECKER_INPUT_SCHEMA.md#4`、`结论：认可（§4 actor_type 与实现一致）`）；其余本批改动区段保持“未审查本批”占位，待 r3 报告统一重冻，不预写结论词。`check_dependency_pins.py` 的 r7 basis 未改。
 - **涉及文件**：`spec/CHECKER_INPUT_SCHEMA.md`、`spec/methods/deterministic-checker.md`、`validation/checker-prototype/checker.py`、`validation/checker-prototype/coverage.json`、`validation/pinned/checker.py`、`scripts/check_coverage_gate.py`、`scripts/test_coverage_gate.py`、`scripts/README.md`、`TODO.md`、`GAP_LEDGER.md`、`CHANGELOG.md`、`validation/reviews/2026-11-15-g018-actor-type-enum.md`、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`AGENTS.md`、`.githooks/pre-commit`（如计数或说明需同步）。
 - **状态**：G-018 维持 `open`，关闭依据留空，待 r3 非同源复核在修复提交上确认。
+
+---
+
+### 批次 0074 — 2026-11-15 — 修复过期钉扎测试并接入 pre-commit
+
+- **背景**：`scripts/test_checker_pins.py` 在 `ea9b674` 上即失败——`valid_basis` 收紧为“复核产物必须在仓库外、`sha256` 与之一致、含 `复核基线：`”后，测试仍用仓库内 `validation/reviews/review.md` 且无 sha256。该测试从未接入 pre-commit，所以 pre-commit 一直全绿，属“声明了但不生效”。
+- **修断言（不放宽实现）**：测试改为在临时仓库 `repo/` 之外创建复核产物 `review.md`，按其内容现算 sha256，并让 `VALID_BASIS` 同时包含 `非同源复核：`、`复核产物：<仓库外绝对路径>`、`sha256：<64hex>`、`复核基线：d8bf413`、`区段：`、`结论：认可`；CP01–CP07 七条恢复全部符合预期。
+- **接入 pre-commit**：新增 `scripts/test_checker_pins.py` 与 `scripts/test_spec_pins.py` 两行，分别紧随 `check_checker_pins.py`、`check_spec_pins.py`；`scripts/test_dependency_pins.py` 原已接入，未动。此前 `test_checker_pins.py` 与 `test_spec_pins.py` 从未被钩子或 CI 执行（仓库无 CI 配置）。
+- **文档**：`scripts/README.md` 新增“测试脚本与执行入口”一节，写明自批次 0074 起接入；并列出仍未接入的 `test_coverage_gate.py`、`test_check_table_mutations.py`，以及 `AGENTS.md` 要求提交前运行但未接入的 `validate_ontology.py --matrix`（均未在本批修改）。
+- **pins**：`scripts/test_checker_pins.py`、`.githooks/pre-commit` 哈希按 `--write` 重冻，basis 标为“未审查本批（批次 0074）”，待后续非同源复核统一重冻。
+- **验证**：`test_checker_pins.py` 7/7、`test_spec_pins.py` 9/9、`test_dependency_pins.py` 13/13；pre-commit 全套 rc=0。
