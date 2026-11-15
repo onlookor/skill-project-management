@@ -30,8 +30,8 @@
       "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
     },
     "scripts/check_no_raw_material.py": {
-      "sha256": "4329798ec9be277bb5f8709f737399158f2e87e368247aa95e8b972cdb57eeaf",
-      "basis": "非同源复核：G-019 r4（基线 11c5d92）指出自写子集语义失真与反向误杀；本批按用户 2026-11-15 裁定接入成熟实现。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md；sha256：47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb；复核基线：11c5d92"
+      "sha256": "6b679c09212f9044132cedf891dd3c7ebe444b9dc2a5a88b4d4721f54f1ae128",
+      "basis": "非同源复核：G-019 r5（基线 3d7211c）要求逐文件核对安装树、恢复契约指针、把缺失 $ref 与深嵌套/灾难性 pattern 转为可诊断失败；用户 2026-11-15 裁定按“收紧威胁模型 + 修可机械修的部分”执行。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r5/REPORT.md；sha256：5373a537d05870dcf4f52756bf7e0012bc0128879e22df92cb85d86007258108；复核基线：3d7211c"
     },
     "scripts/check_spec_pins.py": {
       "sha256": "9e16d25fd45b13737a0076080d87d0c0f309eb97e4472acfaf91fec2c87cee55",
@@ -70,12 +70,12 @@
       "basis": "非同源复核：外部复核基线 48128a8，产物 /tmp/verify-4812/REPORT_48128a8.md；复核产物：validation/reviews/2026-11-14-48128a8-external.md；复核基线：48128a8"
     },
     "scripts/check_dependency_pins.py": {
-      "sha256": "a5fbe383f954fdb0c32e2930caebbd2dc7d72ff20bfdc30eb4836a4b52de617f",
-      "basis": "非同源复核：G-019 r4（基线 11c5d92）指出自写子集语义失真与反向误杀；本批按用户 2026-11-15 裁定接入成熟实现，并把分发产物核对改为强制项。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md；sha256：47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb；复核基线：11c5d92"
+      "sha256": "6e6e34e1ddf42271d9f087aa2fda089aef7fbb7740de2e454a8e48a8516a473a",
+      "basis": "非同源复核：G-019 r5（基线 3d7211c）要求逐文件核对安装树、恢复契约指针、把缺失 $ref 与深嵌套/灾难性 pattern 转为可诊断失败；用户 2026-11-15 裁定按“收紧威胁模型 + 修可机械修的部分”执行。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r5/REPORT.md；sha256：5373a537d05870dcf4f52756bf7e0012bc0128879e22df92cb85d86007258108；复核基线：3d7211c"
     },
     "scripts/test_dependency_pins.py": {
-      "sha256": "fb586b6cf648feab1e662572144d1a627032a32f071f3ecead06cbcefa101d24",
-      "basis": "非同源复核：G-019 r4（基线 11c5d92）指出自写子集语义失真与反向误杀；本批按用户 2026-11-15 裁定接入成熟实现，并把分发产物核对改为强制项。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md；sha256：47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb；复核基线：11c5d92"
+      "sha256": "c7baa471fc7347d2012b63136502394b1b8b7a8d4afa4caec0988f3a2e9e2f4a",
+      "basis": "非同源复核：G-019 r5（基线 3d7211c）要求逐文件核对安装树、恢复契约指针、把缺失 $ref 与深嵌套/灾难性 pattern 转为可诊断失败；用户 2026-11-15 裁定按“收紧威胁模型 + 修可机械修的部分”执行。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r5/REPORT.md；sha256：5373a537d05870dcf4f52756bf7e0012bc0128879e22df92cb85d86007258108；复核基线：3d7211c"
     }
   },
   "note": "受保护脚本的哈希登记：scripts/ 下检查器（含本脚本）、.githooks/pre-commit、validation/checker-prototype/checker.py。改动必须 --write --basis 并附非同源复核记录；本文件与快照检测都不提供权限分离。"

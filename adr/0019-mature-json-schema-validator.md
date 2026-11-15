@@ -23,7 +23,11 @@
 
 ## 决定
 
-数据区与 schema 自身的校验改用成熟实现 `jsonschema`（固定 `4.26.0`），并把版本、分发产物 sha256 与安装树摘要登记进指纹机制（`scripts/dependency-pins.json`，由 `scripts/check_dependency_pins.py` 核对）。自写 `validate()` 退役；对外输出契约不变。
+数据区与 schema 自身的校验改用成熟实现 `jsonschema`（固定 `4.26.0`），并把版本、分发产物 sha256 与安装树登记进指纹机制（`scripts/dependency-pins.json`，由 `scripts/check_dependency_pins.py` 核对）。安装树不再只对 `RECORD` 文本取摘要，而是**按 wheel 内 RECORD 逐文件重算内容哈希**核对实际安装树，并断言 `jsonschema` 的实际导入路径落在分发目录内。自写 `validate()` 退役。
+
+**输出契约**：`(keyword, pointer, message)` 三字段形状、reason code 分流、文件与 JSON 指针（含 `$.x`、`$.a.x`、`$.m.<键>`）与退出码不变；消息文本取自成熟实现的英文诊断（仓库只为 `oneOf` 排他补中文前缀），不再承诺逐字中文。指针与消息的各自来源在 `scripts/README.md` 写明。
+
+**威胁模型（与 ADR-0015 同一信任模型）**：这道核对能发现误装、版本漂移、安装树被改动、同名假 wheel 与非针对性的运行时替换；**不构成对有权写本机 Python 环境者的防护**。`PYTHONPATH` 注入、`sitecustomize`、直接修改 `site-packages` 均在被信任边界之外——检测它们只能提高干扰成本，不能作为安全保证。残留缺口登记为 G-022。
 
 **三重核对都是强制项。** wheel 放在仓库外的持久路径 `~/.local/share/pm-governance/wheels/`（不提交进 git），获取方式：
 
@@ -44,7 +48,7 @@ python3 -m pip download --no-deps --no-cache-dir jsonschema==4.26.0 -d ~/.local/
 
 - **只覆盖校验语义**：`jsonschema` 只决定“一条 schema 如何解释一条数据”。它不接触数据内容、不生成证据、不替代复核，也不进入任何判定链的输入端。
 - **不覆盖数据与证据**：`contracts/schema/` 的 schema 文本、`knowledge/` 条目、`ontology/`、`validation/reviews/` 与 `SOURCE_LEDGER.md` 仍全部在仓库内，且仍由仓库内检查器与钉扎保护。
-- **不改变失败方向**：依赖缺失、导入失败或版本/指纹不符时，`check_no_raw_material.py` 必须以“无法评估”退出 2 并给出安装命令，不得降级为跳过校验，也不得只警告后继续。
+- **不改变失败方向**：依赖缺失、导入路径不在分发目录、安装树逐文件哈希不符、运行时行为探测失败或版本/指纹不符时，`check_no_raw_material.py` 与 `check_dependency_pins.py` 必须以“无法评估”退出 2 或阻断退出 1，不得降级为跳过校验，也不得只警告后继续。
 - **可替换性**：校验入口只依赖 `jsonschema` 的 `Draft202012Validator` 与 `check_schema` 两个公开接口；替换实现只改一处适配层，不触碰输出契约（reason code、文件路径、JSON 指针、退出码）。
 
 ## 撤销条件与退回档次
@@ -67,15 +71,18 @@ python3 -m pip download --no-deps --no-cache-dir jsonschema==4.26.0 -d ~/.local/
 
 - 校验语义由规范实现承担，`items` 布尔/元组、`enum`/`const` 与同级断言、`oneOf` 排他等问题由结构消除，不再依赖逐轮补洞。
 - schema 自身用官方元 schema 校验，schema 写错即失败。
-- 依赖被替换可被发现：版本、分发产物 sha256 与安装树摘要三重核对，且三重都实际执行；产物缺失按“无法评估”阻断，不再只警告。
+- 依赖被替换可被发现：版本、分发产物 sha256、按 wheel RECORD 逐文件核对的安装树与导入路径断言共同生效；产物缺失按“无法评估”阻断，不再只警告。
+- 缺失的本地 `$ref`、灾难性回溯 `pattern` 与超深嵌套均转为带 reason code 与指针的可诊断失败，不再抛未捕获异常或崩溃。
 
 ### 负面
 
 - 引入一个仓库外运行时依赖，破坏“零外部依赖即可运行”的旧假设；已在 `scripts/README.md` 与根 `README.md` 写明安装步骤。
 - 指纹对安装树敏感：升级 `jsonschema` 必须同批更新 `scripts/dependency-pins.json`，否则 pre-commit 阻断。
 - 分发产物必须放在仓库外的持久路径（`~/.local/share/pm-governance/wheels/`）；换机器或清理该目录后，检查器会以“无法评估”退出 2，需要重新 `pip download`。这是有意的 fail-closed：产物级核对不能靠 pip 缓存的偶然存在。
+- 分发产物与登记表都在本机，二者可被同时改写；本机制不是签名，登记表本身没有外部锚点。这属于 G-022 的残留，由外部复核承接。
 
 ### 需要跟进的事项
 
 - `TODO.md` T-146：依赖接入、元 schema 校验、递归发现与 r4 攻击面验收。
+- `GAP_LEDGER.md` G-022：依赖核对不构成对有权写本机 Python 环境者的防护（与 ADR-0015 同一信任模型）。
 - 撤销评审的触发条件由后续复核按本 ADR 检查；撤销时须新增 ADR，不得直接改本文件结论。

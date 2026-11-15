@@ -1,19 +1,24 @@
 #!/usr/bin/env python3
-"""外部校验依赖指纹：锁定版本、分发产物 sha256 与安装树指纹。
+"""外部校验依赖指纹：锁定版本、分发产物 sha256，并按 wheel RECORD 逐文件核对安装树。
 
 依据：ADR-0019。`scripts/check_no_raw_material.py` 的数据区校验改用成熟实现
 `jsonschema`；本检查器保证“依赖被替换能被发现”，而不是只锁版本号。
 
 判定轴（任一命中即非零退出）：
   DP-VERSION   已安装版本与登记不符（未安装按“无法评估”退出 2）
-  DP-TREE      已安装分发树的 RECORD 摘要与登记不符（文件被替换或增删）
-  DP-ARTIFACT  未找到分发产物，或找到但 sha256 与登记不符
+  DP-IMPORT    实际导入的模块不在分发目录内（影子包、PYTHONPATH 劫持）
+  DP-TREE      安装树与 wheel RECORD 的逐文件 sha256 / 大小不符，或出现未收录文件
+  DP-ARTIFACT  未找到分发产物，或找到但 sha256 与登记不符，或 wheel 内 RECORD 不可读
   DP-REGISTRY  登记表缺项、多项或结构非法
 
-三重核对都是强制项：版本、安装树 `RECORD` 摘要、分发产物 wheel 的 sha256。
+三重核对都是强制项：版本、安装树逐文件内容哈希、分发产物 wheel 的 sha256。
 wheel 默认从持久路径 `~/.local/share/pm-governance/wheels/` 读取（`JSONSCHEMA_WHEEL`
 或 `--artifact` 可覆盖）。找不到产物即“无法评估”退出 2，不降级为只核对安装树——
 永远只报警的检查等于没有。依赖缺失同样按“无法评估”处理，绝不降级为通过。
+
+威胁模型（见 ADR-0019）：本检查能发现误装、版本漂移、非恶意不一致与非针对性
+替换；**不构成对有权写本机 Python 环境者的防护**（`PYTHONPATH` 注入、
+`sitecustomize`、直接改 `site-packages` 均在被信任边界之外，同 ADR-0015）。
 
 获取 wheel（放在仓库外，不提交进 git）：
   python3 -m pip download --no-deps --no-cache-dir \
@@ -27,11 +32,14 @@ wheel 默认从持久路径 `~/.local/share/pm-governance/wheels/` 读取（`JSO
 """
 
 import argparse
+import base64
 import hashlib
 import importlib.metadata as metadata
+import importlib.util
 import json
 import os
 import sys
+import zipfile
 from pathlib import Path
 
 PINS_FILE = "scripts/dependency-pins.json"
@@ -48,8 +56,14 @@ def sha256_file(path):
     return digest.hexdigest()
 
 
+def content_hash(path):
+    """wheel RECORD 使用的哈希形式：sha256 的 urlsafe base64（无填充）。"""
+    data = Path(path).read_bytes()
+    return base64.urlsafe_b64encode(hashlib.sha256(data).digest()).rstrip(b"=").decode()
+
+
 def digest_record(text):
-    """对 dist-info/RECORD 做稳定摘要，返回 (sha256, 文件数)。"""
+    """对 dist-info/RECORD 做稳定摘要，返回 (sha256, 文件数)；仅作次级指纹。"""
     entries = []
     for line in text.splitlines():
         parts = line.rsplit(",", 2)
@@ -62,16 +76,105 @@ def digest_record(text):
     return hashlib.sha256("\n".join(sorted(entries)).encode("utf-8")).hexdigest(), len(entries)
 
 
+def wheel_entries(wheel):
+    """读取 wheel 内 RECORD，返回 (dist_info 前缀, {相对路径: (b64 sha256, size)})。"""
+    with zipfile.ZipFile(wheel) as archive:
+        record_name = next(
+            (name for name in archive.namelist() if name.endswith(".dist-info/RECORD")),
+            None,
+        )
+        if record_name is None:
+            raise ValueError("wheel 内缺少 .dist-info/RECORD")
+        entries = {}
+        for line in archive.read(record_name).decode("utf-8").splitlines():
+            parts = line.rsplit(",", 2)
+            if len(parts) != 3:
+                continue
+            path, digest, size = parts
+            if not digest.startswith("sha256="):
+                continue
+            entries[path] = (digest[7:], size)
+        return record_name.split("/")[0] + ".dist-info", entries
+
+
+def import_origin(name):
+    spec = importlib.util.find_spec(name)
+    if spec is None or not spec.origin:
+        return None
+    return Path(spec.origin).resolve()
+
+
 def installed_state(name):
     try:
         dist = metadata.distribution(name)
     except metadata.PackageNotFoundError:
         return None
+    root = Path(dist.locate_file("")).resolve()
+    origin = import_origin(name)
     record = dist.read_text("RECORD")
     if record is None:
-        return {"version": dist.version, "record_sha256": None, "files": 0}
+        return {
+            "version": dist.version,
+            "root": str(root),
+            "import_file": str(origin) if origin else None,
+            "record_sha256": None,
+            "files": 0,
+        }
     digest, count = digest_record(record)
-    return {"version": dist.version, "record_sha256": digest, "files": count}
+    return {
+        "version": dist.version,
+        "root": str(root),
+        "import_file": str(origin) if origin else None,
+        "record_sha256": digest,
+        "files": count,
+    }
+
+
+def tree_errors(entries, root, import_file, package="jsonschema"):
+    """按 wheel RECORD 逐文件核对安装树，并断言导入路径落在分发目录内。"""
+    errors = []
+    root = Path(root)
+    package_root = root / package
+    expected = {
+        path: value for path, value in entries.items() if path.startswith(f"{package}/")
+    }
+    if import_file is None:
+        errors.append(
+            f"[错误] DP-IMPORT 无法定位 {package} 的导入路径；依赖可能不可用"
+        )
+    else:
+        try:
+            Path(import_file).resolve().relative_to(package_root.resolve())
+        except ValueError:
+            errors.append(
+                f"[错误] DP-IMPORT 实际导入 {import_file} 不在分发目录 {package_root} 下；"
+                "影子包或 PYTHONPATH 劫持会让校验器与钉扎对象不一致"
+            )
+    if package_root.is_dir():
+        installed = {
+            path.relative_to(root).as_posix()
+            for path in package_root.rglob("*")
+            if path.is_file() and "__pycache__" not in path.parts
+        }
+    else:
+        installed = set()
+    for rel, (digest, size) in sorted(expected.items()):
+        target = root / rel
+        if not target.is_file():
+            errors.append(f"[错误] DP-TREE 安装树缺少 wheel 收录的文件 {rel}")
+            continue
+        actual = content_hash(target)
+        if actual != digest or str(target.stat().st_size) != size:
+            errors.append(
+                f"[错误] DP-TREE {rel} 内容与 wheel RECORD 不符"
+                f"（实际 {actual[:12]}…，登记 {digest[:12]}…）；依赖可能被改动"
+            )
+    for rel in sorted(installed - set(expected)):
+        errors.append(
+            f"[错误] DP-TREE 安装树存在 wheel 未收录的文件 {rel}；"
+            "保留原 RECORD 的注入物会在这里暴露"
+        )
+    return errors
 
 
 def artifact_candidates(pin, override):
@@ -90,9 +193,14 @@ def artifact_candidates(pin, override):
     return candidates
 
 
-def evaluate(pins, states, artifacts):
-    """返回 (errors, warnings)。纯函数，供自测调用。"""
+def evaluate(pins, states, artifacts, trees=None):
+    """返回 (errors, warnings)。纯函数，供自测调用。
+
+    `trees` 为 {包名: (wheel RECORD 条目, 分发根, 导入文件)}；缺少逐文件数据即
+    “无法评估”，不允许退化成只比较 RECORD 文本。
+    """
     errors, warnings = [], []
+    trees = trees or {}
     registry = pins.get("packages")
     if not isinstance(registry, dict):
         return ["[错误] DP-REGISTRY 登记表缺少 packages 对象"], warnings
@@ -122,7 +230,7 @@ def evaluate(pins, states, artifacts):
         installed = pin.get("installed") or {}
         if state["record_sha256"] != installed.get("record_sha256"):
             errors.append(
-                f"[错误] DP-TREE {name} 安装树摘要与登记不符"
+                f"[错误] DP-TREE {name} RECORD 摘要与登记不符"
                 f"（实际 {state['record_sha256']}，登记 {installed.get('record_sha256')}）；"
                 "依赖可能被替换或改动"
             )
@@ -131,6 +239,15 @@ def evaluate(pins, states, artifacts):
                 f"[错误] DP-TREE {name} 安装文件数 {state['files']} 与登记 "
                 f"{installed.get('files')} 不符"
             )
+        tree = trees.get(name)
+        if tree is None:
+            errors.append(
+                f"[无法评估] DP-TREE {name} 缺少 wheel 逐文件数据，"
+                "无法核对实际安装树；不得退化为只比较 RECORD 文本"
+            )
+        else:
+            entries, root, import_file = tree
+            errors.extend(tree_errors(entries, root, import_file, name))
         artifact = pin.get("artifact") or {}
         if not artifacts:
             errors.append(
@@ -149,6 +266,29 @@ def evaluate(pins, states, artifacts):
                     f"{artifact.get('sha256')} 不符"
                 )
     return errors, warnings
+
+
+def build_trees(pins, artifacts):
+    """按包读取 wheel RECORD，绑到该包的实际分发根与导入路径。"""
+    trees = {}
+    by_name = {}
+    for name in PACKAGES:
+        pin = (pins.get("packages") or {}).get(name) or {}
+        filename = (pin.get("artifact") or {}).get("filename")
+        by_name[name] = next(
+            (path for path in artifacts if path.name == filename), None
+        )
+    for name in PACKAGES:
+        wheel = by_name.get(name)
+        state = installed_state(name)
+        if wheel is None or state is None:
+            continue
+        try:
+            _, entries = wheel_entries(wheel)
+        except (OSError, ValueError, zipfile.BadZipFile):
+            continue
+        trees[name] = (entries, state["root"], state["import_file"])
+    return trees
 
 
 def main():
@@ -198,7 +338,7 @@ def main():
             json.dumps(
                 {
                     "version": 1,
-                    "note": "外部校验依赖指纹；版本、分发产物 sha256 与安装树摘要须同时匹配",
+                    "note": "外部校验依赖指纹；版本、wheel sha256 与按 RECORD 逐文件核对的安装树须同时匹配",
                     "packages": packages,
                 },
                 ensure_ascii=False,
@@ -221,7 +361,8 @@ def main():
         pin = (pins.get("packages") or {}).get(name) or {}
         artifacts.extend(path for path in artifact_candidates(pin, args.artifact) if path.is_file())
 
-    errors, warnings = evaluate(pins, states, artifacts)
+    trees = build_trees(pins, artifacts)
+    errors, warnings = evaluate(pins, states, artifacts, trees)
     for line in warnings:
         print(line)
     for line in errors:
@@ -231,8 +372,10 @@ def main():
             return 2
         return 1
     total = sum(state["files"] for state in states.values() if state)
+    checked = sum(len(entries) for entries, _, _ in trees.values())
     print(f"[通过] 依赖指纹 {len(PACKAGES)} 个包、{total} 个文件；"
-          f"分发产物 sha256 核对 {len(artifacts)} 个")
+          f"分发产物 sha256 核对 {len(artifacts)} 个；"
+          f"按 wheel RECORD 逐文件核对 {checked} 项")
     return 0
 
 

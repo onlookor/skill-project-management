@@ -46,4 +46,13 @@
 - `DP-ARTIFACT` 缺失从警告改为“无法评估”并退出 2；版本、安装树、产物三重全部强制；负例 9 → 10 项。
 - 根 `README.md`、`scripts/README.md`、`adr/0019-mature-json-schema-validator.md` 写明路径、获取方式与退档口径。
 
-**不构成**：G-019、G-021 的关闭依据；也不证明任何提交者身份。
+## 批次 0068 改动范围（r5 复判：可机械修复与威胁模型收口）
+
+- 依据：`/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r5/REPORT.md`，sha256 `5373a537d05870dcf4f52756bf7e0012bc0128879e22df92cb85d86007258108`，基线 `3d7211c`。
+- `scripts/check_dependency_pins.py`：安装树改为按 wheel 内 `RECORD` 逐文件重算内容哈希与大小，新增 `DP-TREE`（缺文件、多文件、内容不符）与 `DP-IMPORT`（导入路径必须落在分发目录内）；不再只对 `RECORD` 文本排序取摘要（旧摘要降为次级核对）。
+- `scripts/test_dependency_pins.py`：临时安装树 + 临时 wheel 夹具，10 → 13 项；覆盖影子包 / `PYTHONPATH`、改安装树保留 `RECORD`、同名假 wheel、注入文件、缺逐文件数据。
+- `scripts/check_no_raw_material.py`：`additionalProperties` 指针按未知键恢复为 `$.x` / `$.a.x`，`propertyNames` 恢复为 `$.m.<键>`；缺失本地 `$ref` 转 `RM-SCHEMA`；`pattern` 嵌套量词与 512 字符上限、schema 嵌套 64 层上限、`RecursionError` 归一；新增运行时行为探测。`--self-test` 76 → 82 项。
+- `adr/0019-mature-json-schema-validator.md`：输出契约段（指针来源本仓库、消息取自库）、威胁模型段（不防护有权写本机 Python 环境者）、G-022 跟进；`README.md`、`scripts/README.md` 同步。
+- `GAP_LEDGER.md`：G-021 以 `accepted` 关闭（修正 2,400 为单值路径上限）；新增 G-022 并以 `accepted` 关闭；G-019 补 0067–0068 与残留、维持 `open`；G-020 未改。
+
+**不构成**：G-019 的关闭依据（该条仍 `open`，残留须非同源复核）；也不证明任何提交者身份。G-021 与 G-022 的关闭依据是本索引所指的 r5 报告，不是本索引。

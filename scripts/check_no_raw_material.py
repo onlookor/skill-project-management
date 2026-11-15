@@ -69,16 +69,48 @@ except ImportError as _exc:  # pragma: no cover - 环境缺失时走 fail-closed
     _jsonschema = None
     _js_validators = None
     JSONSCHEMA_ERROR = _exc
+    _WRAPPED_REF = None
 else:
     JSONSCHEMA_ERROR = None
+    _WRAPPED_REF = getattr(
+        _jsonschema.exceptions, "_WrappedReferencingError", None
+    )
 
 JSONSCHEMA_HINT = (
     "python3 -m pip install --user jsonschema==4.26.0"
 )
+PROBE_SCHEMA = {"type": "string", "maxLength": 3}
+_RUNTIME_OK = None
 
 
 class SchemaDependencyError(RuntimeError):
     """缺少 JSON Schema 实现：必须按“无法评估”处理，不得跳过校验。"""
+
+
+def _runtime_probe(validator_cls=None):
+    """行为探测：校验器被 sitecustomize/影子包换成空实现时立即失败。
+
+    ADR-0019 的威胁模型不把“有权写本机 Python 环境者”当对手；这道探测只负责
+    非针对性的运行时替换，不能替代依赖指纹的逐文件核对。
+    """
+    global _RUNTIME_OK
+    if _RUNTIME_OK is not None:
+        return _RUNTIME_OK
+    cls = validator_cls or _js_validators.Draft202012Validator
+    try:
+        bad = list(cls(PROBE_SCHEMA).iter_errors("abcd"))
+        good = list(cls(PROBE_SCHEMA).iter_errors("ab"))
+    except Exception as exc:  # 运行探测本身不可用同样属于无法评估
+        raise SchemaDependencyError(
+            f"校验器运行探测失败（{exc}）；无法评估，不得跳过校验"
+        ) from exc
+    if not any(error.validator == "maxLength" for error in bad) or good:
+        raise SchemaDependencyError(
+            "jsonschema 运行时行为与被钉实现不符（可能被 sitecustomize 或影子包替换）；"
+            "无法评估，不得跳过校验"
+        )
+    _RUNTIME_OK = True
+    return _RUNTIME_OK
 
 
 def _validator_for(schema):
@@ -87,10 +119,16 @@ def _validator_for(schema):
             f"缺少 jsonschema（{JSONSCHEMA_ERROR}）；安装：{JSONSCHEMA_HINT}；"
             "依赖缺失不得跳过校验"
         )
+    _runtime_probe()
     cls = _js_validators.validator_for(
         schema, default=_js_validators.Draft202012Validator
     )
-    cls.check_schema(schema)
+    try:
+        cls.check_schema(schema)
+    except RecursionError:
+        raise SchemaDependencyError(
+            "schema 嵌套过深，官方元 schema 无法评估；不得跳过校验"
+        )
     return cls
 
 
@@ -117,6 +155,9 @@ MAX_DEFINITION_LITERAL_CHARS = 2000
 MAX_ONTO_COMMENT_CHARS = 800
 MAX_RECORD_PROSE_CHARS = 2800
 MAX_FILE_PROSE_CHARS = 32 * 1024
+MAX_SCHEMA_DEPTH = 64
+MAX_PATTERN_CHARS = 512
+NESTED_QUANTIFIER_RE = re.compile(r"\((?:\?:)?[^()]{0,300}[+*][^()]{0,300}\)\s*[+*{]")
 BASE64_RUN_CHARS = 256
 BASE64_PROBE_CHARS = 64
 
@@ -333,26 +374,56 @@ def validate(value, schema, pointer="$", root=None):
         return [("schema", pointer, f"schema 未通过官方元 schema：{exc.message}")]
 
     errors = []
-    for error in validator_cls(schema).iter_errors(value):
+    try:
+        raw_errors = list(validator_cls(schema).iter_errors(value))
+    except RecursionError:
+        return [("schema", pointer, "schema 或数据嵌套过深，超出可评估深度")]
+    except Exception as exc:  # 缺失的本地 $ref 等引用错误
+        if _WRAPPED_REF is not None and isinstance(exc, _WRAPPED_REF):
+            return [("schema", pointer, f"引用无法解析：{exc}")]
+        if type(exc).__module__.startswith("referencing"):
+            return [("schema", pointer, f"引用无法解析：{exc}")]
+        raise
+    for error in raw_errors:
         keyword = error.validator or "schema"
         location = _pointer(error.absolute_path)
-        if keyword == "required":
-            missing = error.message.split("'")[1] if "'" in error.message else "?"
-            location = f"{location}.{missing}"
         message = error.message
+        if keyword == "required":
+            missing = message.split("'")[1] if "'" in message else "?"
+            location = f"{location}.{missing}"
+        elif keyword == "additionalProperties":
+            # 库把对象路径报在父节点；恢复契约要求的 `$.x` / `$.a.x`。
+            keys = re.findall(r"'([^']*)'", message)
+            for key in keys:
+                errors.append((keyword, f"{location}.{key}", message))
+            if not keys:
+                errors.append((keyword, location, message))
+            continue
+        elif "propertyNames" in [str(step) for step in error.schema_path]:
+            # propertyNames 的失败报在对象路径；恢复到具体键 `$.m.<键>`。
+            keys = re.findall(r"'([^']*)'", message)
+            if keys:
+                location = f"{location}.{keys[0]}"
         if keyword == "oneOf":
             message = f"oneOf 必须恰好命中 1 个分支：{message}"
         errors.append((keyword, location, message))
     return errors
 
 
-def _lint_node(node, pointer, strict, errors):
+def _lint_node(node, pointer, strict, errors, depth=0):
     """schema 完整性 lint：数组/字符串/对象必须有上限，不支持的关键字必须报错。
 
     strict=True 表示“值位置”（根、properties、items、$defs、组合分支），
     此位置必须能独立定出类型与边界；strict=False 用于 `if`/`then`/`else`/`not`
-    这类与其他约束叠加的部分断言。
+    这类与其他约束叠加的部分断言。depth 超过上限即报错，避免深嵌套把
+    lint 或元 schema 校验拖进 RecursionError。
     """
+    if depth > MAX_SCHEMA_DEPTH:
+        errors.append(
+            f"{pointer}：schema 嵌套超过 {MAX_SCHEMA_DEPTH} 层，无法评估；"
+            "拒绝继续递归"
+        )
+        return
     if not isinstance(node, dict):
         errors.append(f"{pointer}：schema 节点必须是 JSON 对象")
         return
@@ -422,6 +493,26 @@ def _lint_node(node, pointer, strict, errors):
                     "或受 `maxProperties` + `propertyNames` 约束的映射"
                 )
 
+    if "pattern" in node:
+        pattern = node["pattern"]
+        if not isinstance(pattern, str) or not pattern:
+            errors.append(f"{pointer}：`pattern` 必须是非空字符串")
+        elif len(pattern) > MAX_PATTERN_CHARS:
+            errors.append(
+                f"{pointer}：`pattern` 长度 {len(pattern)} 超过 {MAX_PATTERN_CHARS}，"
+                "拒绝评估（灾难性回溯风险不可控）"
+            )
+        elif NESTED_QUANTIFIER_RE.search(pattern):
+            errors.append(
+                f"{pointer}：`pattern` 含嵌套量词，存在灾难性回溯风险；"
+                "请改写为线性模式（如用更窄的字符类替代 `(a+)+`）"
+            )
+        else:
+            try:
+                re.compile(pattern)
+            except re.error as exc:
+                errors.append(f"{pointer}：`pattern` 不是合法正则：{exc}")
+
     if "items" in node and not isinstance(node["items"], dict):
         errors.append(
             f"{pointer}：`items` 必须是单个 schema 对象；"
@@ -429,21 +520,61 @@ def _lint_node(node, pointer, strict, errors):
         )
 
     for name, sub in (node.get("properties") or {}).items():
-        _lint_node(sub, f"{pointer}.properties.{name}", True, errors)
+        _lint_node(sub, f"{pointer}.properties.{name}", True, errors, depth + 1)
     for name, sub in (node.get("$defs") or {}).items():
-        _lint_node(sub, f"{pointer}.$defs.{name}", True, errors)
+        _lint_node(sub, f"{pointer}.$defs.{name}", True, errors, depth + 1)
     if isinstance(node.get("additionalProperties"), dict):
-        _lint_node(node["additionalProperties"], f"{pointer}.additionalProperties", True, errors)
+        _lint_node(
+            node["additionalProperties"],
+            f"{pointer}.additionalProperties", True, errors, depth + 1,
+        )
     if isinstance(node.get("items"), dict):
-        _lint_node(node["items"], f"{pointer}.items", True, errors)
+        _lint_node(node["items"], f"{pointer}.items", True, errors, depth + 1)
     if isinstance(node.get("propertyNames"), dict):
-        _lint_node(node["propertyNames"], f"{pointer}.propertyNames", True, errors)
+        _lint_node(
+            node["propertyNames"], f"{pointer}.propertyNames", True, errors, depth + 1
+        )
     for key in COMBINATORS:
         for index, sub in enumerate(node.get(key) or []):
-            _lint_node(sub, f"{pointer}.{key}[{index}]", True, errors)
+            _lint_node(sub, f"{pointer}.{key}[{index}]", True, errors, depth + 1)
     for key in CONDITIONALS:
         if key in node:
-            _lint_node(node[key], f"{pointer}.{key}", False, errors)
+            _lint_node(node[key], f"{pointer}.{key}", False, errors, depth + 1)
+
+
+def _check_local_refs(node, root, pointer, errors, depth=0):
+    """`$ref` 必须指向真实存在的 `$defs` 名；缺失引用在校验时不得变成崩溃。"""
+    if depth > MAX_SCHEMA_DEPTH:
+        errors.append(f"{pointer}：引用检查嵌套超过 {MAX_SCHEMA_DEPTH} 层，无法评估")
+        return
+    if isinstance(node, dict):
+        ref = node.get("$ref")
+        if isinstance(ref, str) and ref.startswith("#/$defs/"):
+            name = ref[len("#/$defs/"):]
+            if not isinstance((root.get("$defs") or {}).get(name), dict):
+                errors.append(
+                    f"{pointer}：`$ref` 指向不存在的 `$defs/{name}`，"
+                    "引用会在校验时失败"
+                )
+        for key, value in node.items():
+            if key in ("properties", "$defs") and isinstance(value, dict):
+                for name, sub in value.items():
+                    _check_local_refs(
+                        sub, root, f"{pointer}.{key}.{name}", errors, depth + 1
+                    )
+            elif key in (
+                "additionalProperties", "items", "propertyNames",
+                "not", "if", "then", "else",
+            ) and isinstance(value, dict):
+                _check_local_refs(value, root, f"{pointer}.{key}", errors, depth + 1)
+            elif key in COMBINATORS and isinstance(value, list):
+                for index, sub in enumerate(value):
+                    _check_local_refs(
+                        sub, root, f"{pointer}.{key}[{index}]", errors, depth + 1
+                    )
+    elif isinstance(node, list):
+        for index, sub in enumerate(node):
+            _check_local_refs(sub, root, f"{pointer}[{index}]", errors, depth + 1)
 
 
 def _resolve_prose_path(schema, path):
@@ -491,7 +622,11 @@ def _prose_terminal_ok(node):
 def lint_schema_doc(rel, schema):
     """返回 (错误列表, 散文路径表)。散文路径表供配额检查使用。"""
     errors = []
-    _lint_node(schema, "$", True, errors)
+    try:
+        _lint_node(schema, "$", True, errors)
+        _check_local_refs(schema, schema, "$", errors)
+    except RecursionError:
+        errors.append("$：schema 嵌套过深，lint 无法评估（拒绝继续递归）")
 
     specs = schema.get("x-prose-fields")
     prose = []
@@ -1761,6 +1896,98 @@ def run_self_test():
         report("T-NRM-12[positions-8]",
                "RM-FIELD" not in codes,
                f"8 条 positions（合计 3,200）不被路径预算误杀（命中 {sorted(codes) or '无'}）")
+
+        # r5 攻击面：引用、灾难性回溯、深嵌套、运行时替换与指针契约
+        missing_ref = {
+            "type": "object", "additionalProperties": False,
+            "properties": {"a": {"$ref": "#/$defs/nope"}},
+            "$defs": {},
+        }
+        lint_errors, _ = lint_schema_doc("missing-ref", missing_ref)
+        ref_hits = validate({"a": 1}, missing_ref, root=missing_ref)
+        report(
+            "T-NRM-12[missing-ref]",
+            any("不存在的 `$defs/nope`" in message for message in lint_errors)
+            and any(keyword == "schema" for keyword, _, _ in ref_hits),
+            f"缺失本地 $ref 报错而不崩溃（{ref_hits[:1]}）",
+        )
+
+        evil_pattern = {
+            "type": "string", "maxLength": 8192, "pattern": "^(a+)+$",
+        }
+        lint_errors, _ = lint_schema_doc("evil-pattern", evil_pattern)
+        report(
+            "T-NRM-12[catastrophic-pattern]",
+            any("嵌套量词" in message for message in lint_errors),
+            f"灾难性回溯 pattern 被 lint 拒绝（{lint_errors[:1]}）",
+        )
+
+        deep = {"type": "string", "maxLength": 5}
+        for _ in range(1500):
+            deep = {
+                "type": "object", "additionalProperties": False,
+                "properties": {"a": deep},
+            }
+        try:
+            lint_errors, _ = lint_schema_doc("deep", deep)
+            deep_ok = any("嵌套超过" in message for message in lint_errors)
+        except RecursionError:
+            deep_ok = False
+        report(
+            "T-NRM-12[deep-nesting]",
+            deep_ok,
+            "1500 层嵌套转为可诊断失败，不抛 RecursionError",
+        )
+
+        class EmptyValidator:
+            def __init__(self, schema):
+                self.schema = schema
+
+            def iter_errors(self, value):
+                return []
+
+        saved_probe = globals().get("_RUNTIME_OK")
+        globals()["_RUNTIME_OK"] = None
+        try:
+            _runtime_probe(EmptyValidator)
+            probe_ok = False
+        except SchemaDependencyError as exc:
+            probe_ok = "sitecustomize" in str(exc)
+        finally:
+            globals()["_RUNTIME_OK"] = saved_probe
+        report(
+            "T-NRM-12[sitecustomize]",
+            probe_ok,
+            "校验器被换成空实现时行为探测 fail-closed",
+        )
+
+        ap_schema = {
+            "type": "object", "additionalProperties": False,
+            "properties": {
+                "a": {
+                    "type": "object", "additionalProperties": False,
+                    "properties": {"b": {"type": "string", "maxLength": 2}},
+                },
+            },
+        }
+        ap_pointers = {pointer for _, pointer, _ in validate({"x": 1, "a": {"x": 2}}, ap_schema)}
+        report(
+            "T-NRM-12[additionalProperties-pointer]",
+            "$.x" in ap_pointers and "$.a.x" in ap_pointers,
+            f"未知键指针恢复为 $.x / $.a.x（实际 {sorted(ap_pointers)}）",
+        )
+
+        pn_schema = {
+            "type": "object", "maxProperties": 2,
+            "propertyNames": {"type": "string", "maxLength": 3},
+            "additionalProperties": {"type": "string", "maxLength": 2},
+        }
+        pn_pointers = {pointer for _, pointer, _ in validate({"longkey": "v"}, pn_schema)}
+        report(
+            "T-NRM-12[propertyNames-pointer]",
+            "$.longkey" in pn_pointers,
+            f"propertyNames 指针恢复到 $.m.<键>（实际 {sorted(pn_pointers)}）",
+        )
 
         id_map = {
             "authoritative": False,

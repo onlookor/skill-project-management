@@ -69,7 +69,7 @@
 python3 -m pip install --user jsonschema==4.26.0
 ```
 
-- 三重核对依赖未被替换（版本 + 安装树摘要 + 分发产物 sha256）。wheel 放在**仓库外**的持久路径，不提交进 git：
+- 依赖核对为三重强制：版本、**按 wheel 内 `RECORD` 逐文件重算内容哈希**核对实际安装树（并断言 `jsonschema` 的导入路径落在分发目录内）、分发产物 sha256。wheel 放在**仓库外**的持久路径，不提交进 git：
 
 ```
 python3 -m pip download --no-deps --no-cache-dir jsonschema==4.26.0 -d ~/.local/share/pm-governance/wheels
@@ -83,6 +83,8 @@ JSONSCHEMA_WHEEL=<jsonschema-4.26.0-py3-none-any.whl> python3 scripts/check_depe
 ```
 
 - 产物缺失、依赖缺失或指纹不符时，检查器以“无法评估”退出 2 并阻断，不会降级为只核对安装树或跳过校验。升级依赖必须同批更新 `scripts/dependency-pins.json` 并在 `CHANGELOG.md` 记录。
+- 这道核对能发现误装、版本漂移、安装树被改动与同名假 wheel，**不构成对有权写本机 Python 环境者的防护**（`PYTHONPATH` 注入、`sitecustomize`、直接改 `site-packages` 属于信任边界之外，见 ADR-0019 与 G-022）。
+- 数据区报错契约：reason code、文件与 JSON 指针（`$.x`、`$.a.x`、`$.m.<键>`）、退出码由本仓库决定；消息文本取自成熟实现的英文诊断（`oneOf` 另加中文前缀）。指针与消息的来源在 `scripts/README.md` 写明。
 
 ## 版本与发布
 

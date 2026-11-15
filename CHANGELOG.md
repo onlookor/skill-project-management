@@ -1138,3 +1138,17 @@
 - **负例**：`test_dependency_pins.py` 9 → 10 项；DP-T03 改为“产物缺席按无法评估阻断”，新增 DP-T10 验证默认读取持久目录。
 - **复跑**：`check_dependency_pins.py` 输出“分发产物 sha256 核对 1 个”，全套检查器与 pre-commit 全绿。
 - **涉及文件**：`scripts/check_dependency_pins.py`、`scripts/test_dependency_pins.py`、`README.md`、`scripts/README.md`、`adr/0019-mature-json-schema-validator.md`、`spec/ACCESS_ZONES.md`、`CHANGELOG.md`、`scripts/checker-pins.json`、`scripts/spec-pins.json`。
+
+---
+
+### 批次 0068 — 2026-11-15 — r5 复判：逐文件核对、契约指针恢复、可诊断失败与威胁模型收口
+
+- **依据**：r5 复判报告 `/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r5/REPORT.md`（sha256 `5373a537d05870dcf4f52756bf7e0012bc0128879e22df92cb85d86007258108`，基线 `3d7211c`）。用户已定“收紧威胁模型 + 修可机械修的部分”。
+- **依赖核对（G-019 关闭条件 1）**：安装树不再只对 `RECORD` 文本排序取摘要，改为按 wheel 内 `RECORD` **逐文件重算 urlsafe-base64 内容哈希**并核对大小，且断言 `jsonschema.__file__` 落在分发目录内（`DP-IMPORT`）。影子包 / `PYTHONPATH`、`sitecustomize`、改 `validators.py` 保留原 `RECORD`、同名假 wheel 四类情形全部阻断。`test_dependency_pins.py` 10 → 13 项。
+- **输出契约（条件 2）**：`additionalProperties` 指针恢复 `$.x` / `$.a.x`，`propertyNames` 恢复 `$.m.<键>`；口径统一为“指针由本仓库恢复、消息文本取自库的英文诊断（`oneOf` 另加中文前缀）”，ADR-0019 与 `README.md`、`scripts/README.md` 同步，不再声称逐字中文消息。
+- **诊断化（条件 3）**：缺失本地 `$ref` 不再抛未捕获 `_WrappedReferencingError`，转 `RM-SCHEMA`“引用无法解析”；`validate()` 兜底捕获 `referencing` 模块异常。
+- **语义风险（二）**：`RM-SCHEMA-LINT` 拒绝 `pattern` 嵌套量词与超过 512 字符（灾难性回溯）、schema 嵌套超过 64 层；`lint_schema_doc`、`_validator_for`、`validate()` 捕获 `RecursionError`，输出带 reason code 与文件/指针的诊断失败，不崩溃。结构性 heuristic 之外仍可能漏检的指数型 alternation 不在静默之列——已写入 ADR 负面项。
+- **威胁模型（三）**：ADR-0019 删去“替换可被发现”的安全暗示，改为“能发现误装与非恶意不一致，不构成对有权写本机 Python 环境者的防护”；`PYTHONPATH` 注入、`sitecustomize`、直接改 `site-packages` 明确移出威胁模型，与 ADR-0015 同一信任模型。新立 G-022 承接，未并入 G-019。
+- **台账（四、五）**：G-021 修正“`positions[].stance` 只有 2,400 预算”为“单值路径上限 2,400，16,800 才是单条总和预算”，按 3.6.4 补理由、批准依据、承接方与时点，以 r5 报告为关闭依据，改 `closed` / `accepted`；G-022 同批 `closed` / `accepted`（成因、影响、承接方与 ADR-0015 外置方向）；G-019 补本轮修复与残留、维持 `open`；G-020 未改。台账 22 条：`open` 3 / `closed` 19。
+- **自测（六）**：`check_no_raw_material.py --self-test` 76 → 82 项（缺失 `$ref`、灾难性 `pattern`、深嵌套、`sitecustomize`、`additionalProperties` 指针、`propertyNames` 指针）；依赖负例 13 项。
+- **涉及文件**：`scripts/check_dependency_pins.py`、`scripts/test_dependency_pins.py`、`scripts/check_no_raw_material.py`、`adr/0019-mature-json-schema-validator.md`、`README.md`、`scripts/README.md`、`GAP_LEDGER.md`、`CHANGELOG.md`、`validation/reviews/2026-11-15-jsonschema-dependency.md`、`scripts/checker-pins.json`。
