@@ -26,11 +26,13 @@
     RM-FIELD    字段超长或模式不符、按路径的散文字段合计超上限、单条总和超预算、
                 单文件散文字段合计超配额
   本体区（O）
-    RM-ONTO-HEADER     缺少 self-authored / source_id 头注释（覆盖全部本体扩展名）
+    RM-ONTO-HEADER     缺少 self-authored / source_id / source_pages 头注释（覆盖全部本体
+                       扩展名）；声明 source_pages: n/a 时缺少 source_pages_basis
     RM-ONTO-LITERAL    定义类谓词字面量超过 2000 字符，其他字面量超过 400 字符
     RM-ONTO-COMMENT    单行注释超过 800 字符
     RM-ONTO-PAGESEQ    出现 12 个以上连续页码数字（页码序列转储）
-    RM-ONTO-PROVENANCE 带 skos:definition 的文件缺少 dcterms:source / pm:sourcePage
+    RM-ONTO-PROVENANCE 带 skos:definition 的文件缺少 dcterms:source / pm:sourcePage；
+                       source_pages: n/a 的依据为空串、占位符或指向不存在的 ADR
   散文区（P）与代码区（C）
     RM-LONGLINE  单行超过 8192 字符
     RM-QUOTE     P 区单条引用超过 400 字符，或连续引用块超过 800 字符
@@ -100,6 +102,13 @@ PAGE_VALUE_RE = re.compile(
     r"(?:" + "|".join(re.escape(pred) for pred in PAGE_PREDICATES) + r")\s+\d{1,4}\b"
 )
 SOURCE_PAGES_HEADER_RE = re.compile(r"^#\s*source_pages:\s*(\S.*)$", re.M)
+SOURCE_PAGES_BASIS_RE = re.compile(r"^#\s*source_pages_basis:\s*(.*)$", re.M)
+ADR_REF_RE = re.compile(r"adr/\d{4}-[a-z0-9-]+\.md")
+BASIS_PLACEHOLDERS = {
+    "n/a", "na", "n.a.", "none", "nil", "null", "todo", "tbd", "fixme",
+    "placeholder", "占位", "占位符", "待补", "待定", "无", "-", "—", "……", "...",
+}
+BASIS_MIN_CHARS = 8
 
 DOTLEADER_RE = re.compile(r"\.{30,}")
 CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
@@ -747,19 +756,48 @@ def _definition_blocks(text):
     ]
 
 
-def check_ontology(rel, text, suffix, findings):
+def n_a_basis_state(root, lines):
+    """`source_pages: n/a` 的依据状态：None=未写、True=可核验、False=不可核验。
+
+    可核验 = 非空、非占位符、含仓库内真实存在的 ADR 引用，且 ADR 之外还有
+    至少 BASIS_MIN_CHARS 个字符的自写理由。`n/a` 本身不构成依据。
+    """
+    match = SOURCE_PAGES_BASIS_RE.search("\n".join(lines[:40]))
+    if match is None:
+        return None
+    raw = match.group(1).strip()
+    norm = raw.strip("`").strip().lower()
+    if not norm:
+        return False
+    if norm.strip(" .。;；,，:：-—*_`\"'") in BASIS_PLACEHOLDERS:
+        return False
+    refs = ADR_REF_RE.findall(norm)
+    if not refs or not any((root / ref).is_file() for ref in refs):
+        return False
+    residue = ADR_REF_RE.sub("", norm).strip(" .。;；,，:：-—*_`\"'")
+    return len(residue) >= BASIS_MIN_CHARS
+
+
+def check_ontology(root, rel, text, suffix, findings):
     lines = text.splitlines()
-    head_lower = "\n".join(lines[:40]).lower()
+    head = "\n".join(lines[:40])
+    head_lower = head.lower()
+    declared = SOURCE_PAGES_HEADER_RE.search(head)
+    declared_pages = declared.group(1).strip().lower() if declared else None
+    basis_state = n_a_basis_state(root, lines) if declared_pages == "n/a" else None
     if suffix in ONTOLOGY_EXTS:
         missing = [
             name for name in ("self-authored", "source_id:", "source_pages:")
             if name not in head_lower
         ]
+        if basis_state is None and declared_pages == "n/a":
+            missing.append("source_pages_basis:")
         if missing:
             findings.append(
                 Finding(
                     "RM-ONTO-HEADER", rel, 1,
-                    f"头注释缺少 {' / '.join(missing)}（CONSTITUTION 13.6 第 5 项要求三项齐全）",
+                    f"头注释缺少 {' / '.join(missing)}（CONSTITUTION 13.6 第 5 项要求三项齐全；"
+                    "声明 `source_pages: n/a` 时还须给出可机械核验的 `source_pages_basis:`）",
                 )
             )
 
@@ -791,8 +829,6 @@ def check_ontology(rel, text, suffix, findings):
         )
 
     # 来源与页码：术语级两项齐全，或由文件头 source_id / source_pages 统一声明。
-    declared = SOURCE_PAGES_HEADER_RE.search("\n".join(lines[:40]))
-    declared_pages = declared.group(1).strip().lower() if declared else None
     has_page_values = PAGE_VALUE_RE.search(text) is not None
     if declared_pages == "n/a" and has_page_values:
         findings.append(
@@ -802,9 +838,19 @@ def check_ontology(rel, text, suffix, findings):
                 "（CONSTITUTION 13.6 第 5 项）",
             )
         )
-    # `n/a` 是显式声明“本文件不含页码定位”，须与正文一致（上面已校验）；
-    # 除此之外，头注释里的范围声明同样视为页码已交代。
-    page_declared = declared_pages is not None
+    if declared_pages == "n/a" and basis_state is not True:
+        reason = "未写" if basis_state is None else "为空串、占位符，或缺少仓库内真实存在的 ADR 引用与自写理由"
+        findings.append(
+            Finding(
+                "RM-ONTO-PROVENANCE", rel, 1,
+                f"文件头声明 `source_pages: n/a` 但依据{reason}；`n/a` 不是无痕豁免，"
+                "须以 `source_pages_basis:` 给出可机械核验的依据（CONSTITUTION 13.6 第 5 项）",
+            )
+        )
+    # `n/a` 只有在依据可核验时才视为“本文件不含页码定位”，否则不解除页码义务。
+    page_declared = declared_pages is not None and (
+        declared_pages != "n/a" or basis_state is True
+    )
     source_declared = "source_id:" in head_lower
     missing_source = []
     missing_page = []
@@ -1005,7 +1051,7 @@ def check_file(root, rel, zones, data_table, schema_root=None):
                 )
             )
             return findings
-        check_ontology(rel, text, suffix, findings)
+        check_ontology(root, rel, text, suffix, findings)
         return findings
 
     if zone == "P":
@@ -1435,10 +1481,56 @@ def run_self_test():
         codes = _codes(root, "ontology/noheader.jsonld", zones, data_table, schema_root)
         report("T-NRM-10[header-ext]", "RM-ONTO-HEADER" in codes,
                f"非 .ttl 本体扩展名同样要求头注释（命中 {sorted(codes) or '无'}）")
+
+        # T-NRM-10b：`source_pages: n/a` 的依据必须可机械核验
+        header_n_a = (
+            "# self-authored: true\n# source_id: PMBOK8-2025\n"
+            "# source_pages: n/a\n"
+        )
+        adr_rel = "adr/0010-self-authored-ontology-in-git.md"
+        _write(root, adr_rel, "# ADR-0010\n自建本体入库边界。\n")
+        body = 'ex:Project a skos:Concept ;\n  skos:definition "自写定义。" .\n'
+        _write(root, "ontology/na-bare.ttl", header_n_a + body)
+        codes = _codes(root, "ontology/na-bare.ttl", zones, data_table, schema_root)
+        report("T-NRM-10b[na-no-basis]",
+               {"RM-ONTO-HEADER", "RM-ONTO-PROVENANCE"} <= codes,
+               f"只写 n/a 不给依据被两条规则同时拦下（命中 {sorted(codes) or '无'}）")
+
+        basis_ok = header_n_a + (
+            f"# source_pages_basis: 本文件结构、类与定义均为自写，未逐页对应来源；"
+            f"依据 {adr_rel}\n"
+        )
+        _write(root, "ontology/na-basis-ok.ttl", basis_ok + body)
+        codes = _codes(root, "ontology/na-basis-ok.ttl", zones, data_table, schema_root)
+        report("T-NRM-10b[na-basis-ok]",
+               not ({"RM-ONTO-HEADER", "RM-ONTO-PROVENANCE"} & codes),
+               f"n/a 附自写理由与仓库内 ADR 引用放行（命中 {sorted(codes) or '无'}）")
+
+        _write(root, "ontology/na-basis-empty.ttl",
+               header_n_a + "# source_pages_basis:\n" + body)
+        codes = _codes(root, "ontology/na-basis-empty.ttl", zones, data_table, schema_root)
+        report("T-NRM-10b[na-basis-empty]", "RM-ONTO-PROVENANCE" in codes,
+               f"依据为空串被拦下（命中 {sorted(codes) or '无'}）")
+
+        for name, placeholder in (("na-basis-placeholder", "n/a"),
+                                  ("na-basis-todo", "TBD"),
+                                  ("na-basis-orphan-adr", "无页码定位 adr/9999-not-exist.md")):
+            _write(root, f"ontology/{name}.ttl",
+                   header_n_a + f"# source_pages_basis: {placeholder}\n" + body)
+            codes = _codes(root, f"ontology/{name}.ttl", zones, data_table, schema_root)
+            report(f"T-NRM-10b[{name}]",
+                   "RM-ONTO-PROVENANCE" in codes,
+                   f"依据为占位符或指向不存在的 ADR 被拦下（{placeholder!r}；命中 {sorted(codes) or '无'}）")
+
+        contradict = basis_ok + 'ex:p1 pm:page 12 .\n'
+        _write(root, "ontology/na-contradict.ttl", contradict)
+        codes = _codes(root, "ontology/na-contradict.ttl", zones, data_table, schema_root)
+        report("T-NRM-10b[na-contradict]", "RM-ONTO-PROVENANCE" in codes,
+               f"n/a 与正文页码值矛盾仍被拦下，依据不能抵消矛盾（命中 {sorted(codes) or '无'}）")
         real_onto = []
         for path in sorted((schema_root / "ontology").glob("*.ttl")):
             rel = f"ontology/{path.name}"
-            check_ontology(rel, path.read_text(encoding="utf-8"), ".ttl", real_onto)
+            check_ontology(schema_root, rel, path.read_text(encoding="utf-8"), ".ttl", real_onto)
         report("T-NRM-10[real-ttl-clean]", not real_onto,
                f"5 份真实 TTL 召回 0（{len(real_onto)} 条命中），规则不再空转")
 

@@ -30,8 +30,8 @@
       "basis": "非同源复核：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；复核产物：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；结论：认可"
     },
     "scripts/check_no_raw_material.py": {
-      "sha256": "ca594fd77aac938d97dd90b7934a5c8a6945e649e61b84b8508a5b138e4bc97c",
-      "basis": "非同源复核：G-019 r3（基线 3664b64）第五节 P1：重写两条本体规则并补 source_pages 头字段。 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r3/REPORT.md sha256：877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0 复核基线：3664b64"
+      "sha256": "ee4ec49b920657e9b4905be5de7f854becabcd788cebad38c8ab240680fcf09b",
+      "basis": "非同源复核：G-019 r3（基线 3664b64）要求 source_pages 头字段；n/a 依据按用户 2026-11-15 裁定收紧。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r3/REPORT.md；sha256：877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0；复核基线：3664b64"
     },
     "scripts/check_spec_pins.py": {
       "sha256": "2eaa728fcd7a67c43ed7cdd93d33b92521fe89502cba13bad11434ecf3c4af9d",

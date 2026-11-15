@@ -1,6 +1,7 @@
 # self-authored: true
 # source_id: PMBOK8-2025
 # source_pages: n/a
+# source_pages_basis: 术语名与结构骨架之外的定义均为自写，未逐页对应来源；依据 adr/0010-self-authored-ontology-in-git.md
 # Vocabulary: classes, object properties and datatype properties.
 # Definitions and structure are written for this repository; no source text is copied.
 @prefix owl: <http://www.w3.org/2002/07/owl#> .

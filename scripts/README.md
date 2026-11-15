@@ -68,11 +68,11 @@ python3 scripts/validate_ontology.py --matrix
 | `RM-SCHEMA` | 数据区文件未在准入登记表登记；解析失败；未知键、必填/类型/枚举不通过；schema 文件缺 `$schema`/`type` |
 | `RM-FIELD` | 数据区字段超长或模式不符；按 schema 的 `x-prose-fields` 逐路径计量超上限；单条散文字段总和超过 `x-prose-budget`；单文件散文字段合计超过 20 KiB；集合字段超过 `maxItems`；`relations` 超过 `maxProperties` |
 | `RM-SCHEMA-LINT` | schema 自身不完整：数组缺 `maxItems`/`items`、字符串缺 `maxLength`、对象缺 `additionalProperties: false`（或 `maxProperties` + `propertyNames` 映射）、关键字不在支持白名单、使用未实现的关键字、`$ref` 与同级断言关键字并用 |
-| `RM-ONTO-HEADER` | 本体文件（`.ttl`/`.nt`/`.n3`/`.owl`/`.rdf`/`.jsonld`）前 40 行缺少 `self-authored`、`source_id:` 或 `source_pages:` 头注释（`source_pages` 取页码范围或 `n/a`） |
+| `RM-ONTO-HEADER` | 本体文件（`.ttl`/`.nt`/`.n3`/`.owl`/`.rdf`/`.jsonld`）前 40 行缺少 `self-authored`、`source_id:` 或 `source_pages:` 头注释（`source_pages` 取页码范围或 `n/a`；声明 `n/a` 时还须有 `source_pages_basis:`，缺该项同样按本码阻断） |
 | `RM-ONTO-LITERAL` | 本体文件的 `skos:definition`/`rdfs:comment`/`dcterms:description` 字面量超过 2000 字符，或其他字面量超过 400 字符 |
 | `RM-ONTO-COMMENT` | 本体文件的单行 `#` 注释超过 800 字符 |
 | `RM-ONTO-PAGESEQ` | 页码序列转储：连续 12 行以上页码三元组（`ex:pN pm:page N .`）、12 个以上逗号分隔页码、或 12 个以上裸页码数字。真实 TTL 的最长连续三元组为 1 行，故对 5 份真实文件召回 0；299 行三元组转储与裸数字转储均命中（实测见 `spec/ACCESS_ZONES.md` 第 6 节） |
-| `RM-ONTO-PROVENANCE` | 按块核对：含定义谓词、页码定位或 `dcterms:source` 的块必须交代来源与页码——术语级（`dcterms:source` / `pm:sourcePage` 等）或文件头统一声明（`source_id` / `source_pages`）。头注释写 `source_pages: n/a` 但正文含页码值 → 声明矛盾，阻断 |
+| `RM-ONTO-PROVENANCE` | 按块核对：含定义谓词、页码定位或 `dcterms:source` 的块必须交代来源与页码——术语级（`dcterms:source` / `pm:sourcePage` 等）或文件头统一声明（`source_id` / `source_pages`）。头注释写 `source_pages: n/a` 但正文含页码值 → 声明矛盾，阻断；`n/a` 未附可机械核验的 `source_pages_basis:`（非空、非占位符、含仓库内真实存在的 `adr/NNNN-*.md` 引用且另有自写理由）→ 视为页码未交代，阻断 |
 | `RM-LONGLINE` | P/C 区单行超过 8192 字符 |
 | `RM-QUOTE` | P 区单条引用超过 400 字符，或连续引用块超过 800 字符 |
 | `RM-DOTLEADER` | P/O 区单行出现 30 个以上连续点（目录转储） |
@@ -83,7 +83,7 @@ python3 scripts/validate_ontology.py --matrix
 
 **结构化数据边界**：JSONL 逐行解析、JSON 数组逐元素过 schema；解析前先剥 UTF-8 BOM；`.yaml` 用安全加载后过同一份契约 schema。键白名单改由 schema 的 `additionalProperties: false` 表达，不再在检查器里维护手写键表。配额只挡“单条整页”与最明显的滥用，不证明来源；均分切块仍可能落在配额内，这是已登记的残余风险。
 
-**自测**：`python3 scripts/check_no_raw_material.py --self-test` 覆盖 58 项合成用例——合法 15 条 JSONL 与 BOM、退役启发式不再误杀长散文/硬换行/中文页/长定义、对象包裹的 `text`/`content`/`chunk` 被 schema 拦下、未知键/缺必填/超长字段/单文件配额、30 万字符单行、base64 PDF 头、单条长引用、PDF/gzip 魔数改名、禁止扩展名、未归类与未登记 fail-closed、本体定义分档与注释上限、页码序列与来源存在性、全本体扩展名头注释、归区最长前缀与全仓覆盖；复核补漏的 13 项覆盖 300 KB 散文塞 manifest、5 万字符契约字段与 statement、200 键 `relations`、100 条 `evidence`/`claim_mapping`、非法 `definitionStatus`、合法 2800 字符定义不被误杀、归区表与契约 schema 已在规格指纹内；r3 补漏的 12 项覆盖仓库内 7 份 schema 的完整性 lint、`package-manifest` 削弱为 `additionalProperties: true` 的 lint 与 fail-closed、三类缺上限各报一条、拼错与未实现关键字、`$ref` 同级关键字、`oneOf` 排他、3 条假设 × 1400 与 12 条 `notes`（6200）不被误杀、`positions` 300×400 与 `recorded_fields` 200×120 被拦。全部用例不依赖外部资源。
+**自测**：`python3 scripts/check_no_raw_material.py --self-test` 覆盖 65 项合成用例——合法 15 条 JSONL 与 BOM、退役启发式不再误杀长散文/硬换行/中文页/长定义、对象包裹的 `text`/`content`/`chunk` 被 schema 拦下、未知键/缺必填/超长字段/单文件配额、30 万字符单行、base64 PDF 头、单条长引用、PDF/gzip 魔数改名、禁止扩展名、未归类与未登记 fail-closed、本体定义分档与注释上限、页码序列与来源存在性、全本体扩展名头注释、归区最长前缀与全仓覆盖；复核补漏的 13 项覆盖 300 KB 散文塞 manifest、5 万字符契约字段与 statement、200 键 `relations`、100 条 `evidence`/`claim_mapping`、非法 `definitionStatus`、合法 2800 字符定义不被误杀、归区表与契约 schema 已在规格指纹内；r3 补漏的 12 项覆盖仓库内 7 份 schema 的完整性 lint、`package-manifest` 削弱为 `additionalProperties: true` 的 lint 与 fail-closed、三类缺上限各报一条、拼错与未实现关键字、`$ref` 同级关键字、`oneOf` 排他、3 条假设 × 1400 与 12 条 `notes`（6200）不被误杀、`positions` 300×400 与 `recorded_fields` 200×120 被拦；`source_pages: n/a` 的 7 项覆盖“只写 n/a 无依据”“依据为空串”“占位符”“指向不存在的 ADR”均阻断，附自写理由与仓库内 ADR 引用放行，`n/a` 与正文页码值矛盾仍阻断。全部用例不依赖外部资源。
 
 提交前接入：每个克隆需自行执行 `git config core.hooksPath .githooks`（只对当前克隆生效）。钩子依次运行全套检查器、准入自测与原型快检，任一失败即阻断提交：
 

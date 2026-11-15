@@ -1077,3 +1077,15 @@
 - **台账同步**：G-021 影响面由 `prose_fields` 改为 `x-prose-fields` / `x-prose-budget`；G-019 影响面补 `scripts/check_spec_pins.py` 与 `contracts/schema/` 全部 schema；核查记录表补批次 0052–0062 共九行。台账 21 条：`open` 4（G-017、G-018、G-019、G-021）/ `closed` 17。
 - **涉及文件**：`GAP_LEDGER.md`、`TODO.md`、`CHANGELOG.md`。
 - **状态**：生效（G-019/G-021 仍 `open`，待非同源复核）
+
+---
+
+### 批次 0063 — 2026-11-15 — 收紧 `source_pages: n/a` 的声明
+
+- **性质**：按用户裁定，`source_pages: n/a` 不再是一个词即成立的豁免；声明 `n/a` 必须同时给出可机械核验的依据。基线 `11c5d92`。仅改本项，未动校验层（`validate()`、lint 与 schema 基线不变）。
+- **判据**：新增头注释 `source_pages_basis:`。依据须非空、非占位符（`n/a`、`TBD`、`待补` 等）、含仓库内**真实存在**的 `adr/NNNN-*.md` 引用，并在 ADR 引用之外另有至少 8 个字符的自写理由。
+- **规则分工**：缺 `source_pages_basis:` → `RM-ONTO-HEADER`；写了但为空串、占位符或 ADR 引用不存在 → `RM-ONTO-PROVENANCE`，且该 `n/a` 不再解除逐块页码义务。`n/a` 与正文页码值矛盾的旧判据保留，依据不能抵消矛盾。
+- **存量补齐**：`ontology/pmbok8-vocab.ttl`、`ontology/pmbok8-shapes.ttl` 两份标 `n/a` 的 TTL 各补一行依据，引用 ADR-0010。
+- **自测**：58 → 65 项。新增 7 项覆盖“只写 n/a 无依据”（`RM-ONTO-HEADER` + `RM-ONTO-PROVENANCE` 同时命中）、“依据为空串”、“占位符 `n/a` / `TBD`”、“指向不存在的 ADR”均阻断，附自写理由与仓库内 ADR 引用放行，`n/a` 与正文页码矛盾仍阻断。
+- **涉及文件**：`scripts/check_no_raw_material.py`、`ontology/pmbok8-vocab.ttl`、`ontology/pmbok8-shapes.ttl`、`spec/ACCESS_ZONES.md`、`scripts/README.md`、`GAP_LEDGER.md`、`TODO.md`、`CHANGELOG.md`、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`validation/reviews/2026-11-15-source-pages-na-basis.md`。
+- **状态**：生效（G-019/G-021 仍 `open`）

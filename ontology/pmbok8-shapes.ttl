@@ -1,6 +1,7 @@
 # self-authored: true
 # source_id: PMBOK8-2025
 # source_pages: n/a
+# source_pages_basis: 形状与约束为本仓库自写，只约束自建词汇表，未逐页对应来源；依据 adr/0010-self-authored-ontology-in-git.md
 # SHACL shapes over the self-authored vocabulary; no source text is copied.
 @prefix pm: <https://example.org/pm#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
