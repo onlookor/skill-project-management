@@ -1361,3 +1361,4 @@
 - **验证**：`config_codes.py --self-check` rc=0；四类场景实测 `ok=0`、`config_incomplete=2`、`cannot_evaluate=3`、`config_invalid=2`、`config_drift=1`；其余检查器结果见提交信息。
 - **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`（新增 3 个无复核对象，均已登记）。
 - **关联 ADR**：无（结构依据为已批准的提案第 9 节）
+- **收尾补正（同一批第三个提交）**：pre-commit 复核发现两份新 schema 未在 `spec/ACCESS_ZONES.md` 第 2 节（数据区准入登记）登记，按 D-1 不应降级为文本扫描。补登记两行 `schema-doc` 后，`check_no_raw_material.py` 由 2 个错误回到 0。**代价如实记录**：该区段此前按 G-019 r4 有合格复核记录，本次改动超出原复核范围，`spec-pins.json` 的 basis 只能降为无复核声明（原复核记录仍在 git 历史 `441218d` 中），并已登记入 `scripts/no-review-declarations.json` 与 T-149；这是本次改动的真实治理成本，不以旧复核顶新内容。

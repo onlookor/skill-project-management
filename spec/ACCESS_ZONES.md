@@ -69,6 +69,8 @@
 | `contracts/schema/ontology-fixtures-manifest.schema.json` | schema-doc | — |
 | `contracts/schema/pilot-artifact.schema.json` | schema-doc | — |
 | `contracts/schema/pilot-id-map.schema.json` | schema-doc | — |
+| `contracts/schema/runtime-config.schema.json` | schema-doc | — |
+| `contracts/schema/runtime-config-lock.schema.json` | schema-doc | — |
 | `ontology/fixtures/manifest.json` | json-object | `contracts/schema/ontology-fixtures-manifest.schema.json` |
 | `scripts/anchor_baseline.json` | json-object | 生成器 `scripts/check_anchors.py --write` |
 | `scripts/checker-pins.json` | json-object | 生成器 `scripts/check_checker_pins.py --write` |

@@ -78,9 +78,9 @@
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "spec/ACCESS_ZONES.md": {
-      "sha256": "2bf7242d4e2879ab47756662eccb7bdd6d4aeedc6591556bfe9b49358b535315",
+      "sha256": "b02613a6a85b37a3446dda498e70033ce81fc406a92b4c38efbd5915a905d49e",
       "path": "spec/ACCESS_ZONES.md",
-      "basis": "非同源复核：G-019 r4（基线 11c5d92）指出自写子集语义失真与配额外溢；本批按用户 2026-11-15 裁定接入成熟实现，并把分发产物核对改为强制项。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md；sha256：47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb；复核基线：11c5d92 区段：spec/ACCESS_ZONES.md 结论：认可"
+      "basis": "无复核声明（不构成认可，不放行）"
     }
   }
 }

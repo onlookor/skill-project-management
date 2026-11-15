@@ -78,7 +78,7 @@
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/no-review-declarations.json": {
-      "sha256": "3bc81f07093a46fbbeab294d11b91b9f2cffc1aa6ded069fc1e7ba8068160fb9",
+      "sha256": "1b3701643c60dc1f27893a1d415da9a1de6db8d7ea4736ee9e61c34d10229b47",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "validation/pinned/checker.py": {

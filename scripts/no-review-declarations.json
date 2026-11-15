@@ -150,6 +150,13 @@
       "due": "M1 出口前",
       "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
       "todo": "T-149"
+    },
+    "spec/ACCESS_ZONES.md": {
+      "reason": "0083 数据区准入登记新增两份配置 schema 两行；该区段此前按 G-019 r4 复核过，本次改动超出原复核范围，原 basis 不再覆盖新内容，故降为无复核声明（原复核记录仍在 git 历史中）",
+      "missing_review": "对 spec/ACCESS_ZONES.md 第 2 节新增两行（runtime-config / runtime-config-lock 的 schema-doc 登记）的非同源复核",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-149"
     }
   }
 }
