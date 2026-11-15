@@ -231,6 +231,7 @@ project-management-grounding/
 │   ├── CONTEXT_ASSEMBLY.md         # 上下文装配规范：四场景加载集、token 预算、装配清单
 │   ├── GROUNDING_CRITERIA.md       # 接地完成判据：六条判据、状态语义、判据记录
 │   ├── ANCHOR_SPEC.md              # 锚点与引用规范：稳定 ID、标题路径、指纹、失效语义
+│   ├── ACCESS_ZONES.md             # 原始资料分区准入：路径归区表与数据区准入登记（唯一归区来源）
 │   ├── ONTOLOGY_FEASIBILITY.md     # 自建本体的可行性评估与方案对比（评估报告，非规范）
 │   ├── CHECKER_INPUT_SCHEMA.md      # 确定性校验器的谓词快照输入 schema（T-107 起的新样例必须遵循）
 │   ├── methods/
@@ -248,7 +249,9 @@ project-management-grounding/
 │
 ├── contracts/
 │   ├── schema/
-│   │   └── pm-slot-contract.schema.json   # 接口契约的 JSON Schema
+│   │   ├── pm-slot-contract.schema.json   # 接口契约的 JSON Schema
+│   │   ├── knowledge-entry.schema.json    # 数据区条目（knowledge/*.jsonl）的准入 schema
+│   │   └── pilot-conflict.schema.json     # 数据区冲突样例（spec/pilot/pilot-conflicts.jsonl）的准入 schema
 │   ├── resolver.md                 # 单层解析规则 + 多层合并语义（定义但不启用）+ PACT 适配节
 │   └── examples/
 │       ├── construction.pm-contract.yaml
@@ -449,7 +452,7 @@ project-management-grounding/
    - 每个文件头部必须写 `# self-authored: true`、`# source_id: <SOURCE_LEDGER id>`、`# source_pages: <定位>`；每个术语带 `dcterms:source` 与 `pm:sourcePage`。
    - 定义必须自写一句话；不得逐句对应原文，不得复制段落、列表、表格行、图注。写不出定义时省略定义并标 `definition_status: pending`，不得用原文改写凑数。
    - 本体是派生工件，不是来源；在 ADR 提升前不得作为 `grounding_ref`，不得直接充当规则依据；`STATE.md` 中状态为 `active`（形状与负例校验通过后）。
-   - 提交前运行 `scripts/check_no_raw_material.py` 与 `scripts/validate_ontology.py --matrix`；本体文件命中 `RM-ONTO-*` 或 `RM-PROSEBLOCK` 同样阻断提交；缺少 `rdflib`/`pyshacl` 时校验以退出码 2 报“无法评估”。
+   - 提交前运行 `scripts/check_no_raw_material.py` 与 `scripts/validate_ontology.py --matrix`；本体文件命中 `RM-ONTO-*`，或任何文件命中分区准入规则（`RM-ZONE`/`RM-SCHEMA`/`RM-FIELD`），同样阻断提交；缺少 `rdflib`/`pyshacl` 时校验以退出码 2 报“无法评估”。
 
 ### 8. 不做的事
 
