@@ -88,6 +88,19 @@ DEFINITION_PREDICATES = {
 }
 
 PAGESEQ_RE = re.compile(r"(?:\b\d{1,4}\b[\s,;]{0,2}){12,}")
+PAGE_LIST_RE = re.compile(r"(?:\b\d{1,4}\b\s*,\s*){12,}")
+PAGE_PREDICATES = ("pm:page", "pm:sourcePage", "dcterms:sourcePage", "foaf:page")
+PAGE_TRIPLE_RE = re.compile(
+    r"^\s*(?:<[^>\n]+>|[A-Za-z][\w.-]*:[\w.-]+)\s+(?:"
+    + "|".join(re.escape(pred) for pred in PAGE_PREDICATES)
+    + r")\s+\d{1,4}\s*[.;]\s*$"
+)
+PAGE_RUN_MIN = 12
+PAGE_VALUE_RE = re.compile(
+    r"(?:" + "|".join(re.escape(pred) for pred in PAGE_PREDICATES) + r")\s+\d{1,4}\b"
+)
+SOURCE_PAGES_HEADER_RE = re.compile(r"^#\s*source_pages:\s*(\S.*)$", re.M)
+
 DOTLEADER_RE = re.compile(r"\.{30,}")
 CONTROL_RE = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f]")
 B64_STD_RE = re.compile(r"[A-Za-z0-9+/]{%d,}={0,2}" % BASE64_RUN_CHARS)
@@ -707,41 +720,109 @@ def check_data(rel, text, suffix, entry, schema_root, findings):
     )
 
 
+def _page_dump_run(lines):
+    """返回连续页码三元组（`ex:pN pm:page N .`）达到阈值的起始行号。"""
+    run = 0
+    start = 0
+    for index, line in enumerate(lines):
+        if PAGE_TRIPLE_RE.match(line):
+            if run == 0:
+                start = index
+            run += 1
+            if run >= PAGE_RUN_MIN:
+                return start
+        else:
+            run = 0
+    return None
+
+
+def _definition_blocks(text):
+    """按空行切块，返回带定义谓词或页码定位的块（这两类都负有来源义务）。"""
+    blocks = [block for block in re.split(r"\n\s*\n", text) if block.strip()]
+    return [
+        block for block in blocks
+        if any(pred in block for pred in DEFINITION_PREDICATES)
+        or any(pred in block for pred in PAGE_PREDICATES)
+        or "dcterms:source" in block
+    ]
+
+
 def check_ontology(rel, text, suffix, findings):
     lines = text.splitlines()
+    head_lower = "\n".join(lines[:40]).lower()
     if suffix in ONTOLOGY_EXTS:
-        head = "\n".join(lines[:40]).lower()
-        if "self-authored" not in head or "source_id" not in head:
+        missing = [
+            name for name in ("self-authored", "source_id:", "source_pages:")
+            if name not in head_lower
+        ]
+        if missing:
             findings.append(
                 Finding(
                     "RM-ONTO-HEADER", rel, 1,
-                    "缺少 self-authored / source_id 头注释（CONSTITUTION 13.6）",
+                    f"头注释缺少 {' / '.join(missing)}（CONSTITUTION 13.6 第 5 项要求三项齐全）",
                 )
             )
 
-    if PAGESEQ_RE.search(text):
-        position = PAGESEQ_RE.search(text).start()
+    # 页码序列转储：真实形态是连续的三元组（`ex:pN pm:page N .`）或逗号数字表；
+    # 裸数字串只作兜底。三者任一命中即可。
+    run_start = _page_dump_run(lines)
+    if run_start is not None:
         findings.append(
             Finding(
-                "RM-ONTO-PAGESEQ", rel, text[:position].count("\n") + 1,
+                "RM-ONTO-PAGESEQ", rel, run_start + 1,
+                f"连续 {PAGE_RUN_MIN} 行以上页码三元组，疑似页码序列转储（CONSTITUTION 13.6 第 3 项）",
+            )
+        )
+    list_match = PAGE_LIST_RE.search(text)
+    if list_match is not None:
+        findings.append(
+            Finding(
+                "RM-ONTO-PAGESEQ", rel, text[:list_match.start()].count("\n") + 1,
+                "出现 12 个以上逗号分隔页码，疑似页码序列转储（CONSTITUTION 13.6 第 3 项）",
+            )
+        )
+    bare_match = PAGESEQ_RE.search(text)
+    if bare_match is not None:
+        findings.append(
+            Finding(
+                "RM-ONTO-PAGESEQ", rel, text[:bare_match.start()].count("\n") + 1,
                 "出现 12 个以上连续页码数字，疑似页码序列转储（CONSTITUTION 13.6 第 3 项）",
             )
         )
 
-    if "pm:sourcePage" in text and "dcterms:source" not in text:
-        head_lower = "\n".join(lines[:40]).lower()
-        if "source_id:" not in head_lower:
-            findings.append(
-                Finding(
-                    "RM-ONTO-PROVENANCE", rel, None,
-                    "术语带页码定位，但既无 dcterms:source 也无文件头 source_id（CONSTITUTION 13.6 第 5 项）",
-                )
+    # 来源与页码：术语级两项齐全，或由文件头 source_id / source_pages 统一声明。
+    declared = SOURCE_PAGES_HEADER_RE.search("\n".join(lines[:40]))
+    declared_pages = declared.group(1).strip().lower() if declared else None
+    has_page_values = PAGE_VALUE_RE.search(text) is not None
+    if declared_pages == "n/a" and has_page_values:
+        findings.append(
+            Finding(
+                "RM-ONTO-PROVENANCE", rel, 1,
+                "文件头声明 `source_pages: n/a`，但正文含页码三元组，声明与实际矛盾"
+                "（CONSTITUTION 13.6 第 5 项）",
             )
-    elif "dcterms:source" in text and "pm:sourcePage" not in text:
+        )
+    # `n/a` 是显式声明“本文件不含页码定位”，须与正文一致（上面已校验）；
+    # 除此之外，头注释里的范围声明同样视为页码已交代。
+    page_declared = declared_pages is not None
+    source_declared = "source_id:" in head_lower
+    missing_source = []
+    missing_page = []
+    for block in _definition_blocks(text):
+        subject = block.strip().splitlines()[0].strip()
+        if not (source_declared or "dcterms:source" in block):
+            missing_source.append(subject)
+        if not (page_declared or any(pred in block for pred in PAGE_PREDICATES)):
+            missing_page.append(subject)
+    for label, subjects in (("来源", missing_source), ("页码", missing_page)):
+        if not subjects:
+            continue
+        preview = "、".join(subjects[:3])
         findings.append(
             Finding(
                 "RM-ONTO-PROVENANCE", rel, None,
-                "术语声明 dcterms:source 但缺少 pm:sourcePage（CONSTITUTION 13.6 第 5 项）",
+                f"{len(subjects)} 个定义术语既无术语级{label}，也无文件头声明"
+                f"（如 {preview}；CONSTITUTION 13.6 第 5 项）",
             )
         )
 
@@ -1182,7 +1263,12 @@ def run_self_test():
                f"O 区非本体扩展名被阻断（命中 {sorted(codes) or '无'}）")
 
         # T-NRM-08：本体字面量分档与注释上限
-        header = "# self-authored: true\n# source_id: PMBOK8-2025\n"
+        header = (
+            "# self-authored: true\n# source_id: PMBOK8-2025\n"
+            "# source_pages: 1-100\n"
+        )
+        header_no_pages = "# self-authored: true\n# source_id: PMBOK8-2025\n"
+        header_bare = "# self-authored: true\n"
         ttl_ok = header + 'ex:Project a skos:Concept ;\n  skos:definition "' + "自写定义" * 300 + '" .\n'
         _write(root, "ontology/ok.ttl", ttl_ok)
         codes = _codes(root, "ontology/ok.ttl", zones, data_table, schema_root)
@@ -1327,16 +1413,34 @@ def run_self_test():
         _write(root, "ontology/pageseq.ttl", pageseq)
         codes = _codes(root, "ontology/pageseq.ttl", zones, data_table, schema_root)
         report("T-NRM-10[pageseq]", "RM-ONTO-PAGESEQ" in codes,
-               f"页码序列被拦下（命中 {sorted(codes) or '无'}）")
-        provenance = header + 'ex:x a skos:Concept ;\n  dcterms:source "PMBOK8-2025" .\n'
+               f"裸数字页码序列被拦下（命中 {sorted(codes) or '无'}）")
+        triple_dump = header + "".join(
+            f"ex:p{i} pm:page {i} .\n" for i in range(1, 300)
+        )
+        _write(root, "ontology/pageseq-triples.ttl", triple_dump)
+        codes = _codes(root, "ontology/pageseq-triples.ttl", zones, data_table, schema_root)
+        report("T-NRM-10[pageseq-triples]", "RM-ONTO-PAGESEQ" in codes,
+               f"299 行 TTL 页码三元组转储被拦下（命中 {sorted(codes) or '无'}）")
+        provenance = header_no_pages + 'ex:x a skos:Concept ;\n  dcterms:source "PMBOK8-2025" .\n'
         _write(root, "ontology/provenance.ttl", provenance)
         codes = _codes(root, "ontology/provenance.ttl", zones, data_table, schema_root)
         report("T-NRM-10[provenance]", "RM-ONTO-PROVENANCE" in codes,
                f"有来源无页码被拦下（命中 {sorted(codes) or '无'}）")
+        both_missing = header_bare + 'ex:y a skos:Concept ;\n  skos:definition "未标来源也未标页码。" .\n'
+        _write(root, "ontology/provenance-both.ttl", both_missing)
+        codes = _codes(root, "ontology/provenance-both.ttl", zones, data_table, schema_root)
+        report("T-NRM-10[provenance-both]", "RM-ONTO-PROVENANCE" in codes,
+               f"来源与页码两项都缺被拦下（命中 {sorted(codes) or '无'}）")
         _write(root, "ontology/noheader.jsonld", '{"@id": "ex:x"}\n')
         codes = _codes(root, "ontology/noheader.jsonld", zones, data_table, schema_root)
         report("T-NRM-10[header-ext]", "RM-ONTO-HEADER" in codes,
                f"非 .ttl 本体扩展名同样要求头注释（命中 {sorted(codes) or '无'}）")
+        real_onto = []
+        for path in sorted((schema_root / "ontology").glob("*.ttl")):
+            rel = f"ontology/{path.name}"
+            check_ontology(rel, path.read_text(encoding="utf-8"), ".ttl", real_onto)
+        report("T-NRM-10[real-ttl-clean]", not real_onto,
+               f"5 份真实 TTL 召回 0（{len(real_onto)} 条命中），规则不再空转")
 
         # T-NRM-11：完整性 lint、按路径配额与复核攻击输入
         real_lint = lint_schema_files(schema_root)

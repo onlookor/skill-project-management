@@ -73,9 +73,9 @@
       "basis": "非同源复核：G-019 r3（基线 3664b64）要求 schema 全量入指纹、补完整性 lint 与按路径配额。 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r3/REPORT.md sha256：877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0 复核基线：3664b64"
     },
     "spec/ACCESS_ZONES.md": {
-      "sha256": "ef5ee4dfda2786bbb34edc5deece13fe983fff31646220eae6b255ed92884b9a",
+      "sha256": "4e8f56e66c9d5f51b44505b11516702adedd7189ebf2ada159c714626f6e1f84",
       "path": "spec/ACCESS_ZONES.md",
-      "basis": "非同源复核：G-019 r3（基线 3664b64）要求 schema 全量入指纹、补完整性 lint 与按路径配额。 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r3/REPORT.md sha256：877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0 复核基线：3664b64"
+      "basis": "非同源复核：G-019 r3（基线 3664b64）第五节 P1：本体页码与来源规则对真实 TTL 零召回。 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r3/REPORT.md sha256：877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0 复核基线：3664b64"
     }
   }
 }

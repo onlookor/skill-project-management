@@ -1,5 +1,6 @@
 # self-authored: true
 # source_id: PMBOK8-2025
+# source_pages: n/a
 # SHACL shapes over the self-authored vocabulary; no source text is copied.
 @prefix pm: <https://example.org/pm#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .

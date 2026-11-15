@@ -1050,3 +1050,18 @@
 - **全仓复跑**：144 个跟踪文件 0 命中；自测 55/55；`checker-pins` 17/17；`spec-pins` 15/15；`test_spec_pins` 8/8；pre-commit 全绿。
 - **涉及文件**：`scripts/check_no_raw_material.py`、`scripts/check_spec_pins.py`、7 份 `contracts/schema/*.schema.json`、`CONSTITUTION.md`、`spec/ACCESS_ZONES.md`、`spec/RAW_MATERIAL_ADMISSION.md`、`scripts/README.md`、`GLOSSARY.md`、`validation/reviews/2026-11-15-admission-r3-structural.md`、两份 pins JSON、`CHANGELOG.md`。
 - **状态**：生效（G-019/G-021 仍 `open`，待非同源复核）
+
+---
+
+### 批次 0061 — 2026-11-15 — 结构性修法（第三批：本体页码与来源规则重写）
+
+- **性质**：按非同源复核 `verify-g019-r3`（sha256 `877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0`，基线 `3664b64`）第三节 P1 修复。D4 未动、未放量、未碰判据 7 外部抽样。
+- **`RM-ONTO-PAGESEQ` 重写**：旧规则只认裸数字串，对真实的 299 行 `ex:pN pm:page N .` 三元组转储 0 命中。新规则三形态任一命中即阻断：连续 12 行以上页码三元组（`pm:page` / `pm:sourcePage` / `dcterms:sourcePage` / `foaf:page`）、12 个以上逗号分隔页码、12 个以上裸页码数字（保留兜底）。
+- **`RM-ONTO-PROVENANCE` 重写**：旧规则只在“有页码无来源且文件头无 `source_id`”时触发，对来源与页码两项都缺的术语 0 命中。新规则按空行切块，对含定义谓词、页码定位或 `dcterms:source` 的块逐块核对：来源与页码必须由术语级字段或文件头 `source_id` / `source_pages` 之一交代；头注释写 `source_pages: n/a` 但正文含页码值 → 声明矛盾，阻断。
+- **头注释补项**：`RM-ONTO-HEADER` 由两项（`self-authored`、`source_id`）增至三项（加 `source_pages:`），与 `CONSTITUTION.md` 13.6 第 5 项一致。5 份真实 TTL 补页码范围（artifacts `1-113`、processes `17-101`、tools `1-145`、shapes/vocab `n/a`）；25 份 `ontology/fixtures/*.ttl` 按各自实际页码补范围。
+- **召回实测**（写入 `spec/ACCESS_ZONES.md` 第 6 节）：真实 TTL 5 文件、349 个页码值、501 个义务块，两条规则均 0 命中；299 行三元组转储、逗号页码表、裸数字串、“两项都缺”术语、`n/a` 声明矛盾均命中。旧版对同样输入 0 命中。
+- **负例/正例**：自测 55 → 58 项——新增 `pageseq-triples`（299 行）、`provenance-both`（两项都缺）、`real-ttl-clean`（真实文件 0 命中）三条；58/58 通过。
+- **指纹重冻**：`spec-pins` 15 区段（`spec/ACCESS_ZONES.md` 变更），`checker-pins` 17 个；basis 指向上述仓库外报告 + sha256 + 基线 `3664b64`；新增 `validation/reviews/2026-11-15-ontology-rules-r3.md` 作为**非权威索引**。
+- **全仓复跑**：145 个跟踪文件 0 命中；自测 58/58；`checker-pins` 17/17；`spec-pins` 15/15；pre-commit 全绿。
+- **涉及文件**：`scripts/check_no_raw_material.py`、5 份 `ontology/*.ttl`、25 份 `ontology/fixtures/*.ttl`、`spec/ACCESS_ZONES.md`、`scripts/README.md`、`validation/reviews/2026-11-15-ontology-rules-r3.md`、两份 pins JSON、`CHANGELOG.md`。
+- **状态**：生效（G-019/G-021 仍 `open`，待非同源复核）

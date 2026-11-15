@@ -1,5 +1,6 @@
 # self-authored: true
 # source_id: PMBOK8-2025
+# source_pages: 17-101
 # Individuals: seven performance domains, five focus areas, forty processes and their I/O.
 # Definitions and structure are written for this repository; no source text is copied.
 @prefix owl: <http://www.w3.org/2002/07/owl#> .

@@ -1,5 +1,6 @@
 # self-authored: true
 # source_id: PMBOK8-2025
+# source_pages: 1-1
 # Positive fixture: every shape in pmbok8-shapes.ttl should conform.
 @prefix pm: <https://example.org/pm#> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
