@@ -6,11 +6,15 @@
   2. `contracts/schema/` 下任何文件未登记为区段 → 阻断（自动发现，取代人工清单）；
   3. 区段相对 HEAD 有改动时，同一提交必须附合格的非同源复核记录，否则阻断；
   4. 复核标准与 `check_checker_pins.py` 对齐：依据必须指向**仓库外**的复核产物，
-     并给出 `sha256：<64 位>`、`复核基线：<提交号>`、`区段：<所绑区段>` 与结论词；
+     并给出 `sha256：<64 位>`、`复核基线：<仓库内存在的提交>`、唯一一条
+     `区段：<所绑区段>` 与结论词（`实质收敛`/`认可`/`通过`，否定前缀无效）；
      仓库内转录件只作索引，不作依据。**默认读取模式同样校验这些字段**，只改 basis
-     文本会被阻断；`初始登记` 前缀表示无复核声明的历史登记项，不参与字段校验。
-  5. `--write` 新增或变更的区段必须附 `--basis`（同样要求外部产物 + sha256），
-     登记项逐区段保存 basis；未变更的旧登记项保留原值或标为“初始登记”。
+     文本会被阻断。“无复核声明”只对代码内冻结的 `UNREVIEWED_KEYS` 成立：历史基文
+     必须**逐字**相等，本批改动必须是结构化
+     `待复核：批次 NNNN …；无复核声明，不构成认可`；`初始登记：<任意>` 之类
+     前缀文本一律拒绝。复核记录（`valid_review`）永不接受该状态。
+  5. `--write` 新增或变更的区段必须附 `--basis`（合格复核记录，或白名单区段的
+     结构化待复核声明）；冻结的历史基文不能用于覆盖新改动。
 
 记录文件放在 validation/reviews/ 下并在同一提交暂存；也可用 --review 指定。
 这不是“签收人身份验证”：机器只能核对记录的存在与字段，不能验证复核者是谁。
@@ -37,11 +41,31 @@ METHOD = "spec/methods/deterministic-checker.md"
 SCHEMA = "spec/CHECKER_INPUT_SCHEMA.md"
 SCHEMA_DIR = "contracts/schema"
 CONCLUSIONS = ("实质收敛", "认可", "通过")
+# 结构化“待复核”声明：批次号 + 说明 + 固定否定尾句。只有白名单对象可用。
+PENDING_RE = re.compile(r"^待复核：批次 \d{4} [^；]+；无复核声明，不构成认可$")
+# 冻结白名单：区段 → 唯一允许的**历史**“无复核声明”文本（逐字匹配）。
+# 值为 None 表示该区段只允许结构化 `待复核：批次 NNNN …`。
+# 不做前缀判定：`初始登记：<任意>`、`无复核声明：<任意>` 一律无效。
+UNREVIEWED_KEYS: dict[str, str | None] = {
+    "GRAMMAR.md": "初始登记",
+    f"{SCHEMA}#2bis": "初始登记",
+    f"{SCHEMA}#1.11": None,
+}
+
+
+def unreviewed_ok(text: str, key: str) -> bool:
+    """白名单内：逐字等于冻结基文，或符合结构化“待复核”声明；其余一律不放行。"""
+    if key not in UNREVIEWED_KEYS:
+        return False
+    if PENDING_RE.match(text) is not None:
+        return True
+    return UNREVIEWED_KEYS[key] == text
 
 SECTIONS = (
     {"key": "GRAMMAR.md", "path": "GRAMMAR.md", "start": None, "end": None},
     {"key": f"{METHOD}#A.2", "path": METHOD, "start": "### A.2 ", "end": "### A.1 "},
     {"key": f"{METHOD}#A.1", "path": METHOD, "start": "### A.1 ", "end": None},
+    {"key": f"{SCHEMA}#1.11", "path": SCHEMA, "start": "11. **封闭枚举全局归一化**", "end": "12. **适用性"},
     {"key": f"{SCHEMA}#2bis", "path": SCHEMA, "start": "## 2bis. ", "end": "## 3. "},
     {"key": f"{SCHEMA}#3", "path": SCHEMA, "start": "## 3. ", "end": "## 3bis. "},
     {"key": f"{SCHEMA}#4", "path": SCHEMA, "start": "## 4. ", "end": "## 5. "},
@@ -118,14 +142,16 @@ def discover_schema_files(root: Path) -> list[str]:
     )
 
 
-def valid_basis(root: Path, text: str, key: str) -> tuple[bool, str]:
+def valid_basis(root: Path, text: str, key: str, allow_unreviewed=None) -> tuple[bool, str]:
     """默认模式与 --write 共用：basis 必须指向仓库外产物、sha256 一致且区段正确。
 
-    `初始登记`（含 `初始登记：...`）明确表示“无复核声明”，只保留历史指针，
-    不参与复核字段校验；除此之外一律按完整字段核对。
+    “无复核声明”只对 `UNREVIEWED_KEYS` 白名单内的区段成立，且必须逐字等于冻结基文
+    或符合结构化“待复核”声明；不再按 `初始登记：` 前缀放行。复核记录永不接受该状态。
     """
     text = text.strip()
-    if text == "初始登记" or text.startswith("初始登记："):
+    if allow_unreviewed is None:
+        allow_unreviewed = key in UNREVIEWED_KEYS
+    if allow_unreviewed and unreviewed_ok(text, key):
         return True, ""
     if "非同源复核：" not in text:
         return False, "缺少 `非同源复核：` 前缀"
@@ -141,18 +167,39 @@ def valid_basis(root: Path, text: str, key: str) -> tuple[bool, str]:
         pass
     else:
         return False, "复核产物位于本仓库内；转录件只作索引，不能作为 basis"
-    if re.search(r"复核基线：`?[0-9a-f]{7,40}`?", text) is None:
+    baseline = re.search(r"复核基线：`?([0-9a-f]{7,40})`?", text)
+    if baseline is None:
         return False, "缺少 `复核基线：<提交号>`"
+    exists = subprocess.run(
+        ["git", "cat-file", "-e", f"{baseline.group(1)}^{{commit}}"],
+        cwd=root,
+        capture_output=True,
+    )
+    if exists.returncode != 0:
+        return False, f"复核基线不存在：{baseline.group(1)}"
     recorded = re.search(r"sha256：`?([0-9a-f]{64})`?", text)
     if recorded is None:
         return False, "缺少 `sha256：<64 位十六进制>`"
     if digest(artifact_path) != recorded.group(1):
         return False, "`sha256` 与复核产物不一致"
-    if re.search(rf"区段：`?{re.escape(key)}`?", text) is None:
-        return False, f"缺少 `区段：{key}` 或与所绑区段不一致"
-    if not any(word in text for word in CONCLUSIONS):
+    segments = re.findall(r"区段：\s*`?([^`\s；，、]+)`?", text)
+    if segments != [key]:
+        return False, f"`区段：` 必须精确等于 {key} 且只出现一次"
+    if re.search(r"结论：\s*(?:不|未|无法)", text) is not None:
+        return False, "结论词被否定（`不予`/`未`/`无法` 前缀）"
+    if re.search(rf"结论：\s*(?:{'|'.join(CONCLUSIONS)})(?=$|[\s；;，,。）（()])", text) is None:
         return False, f"缺少结论词（{'/'.join(CONCLUSIONS)}）"
     return True, ""
+
+
+def writable(root: Path, text: str, key: str) -> tuple[bool, str]:
+    """`--write` 的放行口径：合格复核记录，或白名单区段的**结构化**待复核声明。
+
+    冻结的历史“初始登记/无复核声明”文本不得用来覆盖新改动——那是旧状态，不是新授权。
+    """
+    if key in UNREVIEWED_KEYS and PENDING_RE.match(text.strip()) is not None:
+        return True, ""
+    return valid_basis(root, text, key, allow_unreviewed=False)
 
 
 
@@ -191,7 +238,7 @@ def valid_review(root: Path, reviews: list[str], key: str) -> bool:
             continue
         if not any(word in text for word in CONCLUSIONS):
             continue
-        ok, _ = valid_basis(root, text, key)
+        ok, _ = valid_basis(root, text, key, allow_unreviewed=False)
         if ok:
             return True
     return False
@@ -234,8 +281,9 @@ def evaluate(
         if changed and not valid_review(root, reviews, key):
             errors.append(
                 f"{key}：区段已改动但同一提交缺少合格的非同源复核记录"
-                f"（需含 `区段：{key}`、结论词 {'/'.join(CONCLUSIONS)}，"
-                "且 `复核产物：` 指向仓库外文件、`sha256：` 与之一致、含 `复核基线：`）"
+                f"（需含且仅含一条 `区段：{key}`、结论词 {'/'.join(CONCLUSIONS)}，"
+                "且 `复核产物：` 指向仓库外文件、`sha256：` 与之一致、"
+                "`复核基线：` 指向仓库内存在的提交）"
             )
     declared = {spec["path"] for spec in SECTIONS}
     for path in discover_schema_files(root):
@@ -309,12 +357,12 @@ def main() -> int:
                 if old_sha != actual:
                     changed.append(key)
                     match = next(
-                        (text for text in args.basis if valid_basis(root, text, key)[0]),
+                        (text for text in args.basis if writable(root, text, key)[0]),
                         None,
                     )
                     if match is None:
                         why = (
-                            valid_basis(root, args.basis[0], key)[1]
+                            writable(root, args.basis[0], key)[1]
                             if args.basis
                             else "缺少 --basis"
                         )

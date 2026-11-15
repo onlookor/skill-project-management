@@ -1236,3 +1236,17 @@
 - **pre-commit 接入**：`test_coverage_gate.py` 紧随 `check_coverage_gate.py`、`test_check_table_mutations.py` 紧随 `check_three_table.py`、`validate_ontology.py --matrix` 紧随 `test_dependency_pins.py`。自批次 0075 起三者由钩子执行。
 - **本体依赖钉扎**：`dependency-pins.json` 扩展为 `jsonschema`、`rdflib==7.6.0`、`pyshacl==0.40.2`，沿用同一登记表与同一判定轴（版本、wheel sha256、按 RECORD 逐文件安装树）；`check_dependency_pins.py` 支持 `--artifact <包名>=<wheel>` 可重复；`validate_ontology.py --matrix` 缺依赖仍以退出码 2 报“无法评估”。新增负例 DP-T14–T16（缺依赖、版本不符、安装树被改）。
 - **验证**：检查器全套、`test_coverage_gate.py`、`test_check_table_mutations.py`、`test_checker_pins.py` 11/11、`test_spec_pins.py` 13/13、`test_dependency_pins.py` 16/16；`--matrix` 单次耗时约 0.46s；pre-commit 全套 rc=0。
+
+---
+
+### 批次 0076 — 2026-11-15 — 按 0075 复核整改钉扎（待复核）
+
+- **背景**：批次 0075 复核（基线 `20a5450`，报告 `/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-pins-0075/REPORT.md`，sha256 `77149b…1582`）判不可接受，指出 `初始登记：` 前缀短路、结论词子串命中、区段可重复/带后缀、基线只验形状、历史 basis 名实不符、`§1.11` 未钉扎。
+- **收口短路**：`check_spec_pins.py`/`check_checker_pins.py` 删除 `startswith("初始登记：")` 放行，改为代码内冻结的 `UNREVIEWED_KEYS` 白名单（spec 3 项、checker 13 项），且**不做任何前缀判定**：历史基文必须逐字相等，本批改动必须是结构化 `待复核：批次 NNNN …；无复核声明，不构成认可`。`--write` 不接受冻结的历史基文（旧状态不是新授权），只接受合格复核记录或结构化待复核；`valid_review()` 使用 `allow_unreviewed=False` 的严格版，复核记录永不接受该状态。
+- **结论词与区段**：结论词改为精确匹配 `结论：(实质收敛|认可|通过)` 并要求后接边界，`不予/未/无法` 前缀直接拒绝；`区段：` 必须精确等于所绑 key 且只出现一次（重复或 `.bak` 后缀均阻断）。
+- **基线存在性**：`复核基线：` 除形状外增加 `git cat-file -e <sha>^{commit}` 校验，`deadbeef` 这类不存在的基线阻断。
+- **历史 basis 改写**：六条历史项（`check_anchors`、`check_gap_ledger`、`check_glossary_usage`、`check_ledger_landings`、`check_state`、`check_three_table`）改为显式 `无复核声明：历史指针——…；非权威，不构成认可`，删除 `结论：认可` 字样，并把仓内路径标为“历史指针（仓内转录件）”而非 `复核产物：`。
+- **新增钉扎**：`spec/CHECKER_INPUT_SCHEMA.md#1.11`（封闭枚举全局归一化）纳入 `spec-pins.json`，规格区段 15 → 16。
+- **负例**：`test_checker_pins.py` 11 → 17 条（CP12–CP17：假结论词、重复/带后缀区段、不存在的基线、非白名单 `初始登记：`、白名单对象用同一前缀 `--write`、用冻结旧状态覆盖新改动）；`test_spec_pins.py` 13 → 18 条（SP13–SP17 同构）。
+- **待复核**：本批改动的 7 个脚本（含两个 pins 检查器与两个测试）在 `checker-pins.json` 中登记为 `待复核：批次 0076 …；无复核声明，不构成认可`；`TODO.md` 新增 T-138（`open`）。需另起一轮非同源复核作为放量前的钉扎基础；规则未变，不新增 ADR。
+- **验证**：`test_checker_pins.py` 17/17、`test_spec_pins.py` 18/18；攻击 1（`check_state.py` 加一行 + `--write --basis "初始登记：任意未复核改动"`）rc=2，攻击 1b（手改同一 basis 后默认运行）rc=1，攻击 2（改 A.1 + 更新指纹 + 仓内假复核记录）rc=1；pre-commit 全套 rc=0。
