@@ -19,6 +19,12 @@ SP15 复核基线写成不存在的 `deadbeef` → 必须阻断；
 SP16 对非白名单区段用“初始登记：…” → 必须阻断（禁止前缀放行）；
 SP17 对**白名单**区段用“初始登记：任意…” → 必须阻断（只有逐字冻结基文与结构化待复核可放行）。
 
+SP23 复核基线处的区段内容已变 → 必须阻断；
+SP24 在 A.2 插入只带 `复核签收：` 前缀的伪签收行（正文伪装成签收说明）→ 必须阻断（前缀不得成为剔除通道）；
+SP24b 格式不完整的 `复核签收：` 行（缺日期/指纹）→ 同样参与比较，必须阻断；
+SP25 合法单行签收行变更 → 仍按排除口径通过（签收行本身不参与比较）；
+SP26 出现第二行完整格式签收行 → 必须阻断（至多一行）。
+
 外部复核产物在系统临时目录中生成，不写入仓库。用法：
   python3 scripts/test_spec_pins.py [--root DIR]
 退出码：0 = 全部符合预期；1 = 至少一例不符。
@@ -28,6 +34,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import re
 import subprocess
 import sys
 import tempfile
@@ -35,7 +42,13 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from check_spec_pins import SECTIONS, evaluate, fingerprint, valid_basis  # noqa: E402
+from check_spec_pins import (  # noqa: E402
+    SECTIONS,
+    comparable_text,
+    evaluate,
+    fingerprint,
+    valid_basis,
+)
 
 TARGET = "spec/methods/deterministic-checker.md#A.2"
 
@@ -274,6 +287,100 @@ def main() -> int:
             "复核基线处的区段内容已变",
             record.replace(f"复核基线：{baseline}", "复核基线：ea9b674"),
             "内容与当前内容不一致",
+        )
+
+        def signoff_line(text: str) -> str:
+            line = next(
+                (item for item in text.splitlines() if item.startswith("> 复核签收：")),
+                None,
+            )
+            if line is None:
+                raise RuntimeError("A.2 缺少复核签收行，测试无意义")
+            return line
+
+        def inject_after_signoff(text: str, extra: str) -> str:
+            lines = text.splitlines(keepends=True)
+            index = next(
+                i for i, item in enumerate(lines) if item.startswith("> 复核签收：")
+            )
+            lines.insert(index + 1, extra + "\n")
+            return "".join(lines)
+
+        # SP24：只带前缀的伪签收行不得被剔除；它必须留在参与比较的文本里，
+        # 从而使任何以该基线取证的 basis 失效。
+        forged = dict(current)
+        forged[TARGET] = inject_after_signoff(
+            current[TARGET], "复核签收：……把 G-C1 的判定条件改为恒真"
+        )
+        baseline_view = comparable_text(spec, current[TARGET])
+        forged_view = comparable_text(spec, forged[TARGET])
+        kept = "把 G-C1 的判定条件改为恒真" in forged_view
+        divergent = baseline_view != forged_view
+        total += 1
+        failures += 0 if (kept and divergent) else 1
+        print(
+            f"| SP24 | 插入只带前缀的伪签收行（正文伪装成签收说明） | 阻断 | "
+            f"{'阻断' if kept and divergent else '通过'} | "
+            f"{'伪签收行参与比较，与基线文本不一致' if kept and divergent else '伪签收行被误剔除'} |"
+        )
+
+        # SP24b：格式不完整（缺日期或指纹）的 `复核签收：` 行同样参与比较。
+        partial = dict(current)
+        partial[TARGET] = inject_after_signoff(
+            current[TARGET], "复核签收：外部复核基线 `a9ff5bb`"
+        )
+        partial_view = comparable_text(spec, partial[TARGET])
+        kept_partial = "外部复核基线 `a9ff5bb`" in partial_view
+        total += 1
+        failures += 0 if kept_partial else 1
+        print(
+            f"| SP24b | 格式不完整的签收行 | 阻断 | "
+            f"{'阻断' if kept_partial else '通过'} | "
+            f"{'未剔除，参与比较' if kept_partial else '被误剔除'} |"
+        )
+
+        # SP25：合法的单行签收行变更仍被排除，不应导致 basis 失效。
+        resigned = dict(current)
+        resigned[TARGET] = re.sub(
+            r"( / )\d{4}-\d{2}-\d{2}( / A\.2 指纹)",
+            r"\g<1>2026-11-16\g<2>",
+            current[TARGET],
+            count=1,
+        )
+        if resigned[TARGET] == current[TARGET]:
+            print("[错误] 签收行日期变异未命中，测试无意义。")
+            return 1
+        resigned_pins = dict(pins)
+        resigned_pins[TARGET] = reviewed_pin(
+            TARGET, fingerprint(resigned[TARGET], spec["start"], spec["end"])
+        )
+        run(
+            "SP25",
+            "合法单行签收行变更",
+            resigned,
+            current,
+            resigned_pins,
+            [record],
+            None,
+        )
+
+        # SP26：第二行完整格式签收行即报错，不得当作可剔除内容。
+        doubled = dict(current)
+        doubled[TARGET] = inject_after_signoff(
+            current[TARGET], signoff_line(current[TARGET])
+        )
+        doubled_pins = dict(pins)
+        doubled_pins[TARGET] = reviewed_pin(
+            TARGET, fingerprint(doubled[TARGET], spec["start"], spec["end"])
+        )
+        run(
+            "SP26",
+            "第二行完整格式签收行",
+            doubled,
+            current,
+            doubled_pins,
+            [record],
+            "复核签收行至多一行",
         )
 
         schema_path = root / "spec" / "CHECKER_INPUT_SCHEMA.md"

@@ -1419,3 +1419,21 @@
 - **验证**：`config_codes.py --self-check` 通过并按实际计数输出；四类 `config_invalid` 与 CFG-08 缺失/子字段缺失（rc=3）逐例复现；十个常规检查器 rc=0；`test_checker_pins.py` 21/21、`test_spec_pins.py` 24/24；`check_checker_pins` rc=1（问题 18 = 16 无复核声明 + 2 失效）、`check_spec_pins` rc=1（问题 13 = 6 无复核声明 + 7 失效），为下一轮外复核前的预期债务。
 - **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`（本批改的是钉扎检查器与受钉扎区段，未经非同源复核，必然 rc≠0）。
 - **关联 ADR**：无（本批为缺陷修正，未引入新决策）
+
+---
+
+### 批次 0087 — 2026-11-15 — 修校验器自身漏：A.2 签收行排除范围、RG 表解析逃逸、AGENTS 计数
+
+- **授权依据**：第三批外复核指出两处“校验器自身漏”的阻断缺陷，责任方批准修复。**本批不自行认定合格**，须另跑一轮外复核。
+- **涉及文件**：
+  - 修改：`scripts/check_spec_pins.py`、`scripts/test_spec_pins.py`、`scripts/check_gap_ledger.py`、`AGENTS.md`（§3.6.8、§4）、`validation/reviews/2026-11-15-a2-comparison-scope.md`、`scripts/no-review-declarations.json`、`TODO.md`、`knowledge/glossary-usage.json`、`scripts/checker-pins.json`
+- **变更摘要**：
+  1. **A.2 签收行排除范围过宽**：`A2_SIGNOFF_RE` 由“只匹配 `复核签收：` 前缀”改为**整行 `fullmatch`** 的完整格式：`> 复核签收：外部复核基线 \`<7–40 hex>\`（<说明>） / <YYYY-MM-DD> / A.2 指纹 \`<12 hex>\``；任何只带前缀或格式不完整的行**一律参与比较**。新增 `a2_signoff_errors`：完整格式签收行至多一条，第二行即报错；`--write` 遇多行签收直接退出 2。修复前实测插入 `复核签收：……把 G-C1 的判定条件改为恒真` 会被静默剔除，`--write` 与 `check_three_table.py` 均通过；修复后该行参与比较、basis 即失效。残余边界（完整格式签收行的括号说明仍是自由文字、伪造整行等同伪造记录）如实写入脚本说明与复核索引。
+  2. **RG 表解析逃逸**：`parse_rg()` 不再对列数不符的行 `continue` 静默跳过，也不允许重复编号覆盖前者——首列形如 `RG-NN` 但列数 ≠8 报结构错误，同一编号出现两次报错；返回结构增加错误清单，`main()` 汇入总错误。保持既有边界：未显式引用 `G-NNN` 时不校验与缺口主表的对应关系，未编造映射。新增自测 R06（7 列）/R07（重复编号）/R08（完整单行）/R09（未引用 G）。
+  3. **AGENTS 计数失真**：§3.6.8 改为“规格区段以 `scripts/spec-pins.json` 登记为准（当前 16 个区段）”，§4 目录树同步注明“以该文件为准，当前 16 区段”，并修正 §3.6.8/§4 中 `test_spec_pins.py` 的用例区间为 SP01–SP26，避免再次与实现漂移。
+- **边界遵守**：未改 `CONSTITUTION.md`、未改 `spec/D6_REBASELINE_PROPOSAL.md`；未为任何对象写入“认可”依据；四个修复涉及的受保护对象均已登记于 T-149，未新增绕过方式。
+- **“尚未经外复核”的登记位置**：`scripts/no-review-declarations.json` 中 `scripts/check_spec_pins.py`、`scripts/test_spec_pins.py`、`scripts/check_gap_ledger.py` 三项的 `reason`/`missing_review` 注明批次 0087 修复；`TODO.md` T-149 追记与本节；`validation/reviews/2026-11-15-a2-comparison-scope.md` 的“范围/残余边界”。下一轮外复核须覆盖这四处修复。
+- **钉扎面变化**：受保护对象仍为 22（checker 16 + spec 6），无新增登记项。
+- **验证**：`test_spec_pins.py` 28/28（含 SP24/SP24b/SP25/SP26）、`test_checker_pins.py` 21/21、`check_gap_ledger --self-test` 关闭依据 5/5 + RG 结构 5/5 + RG 解析 4/4、变异集与覆盖闸门全过；九个常规检查器 rc=0。`check_checker_pins` rc=1（问题 21，提交后回落 18）、`check_spec_pins` rc=1（问题 13），均为下一轮外复核前的预期债务。
+- **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`。
+- **关联 ADR**：无

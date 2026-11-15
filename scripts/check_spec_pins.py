@@ -17,7 +17,11 @@
   5. A.2 的内容比较沿用 `check_three_table.a2_block_fingerprint` 的既有口径：
      复核签收行是“复核记录”本身，不是被签收的内容，不参与比较（除此行外，
      A.2 的其余文本仍逐字比较）。若签收行参与比较，写入复核记录这一动作就会让
-     被签收对象失效，合格在结构上不可达；排除范围仅限该行，不扩大到任何其他内容。
+     被签收对象失效，合格在结构上不可达。
+     **排除范围仅限“那一条完整格式的签收行”**：须整行匹配
+     `> 复核签收：外部复核基线 \`<7–40 hex>\`（<说明>） / <YYYY-MM-DD> / A.2 指纹 \`<12 hex>\``，
+     且至多一行（第二行起报错）。只带 `复核签收：` 前缀或格式不完整的行一律参与
+     比较，不得剔除——否则该前缀本身就是可夹带正文的通道。
      理由与范围见 `validation/reviews/2026-11-15-a2-comparison-scope.md`。
   6. `--write` 新增或变更的区段必须附 `--basis`（合格复核记录，或无复核字面量）。
 
@@ -145,16 +149,40 @@ SECTION_BY_KEY = {spec["key"]: spec for spec in SECTIONS}
 A2_KEY = f"{METHOD}#A.2"
 # A.2 的复核签收行记录“谁在何时核对了什么”，属于复核记录本身；
 # `check_three_table.a2_block_fingerprint` 的既有口径也不含该行。
-A2_SIGNOFF_RE = re.compile(r"^\s*>?\s*复核签收：")
+#
+# 排除口径只认**完整格式的该一条签收行**：
+#   > 复核签收：外部复核基线 `<7–40 位十六进制>`（<产物与核对说明>） / <YYYY-MM-DD> / A.2 指纹 `<12 位十六进制>`
+# 必须整行 `fullmatch`，行首、分隔符、日期、指纹缺一不可，行尾不得有任何额外文字。
+# 任何只带 `复核签收：` 前缀、或格式不完整的行**一律参与比较**，不得剔除——否则
+# 该前缀就成了可夹带正文的通道（插入一行 `复核签收：……把判定改成恒真` 即可绕过）。
+# 排除范围仅限这一条签收行，不扩大到“任何以该前缀开头的行”。
+A2_SIGNOFF_RE = re.compile(
+    r"> 复核签收：外部复核基线 `[0-9a-f]{7,40}`（[^（）\n]{1,400}） / "
+    r"\d{4}-\d{2}-\d{2} / A\.2 指纹 `[0-9a-f]{12}`"
+)
+
+
+def a2_signoff_errors(spec: dict, text: str) -> list[str]:
+    """A.2 至多允许一条完整格式的签收行；第二行起即报错（不得当作可剔除内容）。"""
+    if spec["key"] != A2_KEY:
+        return []
+    body = section_text(text, spec["start"], spec["end"])
+    lines = [line for line in body.splitlines() if A2_SIGNOFF_RE.fullmatch(line)]
+    if len(lines) > 1:
+        return [
+            f"{spec['key']}：复核签收行至多一行（实得 {len(lines)} 行完整格式签收行）；"
+            "多行签收不得被当作复核记录剔除，须保留唯一一条"
+        ]
+    return []
 
 
 def comparable_text(spec: dict, text: str) -> str:
-    """按区段定位取文本；A.2 去掉复核签收行后再比，其余区段逐字比较。"""
+    """按区段定位取文本；A.2 只去掉那一条完整格式的签收行，其余逐字比较。"""
     body = section_text(text, spec["start"], spec["end"])
     if spec["key"] != A2_KEY:
         return body
     return "\n".join(
-        line for line in body.splitlines() if not A2_SIGNOFF_RE.match(line)
+        line for line in body.splitlines() if not A2_SIGNOFF_RE.fullmatch(line)
     )
 
 
@@ -332,6 +360,7 @@ def evaluate(
             errors.append(
                 f"{key}：指纹未更新（当前 {actual[:12]}，登记 {registered[:12]}）"
             )
+        errors.extend(a2_signoff_errors(spec, current[key]))
         if isinstance(entry, dict):
             basis = entry.get("basis")
             if not basis:
@@ -435,6 +464,15 @@ def main() -> int:
         pins = load_pins(pins_path)
         previous = pins.get("sections", {})
         if args.write:
+            structural = [
+                problem
+                for spec in SECTIONS
+                for problem in a2_signoff_errors(spec, current[spec["key"]])
+            ]
+            if structural:
+                for problem in structural:
+                    print(f"[错误] {problem}")
+                return 2
             sections = {}
             changed: list[str] = []
             chosen: dict[str, str] = {}

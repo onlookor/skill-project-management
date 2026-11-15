@@ -154,8 +154,15 @@ def parse_ledger(text: str):
 
 
 def parse_rg(text: str):
-    """解析“需求缺口（RG）与配置改判”节：固定 8 列，返回 ({编号: 字段}, 是否可解析)。"""
+    """解析“需求缺口（RG）与配置改判”节：固定 8 列，返回 (行, 是否有节, 表头合规, 结构错误)。
+
+    首列形如 `RG-NN` 的行必须恰为 8 列，且同一编号只能出现一次：
+    列数不符（如漏写“关联”列后的 7 列）与重复编号都会使后者静默覆盖前者，
+    因此一律报结构错误，不得 `continue` 跳过。未显式引用 `G-NNN` 时仍不校验
+    与缺口主表的对应关系（两套编号不同源）。
+    """
     rows = {}
+    errors: list[str] = []
     found = False
     header = False
     in_section = False
@@ -173,16 +180,26 @@ def parse_rg(text: str):
         if first == "编号":
             header = len(cells) == len(RG_FIELDS) + 1 and cells[1:] == list(RG_LABELS.values())
             continue
+        match = RG_ID_RE.match(first)
+        if match is None:
+            continue
         if len(cells) == 9 and cells[-1] == "":
             cells = cells[:8]
-        match = RG_ID_RE.match(first)
-        if len(cells) != 8 or match is None:
+        rg_id = match.group(1)
+        if len(cells) != 8:
+            errors.append(
+                f"[错误] {rg_id} 行有 {len(cells)} 列，RG 表固定 8 列；"
+                "列数不符不得跳过，须补齐或删除该行"
+            )
             continue
-        rows[match.group(1)] = {
+        if rg_id in rows:
+            errors.append(f"[错误] RG 编号重复：{rg_id}（后者不得覆盖前者）")
+            continue
+        rows[rg_id] = {
             field: value.strip("`")
             for field, value in zip(RG_FIELDS, cells[1:])
         }
-    return rows, found, header
+    return rows, found, header, errors
 
 
 def rg_errors(rg_rows: dict, gaps: dict, config_keys: set[str]) -> list[str]:
@@ -313,6 +330,7 @@ def self_test() -> int:
     print()
     print(f"关闭依据字段测试 {len(cases)} 条，符合预期 {len(cases) - failures} 条。")
     failures += rg_self_test()
+    failures += rg_parse_self_test()
     return 0 if not failures else 1
 
 
@@ -361,6 +379,47 @@ def rg_self_test() -> int:
         print(f"| {case_id} | {label} | {want} | {actual} | {evidence} |")
     print()
     print(f"RG 表结构测试 {len(cases)} 条，符合预期 {len(cases) - failures} 条。")
+    return failures
+
+
+def rg_parse_self_test() -> int:
+    """RG 表解析正负例：列数不符与重复编号不得静默跳过。"""
+    header = (
+        "| 编号 | 状态 | 等级 | 原判（第 2 节） | 被配置吸收的部分 | "
+        "仍是缺口的部分 | 剩余关闭出口 | 关联 |"
+    )
+    rule = "|---|---|---|---|---|---|---|---|"
+    row = "| RG-01 | open | L2 | 原判 | 吸收 | 剩余 | 出口 | G-001 |"
+    short = "| RG-02 | open | L2 | 原判 | 吸收 | 剩余 | 出口 |"
+
+    def ledger(*rows: str) -> str:
+        return "\n".join([RG_SECTION, "", header, rule, *rows, ""])
+
+    cases = [
+        ("R06", "列数不足（7 列）", ledger(row, short), "固定 8 列"),
+        ("R07", "RG 编号重复", ledger(row, row), "编号重复"),
+        ("R08", "单行完整", ledger(row), None),
+        ("R09", "未显式引用 G 编号", ledger(short.replace("| 出口 |", "| 出口 | 无 |")), None),
+    ]
+    print("| 编号 | 场景 | 预期 | 实际 | 证据 |")
+    print("|---|---|---|---|---|")
+    failures = 0
+    for case_id, label, text, expected in cases:
+        rows, found, header_ok, errors = parse_rg(text)
+        if expected is None:
+            ok = found and header_ok and bool(rows) and not errors
+            actual = "通过" if ok else "报错"
+            evidence = "无问题" if ok else (errors[0] if errors else "解析未产出数据行")
+            want = "通过"
+        else:
+            ok = any(expected in error for error in errors)
+            actual = "报错" if errors else "未报错"
+            evidence = next((error for error in errors if expected in error), "未命中预期")
+            want = "报错"
+        failures += 0 if ok else 1
+        print(f"| {case_id} | {label} | {want} | {actual} | {evidence} |")
+    print()
+    print(f"RG 表解析测试 {len(cases)} 条，符合预期 {len(cases) - failures} 条。")
     return failures
 
 
@@ -475,7 +534,8 @@ def main() -> int:
         errors.append(f"[错误] TODO.md 的判定口径裁定项 {item} 未进入缺口台账")
 
     # 需求缺口（RG）与配置改判：结构与引用校验。
-    rg_rows, rg_found, rg_header = parse_rg(ledger_text)
+    rg_rows, rg_found, rg_header, rg_parse_errors = parse_rg(ledger_text)
+    errors.extend(rg_parse_errors)
     if not rg_found:
         errors.append(f"[错误] GAP_LEDGER.md 缺少 `{RG_SECTION}` 节")
     elif not rg_header or not rg_rows:

@@ -18,7 +18,7 @@
       "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：scripts/check_coverage_gate.py 结论：认可"
     },
     "scripts/check_gap_ledger.py": {
-      "sha256": "6408271c6148ca0a60d913ef85b4dd945151ce59a999d77157ad83cb5b9c217f",
+      "sha256": "56180ee78171b20b4a7a5547c21da9c019f1258718d51ebe5cc6f1aee093be9b",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/check_glossary_usage.py": {
@@ -34,7 +34,7 @@
       "basis": "非同源复核：G-019 r6（基线 bafcb04）要求撤掉 pattern 嵌套量词启发式只留 512 字符上限、退出码表述与实现对齐、替换范围表述与实测对齐。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r6/REPORT.md；sha256：1db2586ee7f5614920fc6a6ab3f2afc34c4445ff997df8b0aaec48327d6bd1db；复核基线：bafcb04 区段：scripts/check_no_raw_material.py 结论：认可"
     },
     "scripts/check_spec_pins.py": {
-      "sha256": "48190103e3b52fae66f15051d8ea6c3fbc7dbd8bc27909cdacb0fbe3d09692db",
+      "sha256": "871314dd8d34f61b76d794d94aaa6f9a075651753868916951536293e636068c",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/check_state.py": {
@@ -58,7 +58,7 @@
       "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：scripts/test_coverage_gate.py 结论：认可"
     },
     "scripts/test_spec_pins.py": {
-      "sha256": "f847ad1d31110a58e24569d9b61640c8711884b1fdc5e23e5cb6452cbd99358e",
+      "sha256": "b19680e6c99e1da14162b3f17ccb3ce1d8aad83cb3decc2a65af75e8df17527a",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/validate_ontology.py": {
@@ -78,7 +78,7 @@
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/no-review-declarations.json": {
-      "sha256": "1b3701643c60dc1f27893a1d415da9a1de6db8d7ea4736ee9e61c34d10229b47",
+      "sha256": "73d2f23a72a9da25e96d436da105eb635343d37afb007b3d5d1f507d68fc8eba",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "validation/pinned/checker.py": {
