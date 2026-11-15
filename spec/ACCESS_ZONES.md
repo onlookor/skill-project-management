@@ -72,6 +72,7 @@
 | `ontology/fixtures/manifest.json` | json-object | `contracts/schema/ontology-fixtures-manifest.schema.json` |
 | `scripts/anchor_baseline.json` | json-object | 生成器 `scripts/check_anchors.py --write` |
 | `scripts/checker-pins.json` | json-object | 生成器 `scripts/check_checker_pins.py --write` |
+| `scripts/dependency-pins.json` | json-object | 生成器 `scripts/check_dependency_pins.py --write` |
 | `scripts/spec-pins.json` | json-object | 生成器 `scripts/check_spec_pins.py --write` |
 | `validation/checker-prototype/coverage.json` | json-object | 生成器 `scripts/check_coverage_gate.py --write` |
 

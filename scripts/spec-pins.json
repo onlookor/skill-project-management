@@ -73,9 +73,9 @@
       "basis": "非同源复核：G-019 r3（基线 3664b64）要求 schema 全量入指纹、补完整性 lint 与按路径配额。 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r3/REPORT.md sha256：877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0 复核基线：3664b64"
     },
     "spec/ACCESS_ZONES.md": {
-      "sha256": "da1dc7e5c8d0af77d7c197318ac93adce116d2def05475d3cdee3c462d501859",
+      "sha256": "ce70a2185a5c200284cc89dbbc84609530b38a2c2bf8b20c2e7d3e9fb3993915",
       "path": "spec/ACCESS_ZONES.md",
-      "basis": "非同源复核：G-019 r3（基线 3664b64）第四节要求 source_pages 头字段；n/a 依据按用户 2026-11-15 裁定收紧。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r3/REPORT.md；sha256：877047e8f825ad905f560fc27bd6b94dd19277edd80a6d44a0912cd6c707f0b0；复核基线：3664b64"
+      "basis": "非同源复核：G-019 r4（基线 f049f28）指出自写子集语义失真；成熟实现与依赖指纹按用户 2026-11-15 裁定。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md；sha256：47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb；复核基线：f049f28"
     }
   }
 }

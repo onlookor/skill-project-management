@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "note": "外部校验依赖指纹；版本、分发产物 sha256 与安装树摘要须同时匹配",
+  "packages": {
+    "jsonschema": {
+      "version": "4.26.0",
+      "artifact": {
+        "filename": "jsonschema-4.26.0-py3-none-any.whl",
+        "sha256": "d489f15263b8d200f8387e64b4c3a75f06629559fb73deb8fdfb525f2dab50ce"
+      },
+      "installed": {
+        "record_sha256": "9dde6b87861f51e76f8ce1a5d5b559d03793ce6e900eb28ce54ee32bc998f7aa",
+        "files": 45
+      },
+      "reason": "ADR-0019"
+    }
+  }
+}

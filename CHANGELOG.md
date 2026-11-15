@@ -1089,3 +1089,14 @@
 - **自测**：58 → 65 项。新增 7 项覆盖“只写 n/a 无依据”（`RM-ONTO-HEADER` + `RM-ONTO-PROVENANCE` 同时命中）、“依据为空串”、“占位符 `n/a` / `TBD`”、“指向不存在的 ADR”均阻断，附自写理由与仓库内 ADR 引用放行，`n/a` 与正文页码矛盾仍阻断。
 - **涉及文件**：`scripts/check_no_raw_material.py`、`ontology/pmbok8-vocab.ttl`、`ontology/pmbok8-shapes.ttl`、`spec/ACCESS_ZONES.md`、`scripts/README.md`、`GAP_LEDGER.md`、`TODO.md`、`CHANGELOG.md`、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`validation/reviews/2026-11-15-source-pages-na-basis.md`。
 - **状态**：生效（G-019/G-021 仍 `open`）
+
+---
+
+### 批次 0064 — 2026-11-15 — 改用成熟 JSON Schema 实现（第一段：依赖与 ADR）
+
+- **性质**：按用户裁定以成熟实现替换自写 `validate()` 子集。基线 `f049f28`。
+- **ADR**：新增 `adr/0019-mature-json-schema-validator.md`（accepted）——记录放弃自写子集的理由、两个被否方案（继续扩充自写、改为代码校验函数）、例外范围（只覆盖校验语义，不覆盖数据与证据）与三档撤销条件（换成熟实现 / 限关键字自写 / 判无法评估）。
+- **依赖与指纹**：固定 `jsonschema==4.26.0`；新增 `scripts/dependency-pins.json`，登记分发产物 wheel 的 sha256（`d489f15263b8d200f8387e64b4c3a75f06629559fb73deb8fdfb525f2dab50ce`）与安装树 `RECORD` 摘要（45 个文件）；新增 `scripts/check_dependency_pins.py` 核对版本、安装树与产物三重指纹，产物缺席只警告，依赖缺失退出 2（不降级为跳过）。负例 `scripts/test_dependency_pins.py` 9/9。
+- **接线**：`spec/ACCESS_ZONES.md` §2 登记指纹文件；根 `README.md` 与 `scripts/README.md` 写安装与核对步骤；`.githooks/pre-commit` 增加依赖指纹与负例。
+- **涉及文件**：`adr/0019-mature-json-schema-validator.md`、`scripts/dependency-pins.json`、`scripts/check_dependency_pins.py`、`scripts/test_dependency_pins.py`、`spec/ACCESS_ZONES.md`、`README.md`、`scripts/README.md`、`.githooks/pre-commit`、`TODO.md`、`CHANGELOG.md`、`scripts/spec-pins.json`、`scripts/checker-pins.json`。
+- **状态**：第一段完成；第二段（接入与契约不变）与第三段（r4 验收）待做。G-019/G-021 仍 `open`。

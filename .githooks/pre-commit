@@ -29,6 +29,8 @@ run_check "原型 null 快检子集" python3 validation/checker-prototype/checke
 run_check "原型嵌套缺键快检（53 项）" python3 validation/checker-prototype/checker.py --nested-missing-sweep --quiet
 run_check "原型封闭枚举快检（4 项）" python3 validation/checker-prototype/checker.py --enum-sweep --quiet
 run_check "scripts/check_checker_pins.py" python3 scripts/check_checker_pins.py
+run_check "scripts/check_dependency_pins.py" python3 scripts/check_dependency_pins.py
+run_check "scripts/check_dependency_pins.py 负例" python3 scripts/test_dependency_pins.py
 run_check "scripts/check_spec_pins.py" python3 scripts/check_spec_pins.py
 run_check "scripts/check_glossary_usage.py" python3 scripts/check_glossary_usage.py
 run_check "scripts/check_state.py" python3 scripts/check_state.py
