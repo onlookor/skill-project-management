@@ -4,7 +4,7 @@
 CP01 改普通检查器但不更新登记 → 阻断；
 CP02 更新登记但不给 basis → 拒绝（退出 2）；
 CP03 `--write --basis "测试"`（自由文本）→ 拒绝（退出 2）；
-CP04 更新登记并给出合格的非同源复核记录 → 通过；
+CP04 更新登记并给出合格的非同源复核记录（复核基线含当前内容）→ 通过；
 CP05 把根检查器（验收原型）换成空壳 → 阻断；
 CP06 删除 pre-commit 里的一条检查行 → 阻断；
 CP07 验收检查器与快照不一致 → 阻断（漂移检测）；
@@ -17,7 +17,8 @@ CP13 区段重复/带后缀 → 阻断（必须精确等值且只一条）；
 CP14 复核基线写成不存在的 `deadbeef` → 阻断；
 CP15 对非白名单对象用“初始登记：任意未复核改动” → 阻断（禁止前缀放行）；
 CP16 对**白名单内**对象（check_state.py）用同一前缀 --write → 拒绝（退出 2，只有冻结基文或结构化待复核可放行）；
-CP17 用冻结历史基文“初始登记”覆盖白名单对象的新改动 → 拒绝（旧状态不是新授权）。
+CP17 用冻结历史基文“初始登记”覆盖白名单对象的新改动 → 拒绝（旧状态不是新授权）；
+CP21 对象在复核基线之后被改过（基线内容 ≠ 当前内容）→ 拒绝（basis 失效，须重新取证）。
 
 用法：python3 scripts/test_checker_pins.py [--root DIR]
 退出码：0 = 全部符合预期；1 = 至少一例不符。
@@ -165,13 +166,28 @@ def main() -> int:
         rows.append(("CP03", "basis 写成自由文本“测试”", "拒绝" if ok else "未拒绝",
                      str(result.returncode), evidence(result.stdout, expected)))
 
-        result = run(root, base, "--write", "--basis", valid_basis)
+        # CP04 的复核必须针对当前内容：把 v2 提交为新的基线，basis 指向它。
+        subprocess.run(["git", "add", "-A"], cwd=base, check=True)
+        subprocess.run(
+            ["git", "-c", "user.email=t@example.com", "-c", "user.name=t",
+             "commit", "-qm", "sample v2"],
+            cwd=base,
+            check=True,
+        )
+        changed_sha = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=base, capture_output=True, text=True
+        ).stdout.strip()
+        current_basis = valid_basis.replace(
+            f"复核基线：{baseline_sha}", f"复核基线：{changed_sha}"
+        )
+
+        result = run(root, base, "--write", "--basis", current_basis)
         ok = result.returncode == 0
         if ok:
             result = run(root, base)
             ok = result.returncode == 0
         failures += 0 if ok else 1
-        rows.append(("CP04", "合格复核记录更新登记", "通过" if ok else "未通过",
+        rows.append(("CP04", "合格复核记录更新登记（基线含当前内容）", "通过" if ok else "未通过",
                      str(result.returncode), "登记与工作区一致" if ok else result.stdout.strip()))
 
         # 默认读取模式也必须校验 basis 内容（CP08–CP11 只改 basis 文本，不动哈希）。
@@ -239,7 +255,7 @@ def main() -> int:
             failures += 0 if ok else 1
             rows.append((number, scene, "阻断" if ok else "未阻断",
                          str(result.returncode), evidence(result.stdout, expected)))
-        mutate_basis(valid_basis)
+        mutate_basis(current_basis)
 
         # 自我声明不再放行：无复核字面量、括号补充、无关基线、新增 helper、改登记表。
         mutate_basis("无复核声明（不构成认可，不放行）")
@@ -262,14 +278,16 @@ def main() -> int:
             ["git", "commit-tree", f"{baseline_sha}^{{tree}}", "-m", "orphan"],
             cwd=base, capture_output=True, text=True,
         ).stdout.strip()
-        mutate_basis(valid_basis.replace(f"复核基线：{baseline_sha}", f"复核基线：{dangling}"))
+        mutate_basis(
+            current_basis.replace(f"复核基线：{changed_sha}", f"复核基线：{dangling}")
+        )
         result = run(root, base)
         expected = "不是 HEAD 的祖先提交"
         ok = result.returncode == 1 and expected in result.stdout
         failures += 0 if ok else 1
         rows.append(("CP18", "复核基线是无关提交", "阻断" if ok else "未阻断",
                      str(result.returncode), evidence(result.stdout, expected)))
-        mutate_basis(valid_basis)
+        mutate_basis(current_basis)
 
         helper = base / "scripts" / "helper_util.py"
         helper.write_text("print('helper')\n", encoding="utf-8")
@@ -320,6 +338,15 @@ def main() -> int:
         ok = result.returncode == 1 and expected in result.stdout
         failures += 0 if ok else 1
         rows.append(("CP07", "验收检查器与快照不一致", "阻断" if ok else "未阻断",
+                     str(result.returncode), evidence(result.stdout, expected)))
+
+        subprocess.run(["git", "checkout", "--", "."], cwd=base, check=True)
+        sample.write_text("print('checker v3')\n", encoding="utf-8")
+        result = run(root, base, "--write", "--basis", current_basis)
+        expected = "内容与当前内容不一致"
+        ok = result.returncode == 2 and expected in result.stdout
+        failures += 0 if ok else 1
+        rows.append(("CP21", "复核基线处的对象内容已变", "拒绝" if ok else "未拒绝",
                      str(result.returncode), evidence(result.stdout, expected)))
 
     print("| 编号 | 场景 | 预期 | 实际 | 证据 |")

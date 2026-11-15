@@ -7,6 +7,7 @@
 
 import argparse
 import hashlib
+import json
 import re
 import subprocess
 import sys
@@ -15,6 +16,8 @@ from pathlib import Path
 LEDGER = "GAP_LEDGER.md"
 METHOD = "spec/methods/deterministic-checker.md"
 TODO = "TODO.md"
+CONFIG_SCHEMA = "contracts/schema/runtime-config.schema.json"
+RG_SECTION = "## 需求缺口（RG）与配置改判"
 
 LEVEL_MAX = {"L1": 1, "L2": 2, "L3": 2}
 CAUSES = {
@@ -41,7 +44,27 @@ SAME_SOURCE_MARKERS = (
 
 MILESTONE_RE = re.compile(r"^M([0-7])$")
 GAP_ID_RE = re.compile(r"^G-\d{3}$")
+RG_ID_RE = re.compile(r"^(RG-\d{2})(?:\s|（|$)")
+CFG_ID_RE = re.compile(r"CFG-\d{2}")
 TODO_ID_RE = re.compile(r"^T-\d{3}$")
+RG_FIELDS = (
+    "status",
+    "level",
+    "ruling",
+    "absorbed",
+    "remaining",
+    "exit",
+    "related",
+)
+RG_LABELS = {
+    "status": "状态",
+    "level": "等级",
+    "ruling": "原判（第 2 节）",
+    "absorbed": "被配置吸收的部分",
+    "remaining": "仍是缺口的部分",
+    "exit": "剩余关闭出口",
+    "related": "关联",
+}
 
 
 def repo_root() -> Path:
@@ -124,6 +147,76 @@ def parse_ledger(text: str):
         elif len(cells) == 4 and re.fullmatch(r"[A-Z_]+", first):
             audit[first] = {"conclusion": cells[2], "reviewed": cells[3]}
     return current, audit, gaps
+
+
+def parse_rg(text: str):
+    """解析“需求缺口（RG）与配置改判”节：固定 8 列，返回 ({编号: 字段}, 是否可解析)。"""
+    rows = {}
+    found = False
+    header = False
+    in_section = False
+    for line in text.splitlines():
+        if line.startswith("## "):
+            in_section = line.startswith(RG_SECTION)
+            found = found or in_section
+            continue
+        if not in_section:
+            continue
+        cells = split_row(line)
+        if not cells:
+            continue
+        first = cells[0].strip("`")
+        if first == "编号":
+            header = len(cells) == len(RG_FIELDS) + 1 and cells[1:] == list(RG_LABELS.values())
+            continue
+        if len(cells) == 9 and cells[-1] == "":
+            cells = cells[:8]
+        match = RG_ID_RE.match(first)
+        if len(cells) != 8 or match is None:
+            continue
+        rows[match.group(1)] = {
+            field: value.strip("`")
+            for field, value in zip(RG_FIELDS, cells[1:])
+        }
+    return rows, found, header
+
+
+def rg_errors(rg_rows: dict, gaps: dict, config_keys: set[str]) -> list[str]:
+    """RG 表结构：改判列非空、状态词合法且不得 closed、CFG 引用真实存在。
+
+    状态与缺口主表的一致性只在 RG 行显式引用 `G-NNN` 时可比对：RG 编号来自
+    D6 第 8 节的需求缺口，G 编号来自“规则正文 ↔ 判定列”缺口，两套编号不同源；
+    引用存在即要求目标存在且状态相同，未引用则不据此报错（不凭空造映射）。
+    """
+    errors: list[str] = []
+    for rg_id, row in rg_rows.items():
+        if row["status"] not in STATUSES:
+            errors.append(f"[错误] {rg_id} 的状态 `{row['status']}` 非法")
+        if row["status"] == "closed":
+            errors.append(
+                f"[错误] {rg_id} 的改判不得以 closed 收尾；"
+                "关闭必须走缺口主表的常规关闭依据（AGENTS.md 3.6.6）"
+            )
+        if row["level"] not in LEVEL_MAX:
+            errors.append(f"[错误] {rg_id} 的等级 `{row['level']}` 非法")
+        for field in ("ruling", "absorbed", "remaining", "exit"):
+            if not row[field]:
+                errors.append(f"[错误] {rg_id} 的「{RG_LABELS[field]}」为空")
+        for gap_id in re.findall(r"G-\d{3}", row["related"]):
+            if gap_id not in gaps:
+                errors.append(f"[错误] {rg_id} 关联了不存在的缺口 {gap_id}")
+            elif gaps[gap_id]["status"] != row["status"]:
+                errors.append(
+                    f"[错误] {rg_id} 的状态 `{row['status']}` 与缺口主表 "
+                    f"{gap_id} 的 `{gaps[gap_id]['status']}` 不一致"
+                )
+        if config_keys:
+            for ref in sorted(set(CFG_ID_RE.findall(" ".join(row.values())))):
+                if ref not in config_keys:
+                    errors.append(
+                        f"[错误] {rg_id} 引用了配置 schema 中不存在的键 {ref}"
+                    )
+    return errors
 
 
 def parse_checks(text: str):
@@ -215,14 +308,63 @@ def self_test() -> int:
             )
     print()
     print(f"关闭依据字段测试 {len(cases)} 条，符合预期 {len(cases) - failures} 条。")
+    failures += rg_self_test()
     return 0 if not failures else 1
+
+
+def rg_self_test() -> int:
+    """RG 表结构正负例：字段非空、状态一致、CFG 引用真实、改判不得 closed。"""
+    gaps = {"G-001": {"status": "open"}, "G-002": {"status": "closed"}}
+    config_keys = {"CFG-01", "CFG-02"}
+    base = {
+        "status": "open",
+        "level": "L2",
+        "ruling": "原判",
+        "absorbed": "改判至 CFG-01",
+        "remaining": "判据仍缺",
+        "exit": "非同源复核",
+        "related": "G-001",
+    }
+
+    def rows(**overrides) -> dict:
+        row = dict(base)
+        row.update(overrides)
+        return {"RG-01": row}
+
+    cases = [
+        ("R01", "字段齐全、状态一致", rows(), None),
+        ("R02", "被配置吸收的部分为空", rows(absorbed=""), "为空"),
+        ("R03", "改判导致 closed", rows(status="closed"), "不得以 closed"),
+        ("R04", "RG→CFG 指向不存在的键", rows(absorbed="改判至 CFG-99"), "不存在的键"),
+        ("R05", "状态与主表不一致", rows(related="G-002"), "不一致"),
+    ]
+    print("| 编号 | 场景 | 预期 | 实际 | 证据 |")
+    print("|---|---|---|---|---|")
+    failures = 0
+    for case_id, label, rg_rows, expected in cases:
+        errors = rg_errors(rg_rows, gaps, config_keys)
+        if expected is None:
+            ok = not errors
+            actual = "通过" if ok else "报错"
+            evidence = "无问题" if ok else errors[0]
+            want = "通过"
+        else:
+            ok = any(expected in error for error in errors)
+            actual = "报错" if errors else "未报错"
+            evidence = next((error for error in errors if expected in error), "未命中预期")
+            want = "报错"
+        failures += 0 if ok else 1
+        print(f"| {case_id} | {label} | {want} | {actual} | {evidence} |")
+    print()
+    print(f"RG 表结构测试 {len(cases)} 条，符合预期 {len(cases) - failures} 条。")
+    return failures
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--staged", action="store_true", help="检查暂存区是否同步更新台账")
     parser.add_argument("--root", help="仓库根目录；默认由 git 推断")
-    parser.add_argument("--self-test", action="store_true", help="关闭依据字段正负例")
+    parser.add_argument("--self-test", action="store_true", help="关闭依据与 RG 表结构正负例")
     args = parser.parse_args()
 
     if args.self_test:
@@ -327,6 +469,20 @@ def main() -> int:
         tracked_todo.update(re.findall(r"T-\d{3}", gap["todo"]))
     for item in sorted(todo_items - tracked_todo):
         errors.append(f"[错误] TODO.md 的判定口径裁定项 {item} 未进入缺口台账")
+
+    # 需求缺口（RG）与配置改判：结构与引用校验。
+    rg_rows, rg_found, rg_header = parse_rg(ledger_text)
+    if not rg_found:
+        errors.append(f"[错误] GAP_LEDGER.md 缺少 `{RG_SECTION}` 节")
+    elif not rg_header or not rg_rows:
+        errors.append(f"[错误] {RG_SECTION} 的表头或数据行无法解析（固定 8 列）")
+    config_keys: set[str] = set()
+    try:
+        schema = json.loads((root / CONFIG_SCHEMA).read_text(encoding="utf-8"))
+        config_keys = set(schema["properties"]["config"]["properties"])
+    except (OSError, json.JSONDecodeError, KeyError, TypeError) as exc:
+        errors.append(f"[错误] 无法从 {CONFIG_SCHEMA} 读取配置键：{exc}")
+    errors.extend(rg_errors(rg_rows, gaps, config_keys))
 
     # 到期计算。
     overdue = []

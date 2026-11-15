@@ -10,7 +10,7 @@
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/check_checker_pins.py": {
-      "sha256": "329a94ac464cab987e016ca755d81d6f125cdae398804266ef6b3c32cf56cd29",
+      "sha256": "1b66902cfbdaec555701487e4ffa896facafd5c18f7b2fa5f70a756c5f5ee014",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/check_coverage_gate.py": {
@@ -18,7 +18,7 @@
       "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：scripts/check_coverage_gate.py 结论：认可"
     },
     "scripts/check_gap_ledger.py": {
-      "sha256": "58ddb3692d2d82bc31fe8cc1115d6e8a2e7684b0340a8536585d12b34f955e5c",
+      "sha256": "a7234e47dadab05d4ba78cbd887ad4600ee2e68fc67a1f51d7a037227cd8b9c3",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/check_glossary_usage.py": {
@@ -34,7 +34,7 @@
       "basis": "非同源复核：G-019 r6（基线 bafcb04）要求撤掉 pattern 嵌套量词启发式只留 512 字符上限、退出码表述与实现对齐、替换范围表述与实测对齐。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r6/REPORT.md；sha256：1db2586ee7f5614920fc6a6ab3f2afc34c4445ff997df8b0aaec48327d6bd1db；复核基线：bafcb04 区段：scripts/check_no_raw_material.py 结论：认可"
     },
     "scripts/check_spec_pins.py": {
-      "sha256": "9c120d4710d9a860d23239e971e897d53f0c6f2f04a32fccf560e9d91734d3a5",
+      "sha256": "bd193d5ef962272fc2a3c5f8a64d450406408b20bcf247cf5a960dde4067d8a8",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/check_state.py": {
@@ -50,7 +50,7 @@
       "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：scripts/test_check_table_mutations.py 结论：认可"
     },
     "scripts/test_checker_pins.py": {
-      "sha256": "9a9d626fd6a9a6a66510f8c4072e2ca7bb9600769c63f1185d311f49e9c76beb",
+      "sha256": "7abba7449200b7ba487c1a037bd0bb5a21584537d0f184c29e13ca1fa9dd3de9",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/test_coverage_gate.py": {
@@ -58,7 +58,7 @@
       "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：scripts/test_coverage_gate.py 结论：认可"
     },
     "scripts/test_spec_pins.py": {
-      "sha256": "4984575f4e5f7d45acbd908812a608b0a2093789ba7ebcaab5a5be75300b95d8",
+      "sha256": "f847ad1d31110a58e24569d9b61640c8711884b1fdc5e23e5cb6452cbd99358e",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/validate_ontology.py": {

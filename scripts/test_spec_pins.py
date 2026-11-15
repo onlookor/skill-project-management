@@ -269,6 +269,12 @@ def main() -> int:
             record.replace(f"复核基线：{baseline}", f"复核基线：{dangling}"),
             "不是 HEAD 的祖先提交",
         )
+        bad_basis(
+            "SP23",
+            "复核基线处的区段内容已变",
+            record.replace(f"复核基线：{baseline}", "复核基线：ea9b674"),
+            "内容与当前内容不一致",
+        )
 
         schema_path = root / "spec" / "CHECKER_INPUT_SCHEMA.md"
         extra = dict(current)

@@ -11,7 +11,8 @@ basis 只有两种合法形态：
   1. 合格的非同源复核记录：含 `非同源复核：`、`复核产物：<仓库外存在的文件>`、
      `sha256：<64 位>`（与产物实算一致）、`复核基线：<HEAD 的祖先提交>`、
      唯一一条精确等值的 `区段：`，以及**行尾**结论词（`实质收敛`/`认可`/`通过`，
-     后面不得跟括号补充）；
+     后面不得跟括号补充）；并且**该基线处的对象内容必须与当前工作区字节一致**——
+     复核只对内容负责，对象在基线之后被改过即 basis 失效，必须重新取证；
   2. 固定字面量 `无复核声明（不构成认可，不放行）`——它**不构成认可、也不放行**，
      登记项会持续报错，只能以 `git commit --no-verify` 提交，并须在
      `scripts/no-review-declarations.json` 与 `TODO.md` 到期项中留痕（AGENTS.md 3.5.3）。
@@ -102,6 +103,8 @@ def valid_basis(root: Path, text: str, key: str) -> tuple[bool, str]:
 
     五要素：`非同源复核：`、仓库外 `复核产物：`、与产物一致的 `sha256：`、
     `复核基线：`（HEAD 的祖先提交）、唯一且等值的 `区段：`、行尾结论词。
+    另加内容一致性：`git show <复核基线>:<对象>` 必须与当前工作区字节一致，
+    否则 basis 失效（复核只对当时的内容负责），须重新取证。
     """
     text = text.strip()
     if text == DECLARATION:
@@ -155,6 +158,19 @@ def valid_basis(root: Path, text: str, key: str) -> tuple[bool, str]:
         return False, (
             f"缺少结论词或其后紧跟补充说明（{'/'.join(CONCLUSIONS)}）；"
             "结论词后只允许行尾或 `；`/`。` 分隔，不得跟括号"
+        )
+    target = root / key
+    if not target.is_file():
+        return False, f"受保护对象不存在：{key}"
+    shown = subprocess.run(
+        ["git", "show", f"{sha}:{key}"], cwd=root, capture_output=True
+    )
+    if shown.returncode != 0:
+        return False, f"复核基线 {sha} 中不存在对象 {key}"
+    if shown.stdout != target.read_bytes():
+        return False, (
+            f"basis 失效：复核基线 {sha} 处的 {key} 内容与当前内容不一致，需重新取证"
+            "（复核只对基线处的内容负责）"
         )
     return True, ""
 

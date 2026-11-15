@@ -8,7 +8,8 @@
   3. 区段相对 HEAD 有改动时，同一提交必须附合格的非同源复核记录，否则阻断；
   4. basis 只有两种合法形态：(a) 合格的非同源复核记录——指向**仓库外**存在的产物、
      `sha256：` 与之一致、`复核基线：` 是 HEAD 的祖先提交、唯一且等值的 `区段：`、
-     **行尾**结论词（后面不得跟括号补充）；(b) 固定字面量
+     **行尾**结论词（后面不得跟括号补充），并且**该基线处的同一区段内容必须与当前
+     内容一致**——区段在基线之后被改过即 basis 失效，必须重新取证；(b) 固定字面量
      `无复核声明（不构成认可，不放行）`——它记录事实但**永不放行**，登记项会持续
      报错，只能 `git commit --no-verify` 并在 `scripts/no-review-declarations.json`
      与 `TODO.md` 到期项中留痕（AGENTS.md 3.5.3）。不存在“待复核/初始登记”通行证。
@@ -133,6 +134,24 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+SECTION_BY_KEY = {spec["key"]: spec for spec in SECTIONS}
+
+
+def baseline_section(root: Path, sha: str, spec: dict) -> str | None:
+    """按区段定位规则，从 `git show <sha>:<path>` 中取出同一区段文本。"""
+    shown = subprocess.run(
+        ["git", "show", f"{sha}:{spec['path']}"], cwd=root, capture_output=True
+    )
+    if shown.returncode != 0:
+        return None
+    try:
+        return section_text(
+            shown.stdout.decode("utf-8"), spec["start"], spec["end"]
+        )
+    except (UnicodeDecodeError, ValueError):
+        return None
+
+
 def discover_schema_files(root: Path) -> list[str]:
     """`contracts/schema/` 下全部文件（含子目录）；未登记为区段即视为漏钉。"""
     directory = root / SCHEMA_DIR
@@ -199,6 +218,25 @@ def valid_basis(root: Path, text: str, key: str) -> tuple[bool, str]:
         return False, (
             f"缺少结论词或其后紧跟补充说明（{'/'.join(CONCLUSIONS)}）；"
             "结论词后只允许行尾或 `；`/`。` 分隔，不得跟括号"
+        )
+    spec = SECTION_BY_KEY.get(key)
+    if spec is None:
+        return False, f"未登记的区段：{key}"
+    base_text = baseline_section(root, sha, spec)
+    if base_text is None:
+        return False, f"复核基线 {sha} 中不存在区段 {key} 的源文件或起点"
+    try:
+        current_text = section_text(
+            (root / spec["path"]).read_text(encoding="utf-8"),
+            spec["start"],
+            spec["end"],
+        )
+    except (OSError, ValueError) as exc:
+        return False, f"无法定位当前区段 {key}：{exc}"
+    if base_text != current_text:
+        return False, (
+            f"basis 失效：复核基线 {sha} 处的区段 {key} 内容与当前内容不一致，"
+            "需重新取证（复核只对基线处的内容负责）"
         )
     return True, ""
 
@@ -292,7 +330,8 @@ def evaluate(
                 f"{key}：区段已改动但同一提交缺少合格的非同源复核记录"
                 f"（需含且仅含一条 `区段：{key}`、结论词 {'/'.join(CONCLUSIONS)}，"
                 "且 `复核产物：` 指向仓库外文件、`sha256：` 与之一致、"
-                "`复核基线：` 指向仓库内存在的提交）"
+                "`复核基线：` 指向仓库内存在的提交，复核基线处的区段内容与当前一致；"
+                "区段改动后须重新取证）"
             )
     if registry is None:
         try:

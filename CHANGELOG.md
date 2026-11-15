@@ -1380,3 +1380,23 @@
 - **验证**：`config_codes.py --self-check` rc=0（15 项）；样例 `ok=0`、CFG-14 标签数不足=2、缺 CFG-15=2、`SKILL-01` 混入=2（schema 两项违规）；`check_no_raw_material` rc=0。
 - **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`（仅刷新既有无复核对象的指纹，未新增对象）。
 - **关联 ADR**：无（编号扩展由责任方直接裁定）。
+
+---
+
+### 批次 0085 — 2026-11-15 — 只改尺子：pins 内容一致性、RG 表结构校验、EVM 入表 ADR
+
+- **授权依据**：责任方批准 T-149 复核第一批，并明确本批口径——**只改“尺子”，不重做任何被复核对象**；合格仍是要求，不出现“标着认可而实际没过”的对象。
+- **涉及文件**：
+  - 修改：`scripts/check_checker_pins.py`、`scripts/check_spec_pins.py`、`scripts/check_gap_ledger.py`、`scripts/test_checker_pins.py`、`scripts/test_spec_pins.py`、`AGENTS.md`（3.6.6 / 3.6.8 / 目录树）、`scripts/README.md`、`TODO.md`（T-149 追记）、`scripts/checker-pins.json`、`scripts/spec-pins.json`
+  - 新建：`adr/0021-evm-source-admission.md`
+- **变更摘要**：
+  1. **pins 内容一致性（文件级）**：`valid_basis` 在“复核基线是 HEAD 祖先”之外，新增 `git show <复核基线>:<对象>` 与当前工作区**字节一致**的校验；不一致即 basis 失效、退出 2（`--write`）/退出 1（默认），提示重新取证。校验顺序放在五要素之后，不遮蔽原有诊断。
+  2. **pins 内容一致性（区段级）**：按该区段定位规则从基线版本取出同一区段文本（`section_text`），与当前区段文本比较；抓取失败或起点缺失同样判失效。`evaluate` 的“区段已改动但缺少复核记录”提示补上“复核须覆盖当前内容”。
+  3. **RG 表结构校验**：`check_gap_ledger.py` 解析“需求缺口（RG）与配置改判”节（固定 8 列）；改判列（被配置吸收的部分）与剩余缺口列（仍是缺口的部分）非空；状态词合法且**不得为 `closed`**（关闭只能走缺口主表的关闭依据）；`RG→CFG` 引用必须存在于 `runtime-config.schema.json` 的 `properties.config.properties`；RG 行显式引用 `G-NNN` 时须存在且状态一致。新增 `--self-test` 的 R01–R05 正负例。**边界如实说明**：RG 编号来自 D6 第 8 节、G 编号来自“规则↔判定列”缺口，两套编号不同源；不造映射，故“与主表一致”只在显式引用时生效。
+  4. **EVM 入表 ADR（ADR-0021）**：补记批次 0081 已批准但缺 ADR 的五条来源（`GAO-20-195G`、`NASA-NTRS-20200000301`、`NASA-NTRS-20180001499`、`DOE-G-413.3-10A`、`AACE-RP-82R-13`）：章节级准入的理由、三条使用条件、`pending:T-151` 的例外依据、不引 PMI/ANSI 付费标准的理由、替代方案与负面结果。
+  5. **测试**：`test_checker_pins.py` 增 CP21（基线处对象内容已变 → 拒绝），CP04 改为先提交新内容再附复核记录（复核必须覆盖当前内容）；`test_spec_pins.py` 增 SP23（基线处区段内容已变 → 阻断）。CP04 现为 21 项、SP 现为 24 项，均全过。
+- **边界遵守**：未改 `CONSTITUTION.md`、未改 `spec/D6_REBASELINE_PROPOSAL.md`；未修改任何被复核对象的内容（9 个真复核对象的条目文本、7 份数据 schema、方法 A.2 均未动）；未把失效依据改成无复核字面量，也未用旧复核顶新内容。
+- **钉扎面变化**：受保护对象仍为 22（checker 16 + spec 6），**无复核对象数不变**；本批修改的 5 个检查器/测试对象均已在册，指纹按既有机制刷新为无复核声明。**新尺子立即暴露 10 个 basis 失效**：`.githooks/pre-commit`（基线 `a9ff5bb`）、`scripts/check_no_raw_material.py`（`bafcb04`）、7 份数据 schema（`knowledge-entry`、`pilot-conflict`、`pm-slot-contract`、`package-manifest`：`11c5d92`；`ontology-fixtures-manifest`：`3664b64`；`pilot-artifact`、`pilot-id-map`：`11c5d92`），以及方法 A.2（`a9ff5bb`；差异仅为复核签收行在基线之后写入）。复核报告列 9 个，A.2 是本次新尺子额外抓到的一个，一并如实登记，未作调整。
+- **验证**：十个常规检查器 rc=0（`check_anchors`、`check_glossary_usage`、`check_no_raw_material`、`check_three_table`、`check_coverage_gate`、`check_ledger_landings`、`check_gap_ledger`、`check_state`、`check_dependency_pins`）；`check_gap_ledger.py --self-test` E01–E05、R01–R05 全过；`test_checker_pins.py` 21/21、`test_spec_pins.py` 24/24；`check_checker_pins` rc=1（问题 18 = 16 无复核声明 + 2 失效）、`check_spec_pins` rc=1（问题 14 = 6 无复核声明 + 8 失效），均为预期债务。
+- **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`（本批改的就是钉扎检查器与测试本身，必然 rc≠0）。
+- **关联 ADR**：ADR-0021（accepted，补记批次 0081 的来源入表依据）

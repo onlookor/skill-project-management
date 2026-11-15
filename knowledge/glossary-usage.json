@@ -3170,6 +3170,26 @@
           "form": "code"
         },
         {
+          "file": "adr/0021-evm-source-admission.md",
+          "line": 26,
+          "form": "code"
+        },
+        {
+          "file": "adr/0021-evm-source-admission.md",
+          "line": 32,
+          "form": "code"
+        },
+        {
+          "file": "adr/0021-evm-source-admission.md",
+          "line": 44,
+          "form": "code"
+        },
+        {
+          "file": "adr/0021-evm-source-admission.md",
+          "line": 46,
+          "form": "code"
+        },
+        {
           "file": "knowledge/methods/registry-skeleton.md",
           "line": 36,
           "form": "code"
