@@ -1,0 +1,127 @@
+{
+  "version": 1,
+  "note": "钉扎面无复核对象的例外登记（AGENTS.md 3.5.3）。basis 为固定字面量 `无复核声明（不构成认可，不放行）` 的对象必须在此登记，且会持续报错；只有 --no-verify 能提交，每次绕过须在 TODO.md 生成到期项。本文件本身受 checker-pins 保护。",
+  "checker": {
+    "scripts/check_anchors.py": {
+      "reason": "历史依据为仓内转录件或已失效的外部路径，0075 r4 复核已降为无复核声明",
+      "missing_review": "对当前版本的非同源复核（原依据不可复验）",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-149"
+    },
+    "scripts/check_checker_pins.py": {
+      "reason": "批次 0076/0079 的钉扎收紧改动本身未经复核",
+      "missing_review": "对钉扎检查器与测试改动的非同源复核",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-149"
+    },
+    "scripts/check_gap_ledger.py": {
+      "reason": "历史依据为仓内转录件或已失效的外部路径，0075 r4 复核已降为无复核声明",
+      "missing_review": "对当前版本的非同源复核（原依据不可复验）",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-149"
+    },
+    "scripts/check_glossary_usage.py": {
+      "reason": "历史依据为仓内转录件或已失效的外部路径，0075 r4 复核已降为无复核声明",
+      "missing_review": "对当前版本的非同源复核（原依据不可复验）",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-149"
+    },
+    "scripts/check_ledger_landings.py": {
+      "reason": "历史依据为仓内转录件或已失效的外部路径，0075 r4 复核已降为无复核声明",
+      "missing_review": "对当前版本的非同源复核（原依据不可复验）",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-149"
+    },
+    "scripts/check_spec_pins.py": {
+      "reason": "批次 0076/0079 的钉扎收紧改动本身未经复核",
+      "missing_review": "对钉扎检查器与测试改动的非同源复核",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-149"
+    },
+    "scripts/check_state.py": {
+      "reason": "历史依据为仓内转录件或已失效的外部路径，0075 r4 复核已降为无复核声明",
+      "missing_review": "对当前版本的非同源复核（原依据不可复验）",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-149"
+    },
+    "scripts/check_three_table.py": {
+      "reason": "历史依据为仓内转录件或已失效的外部路径，0075 r4 复核已降为无复核声明",
+      "missing_review": "对当前版本的非同源复核（原依据不可复验）",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-149"
+    },
+    "scripts/test_checker_pins.py": {
+      "reason": "批次 0076/0079 的钉扎收紧改动本身未经复核",
+      "missing_review": "对钉扎检查器与测试改动的非同源复核",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-149"
+    },
+    "scripts/test_spec_pins.py": {
+      "reason": "批次 0076/0079 的钉扎收紧改动本身未经复核",
+      "missing_review": "对钉扎检查器与测试改动的非同源复核",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-149"
+    },
+    "scripts/validate_ontology.py": {
+      "reason": "批次 0076/0079 的钉扎收紧改动本身未经复核",
+      "missing_review": "对钉扎检查器与测试改动的非同源复核",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-149"
+    },
+    "scripts/check_dependency_pins.py": {
+      "reason": "批次 0076/0079 的钉扎收紧改动本身未经复核",
+      "missing_review": "对钉扎检查器与测试改动的非同源复核",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-149"
+    },
+    "scripts/test_dependency_pins.py": {
+      "reason": "批次 0076/0079 的钉扎收紧改动本身未经复核",
+      "missing_review": "对钉扎检查器与测试改动的非同源复核",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-149"
+    },
+    "validation/pinned/checker.py": {
+      "reason": "0079 起新纳入钉扎面，纳入时无复核产物",
+      "missing_review": "对新增受保护对象的非同源复核",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-149"
+    },
+    "scripts/no-review-declarations.json": {
+      "reason": "0079 起新纳入钉扎面，纳入时无复核产物",
+      "missing_review": "对新增受保护对象的非同源复核",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-149"
+    }
+  },
+  "spec": {
+    "GRAMMAR.md": {
+      "reason": "只有内部一致性核对，无非同源复核",
+      "missing_review": "对 GRAMMAR.md 全文的非同源复核",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-149"
+    },
+    "spec/CHECKER_INPUT_SCHEMA.md": {
+      "reason": "0079 起改为整文件钉扎；原 §3/§4 的分段复核依据不覆盖整文件",
+      "missing_review": "对 schema 整文件的非同源复核",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-149"
+    }
+  }
+}

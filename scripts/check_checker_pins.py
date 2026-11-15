@@ -2,18 +2,20 @@
 """检查器绑定：受保护脚本的哈希必须与 registry 登记一致。
 
 受保护对象包括：
-  - scripts/ 下全部检查器脚本（含 check_checker_pins.py 自身，不再自排除）；
-  - .githooks/pre-commit（钩子本身就是验证链的一环）；
-  - validation/checker-prototype/checker.py（验收用原型）。
+  - 全仓全部 `.py`（`git ls-files --cached --others` 发现，`PY_EXCLUDE` 当前为空），
+    含本脚本自身；新增 helper 脚本默认受保护，不再依赖文件名 glob；
+  - `.githooks/pre-commit`（钩子本身就是验证链的一环）；
+  - `scripts/no-review-declarations.json`（无复核例外登记表，改表需复核或例外留痕）。
 
-改动任何一个都必须 `--write --basis "<非同源复核记录>"` 更新登记。basis 不是自由文本：
-必须含 `非同源复核：`、`复核产物：<仓库外存在的文件>`、`sha256：<64 位>`、
-`复核基线：<仓库内存在的提交>`、唯一一条 `区段：<所绑对象>` 与结论词，否则拒绝写入。
-**默认读取模式同样校验这些字段**，只改 basis 文本（例如把“未审查本批”改成“结论：认可”）
-会被阻断。“无复核声明”只对代码内冻结的 `UNREVIEWED_KEYS` 成立：历史基文必须**逐字**
-相等，本批改动必须是结构化 `待复核：批次 NNNN …；无复核声明，不构成认可`；
-`初始登记：<任意>` 之类前缀文本一律拒绝。`--write` 不接受冻结的历史基文，
-只接受复核记录或结构化待复核声明，防止用旧状态覆盖新改动。
+basis 只有两种合法形态：
+  1. 合格的非同源复核记录：含 `非同源复核：`、`复核产物：<仓库外存在的文件>`、
+     `sha256：<64 位>`（与产物实算一致）、`复核基线：<HEAD 的祖先提交>`、
+     唯一一条精确等值的 `区段：`，以及**行尾**结论词（`实质收敛`/`认可`/`通过`，
+     后面不得跟括号补充）；
+  2. 固定字面量 `无复核声明（不构成认可，不放行）`——它**不构成认可、也不放行**，
+     登记项会持续报错，只能以 `git commit --no-verify` 提交，并须在
+     `scripts/no-review-declarations.json` 与 `TODO.md` 到期项中留痕（AGENTS.md 3.5.3）。
+不存在“待复核”之类的自我声明通行证：任何自我声明都不会让检查器返回 0。
 
 附带漂移检测：validation/pinned/checker.py 是验收原型的只读快照，默认模式校验字节一致。
 注意：这只是**漂移检测**，不是权限分离——文件都在同一工作区，同一方可以同改；
@@ -36,69 +38,47 @@ import sys
 from pathlib import Path
 
 PINS = Path("scripts/checker-pins.json")
-CHECKER_GLOBS = ("check_*.py", "test_*.py", "validate_*.py")
-EXTRA_PATHS = (".githooks/pre-commit", "validation/checker-prototype/checker.py")
+REGISTRY = Path("scripts/no-review-declarations.json")
+# 全仓 .py 的排除项；当前为空——新增 helper 脚本默认受保护。
+PY_EXCLUDE: frozenset[str] = frozenset()
+EXTRA_PATHS = (".githooks/pre-commit", str(REGISTRY))
 SNAPSHOT = Path("validation/pinned/checker.py")
 SOURCE = Path("validation/checker-prototype/checker.py")
 CONCLUSIONS = ("实质收敛", "认可", "通过")
-# 结构化“待复核”声明：批次号 + 说明 + 固定否定尾句。只有白名单对象可用。
-PENDING_RE = re.compile(r"^待复核：批次 \d{4} [^；]+；无复核声明，不构成认可$")
-# 冻结白名单：对象 → 唯一允许的**历史**“无复核声明”文本（逐字匹配）。
-# 值为 None 表示该对象只允许结构化 `待复核：批次 NNNN …`。
-# 不做前缀判定：`初始登记：<任意>`、`无复核声明：<任意>` 一律无效。
-_FROZEN_D8BF413 = (
-    "无复核声明：历史指针——原依据：基线 d8bf413 复核清单第 1 项"
-    "（根检查器与 pre-commit 纳入保护、basis 强度）；"
-    "历史指针（仓内转录件）：validation/reviews/2026-11-14-d8bf413-review.md；"
-    "复核基线：d8bf413；非权威，不构成认可"
-)
-UNREVIEWED_KEYS: dict[str, str | None] = {
-    "scripts/check_anchors.py": (
-        "无复核声明：历史指针——原依据：用户裁定（parent session "
-        "6af45947fead009e7bdd1e76，批次 0048），2026-11-14；区段：GRAMMAR.md；"
-        "历史指针（仓内转录件）：validation/reviews/2026-11-14-t139-user-adjudication.md；"
-        "复核基线：563c26c；非权威，不构成认可"
-    ),
-    "scripts/check_gap_ledger.py": (
-        "无复核声明：历史指针——原依据：外部复核基线 48128a8，产物 "
-        "/tmp/verify-4812/REPORT_48128a8.md；"
-        "历史指针（仓内转录件）：validation/reviews/2026-11-14-48128a8-external.md；"
-        "复核基线：48128a8；非权威，不构成认可"
-    ),
-    "scripts/check_glossary_usage.py": _FROZEN_D8BF413,
-    "scripts/check_ledger_landings.py": _FROZEN_D8BF413,
-    "scripts/check_state.py": _FROZEN_D8BF413,
-    "scripts/check_three_table.py": _FROZEN_D8BF413,
-    "scripts/check_checker_pins.py": None,
-    "scripts/check_spec_pins.py": None,
-    "scripts/test_checker_pins.py": None,
-    "scripts/test_spec_pins.py": None,
-    "scripts/check_dependency_pins.py": None,
-    "scripts/test_dependency_pins.py": None,
-    "scripts/validate_ontology.py": None,
-}
-
-
-def unreviewed_ok(text: str, key: str) -> bool:
-    """白名单内：逐字等于冻结基文，或符合结构化“待复核”声明；其余一律不放行。"""
-    if key not in UNREVIEWED_KEYS:
-        return False
-    if PENDING_RE.match(text) is not None:
-        return True
-    return UNREVIEWED_KEYS[key] == text
+# 唯一允许的“无复核”字面量：它记录事实，但不构成认可、也不放行。
+DECLARATION = "无复核声明（不构成认可，不放行）"
+REGISTRY_FIELDS = ("reason", "missing_review", "due", "owner", "todo")
 
 
 def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def load_registry(root: Path) -> dict:
+    path = root / REGISTRY
+    if not path.is_file():
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return data.get("checker", {}) if isinstance(data, dict) else {}
+
+
 def discover(root: Path) -> list[str]:
-    names: set[str] = set()
-    scripts_dir = root / "scripts"
-    for pattern in CHECKER_GLOBS:
-        for path in scripts_dir.glob(pattern):
-            if path.is_file():
-                names.add(f"scripts/{path.name}")
+    """全仓 `.py`（含未跟踪但未被忽略者）+ 显式附加对象，减去 `PY_EXCLUDE`。"""
+    listed = subprocess.run(
+        ["git", "ls-files", "--cached", "--others", "--exclude-standard", "*.py"],
+        cwd=root,
+        capture_output=True,
+        text=True,
+    )
+    if listed.returncode == 0:
+        candidates = listed.stdout.split()
+    else:
+        candidates = [
+            path.relative_to(root).as_posix()
+            for path in root.rglob("*.py")
+            if ".git" not in path.parts
+        ]
+    names = {name for name in candidates if name not in PY_EXCLUDE}
     for name in EXTRA_PATHS:
         if (root / name).is_file():
             names.add(name)
@@ -117,17 +97,18 @@ def write_pins(path: Path, pins: dict) -> None:
     )
 
 
-def valid_basis(root: Path, text: str, key: str, allow_unreviewed=None) -> tuple[bool, str]:
-    """默认模式与 --write 共用：basis 必须指向仓库外产物、sha256 一致且区段正确。
+def valid_basis(root: Path, text: str, key: str) -> tuple[bool, str]:
+    """basis 只接受合格的非同源复核记录；“无复核声明”记录事实但永不通过。
 
-    “无复核声明”只对 `UNREVIEWED_KEYS` 白名单内的对象成立，且必须逐字等于冻结基文
-    或符合结构化“待复核”声明；不再按 `初始登记：` 前缀放行。
+    五要素：`非同源复核：`、仓库外 `复核产物：`、与产物一致的 `sha256：`、
+    `复核基线：`（HEAD 的祖先提交）、唯一且等值的 `区段：`、行尾结论词。
     """
     text = text.strip()
-    if allow_unreviewed is None:
-        allow_unreviewed = key in UNREVIEWED_KEYS
-    if allow_unreviewed and unreviewed_ok(text, key):
-        return True, ""
+    if text == DECLARATION:
+        return False, (
+            "无复核声明：不构成认可，也不放行（例外只能 --no-verify 提交，并须在 "
+            "scripts/no-review-declarations.json 与 TODO.md 到期项中留痕）"
+        )
     if "非同源复核：" not in text:
         return False, "缺少 `非同源复核：` 前缀"
     artifact = re.search(r"复核产物：`?([^`\s；，、]+)`?", text)
@@ -145,13 +126,19 @@ def valid_basis(root: Path, text: str, key: str, allow_unreviewed=None) -> tuple
     baseline = re.search(r"复核基线：`?([0-9a-f]{7,40})`?", text)
     if baseline is None:
         return False, "缺少 `复核基线：<提交号>`"
+    sha = baseline.group(1)
     exists = subprocess.run(
-        ["git", "cat-file", "-e", f"{baseline.group(1)}^{{commit}}"],
+        ["git", "cat-file", "-e", f"{sha}^{{commit}}"], cwd=root, capture_output=True
+    )
+    if exists.returncode != 0:
+        return False, f"复核基线不存在：{sha}"
+    ancestor = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", sha, "HEAD"],
         cwd=root,
         capture_output=True,
     )
-    if exists.returncode != 0:
-        return False, f"复核基线不存在：{baseline.group(1)}"
+    if ancestor.returncode != 0:
+        return False, f"复核基线不是 HEAD 的祖先提交（无关提交）：{sha}"
     recorded = re.search(r"sha256：`?([0-9a-f]{64})`?", text)
     if recorded is None:
         return False, "缺少 `sha256：<64 位十六进制>`"
@@ -162,19 +149,21 @@ def valid_basis(root: Path, text: str, key: str, allow_unreviewed=None) -> tuple
         return False, f"`区段：` 必须精确等于 {key} 且只出现一次"
     if re.search(r"结论：\s*(?:不|未|无法)", text) is not None:
         return False, "结论词被否定（`不予`/`未`/`无法` 前缀）"
-    if re.search(rf"结论：\s*(?:{'|'.join(CONCLUSIONS)})(?=$|[\s；;，,。）（()])", text) is None:
-        return False, f"缺少结论词（{'/'.join(CONCLUSIONS)}）"
+    if re.search(
+        rf"结论：\s*(?:{'|'.join(CONCLUSIONS)})(?=[ \t]*(?:$|[；;。]))", text, re.M
+    ) is None:
+        return False, (
+            f"缺少结论词或其后紧跟补充说明（{'/'.join(CONCLUSIONS)}）；"
+            "结论词后只允许行尾或 `；`/`。` 分隔，不得跟括号"
+        )
     return True, ""
 
 
 def writable(root: Path, text: str, key: str) -> tuple[bool, str]:
-    """`--write` 的放行口径：合格复核记录，或白名单对象的**结构化**待复核声明。
-
-    冻结的历史“无复核声明”文本不得用来覆盖新改动——那是旧状态，不是新授权。
-    """
-    if key in UNREVIEWED_KEYS and PENDING_RE.match(text.strip()) is not None:
+    """`--write` 放行口径：合格复核记录，或无复核字面量（后者写入后仍会报错）。"""
+    if text.strip() == DECLARATION:
         return True, ""
-    return valid_basis(root, text, key, allow_unreviewed=False)
+    return valid_basis(root, text, key)
 
 
 def main() -> int:
@@ -237,14 +226,15 @@ def main() -> int:
                 entry["basis"] = chosen[name]
             else:
                 entry.setdefault("sha256", actual)
-                entry.setdefault("basis", "初始登记")
+                entry.setdefault("basis", DECLARATION)
         for name in sorted(set(entries) - set(names)):
             del entries[name]
         pins["version"] = 1
         pins["note"] = (
-            "受保护脚本的哈希登记：scripts/ 下检查器（含本脚本）、.githooks/pre-commit、"
-            "validation/checker-prototype/checker.py。改动必须 --write --basis 并附非同源复核记录；"
-            "本文件与快照检测都不提供权限分离。"
+            "受保护脚本的哈希登记：全仓 .py（含本脚本）、.githooks/pre-commit、"
+            "validation/checker-prototype/checker.py 与 scripts/no-review-declarations.json。"
+            "改动必须 --write --basis 并附非同源复核记录；无复核时只能写固定声明并以 "
+            "--no-verify 提交。本文件与快照检测都不提供权限分离。"
         )
         write_pins(pins_path, pins)
         if source.exists() and snapshot != source:
@@ -264,6 +254,30 @@ def main() -> int:
         ok, why = valid_basis(root, basis, name)
         if not ok:
             errors.append(f"{name}：basis 不合格：{why}")
+
+    try:
+        registry = load_registry(root)
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"[错误] 无法解析 {REGISTRY}：{exc}")
+        return 2
+    for name, entry in sorted(entries.items()):
+        if entry.get("basis") == DECLARATION and name not in registry:
+            errors.append(
+                f"{name}：无复核声明未在 {REGISTRY} 登记"
+                "（须含缺哪份复核、到期里程碑、责任人）"
+            )
+    for name, info in sorted(registry.items()):
+        if name not in entries:
+            errors.append(f"{REGISTRY}：登记项 {name} 不是受保护对象")
+            continue
+        if entries[name].get("basis") != DECLARATION:
+            errors.append(f"{REGISTRY}：{name} 已有复核记录，应删除该例外登记")
+        if not isinstance(info, dict):
+            errors.append(f"{REGISTRY}：{name} 的登记项必须是对象")
+            continue
+        missing = [field for field in REGISTRY_FIELDS if not info.get(field)]
+        if missing:
+            errors.append(f"{REGISTRY}：{name} 缺少字段 {', '.join(missing)}")
 
     if source.exists() and snapshot.exists():
         if digest(source) != digest(snapshot):

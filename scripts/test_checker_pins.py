@@ -78,6 +78,11 @@ def main() -> int:
         (base / "validation" / "checker-prototype").mkdir(parents=True)
         (base / "validation" / "pinned").mkdir(parents=True)
         (base / "validation" / "reviews").mkdir(parents=True)
+        registry = base / "scripts" / "no-review-declarations.json"
+        registry.write_text(
+            json.dumps({"version": 1, "checker": {}, "spec": {}}, ensure_ascii=False),
+            encoding="utf-8",
+        )
         sample = base / "scripts" / "check_sample.py"
         sample.write_text("print('checker v1')\n", encoding="utf-8")
         guarded = base / "scripts" / "check_state.py"
@@ -128,6 +133,10 @@ def main() -> int:
             basis_for("validation/checker-prototype/checker.py"),
             "--basis",
             basis_for("scripts/check_state.py"),
+            "--basis",
+            basis_for("scripts/no-review-declarations.json"),
+            "--basis",
+            basis_for("validation/pinned/checker.py"),
         )
         if baseline.returncode != 0:
             print("[错误] 绑定基线未建立。")
@@ -232,19 +241,61 @@ def main() -> int:
                          str(result.returncode), evidence(result.stdout, expected)))
         mutate_basis(valid_basis)
 
-        # 白名单内对象：前缀文本与冻结旧状态都不能覆盖新改动（--write 侧收口）。
-        guarded.write_text("print('state v2')\n", encoding="utf-8")
-        for number, label, text in (
-            ("CP16", "白名单对象用“初始登记：任意未复核改动”--write", "初始登记：任意未复核改动"),
-            ("CP17", "白名单对象用冻结旧状态“初始登记”覆盖新改动", "初始登记"),
-        ):
-            result = run(root, base, "--write", "--basis", text)
-            expected = "缺少 `非同源复核：` 前缀"
-            ok = result.returncode == 2 and expected in result.stdout
-            failures += 0 if ok else 1
-            rows.append((number, label, "拒绝" if ok else "未拒绝",
-                         str(result.returncode), evidence(result.stdout, expected)))
-        guarded.write_text("print('state v1')\n", encoding="utf-8")
+        # 自我声明不再放行：无复核字面量、括号补充、无关基线、新增 helper、改登记表。
+        mutate_basis("无复核声明（不构成认可，不放行）")
+        result = run(root, base)
+        expected = "无复核声明：不构成认可，也不放行"
+        ok = result.returncode == 1 and expected in result.stdout
+        failures += 0 if ok else 1
+        rows.append(("CP16", "basis 写成无复核字面量", "阻断" if ok else "未阻断",
+                     str(result.returncode), evidence(result.stdout, expected)))
+
+        mutate_basis(valid_basis.replace("结论：认可", "结论：认可（但实质上不予认可）"))
+        result = run(root, base)
+        expected = "缺少结论词或其后紧跟补充说明"
+        ok = result.returncode == 1 and expected in result.stdout
+        failures += 0 if ok else 1
+        rows.append(("CP17", "结论词后跟括号补充", "阻断" if ok else "未阻断",
+                     str(result.returncode), evidence(result.stdout, expected)))
+
+        dangling = subprocess.run(
+            ["git", "commit-tree", f"{baseline_sha}^{{tree}}", "-m", "orphan"],
+            cwd=base, capture_output=True, text=True,
+        ).stdout.strip()
+        mutate_basis(valid_basis.replace(f"复核基线：{baseline_sha}", f"复核基线：{dangling}"))
+        result = run(root, base)
+        expected = "不是 HEAD 的祖先提交"
+        ok = result.returncode == 1 and expected in result.stdout
+        failures += 0 if ok else 1
+        rows.append(("CP18", "复核基线是无关提交", "阻断" if ok else "未阻断",
+                     str(result.returncode), evidence(result.stdout, expected)))
+        mutate_basis(valid_basis)
+
+        helper = base / "scripts" / "helper_util.py"
+        helper.write_text("print('helper')\n", encoding="utf-8")
+        result = run(root, base)
+        expected = "scripts/helper_util.py：未登记"
+        ok = result.returncode == 1 and expected in result.stdout
+        failures += 0 if ok else 1
+        rows.append(("CP19", "新增 helper 脚本未登记", "阻断" if ok else "未阻断",
+                     str(result.returncode), evidence(result.stdout, expected)))
+        helper.unlink()
+
+        registry.write_text(
+            json.dumps({"version": 1, "checker": {}, "spec": {}, "x": 1},
+                       ensure_ascii=False),
+            encoding="utf-8",
+        )
+        result = run(root, base)
+        expected = "scripts/no-review-declarations.json：哈希不一致"
+        ok = result.returncode == 1 and expected in result.stdout
+        failures += 0 if ok else 1
+        rows.append(("CP20", "无复核登记表被改", "阻断" if ok else "未阻断",
+                     str(result.returncode), evidence(result.stdout, expected)))
+        registry.write_text(
+            json.dumps({"version": 1, "checker": {}, "spec": {}}, ensure_ascii=False),
+            encoding="utf-8",
+        )
 
         source.write_text("# empty shell\n", encoding="utf-8")
         result = run(root, base)

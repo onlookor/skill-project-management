@@ -15,9 +15,10 @@
 | `check_gap_ledger.py` | 核查 `GAP_LEDGER.md`：字段枚举、核查矩阵与附录 A 全覆盖、`open` 缺口被矩阵引用、TODO 交叉引用、按里程碑计算到期；`closed` 的关闭依据必须是 `外部复核：<路径>；sha256：<64hex>`，机械核对路径存在、是文件、哈希一致（`--self-test` 的 E01–E05 为正负例）；`--staged` 要求规则/判定文件与台账同批更新。到期未裁定退出 1 | `AGENTS.md` 3.6 / 3.6.6、`adr/0012-gap-ledger-and-adjudication.md` | 已实现 |
 | `check_three_table.py` | 三表机械对照：正文（规则 → 条款与子句范围）、判定列（`check_id` → 子句与原因码）、输入 schema（`check_id` → 输入域、具名枚举、原因码）。覆盖“正文 ↔ 判定列”“判定列 ↔ schema”“正文 ↔ schema”三对关系，核对子句闭合、枚举封闭、判定列不含叙述性短语、G-B1/G-B2 条件归属、原因码与子句映射。**深度边界**：它保证结构一致与已列举的语义短语规则，不保证规则正文与子句表的全文语义等价 | `adr/0013-unified-adjudication-of-check-semantics.md`、`spec/CHECKER_INPUT_SCHEMA.md` | 已实现 |
 | `check_coverage_gate.py` | 覆盖闸门：`validation/checker-prototype/coverage.json` 登记 A.2 每个子句的正例与负例，负例必须声明单一 `expected_clause`，闸门用生产 `evaluate_trace()` 核对 verdict/reason 与子句归属（“归属是真的”，不是“归属非空”），并核对样例 reason 已登记在 A.2 该子句的原因码列。入口归一化与无子句的全局枚举样例登记在 `global_normalization` 分区（`expected_clause: null`），不挂子句但必须被消费。缺正/负例、负例改成正例、负例指错子句、全局样例挂子句、样例未被引用均阻断。负例测试见 `test_coverage_gate.py` | `adr/0014-validation-chain-self-attestation.md`、`GAP_LEDGER.md` G-018 | 已实现 |
-| `check_checker_pins.py` | 检查器绑定：比对 `scripts/checker-pins.json` 登记哈希与工作区脚本（**含本脚本自身、`.githooks/pre-commit`、验收原型**），改动须 `--write --basis "<非同源复核记录>"`。`basis` 默认模式即校验：`复核产物：` 必须在仓库外真实存在、`sha256：` 实算一致、`复核基线：` 必须是仓库内存在的提交、`区段：` 精确等值且只一条、结论词精确匹配（`不予/未/无法` 前缀无效）；“无复核声明”只对代码内冻结的 `UNREVIEWED_KEYS` 成立，历史基文须**逐字**相等，本批改动须为结构化 `待复核：批次 NNNN …；无复核声明，不构成认可`，前缀文本一律拒绝；`--write` 不接受冻结的旧状态。同时校验验收快照 `validation/pinned/checker.py` 与工作区副本一致（漂移检测，不是权限分离）。负例见 `test_checker_pins.py`（17 项） | `adr/0014-validation-chain-self-attestation.md`、`AGENTS.md` 3.6.8 | 已实现 |
+| `check_checker_pins.py` | 检查器绑定：比对 `scripts/checker-pins.json` 登记哈希与工作区脚本，覆盖面为**仓库内全部 `.py`**（`git ls-files --cached --others --exclude-standard '*.py'`，不减任何 glob，`PY_EXCLUDE` 当前为空），另含 `.githooks/pre-commit`、验收原型与例外登记表 `scripts/no-review-declarations.json`。改动须 `--write --basis`：`basis` 只接受两类——五要素齐全的非同源复核记录（`复核产物：` 在仓库外真实存在、`sha256：` 实算一致、`复核基线：` 是 `HEAD` 的祖先提交、`区段：` 精确等值且只一条、结论词后只能是行尾或 `；`/`。`），或固定字面量 `无复核声明（不构成认可，不放行）`。**后者可写入但不放行**：默认模式仍退出 1，只能走 `--no-verify`（`AGENTS.md` 3.5.3）。已取消白名单与“待复核”自我声明；任何自由文本一律拒绝（退出 2）。默认模式还交叉校验登记表：登记项必须是受保护对象、字段齐全、已有合格复核却仍登记即报错。同时校验验收快照 `validation/pinned/checker.py` 与工作区副本一致（漂移检测，不是权限分离）。负例见 `test_checker_pins.py`（20 项） | `adr/0014-validation-chain-self-attestation.md`、`AGENTS.md` 3.5.3 / 3.6.8 | 已实现 |
 | `check_dependency_pins.py` | 外部校验依赖指纹：`scripts/dependency-pins.json` 登记 `jsonschema`、`rdflib`、`pyshacl` 的版本、分发产物 sha256 与安装树计数；**三重均为强制项**。安装树按 wheel 内 `RECORD` 逐文件重算内容哈希核对，并断言导入路径落在分发目录内（影子包、`PYTHONPATH` 劫持、保留原 `RECORD` 的改动均阻断）。wheel 默认从仓库外持久路径 `~/.local/share/pm-governance/wheels/` 读取（`<包名>_WHEEL` 或 `--artifact <包名>=<wheel>` 可覆盖）；产物缺失、版本或安装树不符一律阻断。**威胁模型**：能发现误装与非恶意不一致，不构成对有权写本机 Python 环境者的防护（ADR-0019、G-022）。负例见 `test_dependency_pins.py`（16 项） | ADR-0019 | 已实现 |
-| `check_spec_pins.py` | 规格区段绑定：登记 `GRAMMAR.md` 全文、方法 A.2/A.1、schema §1.11/§2bis/§3/§4、`coverage.json`，以及 `contracts/schema/` 下**全部** schema（自动发现：目录里出现未登记文件即阻断，取代人工清单）。区段新增或改动须 `--write --basis`，`basis` 与 `check_checker_pins` 同一标准——`复核产物：` 必须指向仓库外文件、`sha256：` 与之一致、`复核基线：` 必须是仓库内存在的提交、`区段：` 唯一且等值、结论词精确匹配，仓库内转录件只作索引；区段相对 `HEAD` 改动时同批还须附同样标准的复核记录。“无复核声明”只对冻结白名单成立（历史基文逐字相等，本批改动须为结构化 `待复核：批次 NNNN …`），复核记录永不接受该状态。负例见 `test_spec_pins.py`（18 项） | `adr/0014-validation-chain-self-attestation.md`、`AGENTS.md` 3.6.8 | 已实现 |
+| `check_spec_pins.py` | 规格区段绑定：登记 13 个区段——`GRAMMAR.md` 全文、方法 A.2/A.1、`spec/CHECKER_INPUT_SCHEMA.md` **整文件**（不再只钉 §1.11/§2bis/§3/§4，末尾追加一行同样命中）、`coverage.json`，以及 `contracts/schema/` 下**全部** schema（自动发现：目录里出现未登记文件即阻断）。区段新增或改动须 `--write --basis`，`basis` 与 `check_checker_pins` 同一标准（五要素 + 基线须为 `HEAD` 祖先 + 结论词后只能行尾或 `；`/`。`，仓库内转录件只作索引）；或固定字面量 `无复核声明（不构成认可，不放行）`——可写入但不放行，只能 `--no-verify`（`AGENTS.md` 3.5.3）。已取消白名单与“待复核”自我声明。负例见 `test_spec_pins.py`（22 项） | `adr/0014-validation-chain-self-attestation.md`、`AGENTS.md` 3.5.3 / 3.6.8 | 已实现 |
+| `no-review-declarations.json` | 钉扎面无复核例外登记表（`checker` / `spec` 两分区），每项含 `reason` / `missing_review` / `due` / `owner` / `todo`。**本文件本身纳入 pins**：改表与改检查器同等受约束。两个 pins 检查器交叉校验登记项与 `basis` 的一致性；通道规则与撤除条件见 `AGENTS.md` 3.5.3 / 3.5.2 | `AGENTS.md` 3.5.3 | 数据文件 |
 | `check_glossary_usage.py` | 从 `git ls-files` 的 Markdown / JSONL 生成每条术语的使用位置基线 `knowledge/glossary-usage.json`，并在 `GLOSSARY.md` 第 4 节生成位置表；默认模式校验位置存在、行号有效、该行含术语、生成块未被手改、术语集合一致。`--write` 重生成 | `AGENTS.md` 5bis.1 | 已实现 |
 | `validate_ontology.py` | 用 `rdflib` + `pyshacl` 校验 `ontology/` 本体与 24 条 SHACL 形状；`--matrix` 逐条运行违规 fixture，确认每条形状能判出违规 | 无独立规格（边界见 `CONSTITUTION.md` 第 13.6 条与 `ontology/README.md`） | 已实现（可选依赖） |
 
@@ -74,7 +75,7 @@ python3 scripts/check_dependency_pins.py
 
 `check_state.py` 退出码：`0` 通过（开发态下“HEAD 领先于 tag”只输出警告）；`1` 存在错误（逐条列出）；`2` `STATE.md` 或 `manifest.json` 结构无法解析、缺少字段、`release_state` 非法，或不在 git 仓库中。`release_state` 缺失按 `released` 严格处理；`development` 不豁免 tag 名、版本号、annotated 与祖先关系判断。
 
-发布引导提交的留痕：git 不记录 `--no-verify`，因此 `check_state.py` 改为核查 commit message 中的 `Hook-Bypass: release-bootstrap`、`Hook-Bypass-Reason:`、`Hook-Bypass-Verified:` 三项 trailer。`v0.5.2` 及以后的发布提交缺任一项即错误；非发布提交携带即错误。规则见 `AGENTS.md` 3.5.1，撤除条件见 3.5.2 与 `TODO.md` T-129。
+发布引导提交与钉扎面例外提交的留痕：git 不记录 `--no-verify`，因此 `check_state.py` 改为核查 commit message 中的固定 trailer。发布引导提交须有 `Hook-Bypass: release-bootstrap`、`Hook-Bypass-Reason:`、`Hook-Bypass-Verified:` 三项；`v0.5.2` 及以后缺任一项即错误。钉扎面例外提交须有 `Hook-Bypass: pin-review-debt`、非空 `Hook-Bypass-Reason:` 与非空 `Hook-Bypass-Items:`，`Items` 中每个 `T-xxx` 必须在 `TODO.md` 存在且未关闭。两者之外携带 `Hook-Bypass` 即错误。规则见 `AGENTS.md` 3.5.1 / 3.5.3，撤除条件见 3.5.2 与 `TODO.md` T-129 / T-149。
 
 `check_ledger_landings.py` 退出码：`0` 通过（可有待落点警告）；`1` 存在错误；`2` 登记表结构无法解析。
 
@@ -134,7 +135,7 @@ python3 scripts/check_glossary_usage.py
 python3 scripts/check_state.py
 ```
 
-未启用钩子时，在 `git add` 前手工按上述顺序运行，效果等价。检查器命中时不得用 `--no-verify` 绕过；唯一例外是 `AGENTS.md` 第 3.5 条规定的发布引导提交（tag 只能指向已存在提交），该提交后必须立即打 tag 并复跑全套检查器。新增其他例外须走 ADR 并在脚本中登记路径豁免。
+未启用钩子时，在 `git add` 前手工按上述顺序运行，效果等价。检查器命中时不得用 `--no-verify` 绕过；仅有两个例外：`AGENTS.md` 第 3.5 条规定的发布引导提交（tag 只能指向已存在提交），该提交后必须立即打 tag 并复跑全套检查器；以及 3.5.3 的钉扎面未复核例外，必须携带 `Hook-Bypass: pin-review-debt` + Reason + Items，并逐对象登记到期项。新增其他例外须走 ADR 并在脚本中登记路径豁免。
 
 ### 脚本的定位
 

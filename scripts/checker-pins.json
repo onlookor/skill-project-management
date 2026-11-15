@@ -7,11 +7,11 @@
     },
     "scripts/check_anchors.py": {
       "sha256": "6aa0caa82d38e7f0cfd43303a0f6f798c4291ecbf4ee553d617b954906f6a8a2",
-      "basis": "无复核声明：历史指针——原依据：用户裁定（parent session 6af45947fead009e7bdd1e76，批次 0048），2026-11-14；区段：GRAMMAR.md；历史指针（仓内转录件）：validation/reviews/2026-11-14-t139-user-adjudication.md；复核基线：563c26c；非权威，不构成认可"
+      "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/check_checker_pins.py": {
-      "sha256": "a9da13967cbfe912211a39b9d97c44ec217e32ad160dda4e336474d8ded98bee",
-      "basis": "待复核：批次 0076 钉扎收紧改动；无复核声明，不构成认可"
+      "sha256": "329a94ac464cab987e016ca755d81d6f125cdae398804266ef6b3c32cf56cd29",
+      "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/check_coverage_gate.py": {
       "sha256": "465dbfc1ef772c6ad69c9922d100dfac4219f985a63505d978057b76c815d9ac",
@@ -19,51 +19,51 @@
     },
     "scripts/check_gap_ledger.py": {
       "sha256": "58ddb3692d2d82bc31fe8cc1115d6e8a2e7684b0340a8536585d12b34f955e5c",
-      "basis": "无复核声明：历史指针——原依据：外部复核基线 48128a8，产物 /tmp/verify-4812/REPORT_48128a8.md；历史指针（仓内转录件）：validation/reviews/2026-11-14-48128a8-external.md；复核基线：48128a8；非权威，不构成认可"
+      "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/check_glossary_usage.py": {
       "sha256": "af780d97cad10579ea946ca094ba69ba0871223671c5cc672bd44b21ddd4f6ac",
-      "basis": "无复核声明：历史指针——原依据：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；历史指针（仓内转录件）：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；非权威，不构成认可"
+      "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/check_ledger_landings.py": {
       "sha256": "f860acc16f6ecf722e2f6e484166eb0a5699a0c752db40ecc871d1dadb08adcf",
-      "basis": "无复核声明：历史指针——原依据：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；历史指针（仓内转录件）：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；非权威，不构成认可"
+      "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/check_no_raw_material.py": {
       "sha256": "5fd7d6395a2eb84f46fbb9ca2d7ad47bfa7e7ab467d1a532a254785cc3bd5492",
       "basis": "非同源复核：G-019 r6（基线 bafcb04）要求撤掉 pattern 嵌套量词启发式只留 512 字符上限、退出码表述与实现对齐、替换范围表述与实测对齐。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r6/REPORT.md；sha256：1db2586ee7f5614920fc6a6ab3f2afc34c4445ff997df8b0aaec48327d6bd1db；复核基线：bafcb04 区段：scripts/check_no_raw_material.py 结论：认可"
     },
     "scripts/check_spec_pins.py": {
-      "sha256": "de8bf4465f351fd9d87d38d332452f649448b63055071f4d385c8c32ca8dba71",
-      "basis": "待复核：批次 0076 钉扎收紧改动；无复核声明，不构成认可"
+      "sha256": "d955da7c02adb94fea6d10c6cd51b56188c306124cef20bf3b299c8406b1b0ee",
+      "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/check_state.py": {
-      "sha256": "f0e636ec254a5b435932e3f0755ec0b215ad1be5a3bbe93067dc2009c1793098",
-      "basis": "无复核声明：历史指针——原依据：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；历史指针（仓内转录件）：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；非权威，不构成认可"
+      "sha256": "cb62284b0b5e813bd254deaa24fcb54a9d2a98f5b566feeedee6752796bea6e4",
+      "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/check_three_table.py": {
       "sha256": "7381d82673a074784ff42d60969ba95c9dd7d4ccef76a2f8a4ad53b41f11ce2c",
-      "basis": "无复核声明：历史指针——原依据：基线 d8bf413 复核清单第 1 项（根检查器与 pre-commit 纳入保护、basis 强度）；历史指针（仓内转录件）：validation/reviews/2026-11-14-d8bf413-review.md；复核基线：d8bf413；非权威，不构成认可"
+      "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/test_check_table_mutations.py": {
       "sha256": "22930a9aa0684a0454ed67aa6940d6cf035b847ea783476bbc533b94519c31f4",
       "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：scripts/test_check_table_mutations.py 结论：认可"
     },
     "scripts/test_checker_pins.py": {
-      "sha256": "03c7b9f3f886df602de50adfffb4c00f6716b13d8f89cdabdceaefbd36c11969",
-      "basis": "待复核：批次 0076 钉扎收紧改动；无复核声明，不构成认可"
+      "sha256": "9a9d626fd6a9a6a66510f8c4072e2ca7bb9600769c63f1185d311f49e9c76beb",
+      "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/test_coverage_gate.py": {
       "sha256": "f3b217f338d492b5a632c9a9a098a054be2d77cfae4e6c0b847a23159f531897",
       "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：scripts/test_coverage_gate.py 结论：认可"
     },
     "scripts/test_spec_pins.py": {
-      "sha256": "75f4cb022835160c2aafb76dd2cff57eb56495c958c06f406087b61a60fc6bdd",
-      "basis": "待复核：批次 0076 钉扎收紧改动；无复核声明，不构成认可"
+      "sha256": "4984575f4e5f7d45acbd908812a608b0a2093789ba7ebcaab5a5be75300b95d8",
+      "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/validate_ontology.py": {
       "sha256": "e2a19ab00a0b81ede5eec545d4cbab6797b8ae9d85aa6db3cd02d9cc26bb9cb2",
-      "basis": "待复核：批次 0076 钉扎收紧改动；无复核声明，不构成认可"
+      "basis": "无复核声明（不构成认可，不放行）"
     },
     "validation/checker-prototype/checker.py": {
       "sha256": "b457a7a6160d71b250fd76e8e47993cee0dbe9395fb79b413e131a060ad3bae3",
@@ -71,12 +71,20 @@
     },
     "scripts/check_dependency_pins.py": {
       "sha256": "11307121c4513f1e35a4dae42e94bad225cd90168bf142320ff52da82bda8f50",
-      "basis": "待复核：批次 0076 钉扎收紧改动；无复核声明，不构成认可"
+      "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/test_dependency_pins.py": {
       "sha256": "3a3a28c329a84585bc1a9e981520cba0f819a94ba8143e5ed2e6153677ea8fea",
-      "basis": "待复核：批次 0076 钉扎收紧改动；无复核声明，不构成认可"
+      "basis": "无复核声明（不构成认可，不放行）"
+    },
+    "scripts/no-review-declarations.json": {
+      "sha256": "2f4e3f009930d02e8ead1c27f27fdaa614814f0a2c7e231c27ed2698c6b4add9",
+      "basis": "无复核声明（不构成认可，不放行）"
+    },
+    "validation/pinned/checker.py": {
+      "sha256": "b457a7a6160d71b250fd76e8e47993cee0dbe9395fb79b413e131a060ad3bae3",
+      "basis": "无复核声明（不构成认可，不放行）"
     }
   },
-  "note": "受保护脚本的哈希登记：scripts/ 下检查器（含本脚本）、.githooks/pre-commit、validation/checker-prototype/checker.py。改动必须 --write --basis 并附非同源复核记录；本文件与快照检测都不提供权限分离。"
+  "note": "受保护脚本的哈希登记：全仓 .py（含本脚本）、.githooks/pre-commit、validation/checker-prototype/checker.py 与 scripts/no-review-declarations.json。改动必须 --write --basis 并附非同源复核记录；无复核时只能写固定声明并以 --no-verify 提交。本文件与快照检测都不提供权限分离。"
 }

@@ -1,11 +1,11 @@
 {
   "version": 1,
-  "note": "规格区段指纹。区段新增或改动必须 --write --basis 并同批附非同源复核记录；basis 必须指向仓库外复核产物并与其 sha256、区段、结论词一致；默认读取模式同样校验。",
+  "note": "规格区段指纹。区段新增或改动必须 --write --basis；basis 只接受合格的非同源复核记录，或无复核字面量（后者不放行，须 --no-verify 并在 scripts/no-review-declarations.json 与 TODO.md 到期项留痕）。指纹只证明内容一致，不证明签收人身份。",
   "sections": {
     "GRAMMAR.md": {
       "sha256": "72ae1575dc21ccd2043414f008bf0f27a79fdee225867cef725f2efe9091ad4f",
       "path": "GRAMMAR.md",
-      "basis": "初始登记"
+      "basis": "无复核声明（不构成认可，不放行）"
     },
     "spec/methods/deterministic-checker.md#A.2": {
       "sha256": "09002dd23b761b763557f8ba334959a856e9cd54e1aff9df92c4450b24d2a25c",
@@ -17,25 +17,10 @@
       "path": "spec/methods/deterministic-checker.md",
       "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：spec/methods/deterministic-checker.md#A.1 结论：认可"
     },
-    "spec/CHECKER_INPUT_SCHEMA.md#1.11": {
-      "sha256": "c924c4da65ca3218a573b28daab2b788cf47a5106bad8b032ff4170074afbb0d",
+    "spec/CHECKER_INPUT_SCHEMA.md": {
+      "sha256": "87e6641d5955a2af15577d45c14546808bcc4c832a7ae898d2cfda3deeda8486",
       "path": "spec/CHECKER_INPUT_SCHEMA.md",
-      "basis": "待复核：批次 0076 新增钉扎（r4 M5）；无复核声明，不构成认可"
-    },
-    "spec/CHECKER_INPUT_SCHEMA.md#2bis": {
-      "sha256": "2c4b9b8b0ebe1a754af8fd5b597cbefdea06d9ddc19b120d258488d40d0ae3c2",
-      "path": "spec/CHECKER_INPUT_SCHEMA.md",
-      "basis": "初始登记"
-    },
-    "spec/CHECKER_INPUT_SCHEMA.md#3": {
-      "sha256": "e27b36d0eed24e39bbeb29ada4e81aec83fba26c3c02650e5606f7bbf79b035f",
-      "path": "spec/CHECKER_INPUT_SCHEMA.md",
-      "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：spec/CHECKER_INPUT_SCHEMA.md#3 结论：认可"
-    },
-    "spec/CHECKER_INPUT_SCHEMA.md#4": {
-      "sha256": "b8a5fa2f13b76bc6c962b2294295b4fa73ec98f4257f886652485d79f90f1367",
-      "path": "spec/CHECKER_INPUT_SCHEMA.md",
-      "basis": "非同源复核：G-018 第二轮复核（verify-g018-r2，基线 ea9b674） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r2/REPORT.md sha256：17f631140bc700bf5826a7468f6919e7fc7f65da56302aef9d152b7fd1c1232d 复核基线：ea9b674 区段：spec/CHECKER_INPUT_SCHEMA.md#4 结论：认可（§4 actor_type 与实现一致）"
+      "basis": "无复核声明（不构成认可，不放行）"
     },
     "validation/checker-prototype/coverage.json": {
       "sha256": "bda6c5da3e06790c5af0dab6a591020c3f9cf06ed394dd6b51b137f7010a5e7a",

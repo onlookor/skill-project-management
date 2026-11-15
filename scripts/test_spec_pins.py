@@ -70,10 +70,14 @@ def main() -> int:
     print("| 编号 | 场景 | 预期 | 实际 | 证据 |")
     print("|---|---|---|---|---|")
 
-    def run(case_id, label, cur, head, pin_map, reviews, expected, test_root=None):
+    def run(case_id, label, cur, head, pin_map, reviews, expected, test_root=None,
+            registry=None):
         nonlocal failures, total
         total += 1
-        errors = evaluate(test_root or root, cur, head, pin_map, reviews)
+        errors = evaluate(
+            test_root or root, cur, head, pin_map, reviews,
+            {} if registry is None else registry,
+        )
         if expected is None:
             ok = not errors
             actual = "通过" if ok else "阻断"
@@ -233,23 +237,67 @@ def main() -> int:
         )
         bad_basis(
             "SP16",
-            "非白名单区段用“初始登记：…”",
+            "用“初始登记：…”自我声明放行",
             "初始登记：任意未复核改动",
             "缺少 `非同源复核：` 前缀",
         )
-        whitelist_pins = dict(pins)
-        whitelist_pins["GRAMMAR.md"] = {
-            **pins["GRAMMAR.md"],
-            "basis": "初始登记：任意未复核改动",
-        }
-        run(
+        bad_basis(
             "SP17",
-            "白名单区段用“初始登记：…”前缀（逐字冻结才放行）",
-            current,
-            current,
-            whitelist_pins,
-            [record],
+            "白名单区段用“初始登记：…”前缀（已取消白名单）",
+            "初始登记：任意未复核改动",
             "缺少 `非同源复核：` 前缀",
+        )
+        bad_basis(
+            "SP18",
+            "结论词后跟括号补充",
+            record.replace("结论：实质收敛", "结论：实质收敛（但实质上不予认可）"),
+            "缺少结论词或其后紧跟补充说明",
+        )
+        bad_basis(
+            "SP19",
+            "basis 写成无复核字面量",
+            "无复核声明（不构成认可，不放行）",
+            "无复核声明：不构成认可，也不放行",
+        )
+        dangling = subprocess.run(
+            ["git", "commit-tree", f"{baseline}^{{tree}}", "-m", "orphan"],
+            cwd=root, capture_output=True, text=True,
+        ).stdout.strip()
+        bad_basis(
+            "SP20",
+            "复核基线是无关提交",
+            record.replace(f"复核基线：{baseline}", f"复核基线：{dangling}"),
+            "不是 HEAD 的祖先提交",
+        )
+
+        schema_path = root / "spec" / "CHECKER_INPUT_SCHEMA.md"
+        extra = dict(current)
+        extra["spec/CHECKER_INPUT_SCHEMA.md"] = (
+            current["spec/CHECKER_INPUT_SCHEMA.md"] + "\n<!-- tail injection -->\n"
+        )
+        run(
+            "SP21",
+            "schema 文件末尾追加一行",
+            extra,
+            current,
+            pins,
+            [],
+            "指纹未更新",
+        )
+        run(
+            "SP22",
+            "登记表把已复核区段列为无复核",
+            current,
+            current,
+            pins,
+            [record],
+            "已有复核记录，应删除该例外登记",
+            registry={
+                "GRAMMAR.md": {
+                    "reason": "x", "missing_review": "x", "due": "x",
+                    "owner": "x", "todo": "T-000",
+                }
+            },
         )
 
     print()

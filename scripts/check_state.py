@@ -90,7 +90,10 @@ RELEASE_STATES = {"development", "released"}
 BYPASS_TRAILER = "Hook-Bypass"
 BYPASS_REASON = "Hook-Bypass-Reason"
 BYPASS_VERIFIED = "Hook-Bypass-Verified"
+BYPASS_ITEMS = "Hook-Bypass-Items"
 BYPASS_VALUE = "release-bootstrap"
+BYPASS_DEBT_VALUE = "pin-review-debt"
+TODO_FILE = "TODO.md"
 BYPASS_POLICY_SINCE = (0, 5, 2)  # v0.5.1 及以前为机制引入前的历史发布，不追溯
 
 
@@ -102,15 +105,42 @@ def parse_tag_version(tag: str):
 def parse_bypass_trailers(message: str) -> dict[str, str]:
     trailers: dict[str, str] = {}
     for line in message.splitlines():
-        for key in (BYPASS_TRAILER, BYPASS_REASON, BYPASS_VERIFIED):
+        for key in (BYPASS_TRAILER, BYPASS_REASON, BYPASS_VERIFIED, BYPASS_ITEMS):
             prefix = f"{key}:"
             if line.startswith(prefix):
                 trailers[key] = line[len(prefix):].strip()
     return trailers
 
 
+def check_debt_items(root: Path, items: str) -> list[str]:
+    """`Hook-Bypass-Items` 必须引用 TODO.md 中仍未关闭的到期项。"""
+    path = root / TODO_FILE
+    if not path.is_file():
+        return [f"[错误] 缺少 {TODO_FILE}，无法核对 {BYPASS_ITEMS} 引用"]
+    text = path.read_text(encoding="utf-8")
+    errors: list[str] = []
+    for item in [part.strip() for part in re.split(r"[,，]", items) if part.strip()]:
+        if re.fullmatch(r"T-\d{3}", item) is None:
+            errors.append(f"[错误] {BYPASS_ITEMS} 含非法编号：{item}")
+            continue
+        row = re.search(rf"^\|\s*{re.escape(item)}\s*\|.*$", text, re.M)
+        if row is None:
+            errors.append(f"[错误] {BYPASS_ITEMS} 引用的 {item} 不在 {TODO_FILE} 中")
+            continue
+        status = row.group(0).rstrip().rstrip("|").rsplit("|", 1)[-1].strip()
+        if status.startswith("`done`") or status.startswith("`dropped`"):
+            errors.append(
+                f"[错误] {BYPASS_ITEMS} 引用的 {item} 已关闭，不能作为待复核到期项"
+            )
+    return errors
+
+
 def check_bypass_trailer(root: Path, tag: str, release_state: str, head_is_tag: bool) -> list[str]:
-    """核对发布引导提交的绕过留痕；v0.5.1 及以前不追溯。"""
+    """核对留痕：发布引导提交用 release-bootstrap；钉扎面未复核例外用 pin-review-debt。
+
+    v0.5.1 及以前不追溯。钉扎面例外必须给出非空 `Hook-Bypass-Items:` 并引用
+    TODO.md 中未关闭的到期项（AGENTS.md 3.5.3），不得批量豁免。
+    """
     message = subprocess.run(
         ["git", "log", "-1", "--format=%B"], cwd=root, capture_output=True, text=True
     )
@@ -134,10 +164,21 @@ def check_bypass_trailer(root: Path, tag: str, release_state: str, head_is_tag: 
         if not trailers.get(BYPASS_VERIFIED):
             errors.append(f"[错误] 发布引导提交缺少非空 `{BYPASS_VERIFIED}:` trailer")
     elif trailers:
-        errors.append(
-            "[错误] 非发布引导提交不得携带 Hook-Bypass trailer；该留痕只用于 "
-            "release_state=released 且 tag 指向 HEAD 的提交"
-        )
+        if trailers.get(BYPASS_TRAILER) != BYPASS_DEBT_VALUE:
+            errors.append(
+                f"[错误] 非发布提交只允许 `{BYPASS_TRAILER}: {BYPASS_DEBT_VALUE}`"
+                "（钉扎面未复核例外，AGENTS.md 3.5.3）；其他绕过用途一律阻断"
+            )
+        if not trailers.get(BYPASS_REASON):
+            errors.append(f"[错误] 钉扎面例外提交缺少非空 `{BYPASS_REASON}:` trailer")
+        items = trailers.get(BYPASS_ITEMS, "")
+        if not items:
+            errors.append(
+                f"[错误] 钉扎面例外提交缺少 `{BYPASS_ITEMS}: <T-xxx,T-yyy>`；"
+                "每次绕过都必须在 TODO.md 生成到期项，不得批量豁免"
+            )
+        else:
+            errors.extend(check_debt_items(root, items))
     return errors
 
 

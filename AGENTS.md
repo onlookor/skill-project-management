@@ -76,23 +76,24 @@
 
 - **不得自动推断**。缺省（字段缺失）按 `released` 严格处理；非法值按结构错误（退出码 2）处理。不得根据分支名、提交数量或人工口头说明推断状态。
 - 状态切换必须写入 `manifest.json` 并随提交生效，不得只改工作区。
-- 发布提交的引导顺序固定：tag 只能指向已存在的提交，因此“把 `release_state` 改为 `released` 并递增版本”的提交需以 `git commit --no-verify` 提交，随后立即打 annotated tag 并运行十个检查器。其他提交不得使用 `--no-verify`。
+- 发布提交的引导顺序固定：tag 只能指向已存在的提交，因此“把 `release_state` 改为 `released` 并递增版本”的提交需以 `git commit --no-verify` 提交，随后立即打 annotated tag 并运行十个检查器。除发布引导提交与 3.5.3 的钉扎面未复核例外外，其他提交不得使用 `--no-verify`。
 - 发布点仍只有一个：以 annotated tag 声明（ADR-0003）；`development` 只说明 `HEAD` 领先于最近发布点，不产生第二个发布点。
 
 ##### 3.5.1 绕过留痕（硬要求）
 
-`--no-verify` 的唯一合法用途是发布引导提交。git 不记录该标志（实测：提交对象只有 `tree` / `parent` / `author` / `committer` / `message`，没有任何钩子旁路标记），因此留痕改为固定 trailer，由 `check_state.py` 机械核查：
+`--no-verify` 的合法用途只有两种：发布引导提交（本节）与钉扎面未复核例外（3.5.3）。git 不记录该标志（实测：提交对象只有 `tree` / `parent` / `author` / `committer` / `message`，没有任何钩子旁路标记），因此留痕改为固定 trailer，由 `check_state.py` 机械核查：
 
 ```
-Hook-Bypass: release-bootstrap
+Hook-Bypass: release-bootstrap | pin-review-debt
 Hook-Bypass-Reason: <为什么 pre-commit 无法通过>
-Hook-Bypass-Verified: <tag 名；十个检查器的复跑结果>
+Hook-Bypass-Verified: <tag 名；十个检查器的复跑结果>      # 仅 release-bootstrap
+Hook-Bypass-Items: <T-xxx[,T-yyy]>                      # 仅 pin-review-debt，必填
 ```
 
-- `v0.5.2` 及以后的发布提交必须齐备三项，且 `Hook-Bypass` 的值固定为 `release-bootstrap`；缺失任一项即错误。
-- 非发布提交（`release_state != released` 或 tag 未指向 `HEAD`）不得携带该 trailer，携带即错误。
+- `v0.5.2` 及以后的发布提交必须齐备前三项，且 `Hook-Bypass` 的值固定为 `release-bootstrap`；缺失任一项即错误。
+- 非发布提交只能携带 `Hook-Bypass: pin-review-debt`，且必须同时给出非空 `Hook-Bypass-Reason:` 与 `Hook-Bypass-Items:`；`Items` 中每个 `T-xxx` 必须在 `TODO.md` 存在且未关闭，否则错误。其他值一律错误。
 - `v0.5.1` 及以前为机制引入前的历史发布，不追溯、不回填。
-- trailer 是权威留痕；`CHANGELOG.md` 对应批次以 `**钩子绕过**` 字段引用同一 tag，供人阅读，检查器不解析 CHANGELOG。
+- trailer 是权威留痕；`CHANGELOG.md` 对应批次以 `**钩子绕过**` 字段引用同一提交与 `Items` 编号，供人阅读，检查器不解析 CHANGELOG。
 
 ##### 3.5.2 撤除条件（可判定）
 
@@ -102,6 +103,26 @@ Hook-Bypass-Verified: <tag 名；十个检查器的复跑结果>
 - **关闭时点**：不晚于 `v0.5.2` 的发布提交；若 `v0.5.2` 仍使用 `--no-verify`，通道在该发布后立即冻结，下一次发布前必须先完成撤除。
 - **关闭动作**：删除本条 `--no-verify` 例外（3.5 与 7bis 第 5 条）；新增 pre-push 钩子与待发布识别；移除 `Hook-Bypass` trailer 强制（历史提交保留）；`TODO.md` T-129 标 `done` 并记 CHANGELOG。
 - **次数上限**：机制生效后最多允许 1 次豁免（即 `v0.5.2`）；第 2 次豁免即违规，必须先完成撤除再发布。
+
+**钉扎面通道的撤除条件**（与发布引导通道各自独立，见 3.5.3）：
+
+- **到期即阻断**：例外登记项在 `scripts/no-review-declarations.json` 的 `due` 字段所声明的里程碑内未补出合格复核，则该里程碑关闭时机制冻结——`check_checker_pins.py` / `check_spec_pins.py` 的 rc 不得再被 `--no-verify` 视为可登记例外，任何新的钉扎面改动必须先补复核，再提交。机械判据：登记项 `due` 已过而 `basis` 仍为无复核字面量 → `check_state.py` 报错、pre-commit 阻断。
+- **不得续期**：`due` 只能随“补出复核”一次性地消失，不允许修改 `due` 字段延长；需要延期的，必须由人类责任方另开 ADR 记录理由。
+- **关闭动作**：全部登记项补出复核并从登记表中删除后，删除 3.5.3 与 3.5.1 中的 `pin-review-debt` 取值，`check_state.py` 同步移除该通道，`TODO.md` T-149 标 `done` 并记 CHANGELOG。
+
+#### 3.5.3 钉扎面未复核例外（临时通道）
+
+**适用对象**：`scripts/checker-pins.json` 与 `scripts/spec-pins.json` 登记的一切对象——检查器脚本（全仓 `.py` 除 `PY_EXCLUDE`）、`.githooks/pre-commit`、`scripts/no-review-declarations.json`（登记表自身）、以及 `spec-pins.json` 的 13 个规格区段。
+
+**硬规则**：
+
+1. 钉扎面上的改动**没有真复核时，两个 pins 检查器必须 rc≠0**，不得因任何自我声明放行。`--write --basis` 只接受两种输入：五要素齐全的非同源复核记录，或固定字面量 `无复核声明（不构成认可，不放行）`。后者只登记事实，**不放行**。
+2. 因此，钉扎面改动未复核时**只能以 `git commit --no-verify` 提交**，并携带 `Hook-Bypass: pin-review-debt`、`Hook-Bypass-Reason:` 与非空 `Hook-Bypass-Items:`（格式见 3.5.1）。
+3. 每次 `--no-verify` 必须在 `TODO.md` 新建一条到期项、并在 `scripts/no-review-declarations.json` 对应对象下登记，两处都须含：**改动对象**（`key`）、**缺哪份复核**（`missing_review`）、**到期里程碑**（`due`）、**责任人**（`owner`）。**不得批量豁免**：一个提交豁免多个对象时，每个对象各占一条登记，`Items` 列全部 T 编号；不得用“同批多个对象”折成一条。
+4. 登记表由 `check_state.py` 机械交叉校验：登记项必须是受保护对象、缺任一字段 → 错误；已存在合格复核记录却仍登记为无复核 → 错误。
+5. `--no-verify` 只跳过钩子，不改变 `check_checker_pins.py` / `check_spec_pins.py` 在发布前与每次 pre-commit 复跑中的 rc≠0 事实。**“已提交”不等于“已认可”**：登记项在 `due` 之前未补复核，按 3.5.2 的钉扎面撤除条件冻结本通道。
+
+**与既有机制的关系**：不新造豁免登记体系——沿用 3.5.1 的 trailer 留痕与 `TODO.md` 到期项，另加一份受 pins 保护的数据文件（`scripts/no-review-declarations.json`）承载“哪个对象缺哪份复核”。三者分工：trailer 记录“哪个提交绕过了钩子”，TODO 记录“谁在什么时候补”，登记表记录“哪个对象当前无复核”。
 
 #### 3.6 缺口台账与裁定（临时机制）
 
@@ -193,11 +214,12 @@ Hook-Bypass-Verified: <tag 名；十个检查器的复跑结果>
 
 验证链不能自证：检查器、规格与样例都在同一工作区，同一方可以同时改“判定”和“被判定”。本条把可机械化的部分做成显式留痕，把不能机械化的部分写清边界（完整论证见 ADR-0014）。
 
-- **检查器绑定**：`scripts/checker-pins.json` 登记 `scripts/` 下检查器脚本的 sha256 与 `basis`，**包含 `check_checker_pins.py` 自身**（不再自排除），并包含 `.githooks/pre-commit` 与 `validation/checker-prototype/checker.py`。工作区哈希与登记不一致 → `scripts/check_checker_pins.py` 退出 1。改动检查器必须 `--write --basis "<非同源复核记录>"`；`basis` 必须含 `非同源复核：`、`复核产物：<存在的路径>`、`复核基线：<提交号>`，自由文本被拒绝（退出 2）。
-- **规格区段绑定**：`scripts/spec-pins.json` 分别登记 `GRAMMAR.md` 全文、方法文件 A.2、方法文件 A.1 样例区段、schema §2bis/§3/§4、`validation/checker-prototype/coverage.json` 全文的指纹。区段相对 HEAD 有改动时，同一提交必须附 `validation/reviews/*.md` 复核记录，含 `非同源复核：`、`区段：<key>`、`复核产物：<文件名>` 与结论词（实质收敛/认可/通过），否则 `scripts/check_spec_pins.py` 退出 1。
+- **检查器绑定**：`scripts/checker-pins.json` 登记**全仓 `.py`（`git ls-files` 含未跟踪未忽略者，减去 `PY_EXCLUDE`）**的 sha256 与 `basis`，**包含 `check_checker_pins.py` 自身**，并包含 `.githooks/pre-commit`、`validation/checker-prototype/checker.py` 与例外登记表 `scripts/no-review-declarations.json`。不匹配既有 glob 的新 helper 脚本默认受保护。工作区哈希与登记不一致 → `scripts/check_checker_pins.py` 退出 1。改动检查器必须 `--write --basis "<非同源复核记录>"`；`basis` 只接受五要素齐全的复核记录（`非同源复核：`、`复核产物：<仓库外存在的路径>`、`sha256：<64 位小写十六进制>`、`复核基线：<HEAD 的祖先提交>`、唯一精确等值的 `区段：<key>`、行尾结论词），或固定字面量 `无复核声明（不构成认可，不放行）`。后者可写入但**不放行**；其他自由文本一律拒绝（退出 2）。
+- **规格区段绑定**：`scripts/spec-pins.json` 登记 13 个区段：`GRAMMAR.md` 全文、方法文件 A.2、方法文件 A.1 样例区段、`spec/CHECKER_INPUT_SCHEMA.md` **整文件**、`validation/checker-prototype/coverage.json` 全文等。schema 不再只钉 §1.11/§2bis/§3/§4，文件末尾追加一行同样命中。区段相对 HEAD 有改动时，同一提交必须附合格复核记录（要素同上一款，结论词后只能是行尾或 `；`/`。`，不得跟 `（…）` 补充），否则 `scripts/check_spec_pins.py` 退出 1。
+- **无复核例外的登记**：钉扎面改动缺复核时，`basis` 写无复核字面量，并在 `scripts/no-review-declarations.json` 逐对象登记 `reason` / `missing_review` / `due` / `owner` / `todo`。检查器交叉校验：登记项必须是受保护对象、字段齐全、已存在合格复核却仍登记即报错。该文件本身纳入 pins，改表与改检查器同等受约束。通道规则见 3.5.3。
 - **验收快照**：`validation/pinned/checker.py` 是工作区 `validation/checker-prototype/checker.py` 的只读快照；`check_checker_pins.py` 检测两者是否漂移。**这是漂移检测，不是权限分离**：两份文件仍在同一工作区，同一方可以同改；真正的分离需要 CI/受保护分支，本机无 CI 时做不到，ADR-0014 已记录该限制与残余风险。
 - **不可机械化部分**：签收人身份、签收人与改动人是否同源、复核记录是否真实执行，机器都无法验证；只能靠 3.6.6/3.6.7 的评审流程与提交评审约束。**残余风险明确外置**：伪造复核记录、同一方持有写权限，均由外部控制（真 CI + 受保护分支 + 复核方独立持有工具链）承接，不以“打不穿”作为关闭条件。
-- **正负例**：`scripts/test_checker_pins.py`（CP01–CP07）与 `scripts/test_spec_pins.py`（SP01–SP05）固定验证阻断与放行。
+- **正负例**：`scripts/test_checker_pins.py`（CP01–CP20：含无复核字面量、结论词括号补充、无关基线、新增 helper 未登记、登记表被改）与 `scripts/test_spec_pins.py`（SP01–SP22：含自我声明、结论词括号补充、无关基线、schema 末尾追加、登记表冲突）固定验证阻断与放行。
 - **pre-commit 额外执行**：A.1 全部 68 条样例、聚合顺序无关性、缺键快检（43 键）、`null` 快检子集、嵌套缺键快检（53 项）、封闭枚举快检（5 项）。改 `aggregate()` 或入口归一化后，仅靠原有十个检查器无法全绿。
 
 ### 4. 目录结构（唯一权威）
@@ -308,14 +330,15 @@ project-management-grounding/
 │   ├── check_gap_ledger.py         # 缺口台账结构、覆盖、到期与暂存同步检查（可运行）
 │   ├── check_three_table.py        # 正文 ↔ 判定列 ↔ 输入 schema 三表机械对照（可运行）
 │   ├── check_coverage_gate.py      # A.2 每子句 1 正 1 负的覆盖矩阵闸门（子句级取证，可运行）
-│   ├── check_checker_pins.py       # 检查器哈希登记（含自身与 pre-commit）与验收快照漂移检测（可运行）
-│   ├── check_spec_pins.py          # GRAMMAR/A.2/A.1/schema/coverage 指纹与复核记录绑定（可运行）
+│   ├── check_checker_pins.py       # 检查器哈希登记（全仓 .py + 自身 + pre-commit + 登记表）与验收快照漂移检测（可运行）
+│   ├── check_spec_pins.py          # GRAMMAR/A.2/A.1/schema 整文件/coverage 指纹与复核记录绑定（可运行）
 │   ├── checker-pins.json           # 检查器脚本 sha256 与 basis 登记
-│   ├── spec-pins.json              # 规格区段指纹登记
+│   ├── spec-pins.json              # 规格区段指纹登记（13 区段）
+│   ├── no-review-declarations.json # 钉扎面无复核例外登记（受 pins 保护；见 3.5.3）
 │   ├── test_check_table_mutations.py   # A.2 固定变异集 + 签收正负例（可运行）
 │   ├── test_coverage_gate.py       # 覆盖闸门四条负例（可运行）
-│   ├── test_checker_pins.py        # 检查器绑定七条正负例（可运行）
-│   ├── test_spec_pins.py           # 规格区段绑定五条正负例（可运行）
+│   ├── test_checker_pins.py        # 检查器绑定 CP01–CP20 正负例（可运行）
+│   ├── test_spec_pins.py           # 规格区段绑定 SP01–SP22 正负例（可运行）
 │   ├── check_glossary_usage.py     # 术语使用位置生成与陈旧引用校验（可运行）
 │   ├── validate_ontology.py        # 本体与 SHACL 形状校验，含逐形状负例矩阵（可选依赖）
 │   └── check_state.py              # STATE 与 git 跟踪文件的对账脚本（可运行）
@@ -449,7 +472,7 @@ project-management-grounding/
 2. **`resources/` 只在本地只读使用**。不复制、不打包、不 `git add`；`.gitignore` 已忽略 `resources/` 与文档类扩展名，但忽略规则不是许可。
 3. **引用外部文献只写可复核的定位与自己的话**。默认写法是“页码定位 + 自述摘要”；确需引证术语或条款措辞时，单条不超过一行或一句，并附来源 `id` 与页码（见 `CONSTITUTION.md` 第 13.2 条）。
 4. **提交前必须运行十个检查器与原型快检**：`check_no_raw_material.py`、`check_anchors.py`、`check_ledger_landings.py`、`check_gap_ledger.py --staged`、`check_three_table.py`、`check_coverage_gate.py`、`check_checker_pins.py`、`check_spec_pins.py`、`check_glossary_usage.py`、`check_state.py`；外加 `validation/checker-prototype/checker.py` 的 68 条样例、`--aggregation-order`、`--missing-key-sweep`、`--null-sweep --quick`、`--nested-missing-sweep`、`--enum-sweep`。本仓库已提供 `.githooks/pre-commit`，每个克隆需自行执行 `git config core.hooksPath .githooks` 启用；未启用钩子的部署必须在 `git add` 前手工逐个运行，等价命令见 `scripts/README.md`。
-5. **检查器命中即停止提交**，不得用 `--no-verify` 绕过。唯一例外是第 3.5 条规定的发布引导提交（`release_state` 改为 `released` 并递增版本），该提交必须携带 3.5.1 的三项 `Hook-Bypass` trailer，并紧接 annotated tag 与十个检查器的复跑；该通道按 3.5.2 的撤除条件关闭（`TODO.md` T-129）。确需新增其他例外（例如将来要提交一张合法图片资产），走 ADR 并在检查器中登记路径豁免，而不是删除规则或放宽阈值。
+5. **检查器命中即停止提交**，不得用 `--no-verify` 绕过。仅有的两个例外：一是第 3.5 条规定的发布引导提交（`release_state` 改为 `released` 并递增版本），该提交必须携带 3.5.1 的三项 `Hook-Bypass` trailer，并紧接 annotated tag 与十个检查器的复跑；二是 3.5.3 的钉扎面未复核例外，该提交必须携带 `Hook-Bypass: pin-review-debt` + `Hook-Bypass-Reason:` + `Hook-Bypass-Items:`，并在 `TODO.md` 与 `scripts/no-review-declarations.json` 逐对象登记到期项。两个通道分别按 3.5.2 的撤除条件关闭（`TODO.md` T-129 / T-149）。确需新增其他例外（例如将来要提交一张合法图片资产），走 ADR 并在检查器中登记路径豁免，而不是删除规则或放宽阈值。
 6. **发现已跟踪内容违规时**：先报告文件与位置，再改为“页码定位 + 自述摘要”或移出仓库，并在 `ERRATA.md` 登记；不静默删除他人的内容。
 7. **自建本体（`CONSTITUTION.md` 第 13.6 条）**：
    - 只放 `ontology/`；主格式为 Turtle（`.ttl`、`.shacl.ttl`），`.owl`/`.rdf`/`.nt`/`.n3`/`.jsonld` 仅作生成导出，仍受同一内容检查。

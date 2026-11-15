@@ -1262,3 +1262,30 @@
 - **`CONSTITUTION.md`**：不新增条款。D6 属目标层而非约束层，`CONSTITUTION.md` 登记的是对产物的禁令与准入；出口未定前写成条款会产生无法机械判定的强制项。理由同时写入 `ROADMAP.md` 的 D6 说明。
 - **跟踪**：`TODO.md` 新增 T-147（M7，`open`，出口待定）。
 - **关联 ADR**：无（目标层记录，不改任何规则语义）
+
+---
+
+### 批次 0078 — 2026-11-15 — D6 需求与设计重审提案（待裁定）
+
+- **涉及文件**：新建 `spec/D6_REBASELINE_PROPOSAL.md`；修改 `TODO.md`（新增 T-148）；修改 `CHANGELOG.md`。
+- **变更摘要**：承接批次 0077 的 D6，对全项目做需求与整体设计重审，产出可单独评审的提案：需求层（G0-a/b/c/d 拆分、5 类使用者场景、验收三要件 V1–V3、明确不做、9 条"目标实为方法"、8 条目标冲突）、42 项原子能力五档分解（11 M / 18 M+J / 4 M+J+H / 6 M+H / 3 J+H）、五层架构（新增 L1 运行契约层，含任务契约/工件契约/签字契约与 6 算子闭集）、既有资产逐项定位、R0–R6 可判真假出口、18 项资产处置与代价、9 条待裁决策。
+- **核心结论**：现行设计的可执行产物是"项目管理产物的合规检查器"，缺少任务目录、工序、工件 schema、模板整层；D6 原话应改写为"技能把可机械部分做到极致、判断部分显式外置"；`pmbok8:` 本体在运行期被引用 0 次，309 条定义/92 类/24 条 SHACL 建议标 `dormant`；D6 因缺基准模型、任务集、判据而处于**未验收**。
+- **不改动的文件**：`CONSTITUTION.md`、`ROADMAP.md`、`CHARTER.md`、`GRAMMAR.md` 及任何既有规范正文。提案第 10 节只列修订建议，不执行。
+- **性质**：提案，不产生约束；裁定后若改规范正文另走 ADR。
+- **关联 ADR**：无（提案层，无规则语义变化）。
+
+---
+
+### 批次 0079 — 2026-11-15 — 钉扎体系"甲方案"整改：取消自我声明通道
+
+- **涉及文件**：`scripts/check_checker_pins.py`、`scripts/check_spec_pins.py`、`scripts/check_state.py`、`scripts/test_checker_pins.py`、`scripts/test_spec_pins.py`、`scripts/no-review-declarations.json`（新建）、`scripts/checker-pins.json`、`scripts/spec-pins.json`、`scripts/README.md`、`AGENTS.md`、`TODO.md`、`CHANGELOG.md`。
+- **变更摘要**：按用户裁定（甲方案），取消钉扎体系的自我声明通道，把例外改走 `AGENTS.md` 3.5 既有的 `--no-verify` 留痕机制。
+  1. **取消"待复核"通道**：`--write --basis` 只接受两类输入——五要素齐全的非同源复核记录，或固定字面量 `无复核声明（不构成认可，不放行）`。后者可如实登记但**永不放行**（默认模式 rc=1），只能 `--no-verify`。删除 `UNREVIEWED_KEYS` 白名单与全部"待复核：批次 NNNN"形态；任何自由文本一律 rc=2。
+  2. **例外改走 3.5**：新增 `AGENTS.md` 3.5.3（钉扎面未复核例外）与 3.5.2 的钉扎面撤除条件（到期未补复核即冻结通道）；`Hook-Bypass` 新增 `pin-review-debt` 取值与 `Hook-Bypass-Items`，`check_state.py` 机械核对 `Items` 中每个 `T-xxx` 在 `TODO.md` 存在且未关闭。复用既有 trailer 机制，未另造登记体系。
+  3. **白名单表进入受保护范围**：异常清单移出到 `scripts/no-review-declarations.json`，并纳入 `checker-pins.json`；改表与改检查器同等受约束，两个 pins 检查器交叉校验登记项（须为受保护对象、字段齐全、已有复核却仍登记即报错）。
+  4. **补无痕面**：`spec/CHECKER_INPUT_SCHEMA.md` 由 §1.11/§2bis/§3/§4 四段合并为**整文件**钉扎（spec 区段 16 → 13）；检查器覆盖面由 `scripts/{check_,test_,validate_}*.py` 扩为**全仓 `.py`**（含未跟踪未忽略者，`PY_EXCLUDE` 为空），新 helper 默认受保护；结论词后只允许行尾或 `；`/`。`，`结论：认可（但实质上不予认可）` 被拒；`复核基线` 增加 `git merge-base --is-ancestor` 祖先校验，`git commit-tree` 造出的无关提交被拒。
+- **收口结果**：21 个检查器对象中 15 个显式无复核、6 个保留真实 r3/r6 复核；spec 13 区段中 2 个无复核（`GRAMMAR.md`、schema 整文件）。此前接受自我声明的 13 个对象全部收口为"不构成认可、不放行"。
+- **验证**：`test_checker_pins.py` 20/20、`test_spec_pins.py` 23/23；默认模式 `check_spec_pins.py` rc=1、`check_checker_pins.py` rc=1（预期内，本批未经复核）。
+- **钩子绕过**：本批以 `git commit --no-verify` 提交；`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Reason` 见提交信息，`Hook-Bypass-Items: T-149`。原因：本批改的正是钉扎检查器自身与受钉扎的 spec 区段，未经非同源复核，两个 pins 检查器必然 rc≠0。到期项登记于 `TODO.md` T-149 与 `scripts/no-review-declarations.json`（逐对象一条，未批量豁免）。
+- **关联 ADR**：无（收紧既有机制，未变规则语义；`AGENTS.md` 属执行约定）
+

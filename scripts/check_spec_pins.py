@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
-"""规格区段绑定：GRAMMAR.md 全文、A.2、A.1、schema §2bis/§3/§4、全部数据 schema、coverage.json。
+"""规格区段绑定：GRAMMAR.md 全文、A.2、A.1、CHECKER_INPUT_SCHEMA.md **整文件**、
+全部数据 schema、coverage.json 与 ACCESS_ZONES.md。
 
 规则：
   1. 任一区段当前指纹与 scripts/spec-pins.json 不一致 → 阻断（先 --write）；
   2. `contracts/schema/` 下任何文件未登记为区段 → 阻断（自动发现，取代人工清单）；
   3. 区段相对 HEAD 有改动时，同一提交必须附合格的非同源复核记录，否则阻断；
-  4. 复核标准与 `check_checker_pins.py` 对齐：依据必须指向**仓库外**的复核产物，
-     并给出 `sha256：<64 位>`、`复核基线：<仓库内存在的提交>`、唯一一条
-     `区段：<所绑区段>` 与结论词（`实质收敛`/`认可`/`通过`，否定前缀无效）；
-     仓库内转录件只作索引，不作依据。**默认读取模式同样校验这些字段**，只改 basis
-     文本会被阻断。“无复核声明”只对代码内冻结的 `UNREVIEWED_KEYS` 成立：历史基文
-     必须**逐字**相等，本批改动必须是结构化
-     `待复核：批次 NNNN …；无复核声明，不构成认可`；`初始登记：<任意>` 之类
-     前缀文本一律拒绝。复核记录（`valid_review`）永不接受该状态。
-  5. `--write` 新增或变更的区段必须附 `--basis`（合格复核记录，或白名单区段的
-     结构化待复核声明）；冻结的历史基文不能用于覆盖新改动。
+  4. basis 只有两种合法形态：(a) 合格的非同源复核记录——指向**仓库外**存在的产物、
+     `sha256：` 与之一致、`复核基线：` 是 HEAD 的祖先提交、唯一且等值的 `区段：`、
+     **行尾**结论词（后面不得跟括号补充）；(b) 固定字面量
+     `无复核声明（不构成认可，不放行）`——它记录事实但**永不放行**，登记项会持续
+     报错，只能 `git commit --no-verify` 并在 `scripts/no-review-declarations.json`
+     与 `TODO.md` 到期项中留痕（AGENTS.md 3.5.3）。不存在“待复核/初始登记”通行证。
+  5. `--write` 新增或变更的区段必须附 `--basis`（合格复核记录，或无复核字面量）。
 
 记录文件放在 validation/reviews/ 下并在同一提交暂存；也可用 --review 指定。
 这不是“签收人身份验证”：机器只能核对记录的存在与字段，不能验证复核者是谁。
@@ -37,38 +35,29 @@ import sys
 from pathlib import Path
 
 PINS = Path("scripts/spec-pins.json")
+REGISTRY = Path("scripts/no-review-declarations.json")
 METHOD = "spec/methods/deterministic-checker.md"
 SCHEMA = "spec/CHECKER_INPUT_SCHEMA.md"
 SCHEMA_DIR = "contracts/schema"
 CONCLUSIONS = ("实质收敛", "认可", "通过")
-# 结构化“待复核”声明：批次号 + 说明 + 固定否定尾句。只有白名单对象可用。
-PENDING_RE = re.compile(r"^待复核：批次 \d{4} [^；]+；无复核声明，不构成认可$")
-# 冻结白名单：区段 → 唯一允许的**历史**“无复核声明”文本（逐字匹配）。
-# 值为 None 表示该区段只允许结构化 `待复核：批次 NNNN …`。
-# 不做前缀判定：`初始登记：<任意>`、`无复核声明：<任意>` 一律无效。
-UNREVIEWED_KEYS: dict[str, str | None] = {
-    "GRAMMAR.md": "初始登记",
-    f"{SCHEMA}#2bis": "初始登记",
-    f"{SCHEMA}#1.11": None,
-}
+# 唯一允许的“无复核”字面量：它记录事实，但不构成认可、也不放行。
+DECLARATION = "无复核声明（不构成认可，不放行）"
+REGISTRY_FIELDS = ("reason", "missing_review", "due", "owner", "todo")
 
 
-def unreviewed_ok(text: str, key: str) -> bool:
-    """白名单内：逐字等于冻结基文，或符合结构化“待复核”声明；其余一律不放行。"""
-    if key not in UNREVIEWED_KEYS:
-        return False
-    if PENDING_RE.match(text) is not None:
-        return True
-    return UNREVIEWED_KEYS[key] == text
+def load_registry(root: Path) -> dict:
+    path = root / REGISTRY
+    if not path.is_file():
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    return data.get("spec", {}) if isinstance(data, dict) else {}
+
 
 SECTIONS = (
     {"key": "GRAMMAR.md", "path": "GRAMMAR.md", "start": None, "end": None},
     {"key": f"{METHOD}#A.2", "path": METHOD, "start": "### A.2 ", "end": "### A.1 "},
     {"key": f"{METHOD}#A.1", "path": METHOD, "start": "### A.1 ", "end": None},
-    {"key": f"{SCHEMA}#1.11", "path": SCHEMA, "start": "11. **封闭枚举全局归一化**", "end": "12. **适用性"},
-    {"key": f"{SCHEMA}#2bis", "path": SCHEMA, "start": "## 2bis. ", "end": "## 3. "},
-    {"key": f"{SCHEMA}#3", "path": SCHEMA, "start": "## 3. ", "end": "## 3bis. "},
-    {"key": f"{SCHEMA}#4", "path": SCHEMA, "start": "## 4. ", "end": "## 5. "},
+    {"key": SCHEMA, "path": SCHEMA, "start": None, "end": None},
     {
         "key": "validation/checker-prototype/coverage.json",
         "path": "validation/checker-prototype/coverage.json",
@@ -142,17 +131,14 @@ def discover_schema_files(root: Path) -> list[str]:
     )
 
 
-def valid_basis(root: Path, text: str, key: str, allow_unreviewed=None) -> tuple[bool, str]:
-    """默认模式与 --write 共用：basis 必须指向仓库外产物、sha256 一致且区段正确。
-
-    “无复核声明”只对 `UNREVIEWED_KEYS` 白名单内的区段成立，且必须逐字等于冻结基文
-    或符合结构化“待复核”声明；不再按 `初始登记：` 前缀放行。复核记录永不接受该状态。
-    """
+def valid_basis(root: Path, text: str, key: str) -> tuple[bool, str]:
+    """basis 只接受合格的非同源复核记录；“无复核声明”记录事实但永不通过。"""
     text = text.strip()
-    if allow_unreviewed is None:
-        allow_unreviewed = key in UNREVIEWED_KEYS
-    if allow_unreviewed and unreviewed_ok(text, key):
-        return True, ""
+    if text == DECLARATION:
+        return False, (
+            "无复核声明：不构成认可，也不放行（例外只能 --no-verify 提交，并须在 "
+            "scripts/no-review-declarations.json 与 TODO.md 到期项中留痕）"
+        )
     if "非同源复核：" not in text:
         return False, "缺少 `非同源复核：` 前缀"
     artifact = re.search(r"复核产物：`?([^`\s；，、]+)`?", text)
@@ -170,13 +156,19 @@ def valid_basis(root: Path, text: str, key: str, allow_unreviewed=None) -> tuple
     baseline = re.search(r"复核基线：`?([0-9a-f]{7,40})`?", text)
     if baseline is None:
         return False, "缺少 `复核基线：<提交号>`"
+    sha = baseline.group(1)
     exists = subprocess.run(
-        ["git", "cat-file", "-e", f"{baseline.group(1)}^{{commit}}"],
+        ["git", "cat-file", "-e", f"{sha}^{{commit}}"], cwd=root, capture_output=True
+    )
+    if exists.returncode != 0:
+        return False, f"复核基线不存在：{sha}"
+    ancestor = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", sha, "HEAD"],
         cwd=root,
         capture_output=True,
     )
-    if exists.returncode != 0:
-        return False, f"复核基线不存在：{baseline.group(1)}"
+    if ancestor.returncode != 0:
+        return False, f"复核基线不是 HEAD 的祖先提交（无关提交）：{sha}"
     recorded = re.search(r"sha256：`?([0-9a-f]{64})`?", text)
     if recorded is None:
         return False, "缺少 `sha256：<64 位十六进制>`"
@@ -187,19 +179,21 @@ def valid_basis(root: Path, text: str, key: str, allow_unreviewed=None) -> tuple
         return False, f"`区段：` 必须精确等于 {key} 且只出现一次"
     if re.search(r"结论：\s*(?:不|未|无法)", text) is not None:
         return False, "结论词被否定（`不予`/`未`/`无法` 前缀）"
-    if re.search(rf"结论：\s*(?:{'|'.join(CONCLUSIONS)})(?=$|[\s；;，,。）（()])", text) is None:
-        return False, f"缺少结论词（{'/'.join(CONCLUSIONS)}）"
+    if re.search(
+        rf"结论：\s*(?:{'|'.join(CONCLUSIONS)})(?=[ \t]*(?:$|[；;。]))", text, re.M
+    ) is None:
+        return False, (
+            f"缺少结论词或其后紧跟补充说明（{'/'.join(CONCLUSIONS)}）；"
+            "结论词后只允许行尾或 `；`/`。` 分隔，不得跟括号"
+        )
     return True, ""
 
 
 def writable(root: Path, text: str, key: str) -> tuple[bool, str]:
-    """`--write` 的放行口径：合格复核记录，或白名单区段的**结构化**待复核声明。
-
-    冻结的历史“初始登记/无复核声明”文本不得用来覆盖新改动——那是旧状态，不是新授权。
-    """
-    if key in UNREVIEWED_KEYS and PENDING_RE.match(text.strip()) is not None:
+    """`--write` 放行口径：合格复核记录，或无复核字面量（后者写入后仍会报错）。"""
+    if text.strip() == DECLARATION:
         return True, ""
-    return valid_basis(root, text, key, allow_unreviewed=False)
+    return valid_basis(root, text, key)
 
 
 
@@ -238,7 +232,7 @@ def valid_review(root: Path, reviews: list[str], key: str) -> bool:
             continue
         if not any(word in text for word in CONCLUSIONS):
             continue
-        ok, _ = valid_basis(root, text, key, allow_unreviewed=False)
+        ok, _ = valid_basis(root, text, key)
         if ok:
             return True
     return False
@@ -250,6 +244,7 @@ def evaluate(
     head: dict[str, str | None],
     pins: dict[str, dict],
     reviews: list[str],
+    registry: dict | None = None,
 ) -> list[str]:
     errors: list[str] = []
     for spec in SECTIONS:
@@ -285,6 +280,32 @@ def evaluate(
                 "且 `复核产物：` 指向仓库外文件、`sha256：` 与之一致、"
                 "`复核基线：` 指向仓库内存在的提交）"
             )
+    if registry is None:
+        try:
+            registry = load_registry(root)
+        except (OSError, json.JSONDecodeError) as exc:
+            errors.append(f"{REGISTRY}：无法解析（{exc}）")
+            registry = {}
+    for key, entry in sorted(pins.items()):
+        if isinstance(entry, dict) and entry.get("basis") == DECLARATION:
+            if key not in registry:
+                errors.append(
+                    f"{key}：无复核声明未在 {REGISTRY} 登记"
+                    "（须含缺哪份复核、到期里程碑、责任人）"
+                )
+    for key, info in sorted(registry.items()):
+        entry = pins.get(key)
+        if not isinstance(entry, dict):
+            errors.append(f"{REGISTRY}：登记项 {key} 不是已登记区段")
+            continue
+        if entry.get("basis") != DECLARATION:
+            errors.append(f"{REGISTRY}：{key} 已有复核记录，应删除该例外登记")
+        if not isinstance(info, dict):
+            errors.append(f"{REGISTRY}：{key} 的登记项必须是对象")
+            continue
+        missing = [field for field in REGISTRY_FIELDS if not info.get(field)]
+        if missing:
+            errors.append(f"{REGISTRY}：{key} 缺少字段 {', '.join(missing)}")
     declared = {spec["path"] for spec in SECTIONS}
     for path in discover_schema_files(root):
         if path not in declared:
@@ -375,14 +396,16 @@ def main() -> int:
                     "basis": (
                         chosen[key]
                         if old_sha != actual
-                        else (old or {}).get("basis") or "初始登记"
+                        else (old or {}).get("basis") or DECLARATION
                     ),
                 }
             pins = {
                 "version": 1,
                 "note": (
-                    "规格区段指纹。区段新增或改动必须 --write --basis 并同批附非同源复核记录；"
-                    "basis 必须指向仓库外复核产物并与其 sha256 一致。指纹只证明内容一致，不证明签收人身份。"
+                    "规格区段指纹。区段新增或改动必须 --write --basis；basis 只接受合格的非同源"
+                    "复核记录，或无复核字面量（后者不放行，须 --no-verify 并在 "
+                    "scripts/no-review-declarations.json 与 TODO.md 到期项留痕）。"
+                    "指纹只证明内容一致，不证明签收人身份。"
                 ),
                 "sections": sections,
             }
