@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "A.2 每个子句至少 1 正例 + 1 负例；样例编号形如 A.1.5-3。正例期望 verdict=pass；负例期望 verdict≠pass 且 reason 属于该子句原因码。由 scripts/check_coverage_gate.py 机械核对。",
+  "note": "A.2 每个子句至少 1 正例 + 1 负例；样例编号形如 A.1.5-3。正例期望 verdict=pass；负例期望 verdict≠pass，且 expected_failed_clauses 必须被 failed_clauses() 实际触发（声明集合是实际命中集合的子集）。本闸门不核对 reason 码与子句原因码列的对应关系。failed_clauses() 绕过入口归一化：必需键缺失或为 null 时返回空集；A.1.10-6（actors[].type 为 null）的期望 verdict 来自生产 evaluate() 的入口归一化，其子句归属仅用于取证，不代表生产路径会归出该子句。由 scripts/check_coverage_gate.py 机械核对。",
   "clauses": {
     "G-A1#1": {
       "check_id": "PROJECT_MINIMAL_EXISTENCE",
@@ -28,6 +28,12 @@
         },
         {
           "sample": "A.1.1-10",
+          "expected_failed_clauses": [
+            "G-A1#1"
+          ]
+        },
+        {
+          "sample": "A.1.1-11",
           "expected_failed_clauses": [
             "G-A1#1"
           ]
@@ -468,6 +474,12 @@
       "negative": [
         {
           "sample": "A.1.11-3",
+          "expected_failed_clauses": [
+            "G-F1#2"
+          ]
+        },
+        {
+          "sample": "A.1.11-4",
           "expected_failed_clauses": [
             "G-F1#2"
           ]

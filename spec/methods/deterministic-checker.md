@@ -289,7 +289,7 @@
 
 | check_id | 规则 | 判定（子句 id） | 子句指纹 | 输入 | 原因码 | 规则状态 |
 |---|---|---|---|---|---|---|
-| `PROJECT_MINIMAL_EXISTENCE` | G-A1 | `G-A1#1`–`G-A1#6` | `6a4f8c0ad633` | `project`, `actors`, `outcomes`, `commitments`, `constraints` | missing_actor / missing_outcome / missing_commitment / missing_constraint / broken_commitment_endpoint / constraint_not_applied | active |
+| `PROJECT_MINIMAL_EXISTENCE` | G-A1 | `G-A1#1`–`G-A1#6` | `bb269bbd9299` | `project`, `actors`, `outcomes`, `commitments`, `constraints` | missing_actor / undefined_enum_value / missing_outcome / missing_commitment / missing_constraint / broken_commitment_endpoint / constraint_not_applied | active |
 | `CONSTRAINT_ANCHOR_REQUIRED` | G-A2 | `G-A2#1`–`G-A2#2` | `92b655760009` | `commitments`, `deliverables`, `constraints` | unanchored_management_item / undefined_enum_value | active |
 | `DUAL_DIMENSION_ANNOTATION` | G-B1 | `G-B1#1`–`G-B1#2` | `2cde52fd3961` | `management_items` | missing_dimension | active |
 | `DIMENSION_VALUE_CLOSED` | G-B2 | `G-B2#1`–`G-B2#2` | `b50cfc085765` | `management_items` | dimension_value_out_of_enum / invalid_subject_group_extension / undefined_enum_value | active |
@@ -297,9 +297,9 @@
 | `ASSERTION_MUTUAL_EXCLUSION` | G-C2 | `G-C2#1`–`G-C2#2` | `e099e1ee877a` | `assertions`, `deliverables` | mutually_exclusive_active_assertions / missing_input / undefined_enum_value | active |
 | `CHANGE_CONSTRAINT_LINK` | G-D1 | `G-D1#1`–`G-D1#3` | `3e473f8ea1e8` | `changes`, `constraints`, `commitments`, `deliverables` | missing_change_target / invalid_change_target / missing_constraint_link / invalid_change_relation | active |
 | `ALL_IMPROVEMENT_ASSUMPTION` | G-D2 | `G-D2#1`–`G-D2#3` | `c1573c1eb236` | `changes`, `actors` | all_improvement_without_verification / approval_basis_before_verification / assumption_unclosed | active |
-| `ROLE_MINIMAL_COMPLETENESS` | G-E1 | `G-E1#1`–`G-E1#3` | `a707061b238f` | `actors`, `commitments` | missing_accountable / multiple_accountable / unknown_accountable / accountable_not_human / missing_responsible / missing_role_merge_declaration | active |
-| `AI_AUTONOMY_DELEGATION_AUDITABLE` | G-E2 | `G-E2#1`–`G-E2#3` | `0b227c8dc644` | `actors`, `autonomy_grants`, `assertions` | delegation_chain_not_accountable / accountable_not_human / invalid_path / dangling_reference / assertion_incomplete / assumption_unclosed | active |
-| `PROJECT_CHARTER_EXISTENCE` | G-F1 | `G-F1#1`–`G-F1#2` | `a40c88e331b9` | `projects`, `charters`, `outcomes`, `constraints`, `actors`, `assertions` | missing_charter / incomplete_charter | assumption |
+| `ROLE_MINIMAL_COMPLETENESS` | G-E1 | `G-E1#1`–`G-E1#3` | `d44ba9c154f6` | `actors`, `commitments` | missing_accountable / multiple_accountable / unknown_accountable / accountable_not_human / undefined_enum_value / missing_responsible / missing_role_merge_declaration | active |
+| `AI_AUTONOMY_DELEGATION_AUDITABLE` | G-E2 | `G-E2#1`–`G-E2#3` | `19f01cdf9481` | `actors`, `autonomy_grants`, `assertions` | delegation_chain_not_accountable / accountable_not_human / invalid_path / dangling_reference / undefined_enum_value / assertion_incomplete / assumption_unclosed | active |
+| `PROJECT_CHARTER_EXISTENCE` | G-F1 | `G-F1#1`–`G-F1#2` | `65fd1a81fcf6` | `projects`, `charters`, `outcomes`, `constraints`, `actors`, `assertions` | missing_charter / incomplete_charter / undefined_enum_value | assumption |
 | `CLOSURE_ACCEPTANCE_LINK` | G-F2 | `G-F2#1`–`G-F2#2` | `1c157ebdf8ff` | `deliverables`, `actors` | missing_acceptance_assertion | assumption |
 | `PROCUREMENT_CONTRACT_ANCHOR` | G-F3 | `G-F3#1`–`G-F3#2` | `3b6f71eed103` | `commitments`, `contracts`, `constraints`, `actors` | missing_contract / incomplete_contract | assumption |
 | `SCHEDULE_EVIDENCE_LINK` | G-F4 | `G-F4#1` | `3a1c2ec19e7e` | `commitments` | missing_schedule_evidence | assumption |
@@ -311,11 +311,11 @@
 
 > 用途：解决“一规则一句导致子条件被压缩”（ADR-0013 的问题 P1）。每条规则正文的规范性条件拆为 clause id；A 表每个 `check_id` 的“判定（子句 id）”列只列它覆盖的 clause，**不再写叙述性短语**；条件的自然语言表述与原因码统一放在本表。一个 `check_id` 可承载多个子句，逐子句独立求值、聚合为单一 verdict（任一 `fail` → `fail`；否则任一 `cannot_evaluate` → `cannot_evaluate`；否则 `pass`）。未覆盖的子句必须标 `not-checked` 并写理由，`scripts/check_three_table.py` 机械核对覆盖完整性与“A 表不含叙述性短语”。
 >
-> 复核签收：外部复核基线 `48128a8`（产物 `/tmp/verify-4812/REPORT_48128a8.md`，sha256 `d0f8275f9931f36da93c640ad8a070c8af7200929d0a4a685e5309268356c4e7`；本轮按其清单第 1–6 项修订，修订后版本待下一轮复核） / 2026-11-14 / A.2 指纹 `55c96288c69f`
+> 复核签收：外部复核基线 `0b88547`（产物 `/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018/REPORT.md`，sha256 `4a72e5a12cfa8795342762e539a4b3108988a2411588a0f9056fc7497e59fb21`；本轮按其“阻断项 2”为 `G-A1#1`/`G-E1#1`/`G-E2#1` 补 `undefined_enum_value`，并按“阻断项 1”把全局校验覆盖到 F 类输入，为 `G-F1#2` 补同一原因码；修订后版本待下一轮复核） / 2026-11-15 / A.2 指纹 `fccff980c2ac`
 
 | clause | 规则 | 子句（判定条件） | 原因码 | 承接 check_id | 子句 severity | 覆盖状态 | 规则状态 |
 |---|---|---|---|---|---|---|---|
-| `G-A1#1` | G-A1 | 至少一个 `Actor` | `missing_actor` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked | active |
+| `G-A1#1` | G-A1 | 至少一个 `Actor`，且 `actors[].type` 在 `actor_type` 枚举内 | `missing_actor / undefined_enum_value` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked | active |
 | `G-A1#2` | G-A1 | 至少一个 `Outcome` | `missing_outcome` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked | active |
 | `G-A1#3` | G-A1 | 该 `Actor` 对 `Outcome` 的 `Commitment` 存在 | `missing_commitment` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked | active |
 | `G-A1#4` | G-A1 | 至少一个 `Constraint` | `missing_constraint` | `PROJECT_MINIMAL_EXISTENCE` | `block` | checked | active |
@@ -338,14 +338,14 @@
 | `G-D2#1` | G-D2 | 全部为 `mitigates` 时标 `assumption` 并附验证条件 | `all_improvement_without_verification` | `ALL_IMPROVEMENT_ASSUMPTION` | `warn` | checked | active |
 | `G-D2#2` | G-D2 | 验证条件满足前不得作为批准依据 | `approval_basis_before_verification` | `ALL_IMPROVEMENT_ASSUMPTION` | `warn` | checked（`approval_basis`） | active |
 | `G-D2#3` | G-D2 | `assumption` 为 `pending` 时须有 `approved_by`；`expired` 不得作为有效依据 | `assumption_unclosed` | `ALL_IMPROVEMENT_ASSUMPTION` | `warn` | checked（§1.9） | active |
-| `G-E1#1` | G-E1 | 唯一 `accountable_by` 且指向 `HumanActor`/`LegalEntity` | `missing_accountable / multiple_accountable / unknown_accountable / accountable_not_human` | `ROLE_MINIMAL_COMPLETENESS` | `block` | checked | active |
+| `G-E1#1` | G-E1 | 唯一 `accountable_by` 且指向 `HumanActor`/`LegalEntity`；`actors[].type` 必须在 `actor_type` 枚举内 | `missing_accountable / multiple_accountable / unknown_accountable / accountable_not_human / undefined_enum_value` | `ROLE_MINIMAL_COMPLETENESS` | `block` | checked | active |
 | `G-E1#2` | G-E1 | 至少一个 `responsible_by` | `missing_responsible` | `ROLE_MINIMAL_COMPLETENESS` | `block` | checked | active |
 | `G-E1#3` | G-E1 | 角色重合时有 `role_merge_declaration` | `missing_role_merge_declaration` | `ROLE_MINIMAL_COMPLETENESS` | `warn` | checked | active |
-| `G-E2#1` | G-E2 | `delegated_from` 路径终至 `Accountable`，且终点类型为 `HumanActor`/`LegalEntity` | `delegation_chain_not_accountable / accountable_not_human / invalid_path / dangling_reference` | `AI_AUTONOMY_DELEGATION_AUDITABLE` | `warn` | checked | active |
+| `G-E2#1` | G-E2 | `delegated_from` 路径终至 `Accountable`，且终点类型为 `HumanActor`/`LegalEntity`；`actors[].type` 必须在 `actor_type` 枚举内 | `delegation_chain_not_accountable / accountable_not_human / invalid_path / dangling_reference / undefined_enum_value` | `AI_AUTONOMY_DELEGATION_AUDITABLE` | `warn` | checked | active |
 | `G-E2#2` | G-E2 | 路径上断言覆盖范围/边界/撤销条件 | `assertion_incomplete` | `AI_AUTONOMY_DELEGATION_AUDITABLE` | `warn` | checked | active |
 | `G-E2#3` | G-E2 | 该断言以 `assumption` 形式存在并附验证条件 | `assertion_incomplete / assumption_unclosed / dangling_reference` | `AI_AUTONOMY_DELEGATION_AUDITABLE` | `warn` | checked | active |
 | `G-F1#1` | G-F1 | 执行阶段 `Project` 有 `ProjectCharter` | `missing_charter` | `PROJECT_CHARTER_EXISTENCE` | `advisory` | checked | assumption |
-| `G-F1#2` | G-F1 | 章程关联 Outcome 陈述、Constraint、Accountable、启动授权 | `incomplete_charter` | `PROJECT_CHARTER_EXISTENCE` | `advisory` | checked | assumption |
+| `G-F1#2` | G-F1 | 章程关联 Outcome 陈述、Constraint、Accountable、启动授权；关联的 `actors[].type` 必须在 `actor_type` 枚举内 | `incomplete_charter / undefined_enum_value` | `PROJECT_CHARTER_EXISTENCE` | `advisory` | checked | assumption |
 | `G-F2#1` | G-F2 | 每个 `Deliverable` 有验收/移交断言 | `missing_acceptance_assertion` | `CLOSURE_ACCEPTANCE_LINK` | `advisory` | checked | assumption |
 | `G-F2#2` | G-F2 | 断言关联 `Accountable` 确认 | `missing_acceptance_assertion` | `CLOSURE_ACCEPTANCE_LINK` | `advisory` | checked | assumption |
 | `G-F3#1` | G-F3 | 外部采购承诺有 `Contract` 节点 | `missing_contract` | `PROCUREMENT_CONTRACT_ANCHOR` | `advisory` | checked | assumption |
@@ -580,6 +580,25 @@ reason: undefined_enum_value
 ```yaml
 project: { id: "P-10" }
 actors: [{ id: "A-1", type: "" }]
+outcomes: [{ id: "O-1" }]
+commitments: [{ id: "C-1", by: "A-1", to: "O-1" }]
+constraints: [{ id: "K-1", constrains: "O-1" }]
+```
+
+期望输出：
+
+```yaml
+check_id: PROJECT_MINIMAL_EXISTENCE
+source_rule: G-A1
+verdict: cannot_evaluate
+reason: undefined_enum_value
+```
+
+**样例 11（`actors[].type` 为对象 → `cannot_evaluate`）**：非字符串值同样是未定义枚举值，不得抛异常。
+
+```yaml
+project: { id: "P-11" }
+actors: [{ id: "A-1", type: { x: 1 } }]
 outcomes: [{ id: "O-1" }]
 commitments: [{ id: "C-1", by: "A-1", to: "O-1" }]
 constraints: [{ id: "K-1", constrains: "O-1" }]
@@ -1520,6 +1539,36 @@ severity: advisory
 rule_status: assumption
 verdict: fail
 reason: incomplete_charter
+```
+
+**样例 4（`actors[].type` 为数组 → `cannot_evaluate`）**：`actors[]` 的枚举归一化是全局的，与 `check_id` 是否直接使用 `Actor` 类型无关。
+
+```yaml
+projects:
+  - { id: "P-1", stage: "executing" }
+charters:
+  - id: "PC-1"
+    project: "P-1"
+    outcomes: ["O-1"]
+    constraints: ["K-1"]
+    accountable: "A-1"
+    authorizing_assertion: "S-1"
+outcomes: [{ id: "O-1" }]
+constraints: [{ id: "K-1" }]
+actors: [{ id: "A-1", type: ["HumanActor"] }]
+assertions:
+  - { id: "S-1" }
+```
+
+期望输出：
+
+```yaml
+check_id: PROJECT_CHARTER_EXISTENCE
+source_rule: G-F1
+severity: advisory
+rule_status: assumption
+verdict: cannot_evaluate
+reason: undefined_enum_value
 ```
 
 #### A.1.12 `CLOSURE_ACCEPTANCE_LINK`（G-F2，`advisory` / `assumption`）

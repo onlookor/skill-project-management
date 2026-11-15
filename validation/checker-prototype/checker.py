@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""T-107 最小原型：按附录 A 判定列执行 A.1 的 66 个样例。
+"""T-107 最小原型：按附录 A 判定列执行 A.1 的 68 个样例。
 
 只使用标准库。输入为 spec/methods/deterministic-checker.md 中 A.1 的
 YAML 谓词快照；输出 check_id / source_rule / severity / rule_status /
@@ -243,7 +243,15 @@ def aggregate(
 
 
 def failed_clauses(check_id: str, data: dict) -> list[str]:
-    """返回该输入实际触发的子句 id（按 A.2 行序）。供覆盖闸门机械核对。"""
+    """返回该输入实际触发的子句 id（按 A.2 行序）。供覆盖闸门机械核对。
+
+    入口级拦截（必需顶层键缺失或为 `null`）由 `evaluate()` 返回无子句的
+    `missing_input`；本函数与之一致，这类输入不产生子句，直接返回空集。
+    枚举归一化仍在此生效，因此 `actors[].type` 为 `null` 时仍能取证到子句——
+    该子句只用于覆盖核对，不表示生产路径会归出它。
+    """
+    if any(key not in data or data[key] is None for key in REQUIRED_KEYS.get(check_id, ())):
+        return []
     results = enum_results(check_id, data) + CHECKS[check_id](data)
     seen = []
     for item in results:
@@ -700,12 +708,13 @@ def check_role_minimal(data: dict) -> list[tuple]:
             actor = actors.get(accountable)
             if actor is None:
                 results.append(("fail", "unknown_accountable", "G-E1#1"))
-            elif actor.get("type") in ACTOR_TYPES and actor.get("type") not in (
-                "HumanActor",
-                "LegalEntity",
+            elif (
+                isinstance(actor.get("type"), str)
+                and actor["type"] in ACTOR_TYPES
+                and actor["type"] not in ("HumanActor", "LegalEntity")
             ):
-                # 未定义的类型由封闭枚举层报 cannot_evaluate/undefined_enum_value；
-                # 只有已知类型才能判 accountable_not_human，否则 fail 会盖掉 cannot。
+                # 未定义或非字符串的类型由封闭枚举层报 cannot_evaluate/undefined_enum_value；
+                # 只有已知字符串类型才能判 accountable_not_human，否则 fail 会盖掉 cannot。
                 results.append(("fail", "accountable_not_human", "G-E1#1"))
         responsible = commitment.get("responsible_by") or []
         if not responsible:
@@ -860,12 +869,13 @@ def check_ai_autonomy(data: dict) -> list[tuple]:
                     terminal = actors[cursor]
                     if terminal.get("accountable") is not True:
                         results.append(("fail", "delegation_chain_not_accountable", "G-E2#1"))
-                    elif terminal.get("type") in ACTOR_TYPES and terminal.get("type") not in (
-                        "HumanActor",
-                        "LegalEntity",
+                    elif (
+                        isinstance(terminal.get("type"), str)
+                        and terminal["type"] in ACTOR_TYPES
+                        and terminal["type"] not in ("HumanActor", "LegalEntity")
                     ):
                         # 链终点必须能承担问责：AI 节点即使标 accountable 也不能作为终点。
-                        # 未定义的类型留给封闭枚举层报 cannot_evaluate，不在此判 fail。
+                        # 未定义或非字符串的类型留给封闭枚举层报 cannot_evaluate，不在此判 fail。
                         results.append(("fail", "accountable_not_human", "G-E2#1"))
         covers: set = set()
         for assertion_id in grant.get("assertions") or []:
@@ -1078,6 +1088,7 @@ ACTOR_TYPE_CLAUSES = {
     "PROJECT_MINIMAL_EXISTENCE": "G-A1#1",
     "ROLE_MINIMAL_COMPLETENESS": "G-E1#1",
     "AI_AUTONOMY_DELEGATION_AUDITABLE": "G-E2#1",
+    "PROJECT_CHARTER_EXISTENCE": "G-F1#2",
 }
 
 
@@ -1157,9 +1168,11 @@ def enum_results(check_id: str, data: dict) -> list[tuple]:
     for actor in data.get("actors") or []:
         if not isinstance(actor, dict):
             continue
-        if "type" not in actor or actor["type"] is None:
+        value = actor.get("type")
+        if "type" not in actor or value is None:
             add("missing_input", actor_clause)
-        elif actor["type"] not in ACTOR_TYPES:
+        elif not isinstance(value, str) or value not in ACTOR_TYPES:
+            # 对象、数组、数字、布尔等非字符串值同样是未定义枚举值，不得抛异常。
             add("undefined_enum_value", actor_clause)
     return found
 

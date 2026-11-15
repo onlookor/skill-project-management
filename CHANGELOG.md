@@ -1185,3 +1185,15 @@
 - **reason code**：无新增。复用 `missing_input`（缺失/`null`）与 `undefined_enum_value`（非法值），与 G-001/G-003/G-007 的既有口径一致。
 - **台账**：G-018 维持 `open`，说明补本轮实现与负例，关闭依据留空，等非同源复核；核查记录追加批次 0071。台账 22 条：`open` 2（G-017、G-018）/ `closed` 20。
 - **涉及文件**：`spec/CHECKER_INPUT_SCHEMA.md`、`spec/methods/deterministic-checker.md`、`validation/checker-prototype/checker.py`、`validation/checker-prototype/coverage.json`、`validation/pinned/checker.py`、`AGENTS.md`、`.githooks/pre-commit`、`GAP_LEDGER.md`、`CHANGELOG.md`、`validation/reviews/2026-11-15-g018-actor-type-enum.md`、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`spec/GLOSSARY.md`（位置刷新）。
+
+---
+
+### 批次 0072 — 2026-11-15 — G-018 复核整改：非字符串 `type`、A.2 同步与次要项
+
+- **依据**：G-018 复核报告（基线 `0b88547`，sha256 `4a72e5a1…59fb21`）判不可关闭，逐项整改；缺口状态仍为 `open`。
+- **阻断项 1（崩溃）**：`enum_results()` 以 `isinstance(value, str)` 守卫，对象、数组、数字、布尔等非字符串 `type` 一律给子句级 `cannot_evaluate/undefined_enum_value`，不再抛 `TypeError`；`ROLE_MINIMAL_COMPLETENESS` 与 `AI_AUTONOMY_DELEGATION_AUDITABLE` 的 `accountable_not_human` 同样只在字符串类型下判定。新增对象型 A.1.1-11 与数组型 A.1.11-4。
+- **阻断项 2（A.2 未同步）**：A.2 的 `G-A1#1`、`G-E1#1`、`G-E2#1` 原因码列补 `undefined_enum_value`；F 类 `actors[]` 归属 `G-F1#2` 并补同一原因码。A 表由 `check_three_table.py --write` 重建，`clause_of()` 对四个归属均返回正确子句 id。
+- **次要项**：`failed_clauses()` 在必需顶层键缺失或为 `null` 时返回空集，不再抛 `KeyError`；覆盖矩阵 note 改为实际检查项（不核对 reason 归属），并写明 A.1.10-6 走生产 `evaluate()` 的入口归一化、其子句归属只用于取证。
+- **计数**：A.1 样例 66 → 68，覆盖矩阵负例 47 → 49（新增 4 条负例：A.1.1-11、A.1.11-4，以及在既有子句下新增两条取证条目）。
+- **pins**：本批按裁定重冻，basis 指向 G-018 复核报告并显式标注“覆盖范围缺失：报告审查的是批次 0071，未审查本批修复，仅作指纹登记”。`check_dependency_pins.py` 的 r7 basis 未改。
+- **涉及文件**：`spec/CHECKER_INPUT_SCHEMA.md`、`spec/methods/deterministic-checker.md`、`validation/checker-prototype/checker.py`、`validation/checker-prototype/coverage.json`、`validation/pinned/checker.py`、`AGENTS.md`、`.githooks/pre-commit`、`GAP_LEDGER.md`、`CHANGELOG.md`、`validation/reviews/2026-11-15-g018-actor-type-enum.md`、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`spec/GLOSSARY.md`（位置刷新）。

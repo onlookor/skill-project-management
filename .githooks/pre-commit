@@ -22,7 +22,7 @@ run_check "scripts/check_ledger_landings.py" python3 scripts/check_ledger_landin
 run_check "scripts/check_gap_ledger.py --staged" python3 scripts/check_gap_ledger.py --staged
 run_check "scripts/check_three_table.py" python3 scripts/check_three_table.py
 run_check "scripts/check_coverage_gate.py" python3 scripts/check_coverage_gate.py
-run_check "原型样例 A.1（66 条）" python3 validation/checker-prototype/checker.py --quiet
+run_check "原型样例 A.1（68 条）" python3 validation/checker-prototype/checker.py --quiet
 run_check "原型聚合顺序无关性" python3 validation/checker-prototype/checker.py --aggregation-order
 run_check "原型缺键快检（43 键）" python3 validation/checker-prototype/checker.py --missing-key-sweep --quiet
 run_check "原型 null 快检子集" python3 validation/checker-prototype/checker.py --null-sweep --quick
