@@ -47,7 +47,7 @@ python3 -m pip download --no-deps --no-cache-dir jsonschema==4.26.0 -d ~/.local/
 python3 scripts/check_dependency_pins.py
 ```
 
-`check_dependency_pins.py` 退出码：`0` 通过；`1` 版本、安装树或分发产物指纹不符；`2` 依赖缺失、分发产物缺失或 `scripts/dependency-pins.json` 不可解析——按“无法评估”处理，不得视为通过。wheel 不提交进 git；`JSONSCHEMA_WHEEL=<wheel>` 可覆盖默认目录。升级依赖必须同批 `--write --artifact <wheel>` 记录新 sha256。
+`check_dependency_pins.py` 退出码：`0` 通过；`1` 版本、安装树或分发产物指纹不符；`2` 依赖缺失、分发产物缺失、分发产物存在但不可读取或逐文件数据不可核对，或 `scripts/dependency-pins.json` 不可解析——按“无法评估”处理，不得视为通过（同一次运行既命中“指纹不符”又无法核对逐文件数据时，按 `2` 处理）。wheel 不提交进 git；`JSONSCHEMA_WHEEL=<wheel>` 可覆盖默认目录。升级依赖必须同批 `--write --artifact <wheel>` 记录新 sha256。
 
 `check_gap_ledger.py` 退出码：`0` 通过；`1` 结构非法或存在到期未裁定（含规则/判定文件与台账未同批暂存）；`2` 台账或方法注册表无法解析。输出首行给出总数、`open`/`closed`、按级与到期计数、核查矩阵 `consistent` 比例。`--staged` 用于 pre-commit；独立运行时省略该参数。只有 `open` 缺口必须被核查矩阵引用——`closed` 缺口已记录处置出口，不再锚定矩阵，否则矩阵永远无法达到撤除条件要求的 17/17 `consistent`。
 

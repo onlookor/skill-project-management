@@ -37,7 +37,7 @@
 python3 -m pip download --no-deps --no-cache-dir jsonschema==4.26.0 -d ~/.local/share/pm-governance/wheels
 ```
 
-`JSONSCHEMA_WHEEL` 或 `--artifact` 可覆盖默认路径。**找不到 wheel 时按“无法评估”退出 2**，不是警告、不算通过；这样“登记的 sha256 从未被验证”不会伪装成绿灯。若某环境确实拿不到 wheel，必须在本文件与 `README.md` 显式登记“第三重当前不生效”及其生效条件，不得保留一个只报警的检查。
+`JSONSCHEMA_WHEEL` 或 `--artifact` 可覆盖默认路径。**找不到 wheel，或 wheel 存在但不可读取、无法核对逐文件数据时，按“无法评估”退出 2**，不是警告、不算通过；同名文件内容不是 wheel 时即使同时命中 sha256 不符，也按 2 处理。这样“登记的 sha256 从未被验证”不会伪装成绿灯。若某环境确实拿不到 wheel，必须在本文件与 `README.md` 显式登记“第三重当前不生效”及其生效条件，不得保留一个只报警的检查。
 
 **本 ADR 只批准“校验语义”的外部依赖，不批准任何数据与证据的外部依赖。** `contracts/schema/` 的内容、`knowledge/` 条目、本体、复核记录与来源登记仍必须自包含在仓库内；不得以“依赖库会处理”为由把数据、证据或判据移出仓库。
 
@@ -50,7 +50,7 @@ python3 -m pip download --no-deps --no-cache-dir jsonschema==4.26.0 -d ~/.local/
 
 - **只覆盖校验语义**：`jsonschema` 只决定“一条 schema 如何解释一条数据”。它不接触数据内容、不生成证据、不替代复核，也不进入任何判定链的输入端。
 - **不覆盖数据与证据**：`contracts/schema/` 的 schema 文本、`knowledge/` 条目、`ontology/`、`validation/reviews/` 与 `SOURCE_LEDGER.md` 仍全部在仓库内，且仍由仓库内检查器与钉扎保护。
-- **不改变失败方向**：依赖无法导入、分发产物缺失时按“无法评估”退出 2；产物存在但安装树逐文件哈希不符、导入路径不在分发目录或运行时行为探测失败时，逐条报错后退出 1（`check_no_raw_material.py` 为逐文件 `RM-SCHEMA`/`RM-SCHEMA-LINT`，`check_dependency_pins.py` 为对应 `DP-*` 项）。两者都不得降级为跳过校验，也不得只警告后继续。
+- **不改变失败方向**：依赖无法导入、分发产物缺失、分发产物存在但不可读取或逐文件数据不可核对时，按“无法评估”退出 2（同时命中指纹不符与无法核对时按 2）；产物可核对但安装树逐文件哈希不符、导入路径不在分发目录或运行时行为探测失败时，逐条报错后退出 1（`check_no_raw_material.py` 为逐文件 `RM-SCHEMA`/`RM-SCHEMA-LINT`，`check_dependency_pins.py` 为对应 `DP-*` 项）。两者都不得降级为跳过校验，也不得只警告后继续。
 - **可替换性**：校验入口只依赖 `jsonschema` 的 `Draft202012Validator` 与 `check_schema` 两个公开接口；替换实现只改一处适配层，不触碰输出契约（reason code、文件路径、JSON 指针、退出码）。
 
 ## 撤销条件与退回档次

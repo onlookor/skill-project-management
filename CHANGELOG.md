@@ -1164,3 +1164,12 @@
 - **替换范围表述对齐**：`sitecustomize` 只替换 `validator_for`、保留 `Draft202012Validator` 时不阻断，属 G-022 声明的信任边界（有权写本机 Python 环境者的针对性替换）。更正批次 0068“`sitecustomize` 全部阻断”的表述：被阻断的是空实现/整体替换与同名假 wheel。
 - **台账**：G-019 说明改“非针对性替换均阻断”，补记 r6 实测与“剩余项只有三处口径对齐、本轮已全部完成”，维持 `open`；G-021、G-022 未动；G-020 未改。台账 22 条：`open` 3 / `closed` 19。
 - **涉及文件**：`scripts/check_no_raw_material.py`、`adr/0019-mature-json-schema-validator.md`、`scripts/README.md`、`GAP_LEDGER.md`、`CHANGELOG.md`、`validation/reviews/2026-11-15-jsonschema-dependency.md`、`scripts/checker-pins.json`。
+
+---
+
+### 批次 0070 — 2026-11-15 — r7 复判：退出码文档补同一情形，G-019 关闭
+
+- **依据**：r7 复判报告 `/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r7/REPORT.md`（sha256 `65e319da5b5e3a511b5d8dbf6b3f45f1ddbc9f86e8a4a86c17b4121cea20dacb`，基线 `7300283`）。结论：`pattern` 撤除干净、无回归，G-019 只差一处文档口径。
+- **文档补同一情形（不改实现）**：`scripts/README.md`、ADR-0019 两处（wheel 段与“不改变失败方向”）与 `scripts/check_dependency_pins.py` docstring 均写明“分发产物存在但不可读取 / 逐文件数据不可核对”按“无法评估”退出 2，且与指纹不符同时命中时按 2 处理。实测：同名 `not a wheel` 文件命中 `DP-ARTIFACT` sha256 不符且 `DP-TREE` 无逐文件数据，退出 2；可读但 sha 不符退 1。
+- **台账**：G-019 说明改为“r6 三处已完成；r7 另有一处退出码文档缺口，已同批勘误”，并补记 r7 的 `pattern` 与退出码矩阵结论；按 3.6.6 以 r7 报告 §1 / §2 / §4 为依据，改 `closed` / `check-change`。G-021、G-022 未动；G-020 未改。台账 22 条：`open` 2（G-017、G-018）/ `closed` 20。
+- **涉及文件**：`scripts/check_dependency_pins.py`、`adr/0019-mature-json-schema-validator.md`、`scripts/README.md`、`GAP_LEDGER.md`、`CHANGELOG.md`、`scripts/checker-pins.json`。

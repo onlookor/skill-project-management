@@ -28,7 +28,7 @@ wheel 默认从持久路径 `~/.local/share/pm-governance/wheels/` 读取（`JSO
   python3 scripts/check_dependency_pins.py
   python3 scripts/check_dependency_pins.py --write --artifact <wheel 路径>
   JSONSCHEMA_WHEEL=<wheel 路径> python3 scripts/check_dependency_pins.py
-退出码：0 = 通过；1 = 指纹不符；2 = 依赖或分发产物缺失、登记表不可解析（无法评估，不得视为通过）。
+退出码：0 = 通过；1 = 指纹不符；2 = 依赖缺失、分发产物缺失、分发产物存在但不可读取或逐文件数据不可核对、登记表不可解析（无法评估，不得视为通过；同时命中指纹不符与无法核对时按 2）。
 """
 
 import argparse

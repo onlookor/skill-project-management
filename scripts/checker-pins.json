@@ -70,8 +70,8 @@
       "basis": "非同源复核：外部复核基线 48128a8，产物 /tmp/verify-4812/REPORT_48128a8.md；复核产物：validation/reviews/2026-11-14-48128a8-external.md；复核基线：48128a8"
     },
     "scripts/check_dependency_pins.py": {
-      "sha256": "6e6e34e1ddf42271d9f087aa2fda089aef7fbb7740de2e454a8e48a8516a473a",
-      "basis": "非同源复核：G-019 r5（基线 3d7211c）要求逐文件核对安装树、恢复契约指针、把缺失 $ref 与深嵌套/灾难性 pattern 转为可诊断失败；用户 2026-11-15 裁定按“收紧威胁模型 + 修可机械修的部分”执行。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r5/REPORT.md；sha256：5373a537d05870dcf4f52756bf7e0012bc0128879e22df92cb85d86007258108；复核基线：3d7211c"
+      "sha256": "648a93a7161478ad1ebcdaf0b48cb05aa4fa48d98f15825e8f737e4441ae428b",
+      "basis": "非同源复核：G-019 r7（基线 7300283）要求把“分发产物存在但不可读取/逐文件数据不可核对”补进退出码文档，并据此关闭 G-019。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r7/REPORT.md；sha256：65e319da5b5e3a511b5d8dbf6b3f45f1ddbc9f86e8a4a86c17b4121cea20dacb；复核基线：7300283"
     },
     "scripts/test_dependency_pins.py": {
       "sha256": "c7baa471fc7347d2012b63136502394b1b8b7a8d4afa4caec0988f3a2e9e2f4a",
