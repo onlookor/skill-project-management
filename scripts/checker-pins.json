@@ -58,7 +58,7 @@
       "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：scripts/test_coverage_gate.py 结论：认可"
     },
     "scripts/test_spec_pins.py": {
-      "sha256": "e9dc0fba8f4573c8a25e2d716debd40cd866cebe7230706766992434c2cc6e47",
+      "sha256": "75f4cb022835160c2aafb76dd2cff57eb56495c958c06f406087b61a60fc6bdd",
       "basis": "待复核：批次 0076 钉扎收紧改动；无复核声明，不构成认可"
     },
     "scripts/validate_ontology.py": {

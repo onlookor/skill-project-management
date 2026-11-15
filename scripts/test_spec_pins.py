@@ -152,6 +152,7 @@ def main() -> int:
         ok, why = valid_basis(root, in_repo_record, TARGET)
         rejected = not ok and "转录件只作索引" in why
         failures += 0 if rejected else 1
+        total += 1
         print(
             f"| SP06b | 依据指向仓库内产物 | 阻断 | {'阻断' if rejected else '通过'} | {why} |"
         )
