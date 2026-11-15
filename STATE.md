@@ -39,6 +39,5 @@
 |---|---|---|
 | `adr/ADR-TEMPLATE.md` | `template` | 模板，不承载已接受的决策 |
 | `adr/0013-unified-adjudication-of-check-semantics.md` | `skeleton` | 文件内状态为 `proposed`（修订中），尚未重新接受 |
-| `adr/0018-raw-material-admission-control.md` | `skeleton` | 文件内状态为 `proposed`，待批准后转 `accepted` |
-| `spec/RAW_MATERIAL_ADMISSION.md` | `skeleton` | 改造方案与待批决策，尚未成为现行规范 |
+| `spec/RAW_MATERIAL_ADMISSION.md` | `active` | 已批准的改造方案记录，非现行规范；规范性以 `CONSTITUTION.md` 第 13 条与准入区表为准 |
 | `knowledge/methods/registry-skeleton.md` | `skeleton` | 方法注册表骨架，条目待填充 |

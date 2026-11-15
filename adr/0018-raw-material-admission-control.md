@@ -1,11 +1,11 @@
 # ADR-0018: 以分区准入替代原始资料的形态推断
 
-- **状态**：proposed
+- **状态**：accepted
 - **日期**：2026-11-15
-- **决策者**：待定（需用户/架构负责人批准，见 `spec/RAW_MATERIAL_ADMISSION.md` 第 13.2 节）
+- **决策者**：用户（2026-11-15 批准全部 10 条 D 项，裁定记录见 `validation/reviews/2026-11-15-admission-axis-authorization.md`）
 - **serves_charter**：C6（知识可检索、规则可检查）
 - **grounding_refs**：无（本决策不引入新的来源内容）
-- **affected_files**：`CONSTITUTION.md` 第 13 条（修订草案，未修改）；`spec/RAW_MATERIAL_ADMISSION.md`（新增方案）；`scripts/check_no_raw_material.py`（实现批次改造）；`spec/ACCESS_ZONES.md`、`contracts/schema/knowledge-entry.schema.json`、`contracts/schema/pilot-conflict.schema.json`（实现批次新增，尚未创建）；`GAP_LEDGER.md`（G-019/G-020 改写）；`TODO.md`（T-143/T-144）；`scripts/README.md`、`.githooks/pre-commit`、`scripts/check_state.py`
+- **affected_files**：`CONSTITUTION.md` 第 13.3/13.5 条（已修订）；`spec/RAW_MATERIAL_ADMISSION.md`（方案）；`scripts/check_no_raw_material.py`（实现批次改造）；`spec/ACCESS_ZONES.md`、`contracts/schema/knowledge-entry.schema.json`、`contracts/schema/pilot-conflict.schema.json`（实现批次新增）；`GAP_LEDGER.md`（G-019/G-020 改写）；`TODO.md`（T-143/T-144）；`scripts/README.md`、`.githooks/pre-commit`、`scripts/check_state.py`
 
 ## 背景
 
@@ -23,7 +23,7 @@
 
 以**分区准入**替代形态推断：每个已跟踪路径按目录角色归入数据区、本体区、散文区或代码/配置区；数据区只允许结构化文件并强制 schema 与字段配额；散文区承认散文，只保留与第 13.1/13.2 条直接对应的硬约束；本体区沿用第 13.6 条。退役 `RM-PROSEBLOCK`、`RM-PAGEDUMP`、`RM-PAGESEQ`。内容层面的“是否原文”不再由仓库内判据推断，改由外部指纹比对与人工复核承接，并显式登记为残余风险。
 
-方案细节、131 文件判定表、规则清单与迁移路径见 `spec/RAW_MATERIAL_ADMISSION.md`。本 ADR 只记录决策本身；`CONSTITUTION.md` 第 13 条的修订稿在同文件第 8 节，待批准后按第 5 条特殊程序落地。
+方案细节、131 文件判定表、规则清单与迁移路径见 `spec/RAW_MATERIAL_ADMISSION.md`。本 ADR 只记录决策本身；`CONSTITUTION.md` 第 13 条的修订已于 2026-11-15 按第 5 条特殊程序落地（批次 0052），13.5 增补裁定句：本次换轴不构成对 13.1 禁止范围的缩小，也不构成对 13.3 阻断强度的实质性降低。
 
 ## 考虑过的替代方案
 
@@ -46,7 +46,7 @@
 ### 负面
 
 - 散文区与数据区 `prose_fields` 内的原文抄袭不再有仓库内机械判据；这是明确接受的残余风险，依赖外部指纹与人工复核。
-- 需要一次 `CONSTITUTION.md` 第 13 条修订；第 13.5 条“不得降低阻断强度”与本次换轴存在张力，必须由人类责任方裁定。
+- 需要一次 `CONSTITUTION.md` 第 13 条修订；第 13.5 条“不得降低阻断强度”与本次换轴的张力，已由人类责任方于 2026-11-15 裁定为“不构成实质性降低”：被删判据经实测漏杀与误杀并存（`RM-PAGEDUMP` 真实召回 4/15，整页单条与切块均 0 命中），不提供有效保护。
 - 需要新增归区表与 JSON Schema，并重写检查器；实现批次的工作量大于继续打补丁。
 - 外部指纹方案依赖仓库外资源常驻，干净克隆无法自证；与 ADR-0015 同类，属于已接受的信任边界。
 

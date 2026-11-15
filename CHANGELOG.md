@@ -914,3 +914,19 @@
 - **涉及文件**：`spec/RAW_MATERIAL_ADMISSION.md`（新增）、`adr/0018-raw-material-admission-control.md`（新增）、`GAP_LEDGER.md`、`TODO.md`、`STATE.md`、`CHANGELOG.md`。
 - **未改动**：`scripts/check_no_raw_material.py`、`CONSTITUTION.md`、`scripts/README.md`、`checker-pins.json`、`spec-pins.json`、D4、放量、判据 7 外部抽样。
 - **状态**：方案待批（ADR-0018 `proposed`，T-144 `open`）
+
+---
+
+### 批次 0052 — 2026-11-15 — 准入制落地（阶段一：条文与 ADR）
+
+- **性质**：用户 2026-11-15 批准 `spec/RAW_MATERIAL_ADMISSION.md` 第 13.2 节全部 10 条 D 项，按建议执行。本批是四阶段迁移的第一阶段：修条文与 ADR，不改检查器实现。D4 未动、未放量、未碰判据 7 外部抽样；G-019/G-020/G-021 均不自行关闭。
+- **宪法修订**（`CONSTITUTION.md`）：
+  - 13.3 由“后果与执行”改为“合规判定与执行”：按目录角色分区判定（数据区 schema + 配额、散文区仅硬约束、本体区按 13.6、未归类 fail-closed），并明确“未命中不等于合规”。
+  - 13.5 保留原句，增补 2026-11-15 裁定：本次换轴不构成对 13.1 禁止范围的缩小，也不构成对 13.3 阻断强度的实质性降低；依据是 `RM-PROSEBLOCK`/`RM-PAGEDUMP` 实测漏杀与误杀并存、`RM-PAGEDUMP` 真实召回 4/15、整页单条与切块均 0 命中；残余风险由外部指纹与人工评审承接。
+  - 13.1、13.2、13.4、13.6 未改。
+- **ADR**：`adr/0018-raw-material-admission-control.md` 由 `proposed` 转 `accepted`，决策者记为用户（2026-11-15），并同步 13.5 裁定与受影响文件状态。
+- **授权记录**：新增 `validation/reviews/2026-11-15-admission-axis-authorization.md`，逐条转录 D-1–D-10、注明用户裁定日期、复核基线 `2d0c0ea` 与“不构成缺口关闭依据”的边界。
+- **台账**：`STATE.md` 移除 ADR-0018 的 `skeleton` 例外（随 `adr/` 默认值 `accepted`），`spec/RAW_MATERIAL_ADMISSION.md` 改为 `active` 并注明非现行规范；`TODO.md` 的 T-144 转 `in-progress` 并记录本批进度。
+- **涉及文件**：`CONSTITUTION.md`、`adr/0018-raw-material-admission-control.md`、`validation/reviews/2026-11-15-admission-axis-authorization.md`（新增）、`STATE.md`、`TODO.md`、`CHANGELOG.md`。
+- **未改动**：`scripts/check_no_raw_material.py`、`scripts/README.md`、`checker-pins.json`、`spec-pins.json`、`manifest.json`（未发布，版本与 tag 保持 `0.5.1` / `v0.5.1`）、D4、放量、判据 7 外部抽样。
+- **状态**：生效（阶段二实现与阶段三过检待后续批次；G-019/G-020 仍 `open`）
