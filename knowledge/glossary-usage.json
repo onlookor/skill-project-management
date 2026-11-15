@@ -1395,6 +1395,11 @@
           "form": "code"
         },
         {
+          "file": "spec/D6_REBASELINE_PROPOSAL.md",
+          "line": 144,
+          "form": "code"
+        },
+        {
           "file": "spec/INTERFACE_CONTRACT_SPEC.md",
           "line": 25,
           "form": "code"
