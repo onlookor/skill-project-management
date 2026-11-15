@@ -123,21 +123,21 @@ Hook-Bypass-Items: <T-xxx[,T-yyy]>                      # 仅 pin-review-debt，
 
 **钉扎面通道的撤除条件**（与发布引导通道各自独立，见 3.5.3）：
 
-- **到期即阻断**：例外登记项在 `scripts/no-review-declarations.json` 的 `due` 字段所声明的里程碑内未补出合格复核，则该里程碑关闭时机制冻结——`check_checker_pins.py` / `check_spec_pins.py` 的 rc 不得再被 `--no-verify` 视为可登记例外，任何新的钉扎面改动必须先补复核，再提交。机械判据：登记项 `due` 已过而 `basis` 仍为无复核字面量 → `check_state.py` 报错、pre-commit 阻断。
+- **到期即阻断（未实现，登记为待办 T-159）**：设计意图是——例外登记项在 `scripts/no-review-declarations.json` 的 `due` 字段所声明的里程碑内未补出合格复核，则该里程碑关闭时机制冻结，`check_checker_pins.py` / `check_spec_pins.py` 的 rc 不得再被 `--no-verify` 视为可登记例外。**当前没有任何检查器实现该判据**：两个 pins 检查器只校验 `due` 字段非空，`check_state.py` 不读取登记表，也没有组件知道“当前里程碑”。因此本条现阶段**不构成已生效的阻断**，不得据它宣称“到期即冻结”。机械判据连同实现落在 T-159；实现前的到期判定只能靠人工核对 `TODO.md` 里程碑字段。
 - **不得续期**：`due` 只能随“补出复核”一次性地消失，不允许修改 `due` 字段延长；需要延期的，必须由人类责任方另开 ADR 记录理由。
 - **关闭动作**：全部登记项补出复核并从登记表中删除后，删除 3.5.3 与 3.5.1 中的 `pin-review-debt` 取值，`check_state.py` 同步移除该通道，`TODO.md` T-149 标 `done` 并记 CHANGELOG。
 
 #### 3.5.3 钉扎面未复核例外（临时通道）
 
-**适用对象**：`scripts/checker-pins.json` 与 `scripts/spec-pins.json` 登记的一切对象——检查器脚本（全仓 `.py` 除 `PY_EXCLUDE`）、`.githooks/pre-commit`、`scripts/no-review-declarations.json`（登记表自身）、以及 `spec-pins.json` 的 13 个规格区段。
+**适用对象**：`scripts/checker-pins.json` 与 `scripts/spec-pins.json` 登记的一切对象——检查器脚本（全仓 `.py` 除 `PY_EXCLUDE`）、`.githooks/pre-commit`、`scripts/no-review-declarations.json`（登记表自身），以及 `spec-pins.json` 的 16 个规格区段（`GRAMMAR.md` 全文、方法文件 A.2、方法文件 A.1、`spec/CHECKER_INPUT_SCHEMA.md` 整文件、`AGENTS.md` §3.5、`validation/checker-prototype/coverage.json`、9 份数据 schema、`spec/ACCESS_ZONES.md`）。`contracts/schema/` 下新增文件由检查器自动发现并纳入，区段数随 schema 增加而增加，不写死。
 
 **硬规则**：
 
 1. 钉扎面上的改动**没有真复核时，两个 pins 检查器必须 rc≠0**，不得因任何自我声明放行。`--write --basis` 只接受两种输入：五要素齐全的非同源复核记录，或固定字面量 `无复核声明（不构成认可，不放行）`。后者只登记事实，**不放行**。
 2. 因此，钉扎面改动未复核时**只能以 `git commit --no-verify` 提交**，并携带 `Hook-Bypass: pin-review-debt`、`Hook-Bypass-Reason:` 与非空 `Hook-Bypass-Items:`（格式见 3.5.1）。
 3. 每次 `--no-verify` 必须在 `TODO.md` 新建一条到期项、并在 `scripts/no-review-declarations.json` 对应对象下登记，两处都须含：**改动对象**（`key`）、**缺哪份复核**（`missing_review`）、**到期里程碑**（`due`）、**责任人**（`owner`）。**不得批量豁免**：一个提交豁免多个对象时，每个对象各占一条登记，`Items` 列全部 T 编号；不得用“同批多个对象”折成一条。
-4. 登记表由 `check_state.py` 机械交叉校验：登记项必须是受保护对象、缺任一字段 → 错误；已存在合格复核记录却仍登记为无复核 → 错误。
-5. `--no-verify` 只跳过钩子，不改变 `check_checker_pins.py` / `check_spec_pins.py` 在发布前与每次 pre-commit 复跑中的 rc≠0 事实。**“已提交”不等于“已认可”**：登记项在 `due` 之前未补复核，按 3.5.2 的钉扎面撤除条件冻结本通道。
+4. 登记表由**两个 pins 检查器**（`check_checker_pins.py` 与 `check_spec_pins.py`）各自在加载登记表时机械交叉校验：登记项必须是受保护对象、字段齐全、已存在合格复核却仍登记即报错。`check_state.py` **不**做这项校验（它只核对提交 trailer 与 `TODO.md` 到期项的存在性）。任一侧校验失败，对应检查器 rc≠0。
+5. `--no-verify` 只跳过钩子，不改变 `check_checker_pins.py` / `check_spec_pins.py` 在发布前与每次 pre-commit 复跑中的 rc≠0 事实。**“已提交”不等于“已认可”**：登记项在 `due` 之前未补复核，应冻结本通道——但到期判据本身尚未实现（见 3.5.2 与 T-159），现阶段由人工按 `TODO.md` 核对。
 
 **与既有机制的关系**：不新造豁免登记体系——沿用 3.5.1 的 trailer 留痕与 `TODO.md` 到期项，另加一份受 pins 保护的数据文件（`scripts/no-review-declarations.json`）承载“哪个对象缺哪份复核”。三者分工：trailer 记录“哪个提交绕过了钩子”，TODO 记录“谁在什么时候补”，登记表记录“哪个对象当前无复核”。
 

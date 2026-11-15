@@ -18,7 +18,7 @@
       "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：scripts/check_coverage_gate.py 结论：认可"
     },
     "scripts/check_gap_ledger.py": {
-      "sha256": "a7234e47dadab05d4ba78cbd887ad4600ee2e68fc67a1f51d7a037227cd8b9c3",
+      "sha256": "6408271c6148ca0a60d913ef85b4dd945151ce59a999d77157ad83cb5b9c217f",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/check_glossary_usage.py": {
@@ -34,7 +34,7 @@
       "basis": "非同源复核：G-019 r6（基线 bafcb04）要求撤掉 pattern 嵌套量词启发式只留 512 字符上限、退出码表述与实现对齐、替换范围表述与实测对齐。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r6/REPORT.md；sha256：1db2586ee7f5614920fc6a6ab3f2afc34c4445ff997df8b0aaec48327d6bd1db；复核基线：bafcb04 区段：scripts/check_no_raw_material.py 结论：认可"
     },
     "scripts/check_spec_pins.py": {
-      "sha256": "bd193d5ef962272fc2a3c5f8a64d450406408b20bcf247cf5a960dde4067d8a8",
+      "sha256": "48190103e3b52fae66f15051d8ea6c3fbc7dbd8bc27909cdacb0fbe3d09692db",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/check_state.py": {
@@ -86,7 +86,7 @@
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/config_codes.py": {
-      "sha256": "aa140688b218d2ca61fe7093fee2c29c2641d0d978d481b638b58c99a316f365",
+      "sha256": "6cd5abaf685f98aa468a63f868bba6fdf4d1aee8d51dbf5bd137be1365fbef37",
       "basis": "无复核声明（不构成认可，不放行）"
     }
   },

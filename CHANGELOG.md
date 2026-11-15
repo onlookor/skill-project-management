@@ -1400,3 +1400,22 @@
 - **验证**：十个常规检查器 rc=0（`check_anchors`、`check_glossary_usage`、`check_no_raw_material`、`check_three_table`、`check_coverage_gate`、`check_ledger_landings`、`check_gap_ledger`、`check_state`、`check_dependency_pins`）；`check_gap_ledger.py --self-test` E01–E05、R01–R05 全过；`test_checker_pins.py` 21/21、`test_spec_pins.py` 24/24；`check_checker_pins` rc=1（问题 18 = 16 无复核声明 + 2 失效）、`check_spec_pins` rc=1（问题 14 = 6 无复核声明 + 8 失效），均为预期债务。
 - **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`（本批改的就是钉扎检查器与测试本身，必然 rc≠0）。
 - **关联 ADR**：ADR-0021（accepted，补记批次 0081 的来源入表依据）
+
+---
+
+### 批次 0086 — 2026-11-15 — 修内容缺陷：A.2 比较口径、配置层四缺陷、3.5 三处、RG↔G 口径
+
+- **授权依据**：责任方“第二批：修内容缺陷，不重新取证（重新取证等下一轮外复核）”。本批只修结构/口径缺陷，不为任何对象补写复核依据。
+- **涉及文件**：
+  - 修改：`scripts/check_spec_pins.py`、`scripts/config_codes.py`、`contracts/schema/runtime-config.schema.json`、`contracts/schema/runtime-config-lock.schema.json`、`AGENTS.md`（§3.5.2、§3.5.3）、`scripts/check_gap_ledger.py`、`GAP_LEDGER.md`（RG 节表头）、`TODO.md`（新增 T-159）、`knowledge/glossary-usage.json`（行号重算）、`scripts/checker-pins.json`、`scripts/spec-pins.json`
+  - 新建：`validation/reviews/2026-11-15-a2-comparison-scope.md`
+- **变更摘要**：
+  1. **A.2 比较口径向既有指纹对齐**：`check_spec_pins.py` 新增 `comparable_text()`，对 `deterministic-checker.md#A.2` 的比较先剔除复核签收行（`^\s*>?\s*复核签收：`），其余区段仍逐字比较。理由：签收行是复核记录本身，`check_three_table.a2_block_fingerprint` 的既有口径本就不含它；若签收行参与比较，写入复核记录就会让被签收对象失效，合格在结构上不可达。**这不是放宽**——排除范围仅限该行，注册用 `fingerprint` 仍覆盖整段，其他任何内容变动照旧判失效。效果：A.2 恢复有效，spec 问题由 14 降为 13。理由与范围写入脚本 docstring 第 5 条与 `validation/reviews/2026-11-15-a2-comparison-scope.md`。
+  2. **配置层四缺陷**：① CFG-08（项目日历）删除子字段默认值，改为判定性、无默认，缺项或缺 `timezone`/`workdays` 均 `cannot_evaluate`（退出码 3）；② `runtime-config-lock.schema.json` 的 `defaulted.enum` 由 15 项收缩为 `CFG-10`/`CFG-11`（`maxItems` 2），判定性项不得出现；③ `config_codes.py --self-check` 的开关字段扫描覆盖 `items`、`if`/`then`/`else`、`additionalProperties`、`allOf`/`anyOf`/`oneOf` 与 `$defs`，打印改为按实际 `properties` 计数（“15 项”、仅 CFG-10/11 有默认、其余 13 项无默认均由变量生成），并新增 `lock_policy_errors` 对 `defaulted` 允许取值的校验；④ `config_invalid` 补齐四类：类型错误、取值越界（新增 `_value_errors` 依 schema 校验 type/enum/const/required/范围/长度/pattern）、lock 出现未注册键摘要（如 `CFG-16`）、判定性项被塞进 `defaulted`，均退出码 2；判定性子字段缺失仍记 `cannot_evaluate`（退出码 3）。删除已无落点的 `sub_defaults=` 机制与标语。
+  3. **AGENTS §3.5 三处**：① §3.5.3 适用对象由“13 个规格区段”改为 16 个并列明构成（GRAMMAR 全文、A.2、A.1、CHECKER_INPUT_SCHEMA 整文件、§3.5、coverage.json、9 份数据 schema、ACCESS_ZONES.md），并写明 schema 自动发现、区段数不写死；② §3.5.2 的 `due` 到期判据明确标注“未实现，登记为待办 T-159”（`check_state.py` 不读取登记表，两个 pins 只校验 `due` 非空，无组件知道当前里程碑），§3.5.3 第 5 条同步改为“应冻结、但判据未实现，现阶段人工核对”；③ §3.5.3 第 4 条的校验归属改正为“两个 pins 检查器各自加载登记表时交叉校验”，并注明 `check_state.py` 不做该校验。
+  4. **RG↔G 口径**：保持“显式引用才校验”的边界，在 `check_gap_ledger.py` 模块 docstring 与 `GAP_LEDGER.md` RG 节表头各写一句——两套编号不同源（RG 来自 D6 第 8 节，G 来自“规则正文 ↔ 判定列”缺口），未显式引用时不构成对应关系，不得据以推断或补齐映射。未编造任何映射。
+- **边界遵守**：未改 `CONSTITUTION.md`、未改 `spec/D6_REBASELINE_PROPOSAL.md`；未为任何对象写入“认可”依据；所有改动对象按既有机制以无复核字面量刷新指纹并仍登记于 T-149，未新增绕过方式。
+- **钉扎面变化**：受保护对象仍为 22（checker 16 + spec 6），**无复核对象数不变**；本批改动 `scripts/check_spec_pins.py`、`scripts/config_codes.py`、`scripts/check_gap_ledger.py` 与 `AGENTS.md#3.5`、两份配置 schema 均在册，未新增登记项。
+- **验证**：`config_codes.py --self-check` 通过并按实际计数输出；四类 `config_invalid` 与 CFG-08 缺失/子字段缺失（rc=3）逐例复现；十个常规检查器 rc=0；`test_checker_pins.py` 21/21、`test_spec_pins.py` 24/24；`check_checker_pins` rc=1（问题 18 = 16 无复核声明 + 2 失效）、`check_spec_pins` rc=1（问题 13 = 6 无复核声明 + 7 失效），为下一轮外复核前的预期债务。
+- **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`（本批改的是钉扎检查器与受钉扎区段，未经非同源复核，必然 rc≠0）。
+- **关联 ADR**：无（本批为缺陷修正，未引入新决策）

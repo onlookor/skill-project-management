@@ -23,7 +23,7 @@
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "AGENTS.md#3.5": {
-      "sha256": "93cbf044bf807f5e52632b191af36cd1d5d8f8e1662bfb92175862cd19ab61d4",
+      "sha256": "f398093a81b17b9814f7e2ba7f270b324cd4838d34ba54fd396f2425172e5b54",
       "path": "AGENTS.md",
       "basis": "无复核声明（不构成认可，不放行）"
     },
@@ -68,12 +68,12 @@
       "basis": "非同源复核：G-019 r4（基线 11c5d92）指出自写子集语义失真与配额外溢；本批按用户 2026-11-15 裁定接入成熟实现。复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g019-r4/REPORT.md；sha256：47b0be71a05d726a690278f2075efb13ed54ee79582176a373e8fb6dd7f74fbb；复核基线：11c5d92 区段：contracts/schema/pilot-id-map.schema.json 结论：认可"
     },
     "contracts/schema/runtime-config.schema.json": {
-      "sha256": "5b4541be332f4486036837fdf5707c83f9f666f0b9ca0b157cfd3e7f67149e00",
+      "sha256": "f9f675fdf97b42d2dc119fb58a63f32d580a676111c3429c100421c52778cf9c",
       "path": "contracts/schema/runtime-config.schema.json",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "contracts/schema/runtime-config-lock.schema.json": {
-      "sha256": "ab9b024321469d945d3d7553385e6cb35d46fe23bb6924242ba9e3f0574ee46f",
+      "sha256": "49816c0a2c7bf26d29f5811dfed1d16cb6daeba81c4e73ff6621a932519c2c0e",
       "path": "contracts/schema/runtime-config-lock.schema.json",
       "basis": "无复核声明（不构成认可，不放行）"
     },

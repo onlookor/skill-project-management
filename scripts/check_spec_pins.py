@@ -13,7 +13,13 @@
      `无复核声明（不构成认可，不放行）`——它记录事实但**永不放行**，登记项会持续
      报错，只能 `git commit --no-verify` 并在 `scripts/no-review-declarations.json`
      与 `TODO.md` 到期项中留痕（AGENTS.md 3.5.3）。不存在“待复核/初始登记”通行证。
-  5. `--write` 新增或变更的区段必须附 `--basis`（合格复核记录，或无复核字面量）。
+
+  5. A.2 的内容比较沿用 `check_three_table.a2_block_fingerprint` 的既有口径：
+     复核签收行是“复核记录”本身，不是被签收的内容，不参与比较（除此行外，
+     A.2 的其余文本仍逐字比较）。若签收行参与比较，写入复核记录这一动作就会让
+     被签收对象失效，合格在结构上不可达；排除范围仅限该行，不扩大到任何其他内容。
+     理由与范围见 `validation/reviews/2026-11-15-a2-comparison-scope.md`。
+  6. `--write` 新增或变更的区段必须附 `--basis`（合格复核记录，或无复核字面量）。
 
 记录文件放在 validation/reviews/ 下并在同一提交暂存；也可用 --review 指定。
 这不是“签收人身份验证”：机器只能核对记录的存在与字段，不能验证复核者是谁。
@@ -136,6 +142,21 @@ def digest(path: Path) -> str:
 
 SECTION_BY_KEY = {spec["key"]: spec for spec in SECTIONS}
 
+A2_KEY = f"{METHOD}#A.2"
+# A.2 的复核签收行记录“谁在何时核对了什么”，属于复核记录本身；
+# `check_three_table.a2_block_fingerprint` 的既有口径也不含该行。
+A2_SIGNOFF_RE = re.compile(r"^\s*>?\s*复核签收：")
+
+
+def comparable_text(spec: dict, text: str) -> str:
+    """按区段定位取文本；A.2 去掉复核签收行后再比，其余区段逐字比较。"""
+    body = section_text(text, spec["start"], spec["end"])
+    if spec["key"] != A2_KEY:
+        return body
+    return "\n".join(
+        line for line in body.splitlines() if not A2_SIGNOFF_RE.match(line)
+    )
+
 
 def baseline_section(root: Path, sha: str, spec: dict) -> str | None:
     """按区段定位规则，从 `git show <sha>:<path>` 中取出同一区段文本。"""
@@ -145,9 +166,7 @@ def baseline_section(root: Path, sha: str, spec: dict) -> str | None:
     if shown.returncode != 0:
         return None
     try:
-        return section_text(
-            shown.stdout.decode("utf-8"), spec["start"], spec["end"]
-        )
+        return comparable_text(spec, shown.stdout.decode("utf-8"))
     except (UnicodeDecodeError, ValueError):
         return None
 
@@ -226,10 +245,8 @@ def valid_basis(root: Path, text: str, key: str) -> tuple[bool, str]:
     if base_text is None:
         return False, f"复核基线 {sha} 中不存在区段 {key} 的源文件或起点"
     try:
-        current_text = section_text(
-            (root / spec["path"]).read_text(encoding="utf-8"),
-            spec["start"],
-            spec["end"],
+        current_text = comparable_text(
+            spec, (root / spec["path"]).read_text(encoding="utf-8")
         )
     except (OSError, ValueError) as exc:
         return False, f"无法定位当前区段 {key}：{exc}"

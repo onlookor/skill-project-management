@@ -86,26 +86,13 @@
     },
     "defaulted": {
       "type": "array",
-      "maxItems": 15,
-      "description": "取过默认值的非判定性配置项编号；判定性项不得出现在此列表。",
+      "maxItems": 2,
+      "description": "取过默认值的非判定性配置项编号；仅 CFG-10、CFG-11 可出现在此列表，判定性项一律不得出现。",
       "items": {
         "type": "string",
         "enum": [
-          "CFG-01",
-          "CFG-02",
-          "CFG-03",
-          "CFG-04",
-          "CFG-05",
-          "CFG-06",
-          "CFG-07",
-          "CFG-08",
-          "CFG-09",
           "CFG-10",
-          "CFG-11",
-          "CFG-12",
-          "CFG-13",
-          "CFG-14",
-          "CFG-15"
+          "CFG-11"
         ],
         "maxLength": 8
       }

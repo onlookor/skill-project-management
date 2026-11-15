@@ -3,7 +3,7 @@
   "$id": "https://project-management-grounding/contracts/schema/runtime-config.schema.json",
   "title": "运行期配置实例（<project>/config.json）",
   "description": "配置层的结构 schema，依据 spec/D6_REBASELINE_PROPOSAL.md 第 9 节（9.1 位置与边界、9.2 配置项清单与责任方裁定的 CFG-14/CFG-15、9.3 缺失与非法值、9.4 配置快照）。它约束的是**项目参数的取值形状**，不执行任何判定求值。四类归属只有 project_parameter 能出现在本文件：skill_criterion、acceptance_parameter、capability_switch 由 propertyNames 与 additionalProperties 双重拒绝，不得混写。默认值规则：只有非判定性项允许默认值（CFG-10、CFG-11），判定性项一律无默认，缺失即 cannot_evaluate（退出码 3），不得回落为通过。四条安全边界见顶层 $comment，其中“配置只能调严或调宽、不得关闭检查”的机械落点是本 schema 不含任何 enable/disable/skip/ignore/waive 类字段，且每一层 additionalProperties 均为 false——没有字段可以关闭某个 check。",
-  "$comment": "schema_version=config.schema/1; classes=project_parameter|skill_criterion|acceptance_parameter|capability_switch; present_class=project_parameter; 每个 CFG 属性的 $comment 以 cfg=/class=/defaultable=/absent= 元数据登记，另可用 sub_defaults= 声明子字段默认值。安全边界：B1 缺配置不得默认通过（defaultable=false ⇒ 无 default ⇒ absent=cannot_evaluate）；B2 人审关口不可删除（CFG-12 只有 additional_gates 与 approver_role_map，删除表达不存在）；B3 检查项不可关闭（无任何开关字段）；B4 配置不可改变工件必填字段集合（本文件只约束取值，不出现 required 列表注入工件）。",
+  "$comment": "schema_version=config.schema/1; classes=project_parameter|skill_criterion|acceptance_parameter|capability_switch; present_class=project_parameter; 每个 CFG 属性的 $comment 以 cfg=/class=/defaultable=/absent= 元数据登记，不设子字段默认值例外（判定性项的任何层级都不得出现 default）。安全边界：B1 缺配置不得默认通过（defaultable=false ⇒ 无 default ⇒ absent=cannot_evaluate）；B2 人审关口不可删除（CFG-12 只有 additional_gates 与 approver_role_map，删除表达不存在）；B3 检查项不可关闭（无任何开关字段）；B4 配置不可改变工件必填字段集合（本文件只约束取值，不出现 required 列表注入工件）。",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -318,29 +318,25 @@
           }
         },
         "CFG-08": {
-          "$comment": "cfg=CFG-08; class=project_parameter; defaultable=false; absent=cannot_evaluate; sub_defaults=timezone,workdays",
+          "$comment": "cfg=CFG-08; class=project_parameter; defaultable=false; absent=cannot_evaluate",
           "title": "项目日历",
-          "description": "工作日集合、节假日清单与 IANA 时区。项本身为判定性配置，缺失即 cannot_evaluate（退出码 3）；项内字段 timezone 与 workdays 属非判定性取值，允许子字段默认值（Asia/Shanghai；周一至周五）。",
+          "description": "工作日集合、节假日清单与 IANA 时区。判定性配置，无默认值；项缺失、timezone 或 workdays 缺失均判 cannot_evaluate（退出码 3）。",
           "type": "object",
           "additionalProperties": false,
+          "required": [
+            "timezone",
+            "workdays"
+          ],
           "properties": {
             "timezone": {
               "type": "string",
               "pattern": "^[A-Za-z][A-Za-z0-9_+-]{0,63}(/[A-Za-z0-9_+-]{1,63}){0,2}$",
-              "maxLength": 64,
-              "default": "Asia/Shanghai"
+              "maxLength": 64
             },
             "workdays": {
               "type": "array",
               "minItems": 1,
               "maxItems": 7,
-              "default": [
-                "Mon",
-                "Tue",
-                "Wed",
-                "Thu",
-                "Fri"
-              ],
               "items": {
                 "type": "string",
                 "enum": [
@@ -390,7 +386,7 @@
           "maxLength": 3
         },
         "CFG-10": {
-          "$comment": "cfg=CFG-10; class=project_parameter; defaultable=true; absent=use_default; sub_defaults=decimals,rounding,intermediate",
+          "$comment": "cfg=CFG-10; class=project_parameter; defaultable=true; absent=use_default",
           "title": "舍入口径",
           "description": "非判定性：缺失时取子字段默认值（2 位小数、half-even、中间计算不舍入），并在产物 config_used.defaulted 中登记 CFG-10。舍入会传导到 CPI/EAC，故跨配置不可比。",
           "type": "object",
@@ -424,7 +420,7 @@
           }
         },
         "CFG-11": {
-          "$comment": "cfg=CFG-11; class=project_parameter; defaultable=true; absent=use_default; sub_defaults=template",
+          "$comment": "cfg=CFG-11; class=project_parameter; defaultable=true; absent=use_default",
           "title": "工件命名与版本约定",
           "description": "非判定性：缺失时取默认模板。模板必须含 <type> 段与 <major>/<minor> 版本段，由 pattern 机械校验。不影响任何可比性。",
           "type": "object",

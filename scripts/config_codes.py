@@ -2,7 +2,7 @@
 """配置层错误分类、配置摘要与配置 schema 自检（批次 0083）。
 
 本模块只固定**分类与退出码**，不执行配置求值（求值属下一批的解释器）。
-依据：`spec/D6_REBASELINE_PROPOSAL.md` 9.1（四条安全边界）、9.2（13 项配置，另有责任方批次 0084 裁定的 CFG-14/CFG-15）、
+依据：`spec/D6_REBASELINE_PROPOSAL.md` 9.1（四条安全边界）、9.2（13 项配置，另有责任方批次 0084 裁定的 CFG-14/CFG-15，共 15 项）、
 9.3（缺失与非法值）、9.4（配置快照与可比性）。
 
 四类配置结果与退出码：
@@ -10,7 +10,7 @@
 | 类别 | 含义 | 退出码 |
 |---|---|---|
 | `cannot_evaluate` | 判定性配置项缺失或无法判定 | 3 |
-| `config_invalid` | 越界、类型错、分档不覆盖、引用未注册配置项 | 2 |
+| `config_invalid` | 类型错误、取值越界/越界枚举、lock 含未注册项摘要、判定性项进入 `defaulted` | 2 |
 | `config_incomplete` | 项存在但相互矛盾（如 CFG-04=milestone_fraction 而 CFG-05 缺失） | 2 |
 | `config_drift` | 配置实例与 `config.lock.json` 摘要不一致 | 1 |
 
@@ -72,7 +72,7 @@ EXIT_BY_CLASS = {
 }
 MEANING_BY_CLASS = {
     "cannot_evaluate": "判定性配置项缺失或无法判定；不得回落为通过",
-    "config_invalid": "取值越界、类型错误、分档不覆盖，或引用了未注册配置项",
+    "config_invalid": "类型错误、取值越界、lock 含未注册项摘要，或判定性项进入 defaulted",
     "config_incomplete": "配置项存在但相互矛盾（如采样口径与采样集不匹配）",
     "config_drift": "配置实例与 config.lock.json 的摘要不一致，阻断判定",
 }
@@ -84,6 +84,9 @@ OFF_SWITCH = re.compile(
 )
 
 CFG_IDS = tuple(f"CFG-{index:02d}" for index in range(1, 16))
+# 仅这两项是非判定性项，允许有默认值；其余一律判定性、无默认。
+NON_JUDGMENTAL = ("CFG-10", "CFG-11")
+JUDGMENTAL = tuple(key for key in CFG_IDS if key not in NON_JUDGMENTAL)
 JUDGMENTAL_REQUIRED = ("CFG-01", "CFG-02", "CFG-03", "CFG-04", "CFG-09")
 # 条件必填的判定性项：CFG-15 在按 cost_account 分档/汇总时必填；
 # CFG-14 的触发条件在任务卡（是否执行风险方法），不在配置内部，故无结构规则。
@@ -156,7 +159,11 @@ def parse_comment(text: str) -> dict:
 
 
 def _iter_properties(schema: dict):
-    """递归产出 (属性名, 子 schema)，用于关闭开关与 additionalProperties 检查。"""
+    """递归产出 (属性名, 子 schema)，覆盖 properties 之外的分支。
+
+    `items`、`if`/`then`/`else`、`additionalProperties`、`anyOf`/`oneOf` 里同样可能
+    藏有属性名或嵌套对象，只扫 properties 会漏掉“关闭开关”与未封闭对象。
+    """
     if not isinstance(schema, dict):
         return
     properties = schema.get("properties")
@@ -164,8 +171,16 @@ def _iter_properties(schema: dict):
         for name, subschema in properties.items():
             yield name, subschema
             yield from _iter_properties(subschema)
-    for subschema in schema.get("allOf", []):
-        yield from _iter_properties(subschema)
+    items = schema.get("items")
+    if isinstance(items, dict):
+        yield from _iter_properties(items)
+    for keyword in ("if", "then", "else", "additionalProperties"):
+        child = schema.get(keyword)
+        if isinstance(child, dict):
+            yield from _iter_properties(child)
+    for keyword in ("allOf", "anyOf", "oneOf"):
+        for subschema in schema.get(keyword, []):
+            yield from _iter_properties(subschema)
     for subschema in schema.get("$defs", {}).values():
         yield from _iter_properties(subschema)
 
@@ -176,6 +191,74 @@ def _has_default(schema: dict) -> bool:
     if "default" in schema:
         return True
     return any(_has_default(child) for child in schema.values())
+
+
+TYPE_CHECKS = {
+    "object": dict,
+    "array": list,
+    "string": str,
+    "integer": int,
+    "number": (int, float),
+    "boolean": bool,
+}
+
+
+def _value_errors(value: object, schema: dict, path: str) -> list[tuple[str, str]]:
+    """按 schema 的 type/enum/required/范围校验单个值，返回 (类别, 说明) 清单。
+
+    类别只有两种：`missing` 是判定性必填子字段缺失（对应 cannot_evaluate，
+    退出码 3，不得回落为通过）；`invalid` 是类型错误、未注册字段或取值越界
+    （对应 config_invalid，退出码 2）。只覆盖 config 用到的关键字。
+    """
+    errors: list[tuple[str, str]] = []
+    if not isinstance(schema, dict):
+        return errors
+    expected = schema.get("type")
+    if expected in TYPE_CHECKS:
+        wanted = TYPE_CHECKS[expected]
+        bad = not isinstance(value, wanted) or (
+            expected in ("integer", "number") and isinstance(value, bool)
+        )
+        if bad:
+            errors.append(("invalid", f"{path} 应为 {expected}，实得 {type(value).__name__}"))
+            return errors
+    if "enum" in schema:
+        try:
+            if value not in schema["enum"]:
+                errors.append(("invalid", f"{path} 不在允许取值 {schema['enum']} 内"))
+        except TypeError:
+            errors.append(("invalid", f"{path} 的类型不可与枚举比较"))
+    if "const" in schema and value != schema["const"]:
+        errors.append(("invalid", f"{path} 必须为 {schema['const']!r}"))
+    if expected == "object" and isinstance(value, dict):
+        for name in schema.get("required", []):
+            if name not in value:
+                errors.append(("missing", f"{path}.{name} 缺失"))
+        children = schema.get("properties", {})
+        for name, child_value in value.items():
+            if name in children:
+                errors.extend(_value_errors(child_value, children[name], f"{path}.{name}"))
+            elif schema.get("additionalProperties") is False:
+                errors.append(("invalid", f"{path}.{name} 是未注册字段"))
+    if expected == "array" and isinstance(value, list):
+        if "minItems" in schema and len(value) < schema["minItems"]:
+            errors.append(("invalid", f"{path} 至少 {schema['minItems']} 项，实得 {len(value)}"))
+        if "maxItems" in schema and len(value) > schema["maxItems"]:
+            errors.append(("invalid", f"{path} 至多 {schema['maxItems']} 项，实得 {len(value)}"))
+        if isinstance(schema.get("items"), dict):
+            for index, item in enumerate(value):
+                errors.extend(_value_errors(item, schema["items"], f"{path}[{index}]"))
+    if isinstance(value, str):
+        if "maxLength" in schema and len(value) > schema["maxLength"]:
+            errors.append(("invalid", f"{path} 长度超过 {schema['maxLength']}"))
+        if "pattern" in schema and re.fullmatch(schema["pattern"], value) is None:
+            errors.append(("invalid", f"{path} 不匹配 {schema['pattern']}"))
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        if "minimum" in schema and value < schema["minimum"]:
+            errors.append(("invalid", f"{path} 小于下限 {schema['minimum']}"))
+        if "maximum" in schema and value > schema["maximum"]:
+            errors.append(("invalid", f"{path} 大于上限 {schema['maximum']}"))
+    return errors
 
 
 def policy_errors(schema: dict) -> list[str]:
@@ -199,7 +282,7 @@ def policy_errors(schema: dict) -> list[str]:
     properties = config.get("properties", {})
     if sorted(properties) != sorted(CFG_IDS):
         errors.append(
-            f"config.properties 必须恰好覆盖 CFG-01～CFG-13；实得 {sorted(properties)}"
+            f"config.properties 必须恰好覆盖 CFG-01～{CFG_IDS[-1]}；实得 {sorted(properties)}"
         )
 
     required = config.get("required", [])
@@ -238,35 +321,19 @@ def policy_errors(schema: dict) -> list[str]:
                 f"{key}：absent={meta.get('absent')} 不在 {list(ABSENT_BEHAVIORS)}"
             )
 
-        # 约束二：只有非判定性项有默认值；判定性项一律无默认。
-        sub_defaults = [
-            name for name in meta.get("sub_defaults", "").split(",") if name
-        ]
-        if "default" in subschema and meta.get("defaultable") != "true":
-            errors.append(f"{key}：判定性项不得有顶层 default")
-        if meta.get("absent") == "cannot_evaluate" and "default" in subschema:
-            errors.append(f"{key}：absent=cannot_evaluate 时不得有顶层 default")
+        # 约束二：只有非判定性项有默认值；判定性项一律无默认（含任何子字段）。
+        if meta.get("defaultable") == "true":
+            if not _has_default(subschema):
+                errors.append(f"{key}：defaultable=true 但没有任何 default")
+            if key not in NON_JUDGMENTAL:
+                errors.append(f"{key}：只有 {list(NON_JUDGMENTAL)} 允许 defaultable=true")
+        elif _has_default(subschema):
+            errors.append(
+                f"{key}：判定性项不得有任何 default（含子字段）；"
+                "缺该项即 cannot_evaluate，不取默认"
+            )
         if meta.get("absent") == "use_default" and meta.get("defaultable") != "true":
             errors.append(f"{key}：absent=use_default 要求 defaultable=true")
-        if sub_defaults:
-            nested = subschema.get("properties", {})
-            for name in sub_defaults:
-                if name not in nested:
-                    errors.append(f"{key}：sub_defaults 声明了不存在的子字段 {name}")
-                elif "default" not in nested[name]:
-                    errors.append(f"{key}.{name}：sub_defaults 声明但缺少 default")
-        else:
-            nested_defaults = [
-                name
-                for name, child in subschema.get("properties", {}).items()
-                if isinstance(child, dict) and "default" in child
-            ]
-            if nested_defaults:
-                errors.append(
-                    f"{key}：子字段有 default 但 $comment 未声明 sub_defaults：{nested_defaults}"
-                )
-        if not _has_default(subschema) and meta.get("defaultable") == "true":
-            errors.append(f"{key}：defaultable=true 但没有任何 default")
 
         if subschema.get("type") == "object" and "additionalProperties" not in subschema:
             errors.append(f"{key}：对象必须显式声明 additionalProperties")
@@ -299,7 +366,20 @@ def lock_policy_errors(schema: dict) -> list[str]:
         errors.append("config_digest 必须约束为 sha256:<64 位小写十六进制>")
     items = schema.get("properties", {}).get("item_digests", {})
     if items.get("propertyNames", {}).get("pattern") != CONFIG_KEY_PATTERN:
-        errors.append("item_digests 的键必须约束为 CFG-01～CFG-13")
+        errors.append(f"item_digests 的键必须约束为 CFG-01～{CFG_IDS[-1]}")
+
+    # defaulted 只允许列出非判定性项：判定性项被塞进该列表意味着“缺项按默认值放行”，
+    # 与 absent=cannot_evaluate 直接冲突，必须在 schema 层就堵死。
+    defaulted = schema.get("properties", {}).get("defaulted", {})
+    allowed = (defaulted.get("items") or {}).get("enum")
+    if allowed != list(NON_JUDGMENTAL):
+        errors.append(
+            f"defaulted 的允许取值必须恰为 {list(NON_JUDGMENTAL)}（只有非判定性项可默认）；实得 {allowed}"
+        )
+    if defaulted.get("maxItems") != len(NON_JUDGMENTAL):
+        errors.append(
+            f"defaulted 的 maxItems 必须为 {len(NON_JUDGMENTAL)}；实得 {defaulted.get('maxItems')}"
+        )
     if schema.get("additionalProperties") is not False:
         errors.append("config.lock 顶层必须 additionalProperties=false")
     for name, subschema in _iter_properties(schema):
@@ -315,12 +395,15 @@ def lock_policy_errors(schema: dict) -> list[str]:
 PRECEDENCE = ("config_invalid", "config_incomplete", "config_drift", "cannot_evaluate")
 
 
-def config_findings(config: dict, lock: dict | None = None) -> list[dict]:
+def config_findings(
+    config: dict, lock: dict | None = None, schema: dict | None = None
+) -> list[dict]:
     """对配置实例做结构分类，返回带类别与退出码的发现清单。
 
     不做配置求值：不解释阈值、不采样、不判定工件。它只区分四类情形——
-    未注册键（config_invalid）、跨项矛盾（config_incomplete）、摘要漂移
-    （config_drift）与判定性项缺失（cannot_evaluate）。
+    未注册键、类型错误、取值越界（config_invalid）、跨项矛盾
+    （config_incomplete）、摘要漂移（config_drift）与判定性项缺失
+    （cannot_evaluate）。`schema` 用于逐项校验取值形状；`lock` 用于核对摘要。
     """
     findings: list[dict] = []
     if not isinstance(config, dict):
@@ -331,6 +414,18 @@ def config_findings(config: dict, lock: dict | None = None) -> list[dict]:
         findings.append(
             {"code": "config_invalid", "detail": f"未注册配置项：{unknown}"}
         )
+
+    # 类型错误与取值越界：按 schema 逐项校验已出现的键。
+    # 判定性项的子字段缺失记 cannot_evaluate（缺项不取默认），其余记 config_invalid。
+    if isinstance(schema, dict):
+        children = schema.get("properties", {}).get("config", {}).get("properties", {})
+        for key in sorted(config):
+            subschema = children.get(key)
+            if not isinstance(subschema, dict):
+                continue
+            for kind, message in _value_errors(config[key], subschema, f"config.{key}"):
+                code = "cannot_evaluate" if kind == "missing" else "config_invalid"
+                findings.append({"code": code, "detail": message})
 
     missing = [key for key in JUDGMENTAL_REQUIRED if key not in config]
     if missing:
@@ -354,7 +449,7 @@ def config_findings(config: dict, lock: dict | None = None) -> list[dict]:
         )
     if sampler is not None and "CFG-08" not in config:
         findings.append(
-            {"code": "config_incomplete", "detail": "涉及周期换算时缺少 CFG-08（项目日历）"}
+            {"code": "cannot_evaluate", "detail": "涉及周期换算时缺少 CFG-08（项目日历）"}
         )
 
     bands = config.get("CFG-02")
@@ -400,15 +495,43 @@ def config_findings(config: dict, lock: dict | None = None) -> list[dict]:
             )
 
     if lock is not None:
-        expected = lock.get("config_digest")
-        actual = config_digest(config)
-        if expected != actual:
+        if not isinstance(lock, dict):
             findings.append(
-                {
-                    "code": "config_drift",
-                    "detail": f"config.lock 摘要不符：登记 {expected}，实得 {actual}",
-                }
+                {"code": "config_invalid", "detail": "config.lock 必须是对象"}
             )
+        else:
+            digests = lock.get("item_digests")
+            if isinstance(digests, dict):
+                unregistered = sorted(key for key in digests if key not in CFG_IDS)
+                if unregistered:
+                    findings.append(
+                        {
+                            "code": "config_invalid",
+                            "detail": f"config.lock 含未注册项摘要：{unregistered}",
+                        }
+                    )
+            defaulted = lock.get("defaulted")
+            if isinstance(defaulted, list):
+                illegal = sorted({key for key in defaulted if key not in NON_JUDGMENTAL})
+                if illegal:
+                    findings.append(
+                        {
+                            "code": "config_invalid",
+                            "detail": (
+                                "config.lock 的 defaulted 含不允许默认的项："
+                                f"{illegal}；只有 {list(NON_JUDGMENTAL)} 可默认"
+                            ),
+                        }
+                    )
+            expected = lock.get("config_digest")
+            actual = config_digest(config)
+            if expected != actual:
+                findings.append(
+                    {
+                        "code": "config_drift",
+                        "detail": f"config.lock 摘要不符：登记 {expected}，实得 {actual}",
+                    }
+                )
 
     for finding in findings:
         finding["exit_code"] = EXIT_BY_CLASS[finding["code"]]
@@ -466,7 +589,15 @@ def main(argv: list[str] | None = None) -> int:
         except ConfigError as exc:
             print(f"[错误] {exc.code}：{exc.detail}")
             return exc.exit_code
-        findings = config_findings(data.get("config", data), lock)
+        schema_path = Path(args.schema)
+        schema = None
+        if schema_path.is_file():
+            try:
+                schema = _load_json(schema_path)
+            except ConfigError as exc:
+                print(f"[错误] {exc.code}：{exc.detail}")
+                return exc.exit_code
+        findings = config_findings(data.get("config", data), lock, schema)
         print(json.dumps(findings, ensure_ascii=False, indent=2, sort_keys=True))
         return overall_exit_code(findings)
 
@@ -483,13 +614,18 @@ def main(argv: list[str] | None = None) -> int:
 
     errors = policy_errors(schema) + lock_policy_errors(lock_schema)
     classes = " / ".join(f"{name}={EXIT_BY_CLASS[name]}" for name in ERROR_CLASSES)
-    print(f"配置 schema 自检：15 项，类别 {classes}")
+    count = len(schema.get("properties", {}).get("config", {}).get("properties", {}))
+    print(f"配置 schema 自检：{count} 项（CFG-01～{CFG_IDS[-1]}），类别 {classes}")
     if errors:
         for message in errors:
             print(f"[错误] {message}")
         print(f"[失败] {len(errors)} 项违反配置层设计约束")
         return EXIT_CONFIG_DRIFT
-    print("[通过] 四类归属可区分；判定性项无默认；无关闭开关；摘要字段齐备")
+    print(
+        "[通过] 四类归属可区分；"
+        f"仅 {list(NON_JUDGMENTAL)} 有默认、其余 {len(JUDGMENTAL)} 项无默认；"
+        "无关闭开关；摘要字段齐备"
+    )
     return EXIT_OK
 
 
