@@ -20,7 +20,7 @@
   "spec": {},
   "date_unverified": {
     "spec/methods/deterministic-checker.md#A.2": {
-      "reason": "签收行日期 2026-11-16 与登记项 review_date（origin: executor）一致，但复核产物 batch5/REVIEW-RECORD.md 中无专用记号 `<!-- 复核日期：2026-11-16 -->`。批次 0092 起不再接受独立日期记录或任意位置的同日子串，故 check_spec_pins 报“日期未核验”；该产物不可改字节（3 条已登记 basis 引用其 sha256）。",
+      "reason": "签收行日期 2026-11-16 与登记项 review_date（origin: executor）一致，但复核产物 batch5/REVIEW-RECORD.md 中无专用记号 `<!-- 复核日期：2026-11-16 -->`。批次 0092 起不再接受独立日期记录或任意位置的同日子串，故 check_spec_pins 报“日期未核验”；该产物不可改字节（其复核记录被少数已登记 basis 引用，改字节会连带使这些 basis 失效）。",
       "missing_review": "一次轻量复核：由复核方对当前 A.2 出具含专用记号的复核产物（或书面确认日期）；在此之前该项不计为合规。",
       "due": "M1 出口前",
       "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
