@@ -97,7 +97,7 @@
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：contracts/schema/runtime-config-lock.schema.json；结论：认可"
     },
     "spec/ACCESS_ZONES.md": {
-      "sha256": "95a54c2388d907fe02f5fc9fc06c24a268ee6f3df9df7c308a75df8f862b2a9c",
+      "sha256": "d092b602491195f0cfc4df0178f4c7d8b02bbfd27da04394cb2bd919963ac23b",
       "path": "spec/ACCESS_ZONES.md",
       "anchor": "e21f5c30ab3d8552385fccbf506b4a45dbb599761e6a05af62c06a1cd2a51ca6",
       "basis": "无复核声明（不构成认可，不放行）",
@@ -111,6 +111,16 @@
           "at": "2026-11-16T15:01:42+00:00",
           "commit": "534c3546625e41277ced2b1badef267748f0ada1",
           "summary": "2026-11-16T15:01:42+00:00（HEAD 534c354 之后的工作区改动）：区段 spec/ACCESS_ZONES.md（spec/ACCESS_ZONES.md）指纹自 e21f5c30ab3d 变为 95a54c2388d9；理由：批次 0103：为 D6 验收件登记 validation/cases/ 与 validation/d6/ 的归区（JSON 走 C 区、说明文档走 P 区），落实 ADR-0020 / T-156；改动未经非同源复核，按 3.5.3 保留无复核声明"
+        },
+        {
+          "section": "spec/ACCESS_ZONES.md",
+          "path": "spec/ACCESS_ZONES.md",
+          "from": "95a54c2388d907fe02f5fc9fc06c24a268ee6f3df9df7c308a75df8f862b2a9c",
+          "to": "d092b602491195f0cfc4df0178f4c7d8b02bbfd27da04394cb2bd919963ac23b",
+          "reason": "批次 0104 为 D6 变体配置与批次 2 运行记录登记 C 区归区（2 行）",
+          "at": "2026-11-16T15:10:15+00:00",
+          "commit": "27873f36207a0ba4e8d60631e29f1c91f2efb41e",
+          "summary": "2026-11-16T15:10:15+00:00（HEAD 27873f3 之后的工作区改动）：区段 spec/ACCESS_ZONES.md（spec/ACCESS_ZONES.md）指纹自 95a54c2388d9 变为 d092b6024911；理由：批次 0104 为 D6 变体配置与批次 2 运行记录登记 C 区归区（2 行）"
         }
       ]
     },

@@ -1,0 +1,452 @@
+{
+  "summary": {
+    "run_id": "phase2-public-crossrail",
+    "generated_at": "2026-11-16T23:09:16+08:00",
+    "task_set_version": "0.1.0-skeleton",
+    "models": "not_executed",
+    "total": 6,
+    "pass": 6,
+    "mismatch": 0,
+    "exit_codes": {
+      "0": 4,
+      "1": 2
+    },
+    "observations": [
+      "本批 6 题全部由公开报告摘要级事实改造，原文未入库；EVM 为按公开总额与完成度推导，标 derived_not_official_evm。",
+      "成本与挣值 3 题使用变体快照 V-CFG09-GBP（sha256:9c08d7c3…f548，仅 CFG-09 由 CNY 改为 GBP），单列、不计入主运行；主配置仍为 sha256:228bcbd6…abe8c。",
+      "状态快照不参与货币核对（status 的 4 项检查均不读 CFG-09），其金额仍是公开报告的 GBP 数值；主配置为 CNY 属未覆盖项，不影响本题判定，记为实现缺口而非通过依据。",
+      "依赖图缺 lag 即判 cannot_evaluate 的口径在本批未触发（6 件均显式 lag: 0）；该口径仍由 D6-PUB-08 承接。",
+      "模型弱档/对照档/无技能臂仍未执行（本机无权重，需外部 API 或权重），S0/S1 无数据。"
+    ]
+  },
+  "results": [
+    {
+      "task_id": "D6-PUB-01",
+      "case_id": "NAO-CROSSRAIL",
+      "title": "Crossrail 阶段网络：从隧道到试运行的依赖与关键路径",
+      "artifact": "validation/cases/NAO-CROSSRAIL/inputs/dependency-graph.json",
+      "checks": [
+        "dep.ids_unique",
+        "dep.endpoints_exist",
+        "dep.acyclic",
+        "dep.types_valid",
+        "dep.wbs_mapping",
+        "schedule.critical_path"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "dep.ids_unique",
+          "dep.endpoints_exist",
+          "dep.acyclic",
+          "dep.types_valid",
+          "dep.wbs_mapping",
+          "schedule.critical_path"
+        ]
+      },
+      "config_variant": null,
+      "config": "validation/d6/acceptance-config.json",
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 0,
+        "findings": [
+          {
+            "check": "dep.ids_unique",
+            "detail": "5 个活动 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.endpoints_exist",
+            "detail": "4 条依赖端点闭合",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.acyclic",
+            "detail": "DAG 无环",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.types_valid",
+            "detail": "依赖类型均在 FS/SS/FF/SF 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.wbs_mapping",
+            "detail": "活动↔工作包映射完整",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "schedule.critical_path",
+            "detail": "总工期 3280.0；关键活动 ['TUN', 'STA', 'SYS', 'TRI', 'OPN']",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:c905586532d57facb5ae907057c761650b7f5f1f2d41964b70e13bb101f17931"
+      }
+    },
+    {
+      "task_id": "D6-PUB-02",
+      "case_id": "NAO-CROSSRAIL",
+      "title": "Crossrail 开通里程碑：公开延期对应 due_day 违约",
+      "artifact": "validation/cases/NAO-CROSSRAIL/inputs/dependency-graph-delay.json",
+      "checks": [
+        "dep.ids_unique",
+        "dep.endpoints_exist",
+        "dep.acyclic",
+        "dep.types_valid",
+        "dep.wbs_mapping",
+        "schedule.critical_path"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "schedule.critical_path"
+        ],
+        "must_pass": [
+          "dep.ids_unique",
+          "dep.endpoints_exist",
+          "dep.acyclic",
+          "dep.types_valid",
+          "dep.wbs_mapping"
+        ]
+      },
+      "config_variant": null,
+      "config": "validation/d6/acceptance-config.json",
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 1,
+        "findings": [
+          {
+            "check": "dep.ids_unique",
+            "detail": "5 个活动 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.endpoints_exist",
+            "detail": "4 条依赖端点闭合",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.acyclic",
+            "detail": "DAG 无环",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.types_valid",
+            "detail": "依赖类型均在 FS/SS/FF/SF 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.wbs_mapping",
+            "detail": "活动↔工作包映射完整",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "schedule.critical_path",
+            "detail": "总工期 3520.0；关键活动 ['TUN', 'STA', 'SYS', 'TRI', 'OPN']",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "schedule.critical_path",
+            "detail": "里程碑 OPN 最早完成 3520.0 晚于期限 3280",
+            "path": "activities.OPN.due_day",
+            "status": "violation"
+          }
+        ],
+        "failed_checks": [
+          "schedule.critical_path"
+        ],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:b8988d28a91984f9425e34596d7c3737d26b2c5d54bad49383b3c18a2e8978ea"
+      }
+    },
+    {
+      "task_id": "D6-PUB-03",
+      "case_id": "NAO-CROSSRAIL",
+      "title": "Crossrail 成本汇总：£17.6bn 资金包按科目与阶段守恒",
+      "artifact": "validation/cases/NAO-CROSSRAIL/inputs/cost-budget.json",
+      "checks": [
+        "budget.accounts_registered",
+        "budget.package_unique",
+        "budget.total_conserved",
+        "budget.time_phased_sum",
+        "budget.currency_match"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "budget.accounts_registered",
+          "budget.package_unique",
+          "budget.total_conserved",
+          "budget.time_phased_sum",
+          "budget.currency_match"
+        ]
+      },
+      "config_variant": "V-CFG09-GBP",
+      "config": "validation/d6/configs/V-CFG09-GBP.json",
+      "config_digest": "sha256:9c08d7c34304511af1bd0c8e9480282ae20314362521861dc3f9fffb172cf548",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 0,
+        "findings": [
+          {
+            "check": "budget.accounts_registered",
+            "detail": "全部工作包科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.package_unique",
+            "detail": "5 个工作包 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.total_conserved",
+            "detail": "每个科目与总额均守恒，合计 17600000000.0",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.time_phased_sum",
+            "detail": "每个工作包的分时段金额之和等于总额",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.currency_match",
+            "detail": "货币与 CFG-09 一致",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:6fdfd6593d709e29b49a6da45f0d52de184ef60b14c620954aa216f6229ec39d"
+      }
+    },
+    {
+      "task_id": "D6-PUB-04",
+      "case_id": "NAO-CROSSRAIL",
+      "title": "Crossrail 状态快照：2018 年 7 月的完成度与支出",
+      "artifact": "validation/cases/NAO-CROSSRAIL/inputs/status-snapshot.json",
+      "checks": [
+        "status.dictionary_fields",
+        "status.no_implicit_zero",
+        "status.sample_grid",
+        "status.account_registered"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "status.dictionary_fields",
+          "status.no_implicit_zero",
+          "status.sample_grid",
+          "status.account_registered"
+        ]
+      },
+      "config_variant": null,
+      "config": "validation/d6/acceptance-config.json",
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 0,
+        "findings": [
+          {
+            "check": "status.dictionary_fields",
+            "detail": "数据字典齐备且测量指标均已登记",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.no_implicit_zero",
+            "detail": "缺数均显式登记了 unavailable_reason",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.sample_grid",
+            "detail": "2 个采样点均与配置口径一致",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.account_registered",
+            "detail": "测量科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:c284d46b48a7187503d7c30c14bef3382203a9020d067ede3f9de7bf70b6ac8c"
+      }
+    },
+    {
+      "task_id": "D6-PUB-05",
+      "case_id": "NAO-CROSSRAIL",
+      "title": "Crossrail 推导 EVM：BAC=£17.6bn、EV 按 93%、AC=£12.5bn",
+      "artifact": "validation/cases/NAO-CROSSRAIL/inputs/evm-record.json",
+      "checks": [
+        "evm.formulas",
+        "evm.ev_measurement",
+        "evm.eac_method",
+        "evm.budget_consistent",
+        "evm.term_aliases"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "evm.formulas",
+          "evm.ev_measurement",
+          "evm.eac_method",
+          "evm.budget_consistent",
+          "evm.term_aliases"
+        ]
+      },
+      "config_variant": "V-CFG09-GBP",
+      "config": "validation/d6/configs/V-CFG09-GBP.json",
+      "config_digest": "sha256:9c08d7c34304511af1bd0c8e9480282ae20314362521861dc3f9fffb172cf548",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 0,
+        "findings": [
+          {
+            "check": "evm.formulas",
+            "detail": "逐期复算完成；EAC 方法 cpi，共 1 期",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "evm.ev_measurement",
+            "detail": "EV 按 CFG-13 复算一致（0/100）",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "evm.eac_method",
+            "detail": "EAC 方法显式登记为 cpi",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "evm.budget_consistent",
+            "detail": "BAC 与工作包预算合计一致",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "evm.term_aliases",
+            "detail": "只使用 EV/PV/AC 一套主名",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:9c5b73265fddbbee7d873b5101603240f618a79f0372c6b05d10c520541b06c7"
+      }
+    },
+    {
+      "task_id": "D6-PUB-06",
+      "case_id": "NAO-CROSSRAIL",
+      "title": "Crossrail EVM 负例：BAC 仍用 2010 年 £14.8bn，工作包合计 £17.6bn",
+      "artifact": "validation/cases/NAO-CROSSRAIL/inputs/evm-record-stale-bac.json",
+      "checks": [
+        "evm.formulas",
+        "evm.ev_measurement",
+        "evm.eac_method",
+        "evm.budget_consistent",
+        "evm.term_aliases"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "evm.budget_consistent"
+        ],
+        "must_pass": [
+          "evm.formulas",
+          "evm.ev_measurement",
+          "evm.eac_method",
+          "evm.term_aliases"
+        ]
+      },
+      "config_variant": "V-CFG09-GBP",
+      "config": "validation/d6/configs/V-CFG09-GBP.json",
+      "config_digest": "sha256:9c08d7c34304511af1bd0c8e9480282ae20314362521861dc3f9fffb172cf548",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 1,
+        "findings": [
+          {
+            "check": "evm.formulas",
+            "detail": "逐期复算完成；EAC 方法 cpi，共 1 期",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "evm.ev_measurement",
+            "detail": "EV 按 CFG-13 复算一致（0/100）",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "evm.eac_method",
+            "detail": "EAC 方法显式登记为 cpi",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "evm.budget_consistent",
+            "detail": "BAC=14800000000.0 与工作包预算合计 17600000000.0 不等",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "evm.term_aliases",
+            "detail": "只使用 EV/PV/AC 一套主名",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [
+          "evm.budget_consistent"
+        ],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:8ec7acccf39279b001434829f3b016d26a0b8738282298ace3057ada24d06b15"
+      }
+    }
+  ]
+}

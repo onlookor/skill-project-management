@@ -51,9 +51,11 @@
 | `validation/d6/acceptance.json` | C | — | D6 验收配置（档位/阈值/敏感性） |
 | `validation/d6/acceptance-config.json` | C | — | D6 验收运行时配置快照 |
 | `validation/d6/acceptance-config.lock.json` | C | — | D6 验收配置摘要 |
+| `validation/d6/configs/` | C | — | D6 验收配置变体快照与摘要（S2 敏感性） |
 | `validation/d6/tasks/` | C | — | D6 任务集（结构化） |
 | `validation/d6/results/` | P | P2 | D6 运行记录（非权威） |
 | `validation/d6/results/phase1-synthetic/run.json` | C | — | D6 批次 1 机器可读运行记录 |
+| `validation/d6/results/phase2-public-crossrail/run.json` | C | — | D6 批次 2 机器可读运行记录 |
 | `validation/` | P | P1 | 验证与复核材料 |
 
 ## 2. 数据区准入登记

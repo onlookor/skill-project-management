@@ -14,7 +14,7 @@
 
 | case_id | 机构 / 报告 | 报告号与日期 | 许可 | 访问日期 | 核验状态 | 已入库改造素材 | 对应题目 |
 |---|---|---|---|---|---|---|---|
-| `NAO-CROSSRAIL` | UK National Audit Office, *Completing Crossrail* | HC 2106，2019-05-03 | OGL v3.0 | 2026-11-16 | 摘要级已核实 | `validation/cases/NAO-CROSSRAIL/inputs/`（待建） | D6-PUB-01～06 |
+| `NAO-CROSSRAIL` | UK National Audit Office, *Completing Crossrail* | HC 2106，2019-05-03 | OGL v3.0 | 2026-11-16 | 摘要级已核实 | `validation/cases/NAO-CROSSRAIL/inputs/`（6 件，已运行：`phase2-public-crossrail`） | D6-PUB-01～06 |
 | `NAO-UNIVERSAL-CREDIT` | UK National Audit Office, *Universal Credit: early progress*；*Rolling out Universal Credit* | HC 1123，2018-06-15；早期报告 2013 | OGL v3.0 | 2026-11-16 | 摘要级已核实 | `validation/cases/NAO-UNIVERSAL-CREDIT/inputs/`（待建） | D6-PUB-07～11 |
 | `NAO-HS2` | UK National Audit Office, *High Speed Two reset* | 2026 年报告 | OGL v3.0 | 2026-11-16 | 摘要级已核实 | `validation/cases/NAO-HS2/inputs/`（待建） | D6-PUB-12～17 |
 | `NAO-NPFIT` | UK National Audit Office, *The National Programme for IT in the NHS: an update on the delivery of detailed care records systems* | HC 888，2011 | OGL v3.0 / Parliamentary copyright | 2026-11-16 | 摘要级已核实 | `validation/cases/NAO-NPFIT/inputs/`（待建） | D6-PUB-18～22 |
@@ -52,6 +52,7 @@
 
 ## 4. 待办与未入库
 
-- 公开案例的输入 JSON **尚未建立**（`input_status: planned`）；本台账先固定来源、口径与题号对应，批次 2 再按上表改造并逐题回填。
+- 公开案例的输入 JSON：Crossrail 6 件已建立并运行（批次 2，`validation/d6/results/phase2-public-crossrail/`）；其余 16 题仍为 `input_status: planned`，按 Universal Credit → HS2 → NPfIT 顺序在后续批次改造并逐题回填。
+- Crossrail 成本/挣值件按 GBP 建立，运行需 `V-CFG09-GBP` 变体快照（主配置 CFG-09=CNY），变体题单列、不计入主运行；状态件不参与货币核对，其金额仍为公开报告的 GBP 数值，属未覆盖项（已在运行记录中标注）。
 - 未核验到公开 EVM 三值的案例（NPfIT）不设 EVM 题；Crossrail 的 EVM 题标注为推导值，不冒充官方 EVM。
 - 未纳入本批的候选源（F-35 GAO 报告等）因报告号/明细未在本次访问中核实，暂不入库，避免以未核验编号充作出处。

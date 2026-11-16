@@ -1781,3 +1781,19 @@
 - **未做**：公开案例 22 题的输入 JSON 尚未改造（`input_status: planned`）；模型双档双臂未执行（本机无权重）；未修退出码聚合优先级，仅登记现象；未宣称 D6 达标。
 - **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-172（归区改动与登记表同步）、T-150 / T-156（阶段进展）；`scripts/no-review-declarations.json` 的 `spec/ACCESS_ZONES.md` 与 `scripts/no-review-declarations.json` 条目；本节。
 - **关联 ADR**：ADR-0020（案例素材处理）
+
+---
+
+### 批次 0104 — 2026-11-16 — D6 公开案例批次 1：Crossrail 6 题改造与运行
+
+- **涉及文件**：`validation/cases/NAO-CROSSRAIL/inputs/dependency-graph.json`、`dependency-graph-delay.json`、`cost-budget.json`、`status-snapshot.json`、`evm-record.json`、`evm-record-stale-bac.json`；`validation/d6/configs/V-CFG09-GBP.json`、`validation/d6/configs/V-CFG09-GBP.lock.json`；`validation/d6/results/phase2-public-crossrail/run.json`、`SUMMARY.md`；`validation/d6/tasks/task-set.json`、`validation/cases/MANIFEST.md`、`spec/ACCESS_ZONES.md`、`scripts/no-review-declarations.json`、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`knowledge/glossary-usage.json`、`TODO.md`、`CHANGELOG.md`
+- **变更摘要**：
+  - 按任务集改造 Crossrail 6 题输入（依赖图正例/延期负例、成本、状态、推导 EVM 正例/旧 BAC 负例）。只写入改造后的场景事实（阶段顺序、工期、工作包拆分、2018 年 7 月完成度与支出），不复制 NAO 报告正文；EVM 三值为按公开总额与完成度推导，`provenance` 明标非官方 EVM。
+  - 成本与挣值 3 题按 GBP 建立，故新增 S2 变体快照 `V-CFG09-GBP`（`sha256:9c08d7c3…f548`）：相对主快照仅 `CFG-09` 由 `CNY` 改为 `GBP`，其余逐项摘要不变；锁文件 `history` 记录 `before_digest`/`after_digest` 与变更理由。变体题单列，不计入主运行。
+  - 运行结果：6/6 符合期望（4 题退出 0；D6-PUB-02 由 `schedule.critical_path` 命中里程碑超期，D6-PUB-06 由 `evm.budget_consistent` 命中 BAC 与工作包合计不等，均退出 1）。未改检查器、未改提案、未调整任何期望值。
+  - `spec/ACCESS_ZONES.md` 增 `validation/d6/configs/` 与批次 2 运行记录两行 C 区归区；该区段属钉扎面，本批无新复核，按 3.5.3 新建 T-173 并以 `--no-verify` 提交。
+- **实测**：`pm_check --artifact` 6 次（主配置 3 次、变体 3 次）；`check_no_raw_material` 0、`check_anchors` 0、`check_state` 0、`check_three_table` 0、`check_ledger_landings` 0、`check_coverage_gate` 0、`check_gap_ledger` 0、`check_glossary_usage` 0（`ACCESS_ZONES` 行位移后已 `--write`）；`check_checker_pins` 7、`check_spec_pins` 7（均为无复核声明，含既有欠账）。
+- **钩子绕过**：本批提交携带 `Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-173`（`spec/ACCESS_ZONES.md` 归区与 `scripts/no-review-declarations.json` 未取得非同源复核）。
+- **未做**：Universal Credit / HS2 / NPfIT 共 16 题仍 `planned`；模型弱档/对照档/无技能臂未执行（无权重、或需外部 API，等待确认路线）；D6-SYN-02 的退出码聚合优先级按上级裁定原样保留为待裁定项，未改检查器与提案。
+- **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-173（归区）、T-150 / T-156（批次进展）；`scripts/no-review-declarations.json` 的 `spec/ACCESS_ZONES.md` 条目；本节。
+- **关联 ADR**：ADR-0020（案例素材处理）

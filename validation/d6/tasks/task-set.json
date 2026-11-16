@@ -13,7 +13,8 @@
     "public_case": 22,
     "synthetic": 10,
     "synthetic_ready": 10,
-    "public_inputs_planned": 22
+    "public_inputs_ready": 6,
+    "public_inputs_planned": 16
   },
   "sources": {
     "NAO-CROSSRAIL": {
@@ -92,12 +93,32 @@
       "capability": "CAP-13/CAP-15 依赖图与关键路径",
       "mode": "artifact",
       "artifact_type": "dependency-graph",
-      "checks": ["dep.ids_unique", "dep.endpoints_exist", "dep.acyclic", "dep.types_valid", "dep.wbs_mapping", "schedule.critical_path"],
-      "expected": {"outcome": "pass", "exit_code": 0, "must_flag": [], "must_pass": ["dep.ids_unique", "dep.endpoints_exist", "dep.acyclic", "dep.types_valid", "dep.wbs_mapping", "schedule.critical_path"]},
+      "checks": [
+        "dep.ids_unique",
+        "dep.endpoints_exist",
+        "dep.acyclic",
+        "dep.types_valid",
+        "dep.wbs_mapping",
+        "schedule.critical_path"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "dep.ids_unique",
+          "dep.endpoints_exist",
+          "dep.acyclic",
+          "dep.types_valid",
+          "dep.wbs_mapping",
+          "schedule.critical_path"
+        ]
+      },
       "input": "validation/cases/NAO-CROSSRAIL/inputs/dependency-graph.json",
-      "input_status": "planned",
+      "input_status": "ready",
       "transformation": "把公开的阶段（隧道、车站、系统集成、试运行、开通）改造为活动与 FS 依赖；所有依赖显式 lag: 0；WBS 节点用阶段名。",
-      "source_ref": "NAO-CROSSRAIL"
+      "source_ref": "NAO-CROSSRAIL",
+      "run_batch": "phase2-public-crossrail"
     },
     {
       "id": "D6-PUB-02",
@@ -108,12 +129,33 @@
       "capability": "CAP-13/CAP-15 里程碑期限",
       "mode": "artifact",
       "artifact_type": "dependency-graph",
-      "checks": ["dep.ids_unique", "dep.endpoints_exist", "dep.acyclic", "dep.types_valid", "dep.wbs_mapping", "schedule.critical_path"],
-      "expected": {"outcome": "violation", "exit_code": 1, "must_flag": ["schedule.critical_path"], "must_pass": ["dep.ids_unique", "dep.endpoints_exist", "dep.acyclic", "dep.types_valid", "dep.wbs_mapping"]},
+      "checks": [
+        "dep.ids_unique",
+        "dep.endpoints_exist",
+        "dep.acyclic",
+        "dep.types_valid",
+        "dep.wbs_mapping",
+        "schedule.critical_path"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "schedule.critical_path"
+        ],
+        "must_pass": [
+          "dep.ids_unique",
+          "dep.endpoints_exist",
+          "dep.acyclic",
+          "dep.types_valid",
+          "dep.wbs_mapping"
+        ]
+      },
       "input": "validation/cases/NAO-CROSSRAIL/inputs/dependency-graph-delay.json",
-      "input_status": "planned",
+      "input_status": "ready",
       "transformation": "保留 2018 年 12 月的计划开通里程碑 due_day；把公开的试运行与系统集成延误放入活动工期，使最早完成晚于 due_day。",
-      "source_ref": "NAO-CROSSRAIL"
+      "source_ref": "NAO-CROSSRAIL",
+      "run_batch": "phase2-public-crossrail"
     },
     {
       "id": "D6-PUB-03",
@@ -124,13 +166,31 @@
       "capability": "CAP-19 预算汇总",
       "mode": "artifact",
       "artifact_type": "cost-budget",
-      "checks": ["budget.accounts_registered", "budget.package_unique", "budget.total_conserved", "budget.time_phased_sum", "budget.currency_match"],
-      "expected": {"outcome": "pass", "exit_code": 0, "must_flag": [], "must_pass": ["budget.accounts_registered", "budget.package_unique", "budget.total_conserved", "budget.time_phased_sum", "budget.currency_match"]},
+      "checks": [
+        "budget.accounts_registered",
+        "budget.package_unique",
+        "budget.total_conserved",
+        "budget.time_phased_sum",
+        "budget.currency_match"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "budget.accounts_registered",
+          "budget.package_unique",
+          "budget.total_conserved",
+          "budget.time_phased_sum",
+          "budget.currency_match"
+        ]
+      },
       "input": "validation/cases/NAO-CROSSRAIL/inputs/cost-budget.json",
-      "input_status": "planned",
+      "input_status": "ready",
       "transformation": "把公开的 £17.6bn 资金包按阶段拆为工作包，金额之和等于总额；币种 GBP，需在任务专用配置中设 CFG-09=GBP（变体题，不计入主运行）。",
       "source_ref": "NAO-CROSSRAIL",
-      "config_variant": "V-CFG09-GBP"
+      "config_variant": "V-CFG09-GBP",
+      "run_batch": "phase2-public-crossrail"
     },
     {
       "id": "D6-PUB-04",
@@ -141,12 +201,28 @@
       "capability": "CAP-35 状态采集",
       "mode": "artifact",
       "artifact_type": "status-snapshot",
-      "checks": ["status.dictionary_fields", "status.no_implicit_zero", "status.sample_grid", "status.account_registered"],
-      "expected": {"outcome": "pass", "exit_code": 0, "must_flag": [], "must_pass": ["status.dictionary_fields", "status.no_implicit_zero", "status.sample_grid", "status.account_registered"]},
+      "checks": [
+        "status.dictionary_fields",
+        "status.no_implicit_zero",
+        "status.sample_grid",
+        "status.account_registered"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "status.dictionary_fields",
+          "status.no_implicit_zero",
+          "status.sample_grid",
+          "status.account_registered"
+        ]
+      },
       "input": "validation/cases/NAO-CROSSRAIL/inputs/status-snapshot.json",
-      "input_status": "planned",
+      "input_status": "ready",
       "transformation": "93% 完成度与 £12.5bn 已支出作为 2018-07 样本；PV 用计划完成度推导；字典注明来源与采集时点；采样点落在配置网格上。",
-      "source_ref": "NAO-CROSSRAIL"
+      "source_ref": "NAO-CROSSRAIL",
+      "run_batch": "phase2-public-crossrail"
     },
     {
       "id": "D6-PUB-05",
@@ -157,13 +233,31 @@
       "capability": "CAP-20 挣值",
       "mode": "artifact",
       "artifact_type": "evm-record",
-      "checks": ["evm.formulas", "evm.ev_measurement", "evm.eac_method", "evm.budget_consistent", "evm.term_aliases"],
-      "expected": {"outcome": "pass", "exit_code": 0, "must_flag": [], "must_pass": ["evm.formulas", "evm.ev_measurement", "evm.eac_method", "evm.budget_consistent", "evm.term_aliases"]},
+      "checks": [
+        "evm.formulas",
+        "evm.ev_measurement",
+        "evm.eac_method",
+        "evm.budget_consistent",
+        "evm.term_aliases"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "evm.formulas",
+          "evm.ev_measurement",
+          "evm.eac_method",
+          "evm.budget_consistent",
+          "evm.term_aliases"
+        ]
+      },
       "input": "validation/cases/NAO-CROSSRAIL/inputs/evm-record.json",
-      "input_status": "planned",
+      "input_status": "ready",
       "transformation": "BAC=17.6bn；EV=0.93×17.6bn；AC=12.5bn；PV 用 2018-12 计划完工口径；EAC 方法显式登记。标注 derived_not_official_evm。",
       "source_ref": "NAO-CROSSRAIL",
-      "config_variant": "V-CFG09-GBP"
+      "config_variant": "V-CFG09-GBP",
+      "run_batch": "phase2-public-crossrail"
     },
     {
       "id": "D6-PUB-06",
@@ -174,13 +268,32 @@
       "capability": "CAP-20 挣值",
       "mode": "artifact",
       "artifact_type": "evm-record",
-      "checks": ["evm.formulas", "evm.ev_measurement", "evm.eac_method", "evm.budget_consistent", "evm.term_aliases"],
-      "expected": {"outcome": "violation", "exit_code": 1, "must_flag": ["evm.budget_consistent"], "must_pass": ["evm.formulas", "evm.ev_measurement", "evm.eac_method", "evm.term_aliases"]},
+      "checks": [
+        "evm.formulas",
+        "evm.ev_measurement",
+        "evm.eac_method",
+        "evm.budget_consistent",
+        "evm.term_aliases"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "evm.budget_consistent"
+        ],
+        "must_pass": [
+          "evm.formulas",
+          "evm.ev_measurement",
+          "evm.eac_method",
+          "evm.term_aliases"
+        ]
+      },
       "input": "validation/cases/NAO-CROSSRAIL/inputs/evm-record-stale-bac.json",
-      "input_status": "planned",
+      "input_status": "ready",
       "transformation": "用公开的 2010 年 £14.8bn 作为 BAC，但工作包按 2018 年 £17.6bn 分解，复现“未随资金包重基线”的典型缺口。",
       "source_ref": "NAO-CROSSRAIL",
-      "config_variant": "V-CFG09-GBP"
+      "config_variant": "V-CFG09-GBP",
+      "run_batch": "phase2-public-crossrail"
     },
     {
       "id": "D6-PUB-07",
@@ -191,8 +304,27 @@
       "capability": "CAP-13/CAP-15 依赖图与关键路径",
       "mode": "artifact",
       "artifact_type": "dependency-graph",
-      "checks": ["dep.ids_unique", "dep.endpoints_exist", "dep.acyclic", "dep.types_valid", "dep.wbs_mapping", "schedule.critical_path"],
-      "expected": {"outcome": "pass", "exit_code": 0, "must_flag": [], "must_pass": ["dep.ids_unique", "dep.endpoints_exist", "dep.acyclic", "dep.types_valid", "dep.wbs_mapping", "schedule.critical_path"]},
+      "checks": [
+        "dep.ids_unique",
+        "dep.endpoints_exist",
+        "dep.acyclic",
+        "dep.types_valid",
+        "dep.wbs_mapping",
+        "schedule.critical_path"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "dep.ids_unique",
+          "dep.endpoints_exist",
+          "dep.acyclic",
+          "dep.types_valid",
+          "dep.wbs_mapping",
+          "schedule.critical_path"
+        ]
+      },
       "input": "validation/cases/NAO-UNIVERSAL-CREDIT/inputs/dependency-graph.json",
       "input_status": "planned",
       "transformation": "把公开的重置事件、后续 rollout 与 2028 完成目标改造为活动网络；所有依赖显式 lag: 0。",
@@ -207,8 +339,28 @@
       "capability": "CAP-13/CAP-15 依赖图与关键路径",
       "mode": "artifact",
       "artifact_type": "dependency-graph",
-      "checks": ["dep.ids_unique", "dep.endpoints_exist", "dep.acyclic", "dep.types_valid", "dep.wbs_mapping", "schedule.critical_path"],
-      "expected": {"outcome": "cannot_evaluate", "exit_code": 3, "must_flag": ["schedule.critical_path"], "must_pass": ["dep.ids_unique", "dep.endpoints_exist", "dep.acyclic", "dep.types_valid", "dep.wbs_mapping"]},
+      "checks": [
+        "dep.ids_unique",
+        "dep.endpoints_exist",
+        "dep.acyclic",
+        "dep.types_valid",
+        "dep.wbs_mapping",
+        "schedule.critical_path"
+      ],
+      "expected": {
+        "outcome": "cannot_evaluate",
+        "exit_code": 3,
+        "must_flag": [
+          "schedule.critical_path"
+        ],
+        "must_pass": [
+          "dep.ids_unique",
+          "dep.endpoints_exist",
+          "dep.acyclic",
+          "dep.types_valid",
+          "dep.wbs_mapping"
+        ]
+      },
       "input": "validation/cases/NAO-UNIVERSAL-CREDIT/inputs/dependency-graph-no-lag.json",
       "input_status": "planned",
       "transformation": "同一网络省略 lag 字段；用于固定“未声明滞后不等于 0”的运行时口径。",
@@ -223,8 +375,25 @@
       "capability": "CAP-19 预算汇总",
       "mode": "artifact",
       "artifact_type": "cost-budget",
-      "checks": ["budget.accounts_registered", "budget.package_unique", "budget.total_conserved", "budget.time_phased_sum", "budget.currency_match"],
-      "expected": {"outcome": "pass", "exit_code": 0, "must_flag": [], "must_pass": ["budget.accounts_registered", "budget.package_unique", "budget.total_conserved", "budget.time_phased_sum", "budget.currency_match"]},
+      "checks": [
+        "budget.accounts_registered",
+        "budget.package_unique",
+        "budget.total_conserved",
+        "budget.time_phased_sum",
+        "budget.currency_match"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "budget.accounts_registered",
+          "budget.package_unique",
+          "budget.total_conserved",
+          "budget.time_phased_sum",
+          "budget.currency_match"
+        ]
+      },
       "input": "validation/cases/NAO-UNIVERSAL-CREDIT/inputs/cost-budget.json",
       "input_status": "planned",
       "transformation": "£2,850m 实施成本按阶段拆包，£912m 增量为独立变更包；总额与分时段均守恒。",
@@ -240,8 +409,25 @@
       "capability": "CAP-25/CAP-23 风险登记",
       "mode": "artifact",
       "artifact_type": "risk-register",
-      "checks": ["risk.required_fields", "risk.scale_in_range", "risk.residual_le_initial", "risk.owner_registered", "risk.band_consistent"],
-      "expected": {"outcome": "pass", "exit_code": 0, "must_flag": [], "must_pass": ["risk.required_fields", "risk.scale_in_range", "risk.residual_le_initial", "risk.owner_registered", "risk.band_consistent"]},
+      "checks": [
+        "risk.required_fields",
+        "risk.scale_in_range",
+        "risk.residual_le_initial",
+        "risk.owner_registered",
+        "risk.band_consistent"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "risk.required_fields",
+          "risk.scale_in_range",
+          "risk.residual_le_initial",
+          "risk.owner_registered",
+          "risk.band_consistent"
+        ]
+      },
       "input": "validation/cases/NAO-UNIVERSAL-CREDIT/inputs/risk-register.json",
       "input_status": "planned",
       "transformation": "把公开指出的治理、承包商与系统开发问题改造为三条风险；概率/影响用 3×3，残余评分由缓解后重估。",
@@ -256,8 +442,23 @@
       "capability": "CAP-35 状态采集",
       "mode": "artifact",
       "artifact_type": "status-snapshot",
-      "checks": ["status.dictionary_fields", "status.no_implicit_zero", "status.sample_grid", "status.account_registered"],
-      "expected": {"outcome": "pass", "exit_code": 0, "must_flag": [], "must_pass": ["status.dictionary_fields", "status.no_implicit_zero", "status.sample_grid", "status.account_registered"]},
+      "checks": [
+        "status.dictionary_fields",
+        "status.no_implicit_zero",
+        "status.sample_grid",
+        "status.account_registered"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "status.dictionary_fields",
+          "status.no_implicit_zero",
+          "status.sample_grid",
+          "status.account_registered"
+        ]
+      },
       "input": "validation/cases/NAO-UNIVERSAL-CREDIT/inputs/status-snapshot.json",
       "input_status": "planned",
       "transformation": "“已投入超过 £300m 但无法评估系统价值”改造为 value=null + unavailable_reason，验证缺数不被当作零。",
@@ -272,8 +473,27 @@
       "capability": "CAP-13/CAP-15 依赖图与关键路径",
       "mode": "artifact",
       "artifact_type": "dependency-graph",
-      "checks": ["dep.ids_unique", "dep.endpoints_exist", "dep.acyclic", "dep.types_valid", "dep.wbs_mapping", "schedule.critical_path"],
-      "expected": {"outcome": "pass", "exit_code": 0, "must_flag": [], "must_pass": ["dep.ids_unique", "dep.endpoints_exist", "dep.acyclic", "dep.types_valid", "dep.wbs_mapping", "schedule.critical_path"]},
+      "checks": [
+        "dep.ids_unique",
+        "dep.endpoints_exist",
+        "dep.acyclic",
+        "dep.types_valid",
+        "dep.wbs_mapping",
+        "schedule.critical_path"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "dep.ids_unique",
+          "dep.endpoints_exist",
+          "dep.acyclic",
+          "dep.types_valid",
+          "dep.wbs_mapping",
+          "schedule.critical_path"
+        ]
+      },
       "input": "validation/cases/NAO-HS2/inputs/dependency-graph.json",
       "input_status": "planned",
       "transformation": "把公开的 Phase 1 主要工程与 2026 开通目标改造为活动网络；所有依赖显式 lag: 0。",
@@ -288,8 +508,27 @@
       "capability": "CAP-13/CAP-15 依赖图端点",
       "mode": "artifact",
       "artifact_type": "dependency-graph",
-      "checks": ["dep.ids_unique", "dep.endpoints_exist", "dep.acyclic", "dep.types_valid", "dep.wbs_mapping", "schedule.critical_path"],
-      "expected": {"outcome": "violation", "exit_code": 1, "must_flag": ["dep.endpoints_exist"], "must_pass": ["dep.ids_unique", "dep.acyclic", "dep.types_valid", "dep.wbs_mapping"]},
+      "checks": [
+        "dep.ids_unique",
+        "dep.endpoints_exist",
+        "dep.acyclic",
+        "dep.types_valid",
+        "dep.wbs_mapping",
+        "schedule.critical_path"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "dep.endpoints_exist"
+        ],
+        "must_pass": [
+          "dep.ids_unique",
+          "dep.acyclic",
+          "dep.types_valid",
+          "dep.wbs_mapping"
+        ]
+      },
       "input": "validation/cases/NAO-HS2/inputs/dependency-graph-cancelled.json",
       "input_status": "planned",
       "transformation": "按 2023 年公开的 Phase 2 取消事件删除下游活动，但保留一条指向该活动的依赖，复现范围变更后的悬挂依赖。",
@@ -304,8 +543,25 @@
       "capability": "CAP-19 预算汇总",
       "mode": "artifact",
       "artifact_type": "cost-budget",
-      "checks": ["budget.accounts_registered", "budget.package_unique", "budget.total_conserved", "budget.time_phased_sum", "budget.currency_match"],
-      "expected": {"outcome": "pass", "exit_code": 0, "must_flag": [], "must_pass": ["budget.accounts_registered", "budget.package_unique", "budget.total_conserved", "budget.time_phased_sum", "budget.currency_match"]},
+      "checks": [
+        "budget.accounts_registered",
+        "budget.package_unique",
+        "budget.total_conserved",
+        "budget.time_phased_sum",
+        "budget.currency_match"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "budget.accounts_registered",
+          "budget.package_unique",
+          "budget.total_conserved",
+          "budget.time_phased_sum",
+          "budget.currency_match"
+        ]
+      },
       "input": "validation/cases/NAO-HS2/inputs/cost-budget.json",
       "input_status": "planned",
       "transformation": "取公开区间上界 £102.7bn 作为预算总额，按阶段拆包并显式记录口径；不使用区间中点冒充单点。",
@@ -321,8 +577,25 @@
       "capability": "CAP-19 预算汇总",
       "mode": "artifact",
       "artifact_type": "cost-budget",
-      "checks": ["budget.accounts_registered", "budget.package_unique", "budget.total_conserved", "budget.time_phased_sum", "budget.currency_match"],
-      "expected": {"outcome": "violation", "exit_code": 1, "must_flag": ["budget.total_conserved"], "must_pass": ["budget.accounts_registered", "budget.package_unique", "budget.currency_match"]},
+      "checks": [
+        "budget.accounts_registered",
+        "budget.package_unique",
+        "budget.total_conserved",
+        "budget.time_phased_sum",
+        "budget.currency_match"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "budget.total_conserved"
+        ],
+        "must_pass": [
+          "budget.accounts_registered",
+          "budget.package_unique",
+          "budget.currency_match"
+        ]
+      },
       "input": "validation/cases/NAO-HS2/inputs/cost-budget-range-mismatch.json",
       "input_status": "planned",
       "transformation": "区间口径混用：分时段合计按下界，工作包合计按上界；复现区间估算未对齐的守恒缺口。",
@@ -338,8 +611,25 @@
       "capability": "CAP-25/CAP-23 风险登记",
       "mode": "artifact",
       "artifact_type": "risk-register",
-      "checks": ["risk.required_fields", "risk.scale_in_range", "risk.residual_le_initial", "risk.owner_registered", "risk.band_consistent"],
-      "expected": {"outcome": "pass", "exit_code": 0, "must_flag": [], "must_pass": ["risk.required_fields", "risk.scale_in_range", "risk.residual_le_initial", "risk.owner_registered", "risk.band_consistent"]},
+      "checks": [
+        "risk.required_fields",
+        "risk.scale_in_range",
+        "risk.residual_le_initial",
+        "risk.owner_registered",
+        "risk.band_consistent"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "risk.required_fields",
+          "risk.scale_in_range",
+          "risk.residual_le_initial",
+          "risk.owner_registered",
+          "risk.band_consistent"
+        ]
+      },
       "input": "validation/cases/NAO-HS2/inputs/risk-register.json",
       "input_status": "planned",
       "transformation": "把公开指出的成本低估、低效交付与范围变更改造为三条风险，按 3×3 评分。",
@@ -354,8 +644,23 @@
       "capability": "CAP-35 状态采集",
       "mode": "artifact",
       "artifact_type": "status-snapshot",
-      "checks": ["status.dictionary_fields", "status.no_implicit_zero", "status.sample_grid", "status.account_registered"],
-      "expected": {"outcome": "pass", "exit_code": 0, "must_flag": [], "must_pass": ["status.dictionary_fields", "status.no_implicit_zero", "status.sample_grid", "status.account_registered"]},
+      "checks": [
+        "status.dictionary_fields",
+        "status.no_implicit_zero",
+        "status.sample_grid",
+        "status.account_registered"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "status.dictionary_fields",
+          "status.no_implicit_zero",
+          "status.sample_grid",
+          "status.account_registered"
+        ]
+      },
       "input": "validation/cases/NAO-HS2/inputs/status-snapshot.json",
       "input_status": "planned",
       "transformation": "£1.5bn 已支出作为 AC；暂停期进度指标 value=null 并附 unavailable_reason（施工暂停，进度不可比）。",
@@ -371,8 +676,25 @@
       "capability": "CAP-19 预算汇总",
       "mode": "artifact",
       "artifact_type": "cost-budget",
-      "checks": ["budget.accounts_registered", "budget.package_unique", "budget.total_conserved", "budget.time_phased_sum", "budget.currency_match"],
-      "expected": {"outcome": "pass", "exit_code": 0, "must_flag": [], "must_pass": ["budget.accounts_registered", "budget.package_unique", "budget.total_conserved", "budget.time_phased_sum", "budget.currency_match"]},
+      "checks": [
+        "budget.accounts_registered",
+        "budget.package_unique",
+        "budget.total_conserved",
+        "budget.time_phased_sum",
+        "budget.currency_match"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "budget.accounts_registered",
+          "budget.package_unique",
+          "budget.total_conserved",
+          "budget.time_phased_sum",
+          "budget.currency_match"
+        ]
+      },
       "input": "validation/cases/NAO-NPFIT/inputs/cost-budget.json",
       "input_status": "planned",
       "transformation": "把公开引用的 £11.4bn 按国家系统、本地部署、运维等类别拆包，金额与分时段守恒。",
@@ -388,8 +710,23 @@
       "capability": "CAP-35 状态采集",
       "mode": "artifact",
       "artifact_type": "status-snapshot",
-      "checks": ["status.dictionary_fields", "status.no_implicit_zero", "status.sample_grid", "status.account_registered"],
-      "expected": {"outcome": "pass", "exit_code": 0, "must_flag": [], "must_pass": ["status.dictionary_fields", "status.no_implicit_zero", "status.sample_grid", "status.account_registered"]},
+      "checks": [
+        "status.dictionary_fields",
+        "status.no_implicit_zero",
+        "status.sample_grid",
+        "status.account_registered"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "status.dictionary_fields",
+          "status.no_implicit_zero",
+          "status.sample_grid",
+          "status.account_registered"
+        ]
+      },
       "input": "validation/cases/NAO-NPFIT/inputs/status-snapshot.json",
       "input_status": "planned",
       "transformation": "项目提前关闭、未实现目标：目标类指标 value=null + unavailable_reason（项目关闭，目标未达成且不再采集）；支出类指标保留。",
@@ -405,8 +742,25 @@
       "capability": "CAP-42 审计留痕",
       "mode": "artifact",
       "artifact_type": "audit-trail",
-      "checks": ["audit.required_fields", "audit.chain_digest", "audit.sequence_strict", "audit.exit_code_valid", "audit.evidence_present"],
-      "expected": {"outcome": "pass", "exit_code": 0, "must_flag": [], "must_pass": ["audit.required_fields", "audit.chain_digest", "audit.sequence_strict", "audit.exit_code_valid", "audit.evidence_present"]},
+      "checks": [
+        "audit.required_fields",
+        "audit.chain_digest",
+        "audit.sequence_strict",
+        "audit.exit_code_valid",
+        "audit.evidence_present"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "audit.required_fields",
+          "audit.chain_digest",
+          "audit.sequence_strict",
+          "audit.exit_code_valid",
+          "audit.evidence_present"
+        ]
+      },
       "input": "validation/cases/NAO-NPFIT/inputs/audit-trail.json",
       "input_status": "planned",
       "transformation": "把公开的关闭决定改造为两条审计记录（评估、关闭），哈希链首尾相接，非零结论附证据路径。",
@@ -421,8 +775,26 @@
       "capability": "CAP-42 审计留痕",
       "mode": "artifact",
       "artifact_type": "audit-trail",
-      "checks": ["audit.required_fields", "audit.chain_digest", "audit.sequence_strict", "audit.exit_code_valid", "audit.evidence_present"],
-      "expected": {"outcome": "violation", "exit_code": 1, "must_flag": ["audit.sequence_strict"], "must_pass": ["audit.required_fields", "audit.chain_digest", "audit.exit_code_valid", "audit.evidence_present"]},
+      "checks": [
+        "audit.required_fields",
+        "audit.chain_digest",
+        "audit.sequence_strict",
+        "audit.exit_code_valid",
+        "audit.evidence_present"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "audit.sequence_strict"
+        ],
+        "must_pass": [
+          "audit.required_fields",
+          "audit.chain_digest",
+          "audit.exit_code_valid",
+          "audit.evidence_present"
+        ]
+      },
       "input": "validation/cases/NAO-NPFIT/inputs/audit-trail-gap.json",
       "input_status": "planned",
       "transformation": "在真实关闭上下文里删除中间记录，保留第 1、3 条且哈希链仍闭合，验证序号连续性。",
@@ -437,8 +809,25 @@
       "capability": "CAP-25/CAP-23 风险登记",
       "mode": "artifact",
       "artifact_type": "risk-register",
-      "checks": ["risk.required_fields", "risk.scale_in_range", "risk.residual_le_initial", "risk.owner_registered", "risk.band_consistent"],
-      "expected": {"outcome": "pass", "exit_code": 0, "must_flag": [], "must_pass": ["risk.required_fields", "risk.scale_in_range", "risk.residual_le_initial", "risk.owner_registered", "risk.band_consistent"]},
+      "checks": [
+        "risk.required_fields",
+        "risk.scale_in_range",
+        "risk.residual_le_initial",
+        "risk.owner_registered",
+        "risk.band_consistent"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "risk.required_fields",
+          "risk.scale_in_range",
+          "risk.residual_le_initial",
+          "risk.owner_registered",
+          "risk.band_consistent"
+        ]
+      },
       "input": "validation/cases/NAO-NPFIT/inputs/risk-register.json",
       "input_status": "planned",
       "transformation": "把公开的项目范围、供应商交付与临床采纳问题改造为三条风险，按 3×3 评分。",
@@ -453,8 +842,27 @@
       "capability": "CAP-13/CAP-15 依赖图与关键路径",
       "mode": "artifact",
       "artifact_type": "dependency-graph",
-      "checks": ["dep.ids_unique", "dep.endpoints_exist", "dep.acyclic", "dep.types_valid", "dep.wbs_mapping", "schedule.critical_path"],
-      "expected": {"outcome": "pass", "exit_code": 0, "must_flag": [], "must_pass": ["dep.ids_unique", "dep.endpoints_exist", "dep.acyclic", "dep.types_valid", "dep.wbs_mapping", "schedule.critical_path"]},
+      "checks": [
+        "dep.ids_unique",
+        "dep.endpoints_exist",
+        "dep.acyclic",
+        "dep.types_valid",
+        "dep.wbs_mapping",
+        "schedule.critical_path"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "dep.ids_unique",
+          "dep.endpoints_exist",
+          "dep.acyclic",
+          "dep.types_valid",
+          "dep.wbs_mapping",
+          "schedule.critical_path"
+        ]
+      },
       "input": "validation/cases/synthetic/SYN-DEP-POS/inputs/dependency-graph.json",
       "input_status": "ready",
       "run_ref": "validation/d6/results/phase1-synthetic/run.json#D6-SYN-01"
@@ -468,8 +876,27 @@
       "capability": "CAP-13/CAP-15 依赖图与关键路径",
       "mode": "artifact",
       "artifact_type": "dependency-graph",
-      "checks": ["dep.ids_unique", "dep.endpoints_exist", "dep.acyclic", "dep.types_valid", "dep.wbs_mapping", "schedule.critical_path"],
-      "expected": {"outcome": "violation", "exit_code": 1, "must_flag": ["dep.acyclic"], "must_pass": ["dep.ids_unique", "dep.endpoints_exist", "dep.types_valid", "dep.wbs_mapping"]},
+      "checks": [
+        "dep.ids_unique",
+        "dep.endpoints_exist",
+        "dep.acyclic",
+        "dep.types_valid",
+        "dep.wbs_mapping",
+        "schedule.critical_path"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "dep.acyclic"
+        ],
+        "must_pass": [
+          "dep.ids_unique",
+          "dep.endpoints_exist",
+          "dep.types_valid",
+          "dep.wbs_mapping"
+        ]
+      },
       "input": "validation/cases/synthetic/SYN-DEP-CYCLE/inputs/dependency-graph.json",
       "input_status": "ready",
       "run_ref": "validation/d6/results/phase1-synthetic/run.json#D6-SYN-02"
@@ -483,8 +910,28 @@
       "capability": "CAP-13/CAP-15 依赖图与 WBS 映射",
       "mode": "artifact",
       "artifact_type": "dependency-graph",
-      "checks": ["dep.ids_unique", "dep.endpoints_exist", "dep.acyclic", "dep.types_valid", "dep.wbs_mapping", "schedule.critical_path"],
-      "expected": {"outcome": "cannot_evaluate", "exit_code": 3, "must_flag": ["dep.wbs_mapping"], "must_pass": ["dep.ids_unique", "dep.endpoints_exist", "dep.acyclic", "dep.types_valid", "schedule.critical_path"]},
+      "checks": [
+        "dep.ids_unique",
+        "dep.endpoints_exist",
+        "dep.acyclic",
+        "dep.types_valid",
+        "dep.wbs_mapping",
+        "schedule.critical_path"
+      ],
+      "expected": {
+        "outcome": "cannot_evaluate",
+        "exit_code": 3,
+        "must_flag": [
+          "dep.wbs_mapping"
+        ],
+        "must_pass": [
+          "dep.ids_unique",
+          "dep.endpoints_exist",
+          "dep.acyclic",
+          "dep.types_valid",
+          "schedule.critical_path"
+        ]
+      },
       "input": "validation/cases/synthetic/SYN-DEP-NOWBS/inputs/dependency-graph.json",
       "input_status": "ready",
       "run_ref": "validation/d6/results/phase1-synthetic/run.json#D6-SYN-03"
@@ -498,8 +945,25 @@
       "capability": "CAP-19 预算汇总",
       "mode": "artifact",
       "artifact_type": "cost-budget",
-      "checks": ["budget.accounts_registered", "budget.package_unique", "budget.total_conserved", "budget.time_phased_sum", "budget.currency_match"],
-      "expected": {"outcome": "pass", "exit_code": 0, "must_flag": [], "must_pass": ["budget.accounts_registered", "budget.package_unique", "budget.total_conserved", "budget.time_phased_sum", "budget.currency_match"]},
+      "checks": [
+        "budget.accounts_registered",
+        "budget.package_unique",
+        "budget.total_conserved",
+        "budget.time_phased_sum",
+        "budget.currency_match"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "budget.accounts_registered",
+          "budget.package_unique",
+          "budget.total_conserved",
+          "budget.time_phased_sum",
+          "budget.currency_match"
+        ]
+      },
       "input": "validation/cases/synthetic/SYN-BUD-POS/inputs/cost-budget.json",
       "input_status": "ready",
       "run_ref": "validation/d6/results/phase1-synthetic/run.json#D6-SYN-04"
@@ -513,8 +977,25 @@
       "capability": "CAP-19 预算汇总",
       "mode": "artifact",
       "artifact_type": "cost-budget",
-      "checks": ["budget.accounts_registered", "budget.package_unique", "budget.total_conserved", "budget.time_phased_sum", "budget.currency_match"],
-      "expected": {"outcome": "violation", "exit_code": 1, "must_flag": ["budget.time_phased_sum"], "must_pass": ["budget.accounts_registered", "budget.package_unique", "budget.currency_match"]},
+      "checks": [
+        "budget.accounts_registered",
+        "budget.package_unique",
+        "budget.total_conserved",
+        "budget.time_phased_sum",
+        "budget.currency_match"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "budget.time_phased_sum"
+        ],
+        "must_pass": [
+          "budget.accounts_registered",
+          "budget.package_unique",
+          "budget.currency_match"
+        ]
+      },
       "input": "validation/cases/synthetic/SYN-BUD-TIMESUM/inputs/cost-budget.json",
       "input_status": "ready",
       "run_ref": "validation/d6/results/phase1-synthetic/run.json#D6-SYN-05"
@@ -528,8 +1009,25 @@
       "capability": "CAP-25/CAP-23 风险登记",
       "mode": "artifact",
       "artifact_type": "risk-register",
-      "checks": ["risk.required_fields", "risk.scale_in_range", "risk.residual_le_initial", "risk.owner_registered", "risk.band_consistent"],
-      "expected": {"outcome": "pass", "exit_code": 0, "must_flag": [], "must_pass": ["risk.required_fields", "risk.scale_in_range", "risk.residual_le_initial", "risk.owner_registered", "risk.band_consistent"]},
+      "checks": [
+        "risk.required_fields",
+        "risk.scale_in_range",
+        "risk.residual_le_initial",
+        "risk.owner_registered",
+        "risk.band_consistent"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "risk.required_fields",
+          "risk.scale_in_range",
+          "risk.residual_le_initial",
+          "risk.owner_registered",
+          "risk.band_consistent"
+        ]
+      },
       "input": "validation/cases/synthetic/SYN-RISK-POS/inputs/risk-register.json",
       "input_status": "ready",
       "run_ref": "validation/d6/results/phase1-synthetic/run.json#D6-SYN-06"
@@ -543,8 +1041,26 @@
       "capability": "CAP-25/CAP-23 风险登记",
       "mode": "artifact",
       "artifact_type": "risk-register",
-      "checks": ["risk.required_fields", "risk.scale_in_range", "risk.residual_le_initial", "risk.owner_registered", "risk.band_consistent"],
-      "expected": {"outcome": "violation", "exit_code": 1, "must_flag": ["risk.residual_le_initial"], "must_pass": ["risk.required_fields", "risk.scale_in_range", "risk.owner_registered", "risk.band_consistent"]},
+      "checks": [
+        "risk.required_fields",
+        "risk.scale_in_range",
+        "risk.residual_le_initial",
+        "risk.owner_registered",
+        "risk.band_consistent"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "risk.residual_le_initial"
+        ],
+        "must_pass": [
+          "risk.required_fields",
+          "risk.scale_in_range",
+          "risk.owner_registered",
+          "risk.band_consistent"
+        ]
+      },
       "input": "validation/cases/synthetic/SYN-RISK-RESIDUAL/inputs/risk-register.json",
       "input_status": "ready",
       "run_ref": "validation/d6/results/phase1-synthetic/run.json#D6-SYN-07"
@@ -558,8 +1074,23 @@
       "capability": "CAP-35 状态采集",
       "mode": "artifact",
       "artifact_type": "status-snapshot",
-      "checks": ["status.dictionary_fields", "status.no_implicit_zero", "status.sample_grid", "status.account_registered"],
-      "expected": {"outcome": "pass", "exit_code": 0, "must_flag": [], "must_pass": ["status.dictionary_fields", "status.no_implicit_zero", "status.sample_grid", "status.account_registered"]},
+      "checks": [
+        "status.dictionary_fields",
+        "status.no_implicit_zero",
+        "status.sample_grid",
+        "status.account_registered"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "status.dictionary_fields",
+          "status.no_implicit_zero",
+          "status.sample_grid",
+          "status.account_registered"
+        ]
+      },
       "input": "validation/cases/synthetic/SYN-STATUS-POS/inputs/status-snapshot.json",
       "input_status": "ready",
       "run_ref": "validation/d6/results/phase1-synthetic/run.json#D6-SYN-08"
@@ -573,8 +1104,26 @@
       "capability": "CAP-20 挣值",
       "mode": "artifact",
       "artifact_type": "evm-record",
-      "checks": ["evm.formulas", "evm.ev_measurement", "evm.eac_method", "evm.budget_consistent", "evm.term_aliases"],
-      "expected": {"outcome": "violation", "exit_code": 1, "must_flag": ["evm.budget_consistent"], "must_pass": ["evm.formulas", "evm.ev_measurement", "evm.eac_method", "evm.term_aliases"]},
+      "checks": [
+        "evm.formulas",
+        "evm.ev_measurement",
+        "evm.eac_method",
+        "evm.budget_consistent",
+        "evm.term_aliases"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "evm.budget_consistent"
+        ],
+        "must_pass": [
+          "evm.formulas",
+          "evm.ev_measurement",
+          "evm.eac_method",
+          "evm.term_aliases"
+        ]
+      },
       "input": "validation/cases/synthetic/SYN-EVM-BUDGET/inputs/evm-record.json",
       "input_status": "ready",
       "run_ref": "validation/d6/results/phase1-synthetic/run.json#D6-SYN-09"
@@ -588,8 +1137,26 @@
       "capability": "CAP-42 审计留痕",
       "mode": "artifact",
       "artifact_type": "audit-trail",
-      "checks": ["audit.required_fields", "audit.chain_digest", "audit.sequence_strict", "audit.exit_code_valid", "audit.evidence_present"],
-      "expected": {"outcome": "violation", "exit_code": 1, "must_flag": ["audit.sequence_strict"], "must_pass": ["audit.required_fields", "audit.chain_digest", "audit.exit_code_valid", "audit.evidence_present"]},
+      "checks": [
+        "audit.required_fields",
+        "audit.chain_digest",
+        "audit.sequence_strict",
+        "audit.exit_code_valid",
+        "audit.evidence_present"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "audit.sequence_strict"
+        ],
+        "must_pass": [
+          "audit.required_fields",
+          "audit.chain_digest",
+          "audit.exit_code_valid",
+          "audit.evidence_present"
+        ]
+      },
       "input": "validation/cases/synthetic/SYN-AUDIT-SEQ/inputs/audit-trail.json",
       "input_status": "ready",
       "run_ref": "validation/d6/results/phase1-synthetic/run.json#D6-SYN-10"
