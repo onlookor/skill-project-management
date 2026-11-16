@@ -104,7 +104,7 @@
     "spec/clause-registry.json": {
       "sha256": "bcff1dc76459bdeccea8950e0102051341b2ea7e24d0217a4d509ec3d2fcfdde",
       "path": "spec/clause-registry.json",
-      "basis": "无复核声明（不构成认可，不放行）"
+      "basis": "非同源复核：d6c/d6d 独立复核会话（非执行方）；复核产物：/home/wgz/projects/skills/2026-11-16/pm-governance-review/d6d/probes/basis_b4_kind.txt；sha256：c54d00fdf30c7c40d833bcd68c4ca520af88726cb3f4db16c079d18d42975673；复核基线：8dfbb86；区段：spec/clause-registry.json；结论：认可"
     }
   }
 }

@@ -1720,3 +1720,17 @@
 - **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-169；`no-review-declarations.json` 的 4 条 spec 声明；`GAP_LEDGER.md`“批次 0099 实施进展”与 R-0099-01～04；本节。
 - **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149,T-166,T-167,T-168,T-169`。
 - **关联 ADR**：无
+
+---
+
+### 批次 0100 — 2026-11-16 — 第四轮复核 basis 落库与区段计数收口
+
+- **涉及文件**：`scripts/checker-pins.json`、`scripts/spec-pins.json`、`scripts/no-review-declarations.json`、`AGENTS.md`、`scripts/README.md`、`TODO.md`、`CHANGELOG.md`
+- **变更摘要**：
+  - 从 `/home/wgz/projects/skills/2026-11-16/pm-governance-review/d6d/REVIEW-RECORD.md` 的 `非同源复核：` 行逐字提取 7 条 basis（一个对象一条，未改写、未拼接）；落库前逐条以对应检查器的 `valid_basis()` 回灌，6 条为 True 并落库：`scripts/check_spec_pins.py`、`scripts/check_clause_basis.py`、`scripts/pm_check.py`、`scripts/pm_caps.py`、`scripts/test_pm_runtime.py`（写入 `checker-pins.json`）与 `spec/clause-registry.json`（写入 `spec-pins.json`，spec 侧）。同步删除这 6 个对象的 `no-review-declarations.json` 条目（checker 5 + spec 1），并刷新受钉哈希（28 个受保护对象）。
+  - 第 7 条 `scripts/no-review-declarations.json`：其 basis 在删除上述条目后内容改变，回灌返回“basis 失效：基线 `8dfbb86` 处内容与当前不一致”；按“回灌失败即不落”未落库，保留无复核声明，并在条目中注明原因与“需对删除后的内容重新取证”。
+  - `AGENTS.md` §3.6.8、§4 与 `scripts/README.md` 三处写死的区段数量删除，统一改为“区段清单与数量以 `scripts/spec-pins.json` 登记为准”；`TODO.md` T-161 一并收口（README 纳入范围）。未改动提案与历史批次记录中的历史表述。
+- **实测**：`check_checker_pins` 问题 10 → 5（全部为无复核声明：`.githooks/pre-commit`、`scripts/check_checker_pins.py`、`scripts/no-review-declarations.json`、`scripts/pm_config.py`、`scripts/pm_schema.py`）；`check_spec_pins` 问题 6 → 5（A.2 日期未核验 + `spec/ACCESS_ZONES.md`、`spec/D6_REBASELINE_PROPOSAL.md`、`AGENTS.md#1bis`、`GLOSSARY.md#T-F-015` 无复核声明）。其余检查器 rc=0；`test_spec_pins` 38/38、`test_checker_pins` 21/21、`test_pm_runtime` 73/73。
+- **未做**：不改检查器逻辑；不为第 7 条另造 basis；不改提案与历史批次记录。
+- **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-169 追记与 T-161 收口记录；`scripts/no-review-declarations.json` 中 `scripts/no-review-declarations.json` 条目的 `reason`/`missing_review`；本节。
+- **关联 ADR**：无

@@ -35,7 +35,7 @@
     },
     "scripts/check_spec_pins.py": {
       "sha256": "10d33de0665233cc75e29335838314bd65a6dbff24dcb8c433fc75e2b338daa6",
-      "basis": "无复核声明（不构成认可，不放行）"
+      "basis": "非同源复核：d6c/d6d 独立复核会话（非执行方）；复核产物：/home/wgz/projects/skills/2026-11-16/pm-governance-review/d6d/probes/basis_a1_pin.txt；sha256：c9b891b5190407bb0c2946f84f25ea645935c20580f908d175a088020afde850；复核基线：8dfbb86；区段：scripts/check_spec_pins.py；结论：认可"
     },
     "scripts/check_state.py": {
       "sha256": "cb62284b0b5e813bd254deaa24fcb54a9d2a98f5b566feeedee6752796bea6e4",
@@ -78,7 +78,7 @@
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：scripts/test_dependency_pins.py；结论：认可"
     },
     "scripts/no-review-declarations.json": {
-      "sha256": "61dfdb53042e134943eac4ae088f9e81992d8b9546e9403b007d6f225fbc7ac0",
+      "sha256": "995260d079dd2720547eb5da836f76e76c86c6abd5681511f6031d2741c7502d",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "validation/pinned/checker.py": {
@@ -91,11 +91,11 @@
     },
     "scripts/pm_caps.py": {
       "sha256": "b6ecb056cba9f314a02677e9248516df3b413a8cd29d2e33f2a72fd7faacd9ce",
-      "basis": "无复核声明（不构成认可，不放行）"
+      "basis": "非同源复核：d6c/d6d 独立复核会话（非执行方）；复核产物：/home/wgz/projects/skills/2026-11-16/pm-governance-review/d6d/probes/basis_c6_defaults.txt；sha256：3146a5511e1fcb05ad6529536270f35acb77419c09afc53d2e6945ba813c0900；复核基线：8dfbb86；区段：scripts/pm_caps.py；结论：认可"
     },
     "scripts/pm_check.py": {
       "sha256": "0963773cf2e567420c4e6919427c88c244615c78c8345987de2d9eba0aee78fc",
-      "basis": "无复核声明（不构成认可，不放行）"
+      "basis": "非同源复核：d6c/d6d 独立复核会话（非执行方）；复核产物：/home/wgz/projects/skills/2026-11-16/pm-governance-review/d6d/probes/basis_c5_hardlink.txt；sha256：ccc19b4b183121c6b42d9e113491c34e8e4d6f25f399afdb6a000264e193d86e；复核基线：8dfbb86；区段：scripts/pm_check.py；结论：认可"
     },
     "scripts/pm_config.py": {
       "sha256": "22432042a06d3faf9e2f19be6ab36cbc14361bea146b46acd21c2d837ba2f3ec",
@@ -107,11 +107,11 @@
     },
     "scripts/test_pm_runtime.py": {
       "sha256": "f01c78827bbcccfbadd8fd15f20ccd8bd16d704792e30e092e3ed0c196b7a934",
-      "basis": "无复核声明（不构成认可，不放行）"
+      "basis": "非同源复核：d6c/d6d 独立复核会话（非执行方）；复核产物：/home/wgz/projects/skills/2026-11-16/pm-governance-review/d6d/probes/basis_e8_regression.txt；sha256：7b8497265b94e03cb21163963b8148215df6080d3e28535267f244c9635b0575；复核基线：8dfbb86；区段：scripts/test_pm_runtime.py；结论：认可"
     },
     "scripts/check_clause_basis.py": {
       "sha256": "68a65ddfdf055a8720b1f111ff08412bd9975a284054a9325afd1cefac47d243",
-      "basis": "无复核声明（不构成认可，不放行）"
+      "basis": "非同源复核：d6c/d6d 独立复核会话（非执行方）；复核产物：/home/wgz/projects/skills/2026-11-16/pm-governance-review/d6d/probes/basis_b3_textual.txt；sha256：e06ef13831eab3122a4da56589d672273f274ccf4aa4000eb3f101ee51ddd64b；复核基线：8dfbb86；区段：scripts/check_clause_basis.py；结论：认可"
     }
   },
   "note": "受保护脚本的哈希登记：全仓 .py（含本脚本）、.githooks/pre-commit、validation/checker-prototype/checker.py 与 scripts/no-review-declarations.json。改动必须 --write --basis 并附非同源复核记录；无复核时只能写固定声明并以 --no-verify 提交。本文件与快照检测都不提供权限分离。"
