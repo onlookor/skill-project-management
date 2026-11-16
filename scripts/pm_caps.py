@@ -103,6 +103,15 @@ def compute_cpm(data: dict) -> dict:
     只按活动间逻辑关系计算，不引入日历单位换算（`duration_days` 为口径单位）。
     存在环时返回 `{"status": "cannot_evaluate"}`，由调用方转成结论。
     """
+    for dep in data.get("dependencies", []):
+        if "lag" not in dep:
+            return {
+                "status": CANNOT,
+                "detail": (
+                    f"依赖 {dep.get('from')}→{dep.get('to')} 未给出 lag，"
+                    "无法区分“无滞后”与“滞后期为 0”"
+                ),
+            }
     order, cyclic = _topological(data)
     if cyclic:
         return {"status": CANNOT, "detail": f"依赖图成环：{sorted(cyclic)}"}
@@ -119,7 +128,7 @@ def compute_cpm(data: dict) -> dict:
     for node in order:
         duration = float(activities[node]["duration_days"])
         for dep in incoming[node]:
-            lag = float(dep.get("lag", 0))
+            lag = float(dep["lag"])
             kind = dep["type"]
             if kind == "FS":
                 es[node] = max(es[node], ef[dep["from"]] + lag)
@@ -137,7 +146,7 @@ def compute_cpm(data: dict) -> dict:
     for node in reversed(order):
         duration = float(activities[node]["duration_days"])
         for dep in outgoing[node]:
-            lag = float(dep.get("lag", 0))
+            lag = float(dep["lag"])
             kind = dep["type"]
             child = dep["to"]
             if kind == "FS":
@@ -723,10 +732,13 @@ def _check_deviation_config(data: dict, ctx: dict) -> list[dict]:
 
 
 def _check_deviation_dimensions(data: dict, ctx: dict) -> list[dict]:
+    if "CFG-01" not in ctx["config"]:
+        return [_unknown("deviation.dimensions", "CFG-01 缺失，分档维度无法判定")]
+    dimensions = ctx["config"]["CFG-01"]
     missing = []
-    if "cost_account" in ctx["config"].get("CFG-01", []) and not data.get("work_packages"):
+    if "cost_account" in dimensions and not data.get("work_packages"):
         missing.append("cost_account")
-    if "wbs_node" in ctx["config"].get("CFG-01", []) and not any(
+    if "wbs_node" in dimensions and not any(
         item.get("wbs_ref") for item in data.get("work_packages", [])
     ):
         missing.append("wbs_node")
@@ -741,7 +753,15 @@ def _check_deviation_dimensions(data: dict, ctx: dict) -> list[dict]:
 
 
 def _check_deviation_unsupported(data: dict, ctx: dict) -> list[dict]:
-    if ctx["config"].get("CFG-03", {}).get("metric") == "custom":
+    settings = ctx["config"].get("CFG-03")
+    if not isinstance(settings, dict) or "metric" not in settings:
+        return [
+            _unknown(
+                "deviation.custom_metric",
+                "CFG-03.metric 缺失，偏差点算法无法判定",
+            )
+        ]
+    if settings["metric"] == "custom":
         return [_unknown("deviation.custom_metric", "CFG-03.metric=custom 无机械算法")]
     return [_ok("deviation.custom_metric", "偏差点使用 SPI/CPI，可机械计算")]
 
@@ -753,7 +773,10 @@ def _ev_rule(config: dict) -> tuple[str | None, str]:
     settings = config.get("CFG-13")
     if not isinstance(settings, dict):
         return None, "CFG-13 缺失，挣值计量规则无法确定"
-    return settings.get("rule"), ""
+    rule = settings.get("rule")
+    if rule not in ("0/100", "50/50", "percent_complete", "weighted_milestone"):
+        return None, "CFG-13 未给出可识别的 rule，挣值计量规则无法确定"
+    return rule, ""
 
 
 def _earned_value(data: dict, config: dict) -> tuple[float | None, str]:

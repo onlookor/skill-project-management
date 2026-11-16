@@ -1639,7 +1639,7 @@
 - **修复清单（位置 → 后果）**：
   1. **阻断 1 预算三级失真**：`scripts/pm_caps.py` 新增 `_account_depths()`（按 parent 链算深度），`compute_budget()` 改为深度降序上卷；新增 `_subtree_expected()`，`_check_budget_total()` 改为逐节点比对子树合计。后果：`CFG-15` 为 A←B←C、仅 C 挂 100 时 `by_account = {A:100,B:100,C:100}`；单节点错误不再被总数相等掩盖，`budget.total_conserved` 会点名具体科目。
   2. **阻断 2 退出码契约**：`scripts/pm_check.py` `run()` 把 `InputInvalid` 记为 `invalid`（2）；`load_json()` 捕获 `RecursionError` → 2；`validate_artifact()` 增加非对象工件守卫（数组/标量 → 2）；`_fill_schema()` 按 1/2/3 映射 `violation`/`invalid`/`cannot_evaluate`。后果：缺槽位、工件类型不符、`render` 缺 `--out-dir` 均退 2；数组形态 `approval.json` 与深嵌套 JSON 退 2（不再 `AttributeError`/`RecursionError`）；不带 `--config` 的人审工序退 3。
-  3. **严重 3 聚合优先级**：`pm_check.py` 的 `STATUS_EXIT`/`PRECEDENCE`/`aggregate()` 与 `pm_config.exit_for_findings()` 同步为 `4 > 2 > 3 > 1 > 0`；新增 `config_findings()` 与 `_merge_config()`，在聚合前把配置 finding 以 `config.*` 并入报告。后果：不可判定不再被显式违规掩盖；退 1 的报告必带 `config.*` 条目。
+  3. **严重 3 聚合优先级**：`pm_check.py` 的 `STATUS_EXIT`/`PRECEDENCE`/`aggregate()` 与 `pm_config.exit_for_findings()` 同步为 `4 > 2 > 3 > 1 > 0`；新增 `config_findings()` 与 `_merge_config()`，在聚合前把配置 finding 以 `config.*` 并入报告。后果：不可判定不再被显式违规掩盖；因配置问题退 1 时报告必带 `config.*` 条目（纯工件违规退 1 可以没有配置 finding）。
   4. **严重 4 无配置放行**：`validate_artifact()` 在 `config_state is None` 时直接返回 3 与 `config.missing`，删除“跳过 `config_ref` 比对后工件退 0”的路径。
   5. **严重 5 `item_digests` 篡改**：新增 `scripts/pm_config.py` 的 `_lock_item_findings()`，逐项重算摘要并检查缺失项；该逻辑放在 `pm_config` 而非改动已受复核的 `config_codes.py`。后果：篡改单条摘要退 1（`config_drift`），不再退 0。
   6. **严重 6 `CFG-12` 为空**：`_human_approve()` 在角色映射缺失或 `gate` 不在映射时返回 `cannot_evaluate`（3），不再整段跳过比对。
@@ -1653,5 +1653,25 @@
 - **规模**：修复后 `pm_schema.py` 374 行、`pm_config.py` 546 行、`pm_caps.py` 1037 行、`pm_check.py` 636 行、`test_pm_runtime.py` 521 行（`config_codes.py` 未改，633 行）。
 - **未做**：不新增 CFG-16（EAC 方法仍由工件字段承载，等人裁定）；`CONSTITUTION.md` 与 `spec/D6_REBASELINE_PROPOSAL.md` 未改。
 - **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-151、T-167 的批次 0096 追记；`scripts/no-review-declarations.json` 中 `pm_schema.py`、`pm_config.py`、`pm_caps.py`、`pm_check.py`、`test_pm_runtime.py` 五条的 `reason`/`missing_review`；`GAP_LEDGER.md`“批次 0096 实施进展”；本节。
+- **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149,T-166,T-167`。
+- **关联 ADR**：无
+
+---
+
+### 批次 0097 — 2026-11-16 — 第二轮外复核修复（未复核）
+
+- **授权依据**：外复核对批次 0096 的基线 `cff825b` 判零阻断、8 项认可、4 项不认可；按用户转达的四条不认可与三条“只登记不修”残余逐条处置。本批**不构成任何对象已获认可**，修复后须再走一轮外复核。
+- **复核基线**：`cff825b`（本批改动前 HEAD）。
+- **修复清单（位置 → 后果）**：
+  1. **一 工件逐项摘要（严重）**：`scripts/pm_check.py` 的 `validate_artifact()` 在 `config_digest` 比对之后新增逐项比对——取出 `artifact.config_ref.item_digests` 与 `config_state.snapshot["item_digests"]`，计算多余键、缺失键、摘要不符键与键序差异，并调用 `pm_config.comparability()` 取 `differing` 写入 finding 明细。**多余键退 2**（`config.item_digests` / `invalid`），**缺失、单条摘要不符、键序调换退 1**（`config.item_digests` / `violation`）。后果：四种篡改不再退 0；`comparability()` 首次有调用点。批次 0096 把该判定放在 `pm_config._lock_item_findings()`（只作用于锁文件），对工件无效，本批改在正确位置，0096 的锁文件路径保留不动。
+  2. **二 模板读取（轻微）**：`scripts/pm_check.py` 的 `ProcedureRunner._render()` 先拒绝对路径（`InputInvalid` → 2），再以 `TEMPLATE_DIR.resolve()` 前缀判定拒绝 `..` 越界（→ 2）；`read_text` 包 `try` 捕获 `OSError`/`UnicodeDecodeError` 并转 `RuntimeBroken`（→ 4）。后果：非 UTF-8 模板不再以未捕获异常崩出进程，改为 4 并给出来源路径。
+  3. **三 库层残留默认**：`scripts/pm_caps.py` 的 `compute_cpm()` 在计算前扫描依赖，缺 `lag` 即返回 `cannot_evaluate`（不再把“未给出”当成 0）；`_check_deviation_dimensions()` 缺 `CFG-01` 返回 `cannot_evaluate`；`_check_deviation_unsupported()` 缺 `CFG-03.metric` 返回 `cannot_evaluate`；`_ev_rule()` 只接受 `0/100`、`50/50`、`percent_complete`、`weighted_milestone` 四个规则名，缺失或不可识别一律给出非空原因。后果：三类缺项不再落到“通过”，`lag` 缺失与 `lag=0` 可区分。
+  4. **四 引用失实**：`scripts/test_pm_runtime.py` 中 render 越界用例的依据由“`spec/D6_REBASELINE_PROPOSAL.md` 4.3(1)”（提案无此规定）改为“`GAP_LEDGER.md` 外复核派生条（批次 0096 严重 7）”；`CHANGELOG.md` 批次 0096 严重 3 的后果表述“退 1 的报告必带 `config.*` 条目”更正为“因配置问题退 1 时报告必带 `config.*` 条目（纯工件违规退 1 可以没有配置 finding）”，并在此登记该更正。
+- **只登记不修的三条残余（均为 0096 之前引入）**：`GAP_LEDGER.md`“批次 0097 实施进展”新增 R-0097-01（`render.template` 在工序校验阶段未受约束，运行期路径约束已由本批二补上）、R-0097-02（`--procedure` 不受任务目录约束）、R-0097-03（`_ev_rule` 空理由，重叠部分已按第三条修）。三条均**不构成关闭依据**。
+- **测试（从契约条款派生）**：`scripts/test_pm_runtime.py` 由 55 项增至 66 项。新增 11 条：工件逐项摘要四例（单条篡改 → 1、删除一条 → 1、新增 `CFG-99` → 2、调换顺序 → 1）；模板三例（非 UTF-8 → 4、绝对路径 → 2、`../ok.md` → 2）；库层三例（`lag` 缺失 → `cannot_evaluate`、缺 `CFG-01` 的 `deviation.dimensions` → `cannot_evaluate`、缺 `CFG-03` 的 `deviation.custom_metric` → `cannot_evaluate`）与 `_ev_rule({"CFG-13": {}})` 返回非空原因。摘要值统一用裸 64 位小写 hex（与工件 schema 的 `^[0-9a-f]{64}$` 一致）。演示输入 `runtime/demo/inputs/schedule.json` 的三条无 `lag` 依赖补 `"lag": 0`，避免演示样例自身变成不可判定。
+- **验证**：`test_pm_runtime` 66/66 通过。全仓检查器结果见本批提交信息。
+- **规模**：修复后 `pm_check.py` 695 行、`pm_caps.py` 1060 行、`test_pm_runtime.py` 666 行（`pm_schema.py` 374 行、`pm_config.py` 546 行未改）。
+- **未做**：三条残余只登记不修；不新增 CFG-16；`CONSTITUTION.md` 与 `spec/D6_REBASELINE_PROPOSAL.md` 未改。
+- **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-151、T-167 的批次 0097 追记；`scripts/no-review-declarations.json` 中 `pm_caps.py`、`pm_check.py`、`test_pm_runtime.py` 三条的 `reason`/`missing_review`；`GAP_LEDGER.md`“批次 0097 实施进展”；本节。
 - **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149,T-166,T-167`。
 - **关联 ADR**：无

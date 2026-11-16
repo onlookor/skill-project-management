@@ -213,6 +213,57 @@ def validate_artifact(instance: object, config_state: pm_config.ConfigState | No
             }
         )
 
+    # 逐项摘要与配置快照比对（`spec/D6_REBASELINE_PROPOSAL.md` 9.4；
+    # 批次 0097 外复核一）：整体摘要在，逐项摘要仍可单条篡改、删除或加塞。
+    artifact_items = instance.get("config_ref", {}).get("item_digests", {})
+    state_items = config_state.snapshot.get("item_digests", {})
+    comparison = pm_config.comparability(
+        {"item_digests": artifact_items}, config_state.snapshot
+    )
+    extra = sorted(set(artifact_items) - set(state_items))
+    missing = sorted(set(state_items) - set(artifact_items))
+    mismatched = sorted(
+        key
+        for key in set(artifact_items) & set(state_items)
+        if artifact_items[key] != state_items[key]
+    )
+    # 键序也在比对范围内：调换顺序说明工件不是按快照生成，不能当作可比。
+    reordered = not extra and not missing and list(artifact_items) != list(state_items)
+    if extra:
+        return {
+            "exit_code": 2,
+            "artifact_type": artifact_type,
+            "digest": digest(instance),
+            "findings": findings
+            + config_results
+            + [
+                {
+                    "check": "config.item_digests",
+                    "status": "invalid",
+                    "detail": f"config_ref.item_digests 含配置快照没有的键：{extra}",
+                }
+            ],
+        }
+    if missing or mismatched or reordered:
+        return {
+            "exit_code": 1,
+            "artifact_type": artifact_type,
+            "digest": digest(instance),
+            "findings": findings
+            + config_results
+            + [
+                {
+                    "check": "config.item_digests",
+                    "status": "violation",
+                    "detail": (
+                        "config_ref.item_digests 与配置快照不一致"
+                        f"（缺失 {missing}，摘要不符 {mismatched}，键序不符 {reordered}；"
+                        f"comparability.differing={comparison['differing']}）"
+                    ),
+                }
+            ],
+        }
+
     ctx = {
         "config": config_state.config,
         "artifacts": {artifact_type: instance["data"]},
@@ -425,11 +476,19 @@ class ProcedureRunner:
         return ("pass", f"{step['gate']} 由 {latest.get('actor')}（{role}）签字")
 
     def _render(self, step: dict) -> tuple[str, str]:
-        path = TEMPLATE_DIR / step["template"]
-        if not path.is_file():
-            raise RuntimeBroken(f"{step['id']}：模板不存在：{path}")
+        raw_template = step["template"]
+        candidate = Path(raw_template)
+        if candidate.is_absolute():
+            raise InputInvalid(f"{step['id']}：render.template 不得使用绝对路径：{raw_template}")
+        template_root = TEMPLATE_DIR.resolve()
+        path = (TEMPLATE_DIR / candidate).resolve()
+        if template_root not in path.parents:
+            raise InputInvalid(f"{step['id']}：render.template 越出模板目录：{raw_template}")
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as exc:
+            raise RuntimeBroken(f"{step['id']}：模板不可读：{path}：{exc}") from exc
         payload = self._payload(step["input"])
-        text = path.read_text(encoding="utf-8")
         text = text.replace("{{payload}}", json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True))
         text = text.replace(
             "{{config_digest}}",

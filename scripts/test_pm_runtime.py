@@ -114,7 +114,9 @@ def main() -> int:
         cyclic = mutate(
             INPUTS / "schedule.json",
             temp / "schedule-cycle.json",
-            lambda body: body["data"]["dependencies"].append({"from": "D", "to": "A", "type": "FS"}),
+            lambda body: body["data"]["dependencies"].append(
+                {"from": "D", "to": "A", "type": "FS", "lag": 0}
+            ),
         )
         # 依据：pm_check.py 文件头“聚合优先级 4 > 2 > 3 > 1 > 0；不可判定优先于显式违规”。
         check("依赖成环（违规+不可判定）→ 3", pm_check.validate_artifact(read(cyclic), state)["exit_code"], 3)
@@ -381,8 +383,8 @@ def main() -> int:
             3,
         )
 
-        # 依据：批次 0096 外复核严重 7；render 的 `out` 必须相对 `--out-dir` 解析，
-        # 不得写出输出目录（`spec/D6_REBASELINE_PROPOSAL.md` 4.3(1) 的工序副作用边界）。
+        # 依据：`GAP_LEDGER.md` 外复核派生条（批次 0096 严重 7）；render 的
+        # `out` 必须相对 `--out-dir` 解析，不得写出输出目录。
         escape_proc = procedure(
             "procedure-render-escape.json",
             [
@@ -487,6 +489,149 @@ def main() -> int:
             else:
                 keyword_errors.append(False)
         check("未实现关键字在任意分支均拒绝", keyword_errors, [True, True])
+
+        # 依据：`spec/D6_REBASELINE_PROPOSAL.md` 9.4（逐项摘要用于可比性）与
+        # 批次 0097 外复核一：整体摘要之外，逐项摘要的单条/缺项/加塞/换序都必须拦。
+        base_items = read(INPUTS / "schedule.json")["config_ref"]["item_digests"]
+        items_cases = {
+            "单条篡改": dict(
+                base_items,
+                **{sorted(base_items)[0]: "0" * 64},
+            ),
+            "删除一条": {key: base_items[key] for key in sorted(base_items)[1:]},
+            "新增一条": dict(base_items, **{"CFG-99": "0" * 64}),
+            "调换顺序": dict(reversed(list(base_items.items()))),
+        }
+        expected_items_codes = {
+            "单条篡改": 1,
+            "删除一条": 1,
+            "新增一条": 2,
+            "调换顺序": 1,
+        }
+        for label, items in items_cases.items():
+            artifact = mutate(
+                INPUTS / "schedule.json",
+                temp / f"schedule-items-{label}.json",
+                lambda body, value=items: body["config_ref"].__setitem__("item_digests", value),
+            )
+            check(
+                f"工件逐项摘要{label} → {expected_items_codes[label]}",
+                pm_check.validate_artifact(read(artifact), state)["exit_code"],
+                expected_items_codes[label],
+            )
+
+        # 依据：批次 0097 外复核二；模板不可读属解释器资源问题（4），
+        # 模板路径越出模板目录属输入不合法（2）。
+        template_root = temp / "templates"
+        template_root.mkdir()
+        (template_root / "bad.md").write_bytes(b"\xff\xfe\x00")
+        (template_root / "ok.md").write_text("{{payload}}", encoding="utf-8")
+        original_template_dir = pm_check.TEMPLATE_DIR
+        pm_check.TEMPLATE_DIR = template_root
+        try:
+            render_proc = procedure(
+                "procedure-template.json",
+                [{"id": "S1", "op": "render", "template": "bad.md", "input": "audit.json", "out": "x.md"}],
+            )
+            check(
+                "非 UTF-8 模板 → 4",
+                pm_check.main(
+                    [
+                        "--procedure",
+                        str(render_proc),
+                        "--inputs",
+                        str(INPUTS),
+                        "--config",
+                        str(CONFIG),
+                        "--lock",
+                        str(LOCK),
+                        "--out-dir",
+                        str(temp / "out-template"),
+                    ]
+                ),
+                4,
+            )
+            for label, name in (
+                ("绝对路径", str(template_root / "ok.md")),
+                ("上跳目录", "../ok.md"),
+            ):
+                render_proc.write_text(
+                    json.dumps(
+                        {
+                            "procedure": "procedure-template",
+                            "version": 1,
+                            "steps": [
+                                {
+                                    "id": "S1",
+                                    "op": "render",
+                                    "template": name,
+                                    "input": "audit.json",
+                                    "out": "x.md",
+                                }
+                            ],
+                        }
+                    ),
+                    encoding="utf-8",
+                )
+                check(
+                    f"模板{label} → 2",
+                    pm_check.main(
+                        [
+                            "--procedure",
+                            str(render_proc),
+                            "--inputs",
+                            str(INPUTS),
+                            "--config",
+                            str(CONFIG),
+                            "--lock",
+                            str(LOCK),
+                            "--out-dir",
+                            str(temp / "out-template"),
+                        ]
+                    ),
+                    2,
+                )
+        finally:
+            pm_check.TEMPLATE_DIR = original_template_dir
+
+        # 依据：`spec/D6_REBASELINE_PROPOSAL.md` 9.1（判定性项无默认）与 9.2
+        # CFG-01/CFG-03/CFG-13 行；批次 0097 外复核三。
+        lagless = read(INPUTS / "schedule.json")
+        for dep in lagless["data"]["dependencies"]:
+            dep.pop("lag", None)
+        check(
+            "依赖缺 lag → cannot_evaluate",
+            pm_caps.compute_cpm(lagless["data"])["status"],
+            "cannot_evaluate",
+        )
+        no_dimension_cfg = {key: value for key, value in state.config.items() if key != "CFG-01"}
+        check(
+            "缺 CFG-01 的 deviation.dimensions → cannot_evaluate",
+            [
+                item["status"]
+                for item in pm_caps.run_checks(
+                    ["deviation.dimensions"],
+                    {"work_packages": []},
+                    {"config": no_dimension_cfg, "artifacts": {}},
+                )
+            ],
+            ["cannot_evaluate"],
+        )
+        no_metric_cfg = {key: value for key, value in state.config.items() if key != "CFG-03"}
+        check(
+            "缺 CFG-03 的 deviation.custom_metric → cannot_evaluate",
+            [
+                item["status"]
+                for item in pm_caps.run_checks(
+                    ["deviation.custom_metric"],
+                    {"work_packages": []},
+                    {"config": no_metric_cfg, "artifacts": {}},
+                )
+            ],
+            ["cannot_evaluate"],
+        )
+        empty_rule, empty_reason = pm_caps._ev_rule({"CFG-13": {}})
+        check("CFG-13 缺 rule → 无规则且有理由", (empty_rule, bool(empty_reason)), (None, True))
 
         print("[解释器不可用]")
         original = pm_check.ARTIFACT_DIR

@@ -56,7 +56,8 @@
       {
         "from": "A",
         "to": "B",
-        "type": "FS"
+        "type": "FS",
+        "lag": 0
       },
       {
         "from": "A",
@@ -67,12 +68,14 @@
       {
         "from": "B",
         "to": "D",
-        "type": "FS"
+        "type": "FS",
+        "lag": 0
       },
       {
         "from": "C",
         "to": "D",
-        "type": "FS"
+        "type": "FS",
+        "lag": 0
       }
     ],
     "wbs_node_ids": [
