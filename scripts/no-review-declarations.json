@@ -68,8 +68,8 @@
   },
   "spec": {
     "spec/ACCESS_ZONES.md": {
-      "reason": "批次 0095 为新增的 `runtime/` 顶层目录登记归区（C 区 22 个 JSON、P/P2 10 个 Markdown），区段指纹已重冻；新增归区内容无复核产物",
-      "missing_review": "对 `runtime/` 归区与 P2 分级是否符合 `ACCESS_ZONES` 第 3/4 节的非同源复核",
+      "reason": "批次 0095 为新增的 `runtime/` 顶层目录登记归区（C 区 22 个 JSON、P/P2 10 个 Markdown），区段指纹已重冻；新增归区内容无复核产物。批次 0098 又为 `spec/clause-registry.json` 增加 D 区登记与生成器登记（第 1/2 节），同属未复核改动",
+      "missing_review": "对 `runtime/` 归区、P2 分级与 0098 新增 D 区/生成器登记是否符合 `ACCESS_ZONES` 第 2/3/4 节的非同源复核",
       "due": "M1 出口前",
       "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
       "todo": "T-167"

@@ -78,7 +78,7 @@
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：scripts/test_dependency_pins.py；结论：认可"
     },
     "scripts/no-review-declarations.json": {
-      "sha256": "d646dd7fa981654a98d7bdd04fc3d6ef68cb1d2d0ecd9dce641e45e70af6979d",
+      "sha256": "aca78899d71ed0ccb79e0198d2a10f3ab3e8b01bb2ae656e2fa5f6c3dbb4ef07",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "validation/pinned/checker.py": {
