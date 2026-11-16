@@ -1,15 +1,17 @@
 {
   "version": 1,
-  "note": "规格区段指纹。区段新增或改动必须 --write --basis；basis 只接受合格的非同源复核记录，或无复核字面量（后者不放行，须 --no-verify 并在 scripts/no-review-declarations.json 与 TODO.md 到期项留痕）。指纹只证明内容一致，不证明签收人身份。",
+  "note": "规格区段指纹。区段新增或改动必须 --write --basis；basis 只接受合格的非同源复核记录，或无复核字面量（后者不放行，须 --no-verify 并在 scripts/no-review-declarations.json 与 TODO.md 到期项留痕）。每个登记项带内容锚 anchor；变更只追加 history（旧指纹永不丢弃），无复核声明下的变更还须 --change-reason。指纹只证明内容一致，不证明签收人身份。",
   "sections": {
     "GRAMMAR.md": {
       "sha256": "72ae1575dc21ccd2043414f008bf0f27a79fdee225867cef725f2efe9091ad4f",
       "path": "GRAMMAR.md",
+      "anchor": "72ae1575dc21ccd2043414f008bf0f27a79fdee225867cef725f2efe9091ad4f",
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：GRAMMAR.md；结论：认可"
     },
     "spec/methods/deterministic-checker.md#A.2": {
       "sha256": "bc16ec2ada40983188a7d1672ac1c2771334dd6aa8927458033d47e75f78ff89",
       "path": "spec/methods/deterministic-checker.md",
+      "anchor": "bc16ec2ada40983188a7d1672ac1c2771334dd6aa8927458033d47e75f78ff89",
       "basis": "非同源复核：第五批（基线 c6fa1cd）只读外复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch5/REVIEW-RECORD.md；sha256：8b8581d37c58ee916672a0863b0598cb1317f811e4471ccb328161d66833a935；复核基线：c6fa1cd50955302c207402c454abf91db22e6082；区段：spec/methods/deterministic-checker.md#A.2；结论：认可",
       "review_date": {
         "value": "2026-11-16",
@@ -19,91 +21,109 @@
     "spec/methods/deterministic-checker.md#A.1": {
       "sha256": "1c7ef44a14dd2d7bc0e3ae279baade81c3b6d2a5ea6c221e644362337f23b3bc",
       "path": "spec/methods/deterministic-checker.md",
+      "anchor": "1c7ef44a14dd2d7bc0e3ae279baade81c3b6d2a5ea6c221e644362337f23b3bc",
       "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：spec/methods/deterministic-checker.md#A.1 结论：认可"
     },
     "spec/CHECKER_INPUT_SCHEMA.md": {
       "sha256": "8c068f1676962dcd55c54edeafd49f5da0b3280da007256d89ed441b970264e4",
       "path": "spec/CHECKER_INPUT_SCHEMA.md",
+      "anchor": "8c068f1676962dcd55c54edeafd49f5da0b3280da007256d89ed441b970264e4",
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：spec/CHECKER_INPUT_SCHEMA.md；结论：认可"
     },
     "AGENTS.md#3.5": {
       "sha256": "a1dd58513b30fa256e4d3ad4fdcb9f93ba6c401bbb7e4d8d3c29c23b32d1b7d1",
       "path": "AGENTS.md",
-      "basis": "无复核声明（不构成认可，不放行）"
+      "anchor": "a1dd58513b30fa256e4d3ad4fdcb9f93ba6c401bbb7e4d8d3c29c23b32d1b7d1",
+      "basis": "非同源复核：第五轮独立复核会话（非执行方）对 AGENTS.md §3.5 全文逐句复核；复核产物：/home/wgz/projects/skills/2026-11-16/pm-governance-review/d6f/probes/basis_agents35.txt；sha256：d6468d867c340d5ad970eb72e1ae33b3d5b2a69fe258310cad55db914b6d5fcd；复核基线：1dec4e8；区段：AGENTS.md#3.5；结论：认可"
     },
     "validation/checker-prototype/coverage.json": {
       "sha256": "bda6c5da3e06790c5af0dab6a591020c3f9cf06ed394dd6b51b137f7010a5e7a",
       "path": "validation/checker-prototype/coverage.json",
+      "anchor": "bda6c5da3e06790c5af0dab6a591020c3f9cf06ed394dd6b51b137f7010a5e7a",
       "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：validation/checker-prototype/coverage.json 结论：认可"
     },
     "contracts/schema/knowledge-entry.schema.json": {
       "sha256": "aa3e9dc79e205679a397bda8f165b71846c367c882375b7f12086cdf2e1369a0",
       "path": "contracts/schema/knowledge-entry.schema.json",
+      "anchor": "aa3e9dc79e205679a397bda8f165b71846c367c882375b7f12086cdf2e1369a0",
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：contracts/schema/knowledge-entry.schema.json；结论：认可"
     },
     "contracts/schema/pilot-conflict.schema.json": {
       "sha256": "13fe4b408241de468fa6314741cca1f53d1238c10f375485a586b42005e06c9d",
       "path": "contracts/schema/pilot-conflict.schema.json",
+      "anchor": "13fe4b408241de468fa6314741cca1f53d1238c10f375485a586b42005e06c9d",
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：contracts/schema/pilot-conflict.schema.json；结论：认可"
     },
     "contracts/schema/pm-slot-contract.schema.json": {
       "sha256": "35fd40f33ed4e406f10336f1d5b1850416a0b581c017b36aab125f520717e5db",
       "path": "contracts/schema/pm-slot-contract.schema.json",
+      "anchor": "35fd40f33ed4e406f10336f1d5b1850416a0b581c017b36aab125f520717e5db",
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：contracts/schema/pm-slot-contract.schema.json；结论：认可"
     },
     "contracts/schema/package-manifest.schema.json": {
       "sha256": "080134fb89036e0bda1a0dcbcca7f5b57d011e54d3d26f8d265140c2b1a1994c",
       "path": "contracts/schema/package-manifest.schema.json",
+      "anchor": "080134fb89036e0bda1a0dcbcca7f5b57d011e54d3d26f8d265140c2b1a1994c",
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：contracts/schema/package-manifest.schema.json；结论：认可"
     },
     "contracts/schema/ontology-fixtures-manifest.schema.json": {
       "sha256": "b0dbdd2b2b35f78c21138b572a2b33a2778f0512b63aceffcfc072f6b7b4f882",
       "path": "contracts/schema/ontology-fixtures-manifest.schema.json",
+      "anchor": "b0dbdd2b2b35f78c21138b572a2b33a2778f0512b63aceffcfc072f6b7b4f882",
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：contracts/schema/ontology-fixtures-manifest.schema.json；结论：认可"
     },
     "contracts/schema/pilot-artifact.schema.json": {
       "sha256": "3afeeeb3e7f573da6b3dd40868afa6f606b8387d14f5cdf80fd4477fc30c4411",
       "path": "contracts/schema/pilot-artifact.schema.json",
+      "anchor": "3afeeeb3e7f573da6b3dd40868afa6f606b8387d14f5cdf80fd4477fc30c4411",
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：contracts/schema/pilot-artifact.schema.json；结论：认可"
     },
     "contracts/schema/pilot-id-map.schema.json": {
       "sha256": "cd41e8124cf58c2ad0b777185a6ed3f023b39b4f213a8f55fe145d7555e5bcd3",
       "path": "contracts/schema/pilot-id-map.schema.json",
+      "anchor": "cd41e8124cf58c2ad0b777185a6ed3f023b39b4f213a8f55fe145d7555e5bcd3",
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：contracts/schema/pilot-id-map.schema.json；结论：认可"
     },
     "contracts/schema/runtime-config.schema.json": {
       "sha256": "f9f675fdf97b42d2dc119fb58a63f32d580a676111c3429c100421c52778cf9c",
       "path": "contracts/schema/runtime-config.schema.json",
+      "anchor": "f9f675fdf97b42d2dc119fb58a63f32d580a676111c3429c100421c52778cf9c",
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：contracts/schema/runtime-config.schema.json；结论：认可"
     },
     "contracts/schema/runtime-config-lock.schema.json": {
       "sha256": "49816c0a2c7bf26d29f5811dfed1d16cb6daeba81c4e73ff6621a932519c2c0e",
       "path": "contracts/schema/runtime-config-lock.schema.json",
+      "anchor": "49816c0a2c7bf26d29f5811dfed1d16cb6daeba81c4e73ff6621a932519c2c0e",
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：contracts/schema/runtime-config-lock.schema.json；结论：认可"
     },
     "spec/ACCESS_ZONES.md": {
       "sha256": "e21f5c30ab3d8552385fccbf506b4a45dbb599761e6a05af62c06a1cd2a51ca6",
       "path": "spec/ACCESS_ZONES.md",
+      "anchor": "e21f5c30ab3d8552385fccbf506b4a45dbb599761e6a05af62c06a1cd2a51ca6",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "spec/D6_REBASELINE_PROPOSAL.md": {
       "sha256": "bc50490bd85a1e453b4cad609e96fb5f5f1b31f7232607d8bbfe1faea7fbb4aa",
       "path": "spec/D6_REBASELINE_PROPOSAL.md",
+      "anchor": "bc50490bd85a1e453b4cad609e96fb5f5f1b31f7232607d8bbfe1faea7fbb4aa",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "AGENTS.md#1bis": {
       "sha256": "96539f2020a0a57fac6135fd5d9a7599769880745b9f4b7c50ad21d370a8dcb2",
       "path": "AGENTS.md",
+      "anchor": "96539f2020a0a57fac6135fd5d9a7599769880745b9f4b7c50ad21d370a8dcb2",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "GLOSSARY.md#T-F-015": {
       "sha256": "08b9661c3bedd942870ddfb079b243bf67628605edb74bfea232ee939a55fdfa",
       "path": "GLOSSARY.md",
+      "anchor": "08b9661c3bedd942870ddfb079b243bf67628605edb74bfea232ee939a55fdfa",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "spec/clause-registry.json": {
       "sha256": "bcff1dc76459bdeccea8950e0102051341b2ea7e24d0217a4d509ec3d2fcfdde",
       "path": "spec/clause-registry.json",
+      "anchor": "bcff1dc76459bdeccea8950e0102051341b2ea7e24d0217a4d509ec3d2fcfdde",
       "basis": "非同源复核：d6c/d6d 独立复核会话（非执行方）；复核产物：/home/wgz/projects/skills/2026-11-16/pm-governance-review/d6d/probes/basis_b4_kind.txt；sha256：c54d00fdf30c7c40d833bcd68c4ca520af88726cb3f4db16c079d18d42975673；复核基线：8dfbb86；区段：spec/clause-registry.json；结论：认可"
     }
   }

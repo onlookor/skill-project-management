@@ -1749,3 +1749,19 @@
 - **未做**：不改检查器逻辑；不为 `AGENTS.md#3.5` 另造 basis；不改提案与历史批次记录。
 - **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-170；`scripts/no-review-declarations.json` 的 `AGENTS.md#3.5` 条目；本节。
 - **关联 ADR**：无
+
+---
+
+### 批次 0102 — 2026-11-16 — 无复核声明的改动留痕
+
+- **涉及文件**：`scripts/check_spec_pins.py`、`scripts/test_spec_pins.py`、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`scripts/no-review-declarations.json`、`scripts/README.md`、`AGENTS.md`、`TODO.md`、`CHANGELOG.md`
+- **变更摘要**：
+  - 阻断项整改：`check_spec_pins.py` 给每个登记项加内容锚 `anchor`；内容变动时 `--write` 一律追加 `history`（`section`/`path`/`from`/`to`/`reason`/`at`/`commit`/`summary`），旧指纹永不丢弃；basis 为无复核字面量时强制 `--change-reason`，缺失即 rc=2 且不落盘；`evaluate()` 核对 `anchor → history[].to → 登记指纹` 首尾相接，并把无复核声明下的变更以“已变更 N 次”持续报错，使“改动后重冻”与“未改动”错误集合不再相同。
+  - `test_spec_pins.py` 新增 SP37–SP40（内容未变可刷新、已变无理由拒绝、已变给理由追加历史、二次变更链完整），并把夹具补上 `anchor`；`spec-pins.json` 迁移出 20 个内容锚。变更记录含 `section`/`path`/`from`/`to`/`reason`/`at`/`commit` 与可读 `summary`（写明何时、为何、从什么变成什么），不只留一对十六进制。
+  - `AGENTS.md` §3.6.8 与 `scripts/README.md` 记录改动留痕规则；`no-review-declarations.json` 新增 `check_spec_pins.py`、`test_spec_pins.py` 两条登记。
+  - `AGENTS.md#3.5` 恢复合格 basis：从 `2026-11-16/pm-governance-review/d6f/REVIEW-RECORD.md` 程序化逐字提取（复核基线 `1dec4e8`），回灌 `valid_basis` 通过后与内容锚修复**同一提交**落库，同批删除该区段在 `no-review-declarations.json` 的登记并刷新 `checker-pins.json` 中该登记表的哈希。`AGENTS.md#3.5` 的 `reason` 原写“覆盖 §3.5 全节，任何正文改动均须重新取证”，随声明一并删除（basis 本身即覆盖全节的复核记录）。本批按 3.5.3 第 3 条新建 T-171。
+- **实测**：`check_checker_pins` 问题 5 → 7（新增两个被改脚本的无复核声明）；`check_spec_pins` 问题 6 → 5（A.2 日期 + 4 条声明，`AGENTS.md#3.5` 归零）；`test_spec_pins` 42/42、`test_checker_pins` 21/21、`test_pm_runtime` 73/73。`--write` 正负例：内容未变 rc=0 且补锚；已变 + 声明 + 无理由 rc=2 且不写文件；已变 + 理由 rc=0 并追加一条历史；二次变更后链首仍为原锚。落库后复验：改 §3.5 一行 → 报“指纹未更新、basis 失效、区段已改动”3 条（总数 8）；用旧 basis `--write` → rc=2 且不写盘；还原后回到 5 条。
+- **钩子绕过**：本批提交携带 `Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149,T-166,T-167,T-168,T-169,T-170,T-171`（两个检查器脚本与登记表改动未经非同源复核）。
+- **未做**：不改 `check_checker_pins.py` 的对象级锚（本轮范围为规格区段）；不另造 basis（`AGENTS.md#3.5` 只落库复核方产物）。
+- **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-171；`scripts/no-review-declarations.json` 的 `scripts/check_spec_pins.py`、`scripts/test_spec_pins.py`、`scripts/no-review-declarations.json` 条目；本节。
+- **关联 ADR**：无

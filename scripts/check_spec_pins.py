@@ -39,6 +39,12 @@
      附出该标记，且 basis 又变得可验证通过时会要求人工核实并移除标记。`--write` 原样
      保留该字段，不自动清除。
   7. `--write` 新增或变更的区段必须附 `--basis`（合格复核记录，或无复核字面量）。
+  8. 每个登记项都持有内容锚 `anchor`（首次登记时的区段指纹）。内容变动时 `--write`
+     不得静默重冻：变更项一律追加一条 `history` 记录（`from`、`to`、`reason`、`at`、
+     `commit`），旧指纹永不丢弃；若本次写回的 basis 是无复核字面量，还必须显式给出
+     `--change-reason`，否则 rc=2。`history` 只追加不覆盖，`evaluate()` 核对
+     `anchor → history[].to` 的链与登记指纹首尾相接；无复核声明下的变更会作为**持续
+     报错**保留（“已变更 N 次”），使“改动后重冻”与“未改动”可被区分。
 
 记录文件放在 validation/reviews/ 下并在同一提交暂存；也可用 --review 指定。
 这不是“签收人身份验证”：机器只能核对记录的存在与字段，不能验证复核者是谁。
@@ -46,8 +52,9 @@
 用法：
   python3 scripts/check_spec_pins.py
   python3 scripts/check_spec_pins.py --write --basis "非同源复核：... 复核产物：/abs/report.md sha256：<64hex> 复核基线：3664b64"
+  python3 scripts/check_spec_pins.py --write --basis "无复核声明（不构成认可，不放行）" --change-reason "收口 §3.5.3 计数"
   python3 scripts/check_spec_pins.py --review validation/reviews/20261114-xxx.md
-退出码：0 = 一致；1 = 指纹未更新或缺少复核记录；2 = 解析/登记缺失或 basis 不合格。
+退出码：0 = 一致；1 = 指纹未更新或缺少复核记录；2 = 解析/登记缺失、basis 不合格或变更未显式承担。
 """
 
 from __future__ import annotations
@@ -58,7 +65,7 @@ import json
 import re
 import subprocess
 import sys
-from datetime import date
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 PINS = Path("scripts/spec-pins.json")
@@ -492,6 +499,212 @@ def writable(root: Path, text: str, key: str) -> tuple[bool, str]:
     return valid_basis(root, text, key)
 
 
+HISTORY_FIELDS = ("section", "path", "from", "to", "reason", "at", "commit", "summary")
+
+
+def history_summary(section: str, path: str, old: str, new: str, reason: str,
+                    at: str, commit: str) -> str:
+    """供人直接阅读的变更说明，避免只留一对十六进制。"""
+    return (
+        f"{at}（HEAD {commit[:7] or '未知'} 之后的工作区改动）："
+        f"区段 {section}（{path}）指纹自 {old[:12]} 变为 {new[:12]}；"
+        f"理由：{reason}"
+    )
+
+
+def head_commit(root: Path) -> str:
+    """写入时的 HEAD；变更记录里的“提交”指本次变更将要跟进的提交。"""
+    result = subprocess.run(
+        ["git", "rev-parse", "HEAD"], cwd=root, capture_output=True, text=True
+    )
+    return result.stdout.strip() if result.returncode == 0 else ""
+
+
+def history_errors(key: str, registered: str | None, entry: dict) -> list[str]:
+    """内容锚与变更历史：`anchor → history[].to` 必须与登记指纹首尾相接。
+
+    这一项解决“改动后 --write 重冻”与“未改动”错误集合逐字相同的问题：无复核
+    声明下的任何变更都会在历史里留下旧指纹，并作为持续报错保留。
+    """
+    anchor = entry.get("anchor")
+    if not isinstance(anchor, str) or re.fullmatch(r"[0-9a-f]{64}", anchor) is None:
+        return [f"{key}：登记项缺少内容锚 `anchor`（须运行一次 --write 迁移）"]
+    history = entry.get("history")
+    if history is None:
+        history = []
+    if not isinstance(history, list):
+        return [f"{key}：`history` 必须是数组（只追加，不覆盖）"]
+    errors: list[str] = []
+    if registered is not None and anchor != registered and not history:
+        errors.append(
+            f"{key}：内容锚与登记指纹不一致（锚 {anchor[:12]}，登记 {registered[:12]}）"
+            "且无变更历史；不得静默重冻，须由 --write 追加记录"
+        )
+    expected = anchor
+    for index, record in enumerate(history, 1):
+        if not isinstance(record, dict):
+            errors.append(f"{key}：第 {index} 条变更记录不是对象")
+            return errors
+        missing = [field for field in HISTORY_FIELDS if not record.get(field)]
+        if missing:
+            errors.append(f"{key}：第 {index} 条变更记录缺少字段 {', '.join(missing)}")
+            return errors
+        if record["from"] != expected:
+            errors.append(
+                f"{key}：变更历史链在第 {index} 条断裂（上一条到 {expected[:12]}，"
+                f"本条从 {str(record['from'])[:12]} 起）；旧指纹不得删除或改写"
+            )
+            return errors
+        expected = record["to"]
+    if history and registered is not None and expected != registered:
+        errors.append(
+            f"{key}：变更历史末条到 {expected[:12]}，与登记指纹 "
+            f"{registered[:12]} 不一致（历史被改写或指纹被单独重冻）"
+        )
+    if history and entry.get("basis") == DECLARATION:
+        errors.append(
+            f"{key}：无复核声明下区段内容已变更 {len(history)} 次"
+            f"（锚 {anchor[:12]} → 当前 {str(registered)[:12]}；"
+            f"最近理由：{history[-1].get('reason')}）；旧内容未经复核，须重新取证"
+        )
+    return errors
+
+
+def write_sections(
+    root: Path,
+    pins_path: Path,
+    current: dict[str, str],
+    previous: dict,
+    bases: list[str],
+    change_reason: str,
+) -> tuple[int, list[str]]:
+    """登记区段指纹。内容变动必须显式承担：追加历史；无复核声明还须变更理由。"""
+    structural: list[str] = []
+    for spec in SECTIONS:
+        old = previous.get(spec["key"])
+        if isinstance(old, str):
+            old = {"sha256": old}
+        structural.extend(
+            a2_signoff_errors(
+                root,
+                spec,
+                current[spec["key"]],
+                old.get("basis") if isinstance(old, dict) else None,
+            )
+        )
+    if structural:
+        return 2, [f"区段 {problem}" for problem in structural]
+
+    sections: dict[str, dict] = {}
+    changed: list[str] = []
+    chosen: dict[str, str] = {}
+    declaration_changes: list[str] = []
+    reason = change_reason.strip()
+    stamp = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    commit = head_commit(root)
+    old_sha_by_key: dict[str, str] = {}
+    for spec in SECTIONS:
+        key = spec["key"]
+        actual = fingerprint(current[key], spec["start"], spec["end"])
+        old = previous.get(key)
+        if isinstance(old, str):
+            old = {"sha256": old}
+        old_sha = old.get("sha256") if isinstance(old, dict) else None
+        old_anchor = old.get("anchor") if isinstance(old, dict) else None
+        old_history = old.get("history") if isinstance(old, dict) else None
+        history = list(old_history) if isinstance(old_history, list) else []
+        if old_sha is None or old_sha != actual:
+            match = next(
+                (text for text in bases if writable(root, text, key)[0]), None
+            )
+            if match is None:
+                why = (
+                    writable(root, bases[0], key)[1]
+                    if bases
+                    else "缺少 --basis"
+                )
+                verb = "新增" if old_sha is None else "有新增或变更"
+                return 2, [f"区段 {key} {verb}，但 --basis 不合格：{why}"]
+            chosen[key] = match.strip()
+        if old_sha is None:
+            # 首次登记：建立内容锚，不产生变更记录。
+            anchor = actual
+        elif old_sha != actual:
+            changed.append(key)
+            old_sha_by_key[key] = old_sha
+            anchor = old_anchor if isinstance(old_anchor, str) else old_sha
+            if chosen[key] == DECLARATION:
+                declaration_changes.append(key)
+                record_reason = reason
+            else:
+                baseline = re.search(
+                    r"复核基线：`?([0-9a-f]{7,40})`?", chosen[key]
+                )
+                record_reason = (
+                    f"合格复核记录：{baseline.group(1)}" if baseline else "合格复核记录"
+                )
+            history.append(
+                {
+                    "section": key,
+                    "path": spec["path"],
+                    "from": old_sha,
+                    "to": actual,
+                    "reason": record_reason,
+                    "at": stamp,
+                    "commit": commit,
+                    "summary": history_summary(
+                        key, spec["path"], old_sha, actual, record_reason, stamp, commit
+                    ),
+                }
+            )
+        else:
+            anchor = old_anchor if isinstance(old_anchor, str) else actual
+        entry = {
+            "sha256": actual,
+            "path": spec["path"],
+            "anchor": anchor,
+            "basis": chosen.get(key)
+            or (old or {}).get("basis")
+            or DECLARATION,
+        }
+        if history:
+            entry["history"] = history
+        # 显式失效标记与日期只能人工增删；--write 原样保留。
+        if isinstance(old, dict) and old.get("invalidated"):
+            entry["invalidated"] = old["invalidated"]
+        if isinstance(old, dict) and old.get("review_date"):
+            entry["review_date"] = old["review_date"]
+        sections[key] = entry
+
+    if declaration_changes and not reason:
+        return 2, [
+            f"区段 {key} 内容已变更且 basis 为无复核声明，"
+            f"必须用 --change-reason 说明理由（旧指纹 {old_sha_by_key[key][:12]} "
+            "不得被重冻抹平）"
+            for key in declaration_changes
+        ]
+
+    pins = {
+        "version": 1,
+        "note": (
+            "规格区段指纹。区段新增或改动必须 --write --basis；basis 只接受合格的非同源"
+            "复核记录，或无复核字面量（后者不放行，须 --no-verify 并在 "
+            "scripts/no-review-declarations.json 与 TODO.md 到期项留痕）。"
+            "每个登记项带内容锚 anchor；变更只追加 history（旧指纹永不丢弃），"
+            "无复核声明下的变更还须 --change-reason。"
+            "指纹只证明内容一致，不证明签收人身份。"
+        ),
+        "sections": sections,
+    }
+    pins_path.write_text(
+        json.dumps(pins, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    return 0, [
+        f"[完成] 已登记 {len(sections)} 个规格区段指纹"
+        f"（本次新增或变更 {len(changed)} 个）。"
+    ]
+
+
 
 def section_text(text: str, start: str | None, end: str | None) -> str:
     lines = text.splitlines()
@@ -587,6 +800,7 @@ def evaluate(
                         "但当前 basis 可验证通过；须人工核实后移除该标记"
                         "（--write 不自动清除）"
                     )
+            errors.extend(history_errors(key, registered, entry))
         head_text = head.get(key)
         changed = head_text is None or fingerprint(head_text, spec["start"], spec["end"]) != actual
         if changed and not valid_review(root, reviews, key):
@@ -670,6 +884,11 @@ def main() -> int:
         default=[],
         help="非同源复核记录（新增或变更区段时必填；可重复，按 `区段：` 匹配对应区段）",
     )
+    parser.add_argument(
+        "--change-reason",
+        default="",
+        help="内容变更理由；basis 为无复核字面量时必填（写入 history，旧指纹保留）",
+    )
     args = parser.parse_args()
     root = Path(args.root).resolve() if args.root else Path(__file__).resolve().parents[1]
     pins_path = Path(args.pins) if args.pins else root / PINS
@@ -682,82 +901,12 @@ def main() -> int:
         pins = load_pins(pins_path)
         previous = pins.get("sections", {})
         if args.write:
-            structural = []
-            for spec in SECTIONS:
-                old = previous.get(spec["key"])
-                if isinstance(old, str):
-                    old = {"sha256": old}
-                structural.extend(
-                    a2_signoff_errors(
-                        root,
-                        spec,
-                        current[spec["key"]],
-                        old.get("basis") if isinstance(old, dict) else None,
-                    )
-                )
-            if structural:
-                for problem in structural:
-                    print(f"[错误] {problem}")
-                return 2
-            sections = {}
-            changed: list[str] = []
-            chosen: dict[str, str] = {}
-            for spec in SECTIONS:
-                key = spec["key"]
-                actual = fingerprint(current[key], spec["start"], spec["end"])
-                old = previous.get(key)
-                if isinstance(old, str):
-                    old = {"sha256": old}
-                old_sha = old.get("sha256") if isinstance(old, dict) else None
-                if old_sha != actual:
-                    changed.append(key)
-                    match = next(
-                        (text for text in args.basis if writable(root, text, key)[0]),
-                        None,
-                    )
-                    if match is None:
-                        why = (
-                            writable(root, args.basis[0], key)[1]
-                            if args.basis
-                            else "缺少 --basis"
-                        )
-                        print(f"[错误] 区段 {key} 有新增或变更，但 --basis 不合格：{why}")
-                        return 2
-                    chosen[key] = match.strip()
-                sections[key] = {
-                    "sha256": actual,
-                    "path": spec["path"],
-                    "basis": (
-                        chosen[key]
-                        if old_sha != actual
-                        else (old or {}).get("basis") or DECLARATION
-                    ),
-                }
-                # 显式失效标记只能人工增删；--write 原样保留，不自动抹掉。
-                if isinstance(old, dict) and old.get("invalidated"):
-                    sections[key]["invalidated"] = old["invalidated"]
-                # 日期属于登记方的同级字段（origin: executor），basis 只放复核方原文；
-                # --write 不生成也不删除该字段。
-                if isinstance(old, dict) and old.get("review_date"):
-                    sections[key]["review_date"] = old["review_date"]
-            pins = {
-                "version": 1,
-                "note": (
-                    "规格区段指纹。区段新增或改动必须 --write --basis；basis 只接受合格的非同源"
-                    "复核记录，或无复核字面量（后者不放行，须 --no-verify 并在 "
-                    "scripts/no-review-declarations.json 与 TODO.md 到期项留痕）。"
-                    "指纹只证明内容一致，不证明签收人身份。"
-                ),
-                "sections": sections,
-            }
-            pins_path.write_text(
-                json.dumps(pins, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+            code, messages = write_sections(
+                root, pins_path, current, previous, args.basis, args.change_reason
             )
-            print(
-                f"[完成] 已登记 {len(sections)} 个规格区段指纹"
-                f"（本次新增或变更 {len(changed)} 个）。"
-            )
-            return 0
+            for message in messages:
+                print(message if code == 0 else f"[错误] {message}")
+            return code
         head = {spec["key"]: read_head(root, spec["path"]) for spec in SECTIONS}
         reviews = [
             Path(path).read_text(encoding="utf-8") for path in args.review

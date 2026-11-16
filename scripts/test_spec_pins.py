@@ -34,6 +34,10 @@ SP33 签收日期、`review_date` 与产物记号同步变更 → 必须通过�
 SP34 专用记号只出现在围栏代码块内 → 必须阻断（日期未核验，批次 0092）；
 SP35 复核产物出现两个专用记号 → 必须阻断（只认恰好一个）；
 SP36 复核产物缺专用记号 → 必须阻断（日期未核验）。
+SP37 内容未变时 `--write` 仍可正常刷新（并迁移内容锚）；
+SP38 内容已变、basis 为无复核声明且无 `--change-reason` → 必须拒绝（rc=2），不落盘；
+SP39 内容已变且给出理由 → 放行，history 追加一条，旧指纹保留；
+SP40 第二次变更继续追加，链首仍是原锚，无复核声明下的变更持续报错。
 
 外部复核产物在系统临时目录中生成，不写入仓库。用法：
   python3 scripts/test_spec_pins.py [--root DIR]
@@ -44,6 +48,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import re
 import subprocess
 import sys
@@ -54,11 +59,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from check_spec_pins import (  # noqa: E402
     A2_SIGNOFF_RE,
+    DECLARATION,
     SECTIONS,
     comparable_text,
     evaluate,
     fingerprint,
     valid_basis,
+    write_sections,
 )
 
 TARGET = "spec/methods/deterministic-checker.md#A.2"
@@ -153,6 +160,7 @@ def main() -> int:
             return {
                 "sha256": value,
                 "path": "",
+                "anchor": value,
                 "basis": basis,
                 "review_date": {"value": signed_at, "origin": "executor"},
             }
@@ -590,6 +598,128 @@ def main() -> int:
             "SP36",
             "产物缺专用记号",
             "外部复核产物（测试用，不写入仓库）。\n" f"日期：{signed_at}\n",
+        )
+
+        # SP37–SP40：内容锚与变更历史（批次 0102）——`--write` 不得把改动重冻抹平。
+        cov_key = "validation/checker-prototype/coverage.json"
+        cov_spec = next(item for item in SECTIONS if item["key"] == cov_key)
+        cov_now = fingerprint(current[cov_key], cov_spec["start"], cov_spec["end"])
+        decl_pins = dict(pins)
+        decl_pins[cov_key] = {
+            "sha256": cov_now,
+            "path": cov_spec["path"],
+            "anchor": cov_now,
+            "basis": DECLARATION,
+        }
+        cov_changed = dict(current)
+        cov_changed[cov_key] = current[cov_key].replace(
+            anchor, '"sample": "A.1.6-3"', 1
+        )
+        cov_changed2 = dict(cov_changed)
+        cov_changed2[cov_key] = cov_changed[cov_key].replace(
+            '"sample": "A.1.6-3"', '"sample": "A.1.6-4"', 1
+        )
+
+        # SP37：内容未变，`--write` 仍可正常刷新（并迁移内容锚）。
+        sp37_pins = Path(tmp) / "pins-sp37.json"
+        code37, msg37 = write_sections(root, sp37_pins, current, decl_pins, [], "")
+        written37 = (
+            json.loads(sp37_pins.read_text(encoding="utf-8"))["sections"]
+            if sp37_pins.exists()
+            else {}
+        )
+        entry37 = written37.get(cov_key, {})
+        ok37 = (
+            code37 == 0
+            and entry37.get("anchor") == cov_now
+            and "history" not in entry37
+        )
+        total += 1
+        failures += 0 if ok37 else 1
+        print(
+            f"| SP37 | 内容未变时 --write 刷新 | 通过 | {'通过' if ok37 else '阻断'} | "
+            f"rc={code37}；锚={str(entry37.get('anchor'))[:12]}；{'；'.join(msg37[:1])} |"
+        )
+
+        # SP38：内容已变、basis 为无复核声明、无理由 → 必须拒绝且不落盘。
+        sp38_pins = Path(tmp) / "pins-sp38.json"
+        code38, msg38 = write_sections(
+            root, sp38_pins, cov_changed, decl_pins, [DECLARATION], ""
+        )
+        ok38 = (
+            code38 == 2
+            and not sp38_pins.exists()
+            and any("--change-reason" in item for item in msg38)
+        )
+        total += 1
+        failures += 0 if ok38 else 1
+        print(
+            f"| SP38 | 内容已变且无复核声明、无理由 | 阻断 | {'阻断' if ok38 else '通过'} | "
+            f"rc={code38}；{msg38[0] if msg38 else '无输出'} |"
+        )
+
+        # SP39：带理由 → 放行，追加一条历史（旧指纹保留）。
+        sp39_pins = Path(tmp) / "pins-sp39.json"
+        code39, msg39 = write_sections(
+            root, sp39_pins, cov_changed, decl_pins, [DECLARATION], "测试：改写采样引用"
+        )
+        written39 = (
+            json.loads(sp39_pins.read_text(encoding="utf-8"))["sections"]
+            if sp39_pins.exists()
+            else {}
+        )
+        entry39 = written39.get(cov_key, {})
+        history39 = entry39.get("history") or []
+        cov_new = fingerprint(cov_changed[cov_key], cov_spec["start"], cov_spec["end"])
+        first = history39[0] if history39 else {}
+        ok39 = (
+            code39 == 0
+            and entry39.get("anchor") == cov_now
+            and len(history39) == 1
+            and first.get("from") == cov_now
+            and first.get("to") == cov_new
+            and first.get("reason") == "测试：改写采样引用"
+            and bool(first.get("at"))
+            and "commit" in first
+            and first.get("section") == cov_key
+            and "指纹自" in str(first.get("summary"))
+            and "测试：改写采样引用" in str(first.get("summary"))
+        )
+        total += 1
+        failures += 0 if ok39 else 1
+        print(
+            f"| SP39 | 内容已变、已给理由 | 通过 | {'通过' if ok39 else '阻断'} | "
+            f"rc={code39}；history={len(history39)}；旧指纹保留="
+            f"{first.get('from') == cov_now}；理由={first.get('reason')} |"
+        )
+
+        # SP40：第二次变更继续追加，链首仍是原锚，旧指纹不丢。
+        code40, msg40 = write_sections(
+            root, sp39_pins, cov_changed2, written39, [DECLARATION], "测试：第二次改写"
+        )
+        written40 = json.loads(sp39_pins.read_text(encoding="utf-8"))["sections"]
+        entry40 = written40.get(cov_key, {})
+        history40 = entry40.get("history") or []
+        cov_new2 = fingerprint(cov_changed2[cov_key], cov_spec["start"], cov_spec["end"])
+        chain_ok = (
+            len(history40) == 2
+            and history40[0].get("from") == cov_now
+            and history40[1].get("from") == history40[0].get("to")
+            and history40[-1].get("to") == cov_new2
+        )
+        errors40 = evaluate(
+            root, cov_changed2, current, written40, [record], {}
+        )
+        trace = next(
+            (item for item in errors40 if "无复核声明下区段内容已变更" in item), ""
+        )
+        ok40 = code40 == 0 and chain_ok and bool(trace) and "已变更 2 次" in trace
+        total += 1
+        failures += 0 if ok40 else 1
+        print(
+            f"| SP40 | 第二次变更与历史链 | 通过 | {'通过' if ok40 else '阻断'} | "
+            f"rc={code40}；history={len(history40)}；链首保留={history40[0].get('from') == cov_now if history40 else False}；"
+            f"{trace[:80] if trace else '未报持续变更'} |"
         )
 
         schema_path = root / "spec" / "CHECKER_INPUT_SCHEMA.md"
