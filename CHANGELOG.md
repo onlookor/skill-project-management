@@ -1565,3 +1565,28 @@
 - **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-149 的“批次 0092 追记”；`scripts/checker-pins.json` 中 `check_spec_pins.py`、`check_three_table.py`、`test_check_table_mutations.py` 三项的 `invalidated`；`scripts/no-review-declarations.json` 中 `test_spec_pins.py`、`no-review-declarations.json` 两项的 `reason`/`missing_review`；`scripts/no-review-declarations.json` 的 `date_unverified`；本节。
 - **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`。
 - **关联 ADR**：无
+
+---
+
+### 批次 0093 — 2026-11-16 — 落库 batch8 四条 basis；更正 T-166 引用计数
+
+- **授权依据**：第八轮外复核（基线 `44573db`）七项认可、一项不认可（T-166 引用计数失实），无阻断级缺陷；本批按裁定执行。
+- **涉及文件**：`scripts/checker-pins.json`、`scripts/no-review-declarations.json`、`TODO.md`、`CHANGELOG.md`。未改任何检查器逻辑、未改任何 basis 文本、未触碰 `CONSTITUTION.md` 与 `spec/D6_REBASELINE_PROPOSAL.md`、未改历史复核产物字节。
+- **一、落库 batch8 四条 basis（逐字转写）**
+  - 来源：`/home/wgz/projects/skills/2026-11-16/pm-governance-review/batch8/REPORT.md` 第二节的四个围栏块，程序化提取，**一个对象一条**，未改写、未拼接、未跨对象复用。
+  - 对象与回灌结果（`scripts/check_checker_pins.py` 自带 `valid_basis()`，均返回 `(True, "")`）：
+    - `scripts/check_spec_pins.py` → `(True, "")`
+    - `scripts/check_three_table.py` → `(True, "")`
+    - `scripts/test_spec_pins.py` → `(True, "")`
+    - `scripts/test_check_table_mutations.py` → `(True, "")`
+  - 三条原带 `invalidated` 的对象（`check_spec_pins.py`、`check_three_table.py`、`test_check_table_mutations.py`）在 basis 验证通过后**人工移除**该标记。
+  - `.githooks/pre-commit` 沿用第七批已登记 basis（本批未改该文件），未重复落库。
+  - `scripts/test_spec_pins.py` 由无复核声明转为已复核，其登记项已从 `scripts/no-review-declarations.json` 删除；同时刷新该文件自身哈希。
+- **二、更正 T-166 引用计数**
+  - `TODO.md` T-166 的“（26 条 basis 引用其 sha256）”改为“（3 条已登记 basis 引用其 sha256）”。
+  - `scripts/no-review-declarations.json` 的 `date_unverified.reason` 有同一失实数字，一并更正为“3 条已登记 basis”；不动欠账逻辑、不动任何 basis。
+- **验证**：`check_checker_pins` 2 项（2 条无复核声明）；`check_spec_pins` 1 项（A.2 日期未核验，T-166）；其余检查器与四套测试 rc=0（未改动检查器逻辑）。
+- **账目**：无复核/失效登记对象数 **6 → 2**（`check_checker_pins.py`、`no-review-declarations.json`）；受钉对象键总数不变（checker 22 + spec 16）。
+- **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-149 的“批次 0093 追记”；`scripts/no-review-declarations.json` 中 `check_checker_pins.py`、`no-review-declarations.json` 两项的 `reason`/`missing_review`；本节。
+- **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`。
+- **关联 ADR**：无

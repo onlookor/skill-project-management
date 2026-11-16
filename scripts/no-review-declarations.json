@@ -9,16 +9,9 @@
       "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
       "todo": "T-149"
     },
-    "scripts/test_spec_pins.py": {
-      "reason": "批次 0076/0079 的钉扎收紧改动本身未经复核；0087 新增 SP24/SP24b/SP25/SP26；0088 新增 SP27（签收行内注入叙述）与 SP28（签收行不在尾部），并同步 SP25 的模板分隔符；0091 把 SP25 改为“日期只出现在无关位置”，新增 SP31/SP32/SP33；0092 改写 SP31-SP33 并新增 SP34/SP35/SP36（围栏代码块内记号、两个记号、缺记号）；这些修复尚未经外复核",
-      "missing_review": "对钉扎检查器与测试改动的非同源复核；含 0088 两条签收行正负例与 0091/0092 六条复核日期正负例",
-      "due": "M1 出口前",
-      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
-      "todo": "T-149"
-    },
     "scripts/no-review-declarations.json": {
-      "reason": "0079 起新纳入钉扎面，纳入时无复核产物；0090/0091/0092 又多次增删登记项，本批改动尚未经外复核",
-      "missing_review": "对新增受保护对象的非同源复核；含 0090/0091/0092 的登记表增删",
+      "reason": "0079 起新纳入钉扎面，纳入时无复核产物；0090/0091/0092 多次增删登记项；0093 移出已获复核的 `scripts/test_spec_pins.py` 登记项，本批改动尚未经外复核",
+      "missing_review": "对新增受保护对象的非同源复核；含 0090/0091/0092/0093 的登记表增删",
       "due": "M1 出口前",
       "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
       "todo": "T-149"
@@ -27,7 +20,7 @@
   "spec": {},
   "date_unverified": {
     "spec/methods/deterministic-checker.md#A.2": {
-      "reason": "签收行日期 2026-11-16 与登记项 review_date（origin: executor）一致，但复核产物 batch5/REVIEW-RECORD.md 中无专用记号 `<!-- 复核日期：2026-11-16 -->`。批次 0092 起不再接受独立日期记录或任意位置的同日子串，故 check_spec_pins 报“日期未核验”；该产物不可改字节（26 条 basis 引用其 sha256）。",
+      "reason": "签收行日期 2026-11-16 与登记项 review_date（origin: executor）一致，但复核产物 batch5/REVIEW-RECORD.md 中无专用记号 `<!-- 复核日期：2026-11-16 -->`。批次 0092 起不再接受独立日期记录或任意位置的同日子串，故 check_spec_pins 报“日期未核验”；该产物不可改字节（3 条已登记 basis 引用其 sha256）。",
       "missing_review": "一次轻量复核：由复核方对当前 A.2 出具含专用记号的复核产物（或书面确认日期）；在此之前该项不计为合规。",
       "due": "M1 出口前",
       "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
