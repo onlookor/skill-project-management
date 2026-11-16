@@ -1,0 +1,375 @@
+{
+  "summary": {
+    "run_id": "phase3-public-uc",
+    "generated_at": "2026-11-16T23:11:59+08:00",
+    "task_set_version": "0.1.0-skeleton",
+    "models": "not_executed",
+    "total": 5,
+    "pass": 5,
+    "mismatch": 0,
+    "exit_codes": {
+      "0": 4,
+      "3": 1
+    },
+    "observations": [
+      "D6-PUB-08 按设计返回 3：依赖省略 lag 时 schedule.critical_path 判 cannot_evaluate，其余 5 项通过；固定了“未声明滞后不等于 0”的运行时口径。",
+      "dependency-graph 的 due_day 上限为 3650 天，无法表达 15 年周期（2013 重置 → 2028 完成），故 D6-PUB-07 不设里程碑期限，只验证网络与关键路径可算；长周期期限表达记为实现缺口，未为凑通过而缩放年限。",
+      "风险类别取值受 schema 闭集限制（technical/resource/external/organizational/scope），“治理”类问题按 organizational 登记，未新增类别。",
+      "成本与状态件不读 CFG-09 的只有状态件（成本件走 V-CFG09-GBP 变体）；状态件的金额仍为 GBP 数值，主配置为 CNY，属未覆盖项。",
+      "模型弱档/对照档/无技能臂仍未执行（无权重/需外部 API）。"
+    ]
+  },
+  "results": [
+    {
+      "task_id": "D6-PUB-07",
+      "case_id": "NAO-UNIVERSAL-CREDIT",
+      "title": "Universal Credit 重置期网络：2013 年 2–5 月重置与 2028 完成",
+      "artifact": "validation/cases/NAO-UNIVERSAL-CREDIT/inputs/dependency-graph.json",
+      "checks": [
+        "dep.ids_unique",
+        "dep.endpoints_exist",
+        "dep.acyclic",
+        "dep.types_valid",
+        "dep.wbs_mapping",
+        "schedule.critical_path"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "dep.ids_unique",
+          "dep.endpoints_exist",
+          "dep.acyclic",
+          "dep.types_valid",
+          "dep.wbs_mapping",
+          "schedule.critical_path"
+        ]
+      },
+      "config_variant": null,
+      "config": "validation/d6/acceptance-config.json",
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 0,
+        "findings": [
+          {
+            "check": "dep.ids_unique",
+            "detail": "5 个活动 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.endpoints_exist",
+            "detail": "4 条依赖端点闭合",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.acyclic",
+            "detail": "DAG 无环",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.types_valid",
+            "detail": "依赖类型均在 FS/SS/FF/SF 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.wbs_mapping",
+            "detail": "活动↔工作包映射完整",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "schedule.critical_path",
+            "detail": "总工期 5320.0；关键活动 ['RESET', 'DESIGN', 'BUILD', 'ROLLOUT', 'DONE']",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:7312736060288cd532e854744ed11b7a77f1772ffcb353947b6a637e01bfef88"
+      }
+    },
+    {
+      "task_id": "D6-PUB-08",
+      "case_id": "NAO-UNIVERSAL-CREDIT",
+      "title": "Universal Credit 不能判定例：依赖未声明 lag，关键路径无法区分零滞后",
+      "artifact": "validation/cases/NAO-UNIVERSAL-CREDIT/inputs/dependency-graph-no-lag.json",
+      "checks": [
+        "dep.ids_unique",
+        "dep.endpoints_exist",
+        "dep.acyclic",
+        "dep.types_valid",
+        "dep.wbs_mapping",
+        "schedule.critical_path"
+      ],
+      "expected": {
+        "outcome": "cannot_evaluate",
+        "exit_code": 3,
+        "must_flag": [
+          "schedule.critical_path"
+        ],
+        "must_pass": [
+          "dep.ids_unique",
+          "dep.endpoints_exist",
+          "dep.acyclic",
+          "dep.types_valid",
+          "dep.wbs_mapping"
+        ]
+      },
+      "config_variant": null,
+      "config": "validation/d6/acceptance-config.json",
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 3,
+        "findings": [
+          {
+            "check": "dep.ids_unique",
+            "detail": "5 个活动 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.endpoints_exist",
+            "detail": "4 条依赖端点闭合",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.acyclic",
+            "detail": "DAG 无环",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.types_valid",
+            "detail": "依赖类型均在 FS/SS/FF/SF 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.wbs_mapping",
+            "detail": "活动↔工作包映射完整",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "schedule.critical_path",
+            "detail": "依赖 RESET→DESIGN 未给出 lag，无法区分“无滞后”与“滞后期为 0”",
+            "path": "",
+            "status": "cannot_evaluate"
+          }
+        ],
+        "failed_checks": [],
+        "cannot_evaluate_checks": [
+          "schedule.critical_path"
+        ],
+        "artifact_digest": "sha256:5af62a4c9d42d94c9ee1bbd7fe5d213b199d7f3acd41ce6ba0b8fbe8494c599d"
+      }
+    },
+    {
+      "task_id": "D6-PUB-09",
+      "case_id": "NAO-UNIVERSAL-CREDIT",
+      "title": "Universal Credit 成本汇总：£2,850m 与 +£912m 变更包",
+      "artifact": "validation/cases/NAO-UNIVERSAL-CREDIT/inputs/cost-budget.json",
+      "checks": [
+        "budget.accounts_registered",
+        "budget.package_unique",
+        "budget.total_conserved",
+        "budget.time_phased_sum",
+        "budget.currency_match"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "budget.accounts_registered",
+          "budget.package_unique",
+          "budget.total_conserved",
+          "budget.time_phased_sum",
+          "budget.currency_match"
+        ]
+      },
+      "config_variant": "V-CFG09-GBP",
+      "config": "validation/d6/configs/V-CFG09-GBP.json",
+      "config_digest": "sha256:9c08d7c34304511af1bd0c8e9480282ae20314362521861dc3f9fffb172cf548",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 0,
+        "findings": [
+          {
+            "check": "budget.accounts_registered",
+            "detail": "全部工作包科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.package_unique",
+            "detail": "4 个工作包 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.total_conserved",
+            "detail": "每个科目与总额均守恒，合计 2850000000.0",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.time_phased_sum",
+            "detail": "每个工作包的分时段金额之和等于总额",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.currency_match",
+            "detail": "货币与 CFG-09 一致",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:c4a97b4cf0a564683e28586a5c29977b712eb7ea0753f2a93eac7847d7d8e81d"
+      }
+    },
+    {
+      "task_id": "D6-PUB-10",
+      "case_id": "NAO-UNIVERSAL-CREDIT",
+      "title": "Universal Credit 风险登记册：治理、承包商、系统开发三类公开风险",
+      "artifact": "validation/cases/NAO-UNIVERSAL-CREDIT/inputs/risk-register.json",
+      "checks": [
+        "risk.required_fields",
+        "risk.scale_in_range",
+        "risk.residual_le_initial",
+        "risk.owner_registered",
+        "risk.band_consistent"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "risk.required_fields",
+          "risk.scale_in_range",
+          "risk.residual_le_initial",
+          "risk.owner_registered",
+          "risk.band_consistent"
+        ]
+      },
+      "config_variant": null,
+      "config": "validation/d6/acceptance-config.json",
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 0,
+        "findings": [
+          {
+            "check": "risk.required_fields",
+            "detail": "3 条风险字段齐备",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.scale_in_range",
+            "detail": "概率与影响均在 3×3 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.residual_le_initial",
+            "detail": "残余评分均不高于初始评分",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.owner_registered",
+            "detail": "风险责任人角色均已登记",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.band_consistent",
+            "detail": "初始评分均落在 CFG-14 分档内",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:e3c87f62bc3d897b15dd1ff315ba2eb35edfe350b8d3864d6ffa1133e5d31de8"
+      }
+    },
+    {
+      "task_id": "D6-PUB-11",
+      "case_id": "NAO-UNIVERSAL-CREDIT",
+      "title": "Universal Credit 状态快照：无法评估系统价值的指标显式登记不可用",
+      "artifact": "validation/cases/NAO-UNIVERSAL-CREDIT/inputs/status-snapshot.json",
+      "checks": [
+        "status.dictionary_fields",
+        "status.no_implicit_zero",
+        "status.sample_grid",
+        "status.account_registered"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "status.dictionary_fields",
+          "status.no_implicit_zero",
+          "status.sample_grid",
+          "status.account_registered"
+        ]
+      },
+      "config_variant": null,
+      "config": "validation/d6/acceptance-config.json",
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 0,
+        "findings": [
+          {
+            "check": "status.dictionary_fields",
+            "detail": "数据字典齐备且测量指标均已登记",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.no_implicit_zero",
+            "detail": "缺数均显式登记了 unavailable_reason",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.sample_grid",
+            "detail": "2 个采样点均与配置口径一致",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.account_registered",
+            "detail": "测量科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:5eee044fea154eebd46541fbd3f2b14de7b248b8c9f9e1e9fec1fdb964464899"
+      }
+    }
+  ]
+}

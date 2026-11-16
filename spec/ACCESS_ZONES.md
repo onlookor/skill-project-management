@@ -56,6 +56,7 @@
 | `validation/d6/results/` | P | P2 | D6 运行记录（非权威） |
 | `validation/d6/results/phase1-synthetic/run.json` | C | — | D6 批次 1 机器可读运行记录 |
 | `validation/d6/results/phase2-public-crossrail/run.json` | C | — | D6 批次 2 机器可读运行记录 |
+| `validation/d6/results/phase3-public-uc/run.json` | C | — | D6 批次 3 机器可读运行记录 |
 | `validation/` | P | P1 | 验证与复核材料 |
 
 ## 2. 数据区准入登记

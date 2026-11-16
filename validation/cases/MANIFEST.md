@@ -15,7 +15,7 @@
 | case_id | 机构 / 报告 | 报告号与日期 | 许可 | 访问日期 | 核验状态 | 已入库改造素材 | 对应题目 |
 |---|---|---|---|---|---|---|---|
 | `NAO-CROSSRAIL` | UK National Audit Office, *Completing Crossrail* | HC 2106，2019-05-03 | OGL v3.0 | 2026-11-16 | 摘要级已核实 | `validation/cases/NAO-CROSSRAIL/inputs/`（6 件，已运行：`phase2-public-crossrail`） | D6-PUB-01～06 |
-| `NAO-UNIVERSAL-CREDIT` | UK National Audit Office, *Universal Credit: early progress*；*Rolling out Universal Credit* | HC 1123，2018-06-15；早期报告 2013 | OGL v3.0 | 2026-11-16 | 摘要级已核实 | `validation/cases/NAO-UNIVERSAL-CREDIT/inputs/`（待建） | D6-PUB-07～11 |
+| `NAO-UNIVERSAL-CREDIT` | UK National Audit Office, *Universal Credit: early progress*；*Rolling out Universal Credit* | HC 1123，2018-06-15；早期报告 2013 | OGL v3.0 | 2026-11-16 | 摘要级已核实 | `validation/cases/NAO-UNIVERSAL-CREDIT/inputs/`（5 件，已运行：`phase3-public-uc`） | D6-PUB-07～11 |
 | `NAO-HS2` | UK National Audit Office, *High Speed Two reset* | 2026 年报告 | OGL v3.0 | 2026-11-16 | 摘要级已核实 | `validation/cases/NAO-HS2/inputs/`（待建） | D6-PUB-12～17 |
 | `NAO-NPFIT` | UK National Audit Office, *The National Programme for IT in the NHS: an update on the delivery of detailed care records systems* | HC 888，2011 | OGL v3.0 / Parliamentary copyright | 2026-11-16 | 摘要级已核实 | `validation/cases/NAO-NPFIT/inputs/`（待建） | D6-PUB-18～22 |
 
@@ -31,7 +31,7 @@
 | case_id | 使用的公开事实 | 改造方式 | 局限 |
 |---|---|---|---|
 | `NAO-CROSSRAIL` | £14.8bn（2010）、£17.6bn（2018-12）、+£2.8bn、£12.5bn 已支出、93% 完成（2018-07）、9 座新站、每小时 24 列车 | 阶段→活动与 FS 依赖；资金包→成本工作包；完成度/支出→状态与推导 EVM；2018-12 开通→里程碑 due_day | 无承包商 EVM 三值；EVM 为推导值 |
-| `NAO-UNIVERSAL-CREDIT` | 2013-02～05 重置、系统开发 >£300m 且无法评估价值、2020 预测 £2,850m、+£912m、完成推迟至 2028 | 重置→里程碑网络；成本→实施包+变更包；不可评估价值→`value=null` + `unavailable_reason` | 无分 WBS 公开明细 |
+| `NAO-UNIVERSAL-CREDIT` | 2013-02～05 重置、系统开发 >£300m 且无法评估价值、2020 预测 £2,850m、+£912m、完成推迟至 2028 | 重置→里程碑网络；成本→实施包+变更包；不可评估价值→`value=null` + `unavailable_reason` | 无分 WBS 公开明细；`due_day` 上限 3650 天，2028 目标（约 5475 天）无法表达，故不设里程碑期限；风险类别受 schema 闭集限制 |
 | `NAO-HS2` | £87.7bn–£102.7bn、较 2020 翻倍、2023 取消 Phase 2、Euston 暂停两年、£1.5bn 已支出（2022-12） | 上界/下界→预算口径；取消→悬挂依赖负例；暂停→不可用进度指标 | 成本是区间，题内必须显式标口径 |
 | `NAO-NPFIT` | £11.4bn、项目提前关闭未实现目标 | 类别→成本包；关闭→审计记录；目标未达成→不可用指标 | 无分年度 EVM 三值；不设 EVM 题 |
 
@@ -52,7 +52,7 @@
 
 ## 4. 待办与未入库
 
-- 公开案例的输入 JSON：Crossrail 6 件已建立并运行（批次 2，`validation/d6/results/phase2-public-crossrail/`）；其余 16 题仍为 `input_status: planned`，按 Universal Credit → HS2 → NPfIT 顺序在后续批次改造并逐题回填。
+- 公开案例的输入 JSON：Crossrail 6 件（批次 2）、Universal Credit 5 件（批次 3）已建立并运行；其余 11 题仍为 `input_status: planned`，按 HS2 → NPfIT 顺序在后续批次改造并逐题回填。
 - Crossrail 成本/挣值件按 GBP 建立，运行需 `V-CFG09-GBP` 变体快照（主配置 CFG-09=CNY），变体题单列、不计入主运行；状态件不参与货币核对，其金额仍为公开报告的 GBP 数值，属未覆盖项（已在运行记录中标注）。
 - 未核验到公开 EVM 三值的案例（NPfIT）不设 EVM 题；Crossrail 的 EVM 题标注为推导值，不冒充官方 EVM。
 - 未纳入本批的候选源（F-35 GAO 报告等）因报告号/明细未在本次访问中核实，暂不入库，避免以未核验编号充作出处。

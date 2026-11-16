@@ -1797,3 +1797,19 @@
 - **未做**：Universal Credit / HS2 / NPfIT 共 16 题仍 `planned`；模型弱档/对照档/无技能臂未执行（无权重、或需外部 API，等待确认路线）；D6-SYN-02 的退出码聚合优先级按上级裁定原样保留为待裁定项，未改检查器与提案。
 - **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-173（归区）、T-150 / T-156（批次进展）；`scripts/no-review-declarations.json` 的 `spec/ACCESS_ZONES.md` 条目；本节。
 - **关联 ADR**：ADR-0020（案例素材处理）
+
+---
+
+### 批次 0105 — 2026-11-16 — D6 公开案例批次 2：Universal Credit 5 题改造与运行
+
+- **涉及文件**：`validation/cases/NAO-UNIVERSAL-CREDIT/inputs/dependency-graph.json`、`dependency-graph-no-lag.json`、`cost-budget.json`、`risk-register.json`、`status-snapshot.json`；`validation/d6/results/phase3-public-uc/{run.json,SUMMARY.md}`；`validation/d6/tasks/task-set.json`、`validation/cases/MANIFEST.md`、`spec/ACCESS_ZONES.md`、`scripts/no-review-declarations.json`、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`knowledge/glossary-usage.json`、`TODO.md`、`CHANGELOG.md`
+- **变更摘要**：
+  - 改造 5 件输入：重置→里程碑网络（正例）、同网络省略 `lag`（不能判定例）、实施成本（2,850m 含 912m 变更包）、风险台账（3 条，3×3）、状态快照（AC 有值、EV 因“无法评估系统价值”取 `null` 并附 `unavailable_reason`）。仅写改造后场景事实，不复制 NAO 正文。
+  - 运行结果 5/5 符合期望：D6-PUB-07/09/10/11 退出 0；D6-PUB-08 退出 3（`schedule.critical_path` 因 `lag` 未声明判 `cannot_evaluate`，其余检查通过）——该口径题按设计成立，未把 `cannot_evaluate` 计为通过。
+  - 暴露并登记一项实现缺口：`dependency-graph` 的 `due_day` 上限 3650 天，无法表达 2013→2028 的 15 年周期；未缩放年限去凑“按期完成”，改为不设里程碑期限并在运行记录与台账标注局限。
+  - `spec/ACCESS_ZONES.md` 增批次 3 运行记录一行 C 区归区；本批无新复核，按 3.5.3 新建 T-174 并以 `--no-verify` 提交。
+- **实测**：`pm_check --artifact` 5 次；`check_no_raw_material` 0、`check_anchors` 0、`check_state` 0、`check_three_table` 0、`check_ledger_landings` 0、`check_coverage_gate` 0、`check_gap_ledger` 0、`check_glossary_usage` 0（行位移后已 `--write`）；`check_checker_pins` 7、`check_spec_pins` 7（无复核声明，含既有欠账）。
+- **钩子绕过**：本批提交携带 `Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-174`。
+- **未做**：HS2 6 题、NPfIT 5 题仍 `planned`；模型双臂未执行；D6-SYN-02 退出码聚合优先级按上级裁定原样保留，未改检查器与提案。
+- **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-174、T-150 / T-156；`scripts/no-review-declarations.json` 的 `spec/ACCESS_ZONES.md` 条目；本节。
+- **关联 ADR**：ADR-0020

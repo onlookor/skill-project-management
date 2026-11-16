@@ -13,8 +13,8 @@
     "public_case": 22,
     "synthetic": 10,
     "synthetic_ready": 10,
-    "public_inputs_ready": 6,
-    "public_inputs_planned": 16
+    "public_inputs_ready": 11,
+    "public_inputs_planned": 11
   },
   "sources": {
     "NAO-CROSSRAIL": {
@@ -429,9 +429,10 @@
         ]
       },
       "input": "validation/cases/NAO-UNIVERSAL-CREDIT/inputs/risk-register.json",
-      "input_status": "planned",
+      "input_status": "ready",
       "transformation": "把公开指出的治理、承包商与系统开发问题改造为三条风险；概率/影响用 3×3，残余评分由缓解后重估。",
-      "source_ref": "NAO-UNIVERSAL-CREDIT"
+      "source_ref": "NAO-UNIVERSAL-CREDIT",
+      "run_batch": "phase3-public-uc"
     },
     {
       "id": "D6-PUB-11",
@@ -460,9 +461,10 @@
         ]
       },
       "input": "validation/cases/NAO-UNIVERSAL-CREDIT/inputs/status-snapshot.json",
-      "input_status": "planned",
+      "input_status": "ready",
       "transformation": "“已投入超过 £300m 但无法评估系统价值”改造为 value=null + unavailable_reason，验证缺数不被当作零。",
-      "source_ref": "NAO-UNIVERSAL-CREDIT"
+      "source_ref": "NAO-UNIVERSAL-CREDIT",
+      "run_batch": "phase3-public-uc"
     },
     {
       "id": "D6-PUB-12",
