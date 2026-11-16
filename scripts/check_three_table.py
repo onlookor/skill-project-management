@@ -14,7 +14,9 @@
    新增字段未标注即报错。
 7. 输入域闭包：样例中实际出现的引用目标集合必须在 §3 的必需顶层键中声明。
 8. A.2 复核签收：A.2 区段内的“复核签收”行（应为区段最后一条非空行）必须携带当前
-   A.2 区段指纹；只改 A.2 再跑 `--write` 会使 A 表自洽，本条是唯一能阻断该绕过的机械检查（AGENTS 3.6.7）。
+   A.2 区段指纹，且所载基线/日期须与 `scripts/spec-pins.json` 中 A.2 basis 自洽
+   （基线等于 `复核基线：` 且存在于仓库；日期为合法日历日期且见于 `复核产物：` 文本）；
+   只改 A.2 再跑 `--write` 会使 A 表自洽，本条是唯一能阻断该绕过的机械检查（AGENTS 3.6.7）。
    签收行只接受固定模板整行匹配：`> 复核签收：外部复核基线 `<7–40 hex>`；`
    `<YYYY-MM-DD>；A.2 指纹 `<12 hex>``，行内不得含自由文本（批次 0088 甲方案）。
 
@@ -27,9 +29,11 @@ from __future__ import annotations
 import argparse
 import hashlib
 import importlib.util
+import json
 import re
 import subprocess
 import sys
+from datetime import date
 from pathlib import Path
 
 GRAMMAR = "GRAMMAR.md"
@@ -174,6 +178,68 @@ def parse_a2_signoff(text: str) -> tuple[str, str, str] | None:
             if match:
                 return match.group("baseline"), match.group("date"), match.group("fingerprint")
     return None
+
+
+def resolve_commit(root: Path, ref: str) -> str | None:
+    """把提交号（含缩写）解析为完整对象 id；不可解析返回 None。"""
+    result = subprocess.run(
+        ["git", "rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}"],
+        cwd=root,
+        capture_output=True,
+        text=True,
+    )
+    return result.stdout.strip() or None if result.returncode == 0 else None
+
+
+def a2_signoff_fact_issues(root: Path, signoff: tuple[str, str, str]) -> list[str]:
+    """签收行的 `外部复核基线` 与日期必须与 A.2 basis 自洽（批次 0090）。
+
+    - 基线须与 `scripts/spec-pins.json` 中 A.2 basis 的 `复核基线：` 逐字相同且存在于仓库；
+    - 日期须为合法日历日期，且以独立 `YYYY-MM-DD` 记号出现在 basis 的 `复核产物：` 文本中。
+    """
+    baseline, signed_at, _ = signoff
+    pins_path = root / "scripts" / "spec-pins.json"
+    key = f"{METHOD}#A.2"
+    try:
+        pins = json.loads(pins_path.read_text(encoding="utf-8"))
+        basis = (pins.get("sections") or {}).get(key, {}).get("basis")
+    except (OSError, json.JSONDecodeError) as exc:
+        return [f"无法读取 {pins_path.name} 核验 A.2 签收行：{exc}"]
+    if not basis:
+        return [f"A.2 未登记 basis，签收行基线 `{baseline}` 与日期 `{signed_at}` 无法核验"]
+    errors: list[str] = []
+    recorded = re.search(r"复核基线：`?([0-9a-f]{7,40})`?", basis)
+    if recorded is None:
+        return [f"A.2 basis 无 `复核基线：`，签收行基线 `{baseline}` 无法核验"]
+    if baseline != recorded.group(1):
+        signed_id = resolve_commit(root, baseline)
+        recorded_id = resolve_commit(root, recorded.group(1))
+        if signed_id != recorded_id:
+            errors.append(
+                f"A.2 签收行基线 `{baseline}` 与 spec-pins.json 中 basis 的 "
+                f"`复核基线：{recorded.group(1)}` 不一致"
+            )
+    if resolve_commit(root, baseline) is None:
+        errors.append(f"A.2 签收行基线不存在于仓库：{baseline}")
+    try:
+        date.fromisoformat(signed_at)
+    except ValueError:
+        errors.append(f"A.2 签收行日期不是合法日历日期：{signed_at}")
+    artifact = re.search(r"复核产物：`?([^`\s；，、]+)`?", basis)
+    if artifact is None:
+        errors.append(f"A.2 basis 无 `复核产物：`，签收行日期 `{signed_at}` 无法核对")
+    else:
+        path = Path(artifact.group(1))
+        if not path.is_file():
+            errors.append(f"A.2 复核产物不存在，无法核对签收行日期：{path}")
+        else:
+            record = path.read_text(encoding="utf-8", errors="replace")
+            if re.search(rf"(?<![0-9]){re.escape(signed_at)}(?![0-9])", record) is None:
+                errors.append(
+                    f"A.2 签收行日期 `{signed_at}` 未出现在复核产物 {path.name} 中"
+                    "（日期与复核记录不自洽）"
+                )
+    return errors
 
 
 def render_clause_ids(ids: list[str]) -> str:
@@ -537,6 +603,8 @@ def main() -> int:
                 f"`{signed_fingerprint}`，当前 A.2 指纹 `{current_a2}`；"
                 "改 A.2 后必须由非同源复核更新签收行，不得只跑 --write"
             )
+        for issue in a2_signoff_fact_issues(root, signoff):
+            errors.append(f"[错误] {issue}")
 
     print(
         f"三表对照：正文 {len(rules)} 条规则，判定列 {len(checks)} 个 check_id / "

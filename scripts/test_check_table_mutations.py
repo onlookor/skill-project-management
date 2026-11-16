@@ -224,7 +224,9 @@ def main() -> int:
         if original.count(anchor) != 1:
             signoff_rows.append(("S01", "只改 A.2 + --write，不更新签收", "阻断", "未执行", "-", "变异锚点不唯一"))
             signoff_rows.append(("S02", "改 A.2 并更新签收", "通过", "未执行", "-", "变异锚点不唯一"))
-            signoff_failures = 2
+            for case_id, forged in (("S03", "deadbee"), ("S04", "be974fe")):
+                signoff_rows.append((case_id, f"签收行基线改为 {forged}", "阻断", "未执行", "-", "变异锚点不唯一"))
+            signoff_failures = 4
         else:
             mutated = original.replace(anchor, replacement)
             target = Path(tmp) / "signoff.md"
@@ -233,7 +235,9 @@ def main() -> int:
             if write_result.returncode != 0:
                 signoff_rows.append(("S01", "只改 A.2 + --write，不更新签收", "阻断", "未执行", str(write_result.returncode), "A 表重建失败"))
                 signoff_rows.append(("S02", "改 A.2 并更新签收", "通过", "未执行", "-", "A 表重建失败"))
-                signoff_failures = 2
+                for case_id, forged in (("S03", "deadbee"), ("S04", "be974fe")):
+                    signoff_rows.append((case_id, f"签收行基线改为 {forged}", "阻断", "未执行", "-", "A 表重建失败"))
+                signoff_failures = 4
             else:
                 negative = run_checker(root, target)
                 negative_ok = (
@@ -258,12 +262,10 @@ def main() -> int:
                 else:
                     after_write = target.read_text(encoding="utf-8")
                     updated = re.sub(
-                        r"^> 复核签收：[^\n]*$",
-                        f"> 复核签收：外部复核基线 `a9ff5bb`；2026-11-16；"
-                        f"A.2 指纹 `{match.group(1)}`",
+                        r"(A\.2 指纹 `)[0-9a-f]{12}(`)",
+                        rf"\g<1>{match.group(1)}\g<2>",
                         after_write,
                         count=1,
-                        flags=re.M,
                     )
                     target.write_text(updated, encoding="utf-8")
                     positive = run_checker(root, target)
@@ -279,13 +281,34 @@ def main() -> int:
                             evidence(positive.stdout, "[通过]"),
                         )
                     )
+                    for case_id, forged in (("S03", "deadbee"), ("S04", "be974fe")):
+                        forged_text = re.sub(
+                            r"(外部复核基线 `)[0-9a-f]{7,40}(`)",
+                            rf"\g<1>{forged}\g<2>",
+                            updated,
+                            count=1,
+                        )
+                        target.write_text(forged_text, encoding="utf-8")
+                        drift = run_checker(root, target)
+                        drift_ok = drift.returncode == 1 and "不一致" in drift.stdout
+                        signoff_failures += 0 if drift_ok else 1
+                        signoff_rows.append(
+                            (
+                                case_id,
+                                f"签收行基线改为 {forged}",
+                                "阻断",
+                                "阻断" if drift_ok else "未阻断",
+                                str(drift.returncode),
+                                evidence(drift.stdout, "不一致"),
+                            )
+                        )
 
     print("| 编号 | 场景 | 预期 | 实际 | 退出码 | 证据 |")
     print("|---|---|---|---|---|---|")
     for row in signoff_rows:
         print("| " + " | ".join(row) + " |")
     print()
-    print(f"A.2 签收正负例 2 条，符合预期 {2 - signoff_failures} 条。")
+    print(f"A.2 签收正负例 4 条，符合预期 {4 - signoff_failures} 条。")
     if failures or signoff_failures:
         print("[失败] 存在未被检查器抓到或不符合预期的用例，第三层不通过。")
         return 1

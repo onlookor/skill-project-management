@@ -25,7 +25,9 @@ SP24b 格式不完整的 `复核签收：` 行（缺日期/指纹）→ 同样�
 SP25 合法单行签收行变更 → 仍按排除口径通过（签收行本身不参与比较）；
 SP26 出现第二行完整格式签收行 → 必须阻断（至多一行）；
 SP27 模板签收行内注入叙述文字 → 不再匹配模板、参与比较，A.2 必须判 basis 失效；
-SP28 签收行不在区段尾部 → 必须阻断。
+SP28 签收行不在区段尾部 → 必须阻断；
+SP29 签收行基线改为 `deadbee` → 必须阻断（与 basis 的 `复核基线：` 不一致且不存在）；
+SP30 签收行基线改为另一个真实提交 `be974fe` → 必须阻断（与 basis 不一致）。
 
 外部复核产物在系统临时目录中生成，不写入仓库。用法：
   python3 scripts/test_spec_pins.py [--root DIR]
@@ -81,6 +83,12 @@ def main() -> int:
         print("[错误] 变异锚点未命中，测试无意义。")
         return 1
 
+    signed_at = next(
+        match.group("date")
+        for line in current[TARGET].splitlines()
+        if (match := A2_SIGNOFF_RE.fullmatch(line))
+    )
+
     failures = 0
     total = 0
     print("| 编号 | 场景 | 预期 | 实际 | 证据 |")
@@ -107,11 +115,27 @@ def main() -> int:
 
     with tempfile.TemporaryDirectory() as tmp:
         artifact = Path(tmp) / "REPORT.md"
-        artifact.write_text("外部复核产物（测试用，不写入仓库）。\n", encoding="utf-8")
+        artifact.write_text(
+            "外部复核产物（测试用，不写入仓库）。\n"
+            f"复核日期：{signed_at}\n另见：2000-01-01\n",
+            encoding="utf-8",
+        )
         sha = hashlib.sha256(artifact.read_bytes()).hexdigest()
         baseline = subprocess.run(
             ["git", "rev-parse", "HEAD"], cwd=root, capture_output=True, text=True
         ).stdout.strip()
+
+        def retarget_signoff(text: str, target: str) -> str:
+            """把签收行的基线与测试用 basis 对齐（签收行事实核验要求二者一致）。"""
+            return re.sub(
+                r"(> 复核签收：外部复核基线 `)[0-9a-f]{7,40}(`)",
+                rf"\g<1>{target}\g<2>",
+                text,
+                count=1,
+            )
+
+        current[TARGET] = retarget_signoff(current[TARGET], baseline)
+        mutated[TARGET] = retarget_signoff(mutated[TARGET], baseline)
 
         def reviewed_pin(key: str, value: str) -> dict:
             basis = RECORD.format(
@@ -346,7 +370,7 @@ def main() -> int:
         resigned = dict(current)
         resigned[TARGET] = re.sub(
             r"(；)\d{4}-\d{2}-\d{2}(；A\.2 指纹)",
-            r"\g<1>2026-11-16\g<2>",
+            r"\g<1>2000-01-01\g<2>",
             current[TARGET],
             count=1,
         )
@@ -425,6 +449,32 @@ def main() -> int:
             [record],
             "最后一条非空行",
         )
+
+        # SP29/SP30：签收行所载基线必须与 basis 的 `复核基线：` 一致（批次 0090）。
+        for case_id, forged_baseline in (
+            ("SP29", "deadbee"),
+            ("SP30", "be974fe"),
+        ):
+            drift = dict(current)
+            drift[TARGET] = re.sub(
+                r"(> 复核签收：外部复核基线 `)[0-9a-f]{7,40}(`)",
+                rf"\g<1>{forged_baseline}\g<2>",
+                current[TARGET],
+                count=1,
+            )
+            drift_pins = dict(pins)
+            drift_pins[TARGET] = reviewed_pin(
+                TARGET, fingerprint(drift[TARGET], spec["start"], spec["end"])
+            )
+            run(
+                case_id,
+                f"签收行基线改为 {forged_baseline}",
+                drift,
+                current,
+                drift_pins,
+                [record],
+                "不一致",
+            )
 
         schema_path = root / "spec" / "CHECKER_INPUT_SCHEMA.md"
         extra = dict(current)

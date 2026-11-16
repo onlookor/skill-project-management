@@ -1472,3 +1472,30 @@
 - **验证**：`check_spec_pins` rc=1，问题由 14 降为 **13**（6 项无复核声明 + 7 项 basis 失效）；`check_checker_pins` rc=1，问题由 19 降为 **17**（14 项无复核声明 + 3 项 basis 失效：`.githooks/pre-commit`、`scripts/check_no_raw_material.py`、`scripts/test_check_table_mutations.py`）。
 - **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`。
 - **关联 ADR**：无
+
+---
+
+### 批次 0090 — 2026-11-16 — 修第五轮复核两条残余；存量 basis 对账落库
+
+- **授权依据**：责任方要求“先修残余、再对账落库”，避免刚落库的 basis 立刻失效。
+- **涉及文件**：
+  - 修改：`scripts/check_spec_pins.py`、`scripts/check_checker_pins.py`、`scripts/check_three_table.py`、`scripts/test_spec_pins.py`、`scripts/test_check_table_mutations.py`、`spec/methods/deterministic-checker.md`（A.2 签收行）、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`scripts/no-review-declarations.json`、`TODO.md`、`CHANGELOG.md`
+  - 未改：`CONSTITUTION.md`、`spec/D6_REBASELINE_PROPOSAL.md` 以及任何被钉对象的正文
+- **一、残余 1：失效 basis 的显示层（`invalidated`）**
+  - 两个 pins 检查器新增可选字符串字段 `invalidated`，**只作显示层**：不改变 basis 原文（`valid_basis()` 仍是唯一判据）、不构成任何放行；basis 失效时错误信息追加“；存储层已显式标记失效：<原因>”；basis 又变得可验证通过时反而报错，要求人工核实后移除标记；`--write` 原样保留该字段，不自动抹掉。无“声明即有效”通道。
+  - 已标记：`scripts/check_spec_pins.py`、`scripts/check_three_table.py`、`scripts/test_check_table_mutations.py`（三者原 basis 均为“结论：认可”，因本批改动而失效）。
+- **二、残余 2：签收行事实核验**
+  - `check_spec_pins.py`：`A2_SIGNOFF_RE` 改用具名组；新增 `resolve_commit()` 与 `a2_signoff_fact_errors()`——签收行所载基线须与 basis 的 `复核基线：` 解析为同一 commit 且存在于仓库；日期须为合法日历日期，且以独立 `YYYY-MM-DD` 记号出现在 `复核产物：` 所指文件文本中。
+  - `check_three_table.py`：新增 `resolve_commit()` 与 `a2_signoff_fact_issues()`，同一规则（读 `scripts/spec-pins.json` 的 A.2 basis）。
+  - A.2 签收行同步改为 `> 复核签收：外部复核基线 \`c6fa1cd\`；2026-11-16；A.2 指纹 \`b14854847668\``（原行指向旧基线 `a9ff5bb`，正是残余 1 所指的显示误判）。
+  - 回归用例：`test_spec_pins.py` 新增 **SP29**（`deadbee`）与 **SP30**（真实但不同的 `be974fe`）；`test_check_table_mutations.py` 新增 **S03**（`deadbee`）与 **S04**（`be974fe`）。结果 32/32 与 4/4 全符合预期。
+- **三、存量 basis 对账落库**
+  - 扫描 22 份外复核产物（`2026-11-14` 的 17 份 `verify-*/REPORT*.md`；`2026-11-15` 的 `batch3/`、`batch4/`、`batch5/` 的 REPORT 与 REVIEW-RECORD），排除 `_work/`、`probes/`、`_artifacts/` 转录副本，得候选 basis 行 36 条。
+  - 当前欠账对象 32 个；对每条候选逐条用检查器自带 `valid_basis()` 在 HEAD 上回灌，**落库 26 个**（spec 13 + checker 13，其中 `.githooks/pre-commit` 本不在登记表），**6 个不落**。逐字转写，未改写/拼接/补写；一个对象一条 basis；未为落库改动任何被钉对象正文。
+  - 不落的 6 个：`scripts/check_checker_pins.py`、`scripts/check_spec_pins.py`、`scripts/check_three_table.py`、`scripts/test_spec_pins.py`、`scripts/test_check_table_mutations.py`、`scripts/no-review-declarations.json`——均为本批（或 0089 之后）改动过的对象，候选 basis 在各自基线上的内容与 HEAD 不一致，按纪律留债。
+  - 登记表同步：`scripts/no-review-declarations.json` 由 20 条降为 **3 条**（`check_checker_pins.py`、`test_spec_pins.py`、`no-review-declarations.json`）；spec 段清空。
+- **验证**：提交前 `check_spec_pins` rc=1，问题 13 → **1**（A.2 区段相对 HEAD 已改动但同一提交没有复核记录；其 basis 本身仍有效）；本提交落盘后该 1 项消失，复查为 **0**（该门只拦未提交的区段改动）。`check_checker_pins` 提交前后均为 rc=1，问题 17 → **6**（3 项无复核声明 + 3 项 basis 失效，后者均已带 `invalidated` 标记）。其余检查器与测试全部 rc=0（`test_checker_pins` 21/21、`test_spec_pins` 32/32、`test_check_table_mutations` 11 变异 + 4 签收正负例、`test_coverage_gate` 4/4）。
+- **台账同步**：T-149 欠账对象 **20 → 6**（checker 6 + spec 0）；受钉对象键总数不变（checker 22 + spec 16）。
+- **“这批改动尚未经外复核”的登记位置**：`scripts/checker-pins.json` 中 `check_spec_pins.py`、`check_three_table.py`、`test_check_table_mutations.py` 三项的 `invalidated`；`scripts/no-review-declarations.json` 中 `check_checker_pins.py`、`test_spec_pins.py`、`no-review-declarations.json` 三项的 `reason`/`missing_review`；`TODO.md` T-149 的“批次 0090 追记”；本节。
+- **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`。
+- **关联 ADR**：无

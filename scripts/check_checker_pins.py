@@ -240,6 +240,7 @@ def main() -> int:
             if entry.get("sha256") != actual:
                 entry["sha256"] = actual
                 entry["basis"] = chosen[name]
+                # 显式失效标记只能人工增删；--write 原样保留，不自动抹掉。
             else:
                 entry.setdefault("sha256", actual)
                 entry.setdefault("basis", DECLARATION)
@@ -269,7 +270,15 @@ def main() -> int:
             continue
         ok, why = valid_basis(root, basis, name)
         if not ok:
-            errors.append(f"{name}：basis 不合格：{why}")
+            marked = entry.get("invalidated")
+            suffix = f"；存储层已显式标记失效：{marked}" if marked else ""
+            errors.append(f"{name}：basis 不合格：{why}{suffix}")
+        elif entry.get("invalidated"):
+            errors.append(
+                f"{name}：存储层标记 basis 失效（{entry['invalidated']}），"
+                "但当前 basis 可验证通过；须人工核实后移除该标记"
+                "（--write 不自动清除）"
+            )
 
     try:
         registry = load_registry(root)

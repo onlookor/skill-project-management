@@ -375,7 +375,7 @@
 
 **G-A2#2 可达性**：schema 第 2、3 节已为 `commitments[]` / `deliverables[]` 声明可选 `node_type`。提供且不在 `management_node_type` 内 → `cannot_evaluate` / `undefined_object_type`；未提供视为“未断言节点类型”，不触发本子句，也不影响 `G-A2#1`。这样该子句在声明输入域内可达，且不需要把 `node_type` 变成所有样例的必填键。
 
-> 复核签收：外部复核基线 `a9ff5bb`；2026-11-15；A.2 指纹 `b14854847668`
+> 复核签收：外部复核基线 `c6fa1cd`；2026-11-16；A.2 指纹 `b14854847668`
 
 ### A.1 参考样例（T-011）
 

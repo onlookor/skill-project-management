@@ -26,7 +26,14 @@
      理由与范围见 `validation/reviews/2026-11-15-a2-comparison-scope.md`。
      `--write` 只登记区段指纹，不生成也不改写签收行；签收行只能按上述固定模板人工写入，
      因而不存在“由工具重写签收行”的路径。
-  6. `--write` 新增或变更的区段必须附 `--basis`（合格复核记录，或无复核字面量）。
+     另核验签收行事实（批次 0090）：所载基线必须与登记 basis 的 `复核基线：` 一致且
+     在仓库存在；日期须为合法日历日期，且以独立 `YYYY-MM-DD` 记号出现在 basis 的
+     `复核产物：` 文本中（与复核记录自洽）。
+  6. 已判失效的对象可在登记项上带 `invalidated`（字符串原因）作为**显示层**标记：
+     它不改变 basis 原文，也不改变判定（`valid_basis()` 仍是唯一依据）；检查器报错时
+     附出该标记，且 basis 又变得可验证通过时会要求人工核实并移除标记。`--write` 原样
+     保留该字段，不自动清除。
+  7. `--write` 新增或变更的区段必须附 `--basis`（合格复核记录，或无复核字面量）。
 
 记录文件放在 validation/reviews/ 下并在同一提交暂存；也可用 --review 指定。
 这不是“签收人身份验证”：机器只能核对记录的存在与字段，不能验证复核者是谁。
@@ -46,6 +53,7 @@ import json
 import re
 import subprocess
 import sys
+from datetime import date
 from pathlib import Path
 
 PINS = Path("scripts/spec-pins.json")
@@ -160,29 +168,96 @@ A2_KEY = f"{METHOD}#A.2"
 # 该前缀就成了可夹带正文的通道（插入一行 `复核签收：……把判定改成恒真` 即可绕过）。
 # A.2 内至多一条，且必须位于区段尾部（最后一条非空行）。
 A2_SIGNOFF_RE = re.compile(
-    r"> 复核签收：外部复核基线 `[0-9a-f]{7,40}`；"
-    r"\d{4}-\d{2}-\d{2}；A\.2 指纹 `[0-9a-f]{12}`"
+    r"> 复核签收：外部复核基线 `(?P<baseline>[0-9a-f]{7,40})`；"
+    r"(?P<date>\d{4}-\d{2}-\d{2})；A\.2 指纹 `(?P<fingerprint>[0-9a-f]{12})`"
 )
 
 
-def a2_signoff_errors(spec: dict, text: str) -> list[str]:
-    """A.2 只允许一条固定模板签收行，且必须在区段尾部；否则报错。"""
+def resolve_commit(root: Path, ref: str) -> str | None:
+    """把提交号（含缩写）解析为完整对象 id；不可解析返回 None。"""
+    result = subprocess.run(
+        ["git", "rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}"],
+        cwd=root,
+        capture_output=True,
+        text=True,
+    )
+    return result.stdout.strip() or None if result.returncode == 0 else None
+
+
+def a2_signoff_fact_errors(
+    root: Path, key: str, match: re.Match, basis: str | None
+) -> list[str]:
+    """签收行事实核验：基线与 basis 一致、存在；日期合法且见于复核产物。"""
+    errors: list[str] = []
+    signed_baseline = match.group("baseline")
+    signed_at = match.group("date")
+    recorded = re.search(r"复核基线：`?([0-9a-f]{7,40})`?", basis or "")
+    if recorded is None:
+        errors.append(
+            f"{key}：basis 无可比对的 `复核基线：`，签收行基线 `{signed_baseline}`"
+            f"与日期 `{signed_at}` 无法核验"
+        )
+        return errors
+    if signed_baseline != recorded.group(1):
+        signed_id = resolve_commit(root, signed_baseline)
+        recorded_id = resolve_commit(root, recorded.group(1))
+        if signed_id != recorded_id:
+            errors.append(
+                f"{key}：签收行基线 `{signed_baseline}` 与 basis "
+                f"`复核基线：{recorded.group(1)}` 不一致"
+            )
+    if resolve_commit(root, signed_baseline) is None:
+        errors.append(f"{key}：签收行基线不存在于仓库：{signed_baseline}")
+    try:
+        date.fromisoformat(signed_at)
+    except ValueError:
+        errors.append(f"{key}：签收行日期不是合法日历日期：{signed_at}")
+    artifact = re.search(r"复核产物：`?([^`\s；，、]+)`?", basis or "")
+    if artifact is None:
+        errors.append(f"{key}：basis 无 `复核产物：`，签收行日期 `{signed_at}` 无法核对")
+    else:
+        path = Path(artifact.group(1))
+        if not path.is_file():
+            errors.append(f"{key}：复核产物不存在，无法核对签收行日期：{path}")
+        else:
+            record = path.read_text(encoding="utf-8", errors="replace")
+            if re.search(rf"(?<![0-9]){re.escape(signed_at)}(?![0-9])", record) is None:
+                errors.append(
+                    f"{key}：签收行日期 `{signed_at}` 未出现在复核产物 {path.name} 中"
+                    "（日期与复核记录不自洽）"
+                )
+    return errors
+
+
+def a2_signoff_errors(
+    root: Path, spec: dict, text: str, basis: str | None = None
+) -> list[str]:
+    """A.2 只允许一条固定模板签收行，必须在区段尾部，且事实可核验。"""
     if spec["key"] != A2_KEY:
         return []
     body = section_text(text, spec["start"], spec["end"])
     content = [line for line in body.splitlines() if line.strip()]
-    matches = [index for index, line in enumerate(content) if A2_SIGNOFF_RE.fullmatch(line)]
+    matches = [
+        (index, A2_SIGNOFF_RE.fullmatch(line))
+        for index, line in enumerate(content)
+        if A2_SIGNOFF_RE.fullmatch(line)
+    ]
     if len(matches) > 1:
         return [
             f"{spec['key']}：复核签收行至多一行（实得 {len(matches)} 行模板签收行）；"
             "多行签收不得被当作复核记录剔除，须保留唯一一条"
         ]
-    if matches and matches[0] != len(content) - 1:
-        return [
+    if not matches:
+        return []
+    index, match = matches[0]
+    errors: list[str] = []
+    if index != len(content) - 1:
+        errors.append(
             f"{spec['key']}：复核签收行必须是区段最后一条非空行"
-            f"（当前位于倒数第 {len(content) - matches[0]} 行）"
-        ]
-    return []
+            f"（当前位于倒数第 {len(content) - index} 行）"
+        )
+    errors.extend(a2_signoff_fact_errors(root, spec["key"], match, basis))
+    return errors
 
 
 def comparable_text(spec: dict, text: str) -> str:
@@ -369,7 +444,14 @@ def evaluate(
             errors.append(
                 f"{key}：指纹未更新（当前 {actual[:12]}，登记 {registered[:12]}）"
             )
-        errors.extend(a2_signoff_errors(spec, current[key]))
+        errors.extend(
+            a2_signoff_errors(
+                root,
+                spec,
+                current[key],
+                entry.get("basis") if isinstance(entry, dict) else None,
+            )
+        )
         if isinstance(entry, dict):
             basis = entry.get("basis")
             if not basis:
@@ -377,7 +459,15 @@ def evaluate(
             else:
                 ok, why = valid_basis(root, basis, key)
                 if not ok:
-                    errors.append(f"{key}：basis 不合格：{why}")
+                    marked = entry.get("invalidated")
+                    suffix = f"；存储层已显式标记失效：{marked}" if marked else ""
+                    errors.append(f"{key}：basis 不合格：{why}{suffix}")
+                elif entry.get("invalidated"):
+                    errors.append(
+                        f"{key}：存储层标记 basis 失效（{entry['invalidated']}），"
+                        "但当前 basis 可验证通过；须人工核实后移除该标记"
+                        "（--write 不自动清除）"
+                    )
         head_text = head.get(key)
         changed = head_text is None or fingerprint(head_text, spec["start"], spec["end"]) != actual
         if changed and not valid_review(root, reviews, key):
@@ -473,11 +563,19 @@ def main() -> int:
         pins = load_pins(pins_path)
         previous = pins.get("sections", {})
         if args.write:
-            structural = [
-                problem
-                for spec in SECTIONS
-                for problem in a2_signoff_errors(spec, current[spec["key"]])
-            ]
+            structural = []
+            for spec in SECTIONS:
+                old = previous.get(spec["key"])
+                if isinstance(old, str):
+                    old = {"sha256": old}
+                structural.extend(
+                    a2_signoff_errors(
+                        root,
+                        spec,
+                        current[spec["key"]],
+                        old.get("basis") if isinstance(old, dict) else None,
+                    )
+                )
             if structural:
                 for problem in structural:
                     print(f"[错误] {problem}")
@@ -516,6 +614,9 @@ def main() -> int:
                         else (old or {}).get("basis") or DECLARATION
                     ),
                 }
+                # 显式失效标记只能人工增删；--write 原样保留，不自动抹掉。
+                if isinstance(old, dict) and old.get("invalidated"):
+                    sections[key]["invalidated"] = old["invalidated"]
             pins = {
                 "version": 1,
                 "note": (
