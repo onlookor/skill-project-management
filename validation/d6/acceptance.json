@@ -1,6 +1,6 @@
 {
   "acceptance_version": "0.1.0",
-  "status": "skeleton",
+  "status": "mechanical_runtime_verified_models_pending",
   "baseline_models": {
     "weak": {
       "family": "Qwen2.5-Instruct",
@@ -57,5 +57,19 @@
     "flip_requires_declaration": true
   },
   "task_set": "validation/d6/tasks/task-set.json",
-  "case_manifest": "validation/cases/MANIFEST.md"
+  "case_manifest": "validation/cases/MANIFEST.md",
+  "runtime_evidence": {
+    "batches": [
+      "phase1-synthetic",
+      "phase2-public-crossrail",
+      "phase3-public-uc",
+      "phase4-public-hs2",
+      "phase5-public-npfit"
+    ],
+    "tasks_executed": 32,
+    "tasks_matching_expectation": 31,
+    "tasks_mismatching": 1,
+    "mismatch": "D6-SYN-02：违规与 cannot_evaluate 同时成立时聚合退出码优先级未定义，实际 3、按规范 4.5 期望 1；按上级裁定保留为待裁定项，未改检查器与期望",
+    "model_arms": "not_executed（无权重；需外部 API 或本地权重）"
+  }
 }

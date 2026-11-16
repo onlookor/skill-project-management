@@ -1829,3 +1829,19 @@
 - **未做**：NPfIT 5 题仍 `planned`；模型双臂未执行；D6-SYN-02 退出码聚合优先级按上级裁定原样保留，未改检查器与提案。
 - **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-175、T-150 / T-156；`scripts/no-review-declarations.json` 的 `spec/ACCESS_ZONES.md` 条目；本节。
 - **关联 ADR**：ADR-0020
+
+---
+
+### 批次 0107 — 2026-11-16 — D6 公开案例批次 4（NPfIT 5 题）；任务集输入全覆盖
+
+- **涉及文件**：`validation/cases/NAO-NPFIT/inputs/cost-budget.json`、`status-snapshot.json`、`audit-trail.json`、`audit-trail-gap.json`、`risk-register.json`；`validation/d6/results/phase5-public-npfit/{run.json,SUMMARY.md}`；`validation/d6/tasks/task-set.json`、`validation/d6/acceptance.json`、`validation/cases/MANIFEST.md`、`spec/ACCESS_ZONES.md`、`scripts/no-review-declarations.json`、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`knowledge/glossary-usage.json`、`TODO.md`、`CHANGELOG.md`
+- **变更摘要**：
+  - 改造 5 件输入：£11.4bn 按类别拆包的成本件、关闭后目标类指标 `value=null` 的状态件、两条记录首尾相接的审计正例、删除中间记录但链仍闭合的序号负例、三条风险。仅写改造后场景事实，不复制 NAO 正文；NPfIT 无官方 EVM 三值，故不设挣值题。
+  - 运行结果 5/5 符合期望：D6-PUB-18/19/20/22 退出 0；D6-PUB-21 仅 `audit.sequence_strict` 命中，退出 1（链摘要仍相接，证明“链对但序号断”能被单独识别）。
+  - 任务集 32 题输入全部就绪（公开 22 + 合成 10），机械运行 32/32；总计 31 题符合期望、1 题不符（D6-SYN-02 退出码聚合优先级，待裁定）。`acceptance.json` 新增 `runtime_evidence` 记录该统计与不符原因，`status` 改为 `mechanical_runtime_verified_models_pending`，**不构成 D6 达标结论**。
+  - `spec/ACCESS_ZONES.md` 增批次 5 运行记录一行 C 区归区；本批无新复核，按 3.5.3 新建 T-176 并以 `--no-verify` 提交。
+- **实测**：`pm_check --artifact` 5 次；`check_no_raw_material` 0、`check_anchors` 0、`check_state` 0、`check_three_table` 0、`check_ledger_landings` 0、`check_coverage_gate` 0、`check_gap_ledger` 0、`check_glossary_usage` 0；`check_checker_pins` 7、`check_spec_pins` 7（无复核声明，含既有欠账）。
+- **钩子绕过**：本批提交携带 `Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-176`。
+- **未做**：模型弱档/对照档/无技能臂未执行（无权重、或需外部 API，等待确认路线）；S2 变体只建了 `V-CFG09-GBP`，CFG-03/05/14/15 变体未建；D6-SYN-02 保持待裁定，未改检查器与提案。
+- **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-176、T-150 / T-156；`scripts/no-review-declarations.json` 的 `spec/ACCESS_ZONES.md` 条目；本节。
+- **关联 ADR**：ADR-0020

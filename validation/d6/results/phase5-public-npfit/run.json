@@ -1,0 +1,358 @@
+{
+  "summary": {
+    "run_id": "phase5-public-npfit",
+    "generated_at": "2026-11-16T23:16:38+08:00",
+    "task_set_version": "0.1.0-skeleton",
+    "models": "not_executed",
+    "total": 5,
+    "pass": 5,
+    "mismatch": 0,
+    "exit_codes": {
+      "0": 4,
+      "1": 1
+    },
+    "observations": [
+      "D6-PUB-21 为审计序号负例：删除中间记录后保留第 1、3 条，prev_digest 仍与第 1 条摘要相接（链闭合），仅 audit.sequence_strict 命中，退出 1；符合“链对但序号断”的设计。",
+      "NPfIT 无官方 EVM 三值，故本案例不设挣值题；成本按公开总额 11.4bn 拆包，拆分为改造值。",
+      "本批成本与状态件均按 GBP 建立并跑在 V-CFG09-GBP 变体下，未出现币种与配置不一致；审计与风险件无金额字段，不涉及 G-023 的未覆盖面。",
+      "模型弱档/对照档/无技能臂仍未执行（无权重/需外部 API）。"
+    ]
+  },
+  "results": [
+    {
+      "task_id": "D6-PUB-18",
+      "case_id": "NAO-NPFIT",
+      "title": "NPfIT 成本汇总：£11.4bn 按类别拆包",
+      "artifact": "validation/cases/NAO-NPFIT/inputs/cost-budget.json",
+      "checks": [
+        "budget.accounts_registered",
+        "budget.package_unique",
+        "budget.total_conserved",
+        "budget.time_phased_sum",
+        "budget.currency_match"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "budget.accounts_registered",
+          "budget.package_unique",
+          "budget.total_conserved",
+          "budget.time_phased_sum",
+          "budget.currency_match"
+        ]
+      },
+      "config_variant": "V-CFG09-GBP",
+      "config": "validation/d6/configs/V-CFG09-GBP.json",
+      "config_digest": "sha256:9c08d7c34304511af1bd0c8e9480282ae20314362521861dc3f9fffb172cf548",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 0,
+        "findings": [
+          {
+            "check": "budget.accounts_registered",
+            "detail": "全部工作包科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.package_unique",
+            "detail": "4 个工作包 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.total_conserved",
+            "detail": "每个科目与总额均守恒，合计 11400000000.0",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.time_phased_sum",
+            "detail": "每个工作包的分时段金额之和等于总额",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.currency_match",
+            "detail": "货币与 CFG-09 一致",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:9f2ec3d2ac27868649fdcccbc14ea4674761c4c44f2cbd5281a3f17ae086045c"
+      }
+    },
+    {
+      "task_id": "D6-PUB-19",
+      "case_id": "NAO-NPFIT",
+      "title": "NPfIT 状态快照：项目关闭后目标类指标显式不可用",
+      "artifact": "validation/cases/NAO-NPFIT/inputs/status-snapshot.json",
+      "checks": [
+        "status.dictionary_fields",
+        "status.no_implicit_zero",
+        "status.sample_grid",
+        "status.account_registered"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "status.dictionary_fields",
+          "status.no_implicit_zero",
+          "status.sample_grid",
+          "status.account_registered"
+        ]
+      },
+      "config_variant": "V-CFG09-GBP",
+      "config": "validation/d6/configs/V-CFG09-GBP.json",
+      "config_digest": "sha256:9c08d7c34304511af1bd0c8e9480282ae20314362521861dc3f9fffb172cf548",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 0,
+        "findings": [
+          {
+            "check": "status.dictionary_fields",
+            "detail": "数据字典齐备且测量指标均已登记",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.no_implicit_zero",
+            "detail": "缺数均显式登记了 unavailable_reason",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.sample_grid",
+            "detail": "2 个采样点均与配置口径一致",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.account_registered",
+            "detail": "测量科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:bc8e8287cdff46cd4636e58add7d207cc3ecc7fac637708122847b7fd3fec2df"
+      }
+    },
+    {
+      "task_id": "D6-PUB-20",
+      "case_id": "NAO-NPFIT",
+      "title": "NPfIT 审计留痕：提前关闭决策的证据链",
+      "artifact": "validation/cases/NAO-NPFIT/inputs/audit-trail.json",
+      "checks": [
+        "audit.required_fields",
+        "audit.chain_digest",
+        "audit.sequence_strict",
+        "audit.exit_code_valid",
+        "audit.evidence_present"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "audit.required_fields",
+          "audit.chain_digest",
+          "audit.sequence_strict",
+          "audit.exit_code_valid",
+          "audit.evidence_present"
+        ]
+      },
+      "config_variant": null,
+      "config": "validation/d6/acceptance-config.json",
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 0,
+        "findings": [
+          {
+            "check": "audit.required_fields",
+            "detail": "2 条记录字段齐备",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "audit.chain_digest",
+            "detail": "2 条记录首尾相接",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "audit.sequence_strict",
+            "detail": "序号严格递增且连续",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "audit.exit_code_valid",
+            "detail": "退出码均在 0–4 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "audit.evidence_present",
+            "detail": "非零结论均附证据路径",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:14eeb2de034ddcf88680711e9500457fcd23299192a23f27a077f8491286a200"
+      }
+    },
+    {
+      "task_id": "D6-PUB-21",
+      "case_id": "NAO-NPFIT",
+      "title": "NPfIT 审计负例：关闭记录序号 1、3 不连续",
+      "artifact": "validation/cases/NAO-NPFIT/inputs/audit-trail-gap.json",
+      "checks": [
+        "audit.required_fields",
+        "audit.chain_digest",
+        "audit.sequence_strict",
+        "audit.exit_code_valid",
+        "audit.evidence_present"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "audit.sequence_strict"
+        ],
+        "must_pass": [
+          "audit.required_fields",
+          "audit.chain_digest",
+          "audit.exit_code_valid",
+          "audit.evidence_present"
+        ]
+      },
+      "config_variant": null,
+      "config": "validation/d6/acceptance-config.json",
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 1,
+        "findings": [
+          {
+            "check": "audit.required_fields",
+            "detail": "2 条记录字段齐备",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "audit.chain_digest",
+            "detail": "2 条记录首尾相接",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "audit.sequence_strict",
+            "detail": "序号不是从 1 起的连续整数：[1, 3]",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "audit.exit_code_valid",
+            "detail": "退出码均在 0–4 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "audit.evidence_present",
+            "detail": "非零结论均附证据路径",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [
+          "audit.sequence_strict"
+        ],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:0ed3e38f6a1414b780160605df4866770bdd82db8c5146fad2b337b830d5fc7d"
+      }
+    },
+    {
+      "task_id": "D6-PUB-22",
+      "case_id": "NAO-NPFIT",
+      "title": "NPfIT 风险登记册：范围、供应商、临床采纳",
+      "artifact": "validation/cases/NAO-NPFIT/inputs/risk-register.json",
+      "checks": [
+        "risk.required_fields",
+        "risk.scale_in_range",
+        "risk.residual_le_initial",
+        "risk.owner_registered",
+        "risk.band_consistent"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "risk.required_fields",
+          "risk.scale_in_range",
+          "risk.residual_le_initial",
+          "risk.owner_registered",
+          "risk.band_consistent"
+        ]
+      },
+      "config_variant": null,
+      "config": "validation/d6/acceptance-config.json",
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 0,
+        "findings": [
+          {
+            "check": "risk.required_fields",
+            "detail": "3 条风险字段齐备",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.scale_in_range",
+            "detail": "概率与影响均在 3×3 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.residual_le_initial",
+            "detail": "残余评分均不高于初始评分",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.owner_registered",
+            "detail": "风险责任人角色均已登记",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.band_consistent",
+            "detail": "初始评分均落在 CFG-14 分档内",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:9009ab24a210173e56e9ab278ce7e7d16876d62d52d7c8701d7854f66286ccee"
+      }
+    }
+  ]
+}

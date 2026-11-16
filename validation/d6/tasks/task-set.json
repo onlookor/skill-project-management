@@ -1,6 +1,6 @@
 {
   "set_version": "0.1.0-skeleton",
-  "status": "skeleton",
+  "status": "inputs_complete_runtime_verified_models_pending",
   "generated_at": "2026-11-16",
   "acceptance_ref": "validation/d6/acceptance.json",
   "config_ref": {
@@ -13,8 +13,8 @@
     "public_case": 22,
     "synthetic": 10,
     "synthetic_ready": 10,
-    "public_inputs_ready": 17,
-    "public_inputs_planned": 5
+    "public_inputs_ready": 22,
+    "public_inputs_planned": 0
   },
   "sources": {
     "NAO-CROSSRAIL": {
@@ -704,10 +704,11 @@
         ]
       },
       "input": "validation/cases/NAO-NPFIT/inputs/cost-budget.json",
-      "input_status": "planned",
+      "input_status": "ready",
       "transformation": "把公开引用的 £11.4bn 按国家系统、本地部署、运维等类别拆包，金额与分时段守恒。",
       "source_ref": "NAO-NPFIT",
-      "config_variant": "V-CFG09-GBP"
+      "config_variant": "V-CFG09-GBP",
+      "run_batch": "phase5-public-npfit"
     },
     {
       "id": "D6-PUB-19",
@@ -736,10 +737,11 @@
         ]
       },
       "input": "validation/cases/NAO-NPFIT/inputs/status-snapshot.json",
-      "input_status": "planned",
+      "input_status": "ready",
       "transformation": "项目提前关闭、未实现目标：目标类指标 value=null + unavailable_reason（项目关闭，目标未达成且不再采集）；支出类指标保留。",
       "source_ref": "NAO-NPFIT",
-      "config_variant": "V-CFG09-GBP"
+      "config_variant": "V-CFG09-GBP",
+      "run_batch": "phase5-public-npfit"
     },
     {
       "id": "D6-PUB-20",
@@ -770,9 +772,10 @@
         ]
       },
       "input": "validation/cases/NAO-NPFIT/inputs/audit-trail.json",
-      "input_status": "planned",
+      "input_status": "ready",
       "transformation": "把公开的关闭决定改造为两条审计记录（评估、关闭），哈希链首尾相接，非零结论附证据路径。",
-      "source_ref": "NAO-NPFIT"
+      "source_ref": "NAO-NPFIT",
+      "run_batch": "phase5-public-npfit"
     },
     {
       "id": "D6-PUB-21",
@@ -804,9 +807,10 @@
         ]
       },
       "input": "validation/cases/NAO-NPFIT/inputs/audit-trail-gap.json",
-      "input_status": "planned",
+      "input_status": "ready",
       "transformation": "在真实关闭上下文里删除中间记录，保留第 1、3 条且哈希链仍闭合，验证序号连续性。",
-      "source_ref": "NAO-NPFIT"
+      "source_ref": "NAO-NPFIT",
+      "run_batch": "phase5-public-npfit"
     },
     {
       "id": "D6-PUB-22",
@@ -837,9 +841,10 @@
         ]
       },
       "input": "validation/cases/NAO-NPFIT/inputs/risk-register.json",
-      "input_status": "planned",
+      "input_status": "ready",
       "transformation": "把公开的项目范围、供应商交付与临床采纳问题改造为三条风险，按 3×3 评分。",
-      "source_ref": "NAO-NPFIT"
+      "source_ref": "NAO-NPFIT",
+      "run_batch": "phase5-public-npfit"
     },
     {
       "id": "D6-SYN-01",
