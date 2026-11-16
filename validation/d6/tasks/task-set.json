@@ -13,8 +13,8 @@
     "public_case": 22,
     "synthetic": 10,
     "synthetic_ready": 10,
-    "public_inputs_ready": 11,
-    "public_inputs_planned": 11
+    "public_inputs_ready": 17,
+    "public_inputs_planned": 5
   },
   "sources": {
     "NAO-CROSSRAIL": {
@@ -497,9 +497,10 @@
         ]
       },
       "input": "validation/cases/NAO-HS2/inputs/dependency-graph.json",
-      "input_status": "planned",
+      "input_status": "ready",
       "transformation": "把公开的 Phase 1 主要工程与 2026 开通目标改造为活动网络；所有依赖显式 lag: 0。",
-      "source_ref": "NAO-HS2"
+      "source_ref": "NAO-HS2",
+      "run_batch": "phase4-public-hs2"
     },
     {
       "id": "D6-PUB-13",
@@ -532,9 +533,10 @@
         ]
       },
       "input": "validation/cases/NAO-HS2/inputs/dependency-graph-cancelled.json",
-      "input_status": "planned",
+      "input_status": "ready",
       "transformation": "按 2023 年公开的 Phase 2 取消事件删除下游活动，但保留一条指向该活动的依赖，复现范围变更后的悬挂依赖。",
-      "source_ref": "NAO-HS2"
+      "source_ref": "NAO-HS2",
+      "run_batch": "phase4-public-hs2"
     },
     {
       "id": "D6-PUB-14",
@@ -565,10 +567,11 @@
         ]
       },
       "input": "validation/cases/NAO-HS2/inputs/cost-budget.json",
-      "input_status": "planned",
+      "input_status": "ready",
       "transformation": "取公开区间上界 £102.7bn 作为预算总额，按阶段拆包并显式记录口径；不使用区间中点冒充单点。",
       "source_ref": "NAO-HS2",
-      "config_variant": "V-CFG09-GBP"
+      "config_variant": "V-CFG09-GBP",
+      "run_batch": "phase4-public-hs2"
     },
     {
       "id": "D6-PUB-15",
@@ -599,10 +602,11 @@
         ]
       },
       "input": "validation/cases/NAO-HS2/inputs/cost-budget-range-mismatch.json",
-      "input_status": "planned",
+      "input_status": "ready",
       "transformation": "区间口径混用：分时段合计按下界，工作包合计按上界；复现区间估算未对齐的守恒缺口。",
       "source_ref": "NAO-HS2",
-      "config_variant": "V-CFG09-GBP"
+      "config_variant": "V-CFG09-GBP",
+      "run_batch": "phase4-public-hs2"
     },
     {
       "id": "D6-PUB-16",
@@ -633,9 +637,10 @@
         ]
       },
       "input": "validation/cases/NAO-HS2/inputs/risk-register.json",
-      "input_status": "planned",
+      "input_status": "ready",
       "transformation": "把公开指出的成本低估、低效交付与范围变更改造为三条风险，按 3×3 评分。",
-      "source_ref": "NAO-HS2"
+      "source_ref": "NAO-HS2",
+      "run_batch": "phase4-public-hs2"
     },
     {
       "id": "D6-PUB-17",
@@ -664,10 +669,11 @@
         ]
       },
       "input": "validation/cases/NAO-HS2/inputs/status-snapshot.json",
-      "input_status": "planned",
+      "input_status": "ready",
       "transformation": "£1.5bn 已支出作为 AC；暂停期进度指标 value=null 并附 unavailable_reason（施工暂停，进度不可比）。",
       "source_ref": "NAO-HS2",
-      "config_variant": "V-CFG09-GBP"
+      "config_variant": "V-CFG09-GBP",
+      "run_batch": "phase4-public-hs2"
     },
     {
       "id": "D6-PUB-18",

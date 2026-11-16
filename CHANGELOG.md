@@ -1813,3 +1813,19 @@
 - **未做**：HS2 6 题、NPfIT 5 题仍 `planned`；模型双臂未执行；D6-SYN-02 退出码聚合优先级按上级裁定原样保留，未改检查器与提案。
 - **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-174、T-150 / T-156；`scripts/no-review-declarations.json` 的 `spec/ACCESS_ZONES.md` 条目；本节。
 - **关联 ADR**：ADR-0020
+
+---
+
+### 批次 0106 — 2026-11-16 — D6 公开案例批次 3：HS2 6 题改造与运行；三缺口入台账
+
+- **涉及文件**：`validation/cases/NAO-HS2/inputs/dependency-graph.json`、`dependency-graph-cancelled.json`、`cost-budget.json`、`cost-budget-range-mismatch.json`、`risk-register.json`、`status-snapshot.json`；`validation/d6/results/phase4-public-hs2/{run.json,SUMMARY.md}`；`GAP_LEDGER.md`（G-023/G-024/G-025 与矩阵说明）；`validation/d6/tasks/task-set.json`、`validation/cases/MANIFEST.md`、`spec/ACCESS_ZONES.md`、`scripts/no-review-declarations.json`、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`knowledge/glossary-usage.json`、`TODO.md`、`CHANGELOG.md`
+- **变更摘要**：
+  - 改造 6 件输入：Phase 1 网络（含 2026 开通里程碑）、取消 Phase 2 后的悬挂依赖负例、区间成本的显式上界正例、工作包合计按上界而分时段合计按下界的口径混用负例、风险台账、状态快照（AC 有值、进度因 Euston 暂停取 `null` + `unavailable_reason`）。
+  - 运行结果 6/6 符合期望：D6-PUB-12/14/16/17 退出 0；D6-PUB-13 由 `dep.endpoints_exist` 命中、D6-PUB-15 由 `budget.total_conserved` 命中，均退出 1。D6-PUB-15 同时连带命中 `budget.time_phased_sum`，已如实写入观察。
+  - 按上级指示把三类缺口从运行观察升级为台账条目：**G-023** 状态与挣值工件无币种字段、`CFG-09` 仅由 `budget.currency_match` 消费（影响面、漏检原因、不修后果与修复前禁令均已写明）；**G-024** `due_day` 上限 3650 天装不下长周期，登记为待裁定项，未扩受钉扎 schema；**G-025** 风险类别闭集，登记不扩枚举。三条均 `open`，按仓库级缺口既有做法锚定核查矩阵首行（与 G-014/G-016/G-017 同）。
+  - `spec/ACCESS_ZONES.md` 增批次 4 运行记录一行 C 区归区；本批无新复核，按 3.5.3 新建 T-175 并以 `--no-verify` 提交。
+- **实测**：`pm_check --artifact` 6 次；`check_gap_ledger` 通过（25 条，open 4，到期 0）；`check_no_raw_material` 0、`check_anchors` 0、`check_state` 0、`check_three_table` 0、`check_ledger_landings` 0、`check_coverage_gate` 0、`check_glossary_usage` 0；`check_checker_pins` 7、`check_spec_pins` 7（无复核声明，含既有欠账）。
+- **钩子绕过**：本批提交携带 `Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-175`。
+- **未做**：NPfIT 5 题仍 `planned`；模型双臂未执行；D6-SYN-02 退出码聚合优先级按上级裁定原样保留，未改检查器与提案。
+- **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-175、T-150 / T-156；`scripts/no-review-declarations.json` 的 `spec/ACCESS_ZONES.md` 条目；本节。
+- **关联 ADR**：ADR-0020

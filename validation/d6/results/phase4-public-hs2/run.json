@@ -1,0 +1,445 @@
+{
+  "summary": {
+    "run_id": "phase4-public-hs2",
+    "generated_at": "2026-11-16T23:13:41+08:00",
+    "task_set_version": "0.1.0-skeleton",
+    "models": "not_executed",
+    "total": 6,
+    "pass": 6,
+    "mismatch": 0,
+    "exit_codes": {
+      "0": 4,
+      "1": 2
+    },
+    "observations": [
+      "D6-PUB-13 为悬挂依赖负例：依赖指向已取消的 PH2-CIVL，dep.endpoints_exist 命中，关键路径计算忽略该端点后其余 5 项通过，聚合退出 1。",
+      "D6-PUB-15 同时命中 budget.total_conserved 与 budget.time_phased_sum（分时段按下界 87.7bn、工作包按上界 102.7bn），期望只要求前者；后者是一致性检查的连带命中，未视为额外放宽。",
+      "区间成本 87.7bn–102.7bn 在工件中取上界并显式标注口径（provenance），未用平均值或区间中值掩盖口径选择。",
+      "币种口径缺口已从 observation 升级为缺口台账 G-023（状态与挣值工件无 currency 字段，CFG-09 仅由 budget.currency_match 消费）；due_day 上限记为 G-024（待裁定，未改受钉扎 schema）；风险类别闭集记为 G-025（登记不扩）。",
+      "模型弱档/对照档/无技能臂仍未执行（无权重/需外部 API）。"
+    ]
+  },
+  "results": [
+    {
+      "task_id": "D6-PUB-12",
+      "case_id": "NAO-HS2",
+      "title": "HS2 Phase 1 里程碑网络：2026 开通目标",
+      "artifact": "validation/cases/NAO-HS2/inputs/dependency-graph.json",
+      "checks": [
+        "dep.ids_unique",
+        "dep.endpoints_exist",
+        "dep.acyclic",
+        "dep.types_valid",
+        "dep.wbs_mapping",
+        "schedule.critical_path"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "dep.ids_unique",
+          "dep.endpoints_exist",
+          "dep.acyclic",
+          "dep.types_valid",
+          "dep.wbs_mapping",
+          "schedule.critical_path"
+        ]
+      },
+      "config_variant": null,
+      "config": "validation/d6/acceptance-config.json",
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 0,
+        "findings": [
+          {
+            "check": "dep.ids_unique",
+            "detail": "6 个活动 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.endpoints_exist",
+            "detail": "6 条依赖端点闭合",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.acyclic",
+            "detail": "DAG 无环",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.types_valid",
+            "detail": "依赖类型均在 FS/SS/FF/SF 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.wbs_mapping",
+            "detail": "活动↔工作包映射完整",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "schedule.critical_path",
+            "detail": "总工期 2500.0；关键活动 ['DESN', 'TUNN', 'SYSI', 'TEST', 'OPEN']",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:e373be6d48e16ddb2461840dfa99547e42117d643dfbd5f7a4baf9b23d66bd0f"
+      }
+    },
+    {
+      "task_id": "D6-PUB-13",
+      "case_id": "NAO-HS2",
+      "title": "HS2 负例：Phase 2 取消后仍保留指向已删活动的依赖",
+      "artifact": "validation/cases/NAO-HS2/inputs/dependency-graph-cancelled.json",
+      "checks": [
+        "dep.ids_unique",
+        "dep.endpoints_exist",
+        "dep.acyclic",
+        "dep.types_valid",
+        "dep.wbs_mapping",
+        "schedule.critical_path"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "dep.endpoints_exist"
+        ],
+        "must_pass": [
+          "dep.ids_unique",
+          "dep.acyclic",
+          "dep.types_valid",
+          "dep.wbs_mapping"
+        ]
+      },
+      "config_variant": null,
+      "config": "validation/d6/acceptance-config.json",
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 1,
+        "findings": [
+          {
+            "check": "dep.ids_unique",
+            "detail": "5 个活动 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.endpoints_exist",
+            "detail": "悬挂依赖：['PH2-CIVL→TEST']",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "dep.acyclic",
+            "detail": "DAG 无环",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.types_valid",
+            "detail": "依赖类型均在 FS/SS/FF/SF 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.wbs_mapping",
+            "detail": "活动↔工作包映射完整",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "schedule.critical_path",
+            "detail": "总工期 2500.0；关键活动 ['DESN', 'TUNN', 'SYSI', 'TEST']",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [
+          "dep.endpoints_exist"
+        ],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:0fc9f0f509a8527da755d8245bf2ef0e5ff90c38240e8ec814d80032cb8bb5c5"
+      }
+    },
+    {
+      "task_id": "D6-PUB-14",
+      "case_id": "NAO-HS2",
+      "title": "HS2 成本汇总：按 £102.7bn 上界拆包",
+      "artifact": "validation/cases/NAO-HS2/inputs/cost-budget.json",
+      "checks": [
+        "budget.accounts_registered",
+        "budget.package_unique",
+        "budget.total_conserved",
+        "budget.time_phased_sum",
+        "budget.currency_match"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "budget.accounts_registered",
+          "budget.package_unique",
+          "budget.total_conserved",
+          "budget.time_phased_sum",
+          "budget.currency_match"
+        ]
+      },
+      "config_variant": "V-CFG09-GBP",
+      "config": "validation/d6/configs/V-CFG09-GBP.json",
+      "config_digest": "sha256:9c08d7c34304511af1bd0c8e9480282ae20314362521861dc3f9fffb172cf548",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 0,
+        "findings": [
+          {
+            "check": "budget.accounts_registered",
+            "detail": "全部工作包科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.package_unique",
+            "detail": "5 个工作包 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.total_conserved",
+            "detail": "每个科目与总额均守恒，合计 102700000000.0",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.time_phased_sum",
+            "detail": "每个工作包的分时段金额之和等于总额",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.currency_match",
+            "detail": "货币与 CFG-09 一致",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:14ca44f971c71f9608904ca654571a267622fee47acf5ac8e17c1bc6dd3474c9"
+      }
+    },
+    {
+      "task_id": "D6-PUB-15",
+      "case_id": "NAO-HS2",
+      "title": "HS2 成本负例：总额写下界 £87.7bn，工作包按上界 £102.7bn",
+      "artifact": "validation/cases/NAO-HS2/inputs/cost-budget-range-mismatch.json",
+      "checks": [
+        "budget.accounts_registered",
+        "budget.package_unique",
+        "budget.total_conserved",
+        "budget.time_phased_sum",
+        "budget.currency_match"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "budget.total_conserved"
+        ],
+        "must_pass": [
+          "budget.accounts_registered",
+          "budget.package_unique",
+          "budget.currency_match"
+        ]
+      },
+      "config_variant": "V-CFG09-GBP",
+      "config": "validation/d6/configs/V-CFG09-GBP.json",
+      "config_digest": "sha256:9c08d7c34304511af1bd0c8e9480282ae20314362521861dc3f9fffb172cf548",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 1,
+        "findings": [
+          {
+            "check": "budget.accounts_registered",
+            "detail": "全部工作包科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.package_unique",
+            "detail": "5 个工作包 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.total_conserved",
+            "detail": "分时段合计 87700000000.0 与工作包合计 102700000000.0 不等",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "budget.time_phased_sum",
+            "detail": "分时段金额与工作包金额不一致或缺分时段：['PKG-DESN']",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "budget.currency_match",
+            "detail": "货币与 CFG-09 一致",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [
+          "budget.total_conserved",
+          "budget.time_phased_sum"
+        ],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:18f8224a009ac411244f7fde27d033dbf826194902e50ba19e066312195c98af"
+      }
+    },
+    {
+      "task_id": "D6-PUB-16",
+      "case_id": "NAO-HS2",
+      "title": "HS2 风险登记册：成本低估、交付效率、范围变更",
+      "artifact": "validation/cases/NAO-HS2/inputs/risk-register.json",
+      "checks": [
+        "risk.required_fields",
+        "risk.scale_in_range",
+        "risk.residual_le_initial",
+        "risk.owner_registered",
+        "risk.band_consistent"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "risk.required_fields",
+          "risk.scale_in_range",
+          "risk.residual_le_initial",
+          "risk.owner_registered",
+          "risk.band_consistent"
+        ]
+      },
+      "config_variant": null,
+      "config": "validation/d6/acceptance-config.json",
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 0,
+        "findings": [
+          {
+            "check": "risk.required_fields",
+            "detail": "3 条风险字段齐备",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.scale_in_range",
+            "detail": "概率与影响均在 3×3 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.residual_le_initial",
+            "detail": "残余评分均不高于初始评分",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.owner_registered",
+            "detail": "风险责任人角色均已登记",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.band_consistent",
+            "detail": "初始评分均落在 CFG-14 分档内",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:4ba91d798dc11a03f8e3bd84d094137554130f79f4071a91cec99ef4b6c5fc27"
+      }
+    },
+    {
+      "task_id": "D6-PUB-17",
+      "case_id": "NAO-HS2",
+      "title": "HS2 状态快照：Euston 暂停期的支出与不可用进度指标",
+      "artifact": "validation/cases/NAO-HS2/inputs/status-snapshot.json",
+      "checks": [
+        "status.dictionary_fields",
+        "status.no_implicit_zero",
+        "status.sample_grid",
+        "status.account_registered"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "status.dictionary_fields",
+          "status.no_implicit_zero",
+          "status.sample_grid",
+          "status.account_registered"
+        ]
+      },
+      "config_variant": "V-CFG09-GBP",
+      "config": "validation/d6/configs/V-CFG09-GBP.json",
+      "config_digest": "sha256:9c08d7c34304511af1bd0c8e9480282ae20314362521861dc3f9fffb172cf548",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 0,
+        "findings": [
+          {
+            "check": "status.dictionary_fields",
+            "detail": "数据字典齐备且测量指标均已登记",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.no_implicit_zero",
+            "detail": "缺数均显式登记了 unavailable_reason",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.sample_grid",
+            "detail": "2 个采样点均与配置口径一致",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.account_registered",
+            "detail": "测量科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:76fe8535b00b60e686abef32413337de303914969578fe8a438078e64bc0153e"
+      }
+    }
+  ]
+}
