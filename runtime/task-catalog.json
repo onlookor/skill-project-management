@@ -1,0 +1,175 @@
+{
+  "catalog_version": "1.0.0",
+  "tasks": [
+    {
+      "id": "T01",
+      "title": "建立依赖图与关键路径",
+      "domain": "schedule",
+      "capabilities": [
+        "dependency_graph"
+      ],
+      "procedure": "schedule_baseline.json",
+      "outputs": [
+        "dependency-graph"
+      ],
+      "gates": [
+        "GATE-SCHEDULE"
+      ],
+      "checks": [
+        "dep.ids_unique",
+        "dep.endpoints_exist",
+        "dep.acyclic",
+        "dep.types_valid",
+        "dep.wbs_mapping",
+        "schedule.critical_path"
+      ]
+    },
+    {
+      "id": "T02",
+      "title": "汇总成本基线",
+      "domain": "cost",
+      "capabilities": [
+        "cost_budget"
+      ],
+      "procedure": "cost_baseline.json",
+      "outputs": [
+        "cost-budget"
+      ],
+      "gates": [
+        "GATE-COST"
+      ],
+      "checks": [
+        "budget.accounts_registered",
+        "budget.package_unique",
+        "budget.total_conserved",
+        "budget.time_phased_sum",
+        "budget.currency_match"
+      ]
+    },
+    {
+      "id": "T03",
+      "title": "维护风险登记册",
+      "domain": "risk",
+      "capabilities": [
+        "risk_register"
+      ],
+      "procedure": "risk_review.json",
+      "outputs": [
+        "risk-register"
+      ],
+      "gates": [
+        "GATE-RISK"
+      ],
+      "checks": [
+        "risk.required_fields",
+        "risk.scale_in_range",
+        "risk.residual_le_initial",
+        "risk.owner_registered",
+        "risk.band_consistent"
+      ]
+    },
+    {
+      "id": "T04",
+      "title": "采集状态快照",
+      "domain": "status",
+      "capabilities": [
+        "status_collection"
+      ],
+      "procedure": "status_review.json",
+      "outputs": [
+        "status-snapshot"
+      ],
+      "gates": [
+        "GATE-STATUS"
+      ],
+      "checks": [
+        "status.dictionary_fields",
+        "status.no_implicit_zero",
+        "status.sample_grid",
+        "status.account_registered",
+        "evm.formulas",
+        "evm.ev_measurement",
+        "evm.eac_method",
+        "evm.budget_consistent",
+        "evm.term_aliases"
+      ]
+    },
+    {
+      "id": "T05",
+      "title": "计算挣值与预测",
+      "domain": "evm",
+      "capabilities": [
+        "earned_value"
+      ],
+      "procedure": "status_review.json",
+      "outputs": [
+        "evm-record"
+      ],
+      "gates": [
+        "GATE-STATUS"
+      ],
+      "checks": [
+        "evm.formulas",
+        "evm.ev_measurement",
+        "evm.eac_method",
+        "evm.budget_consistent",
+        "evm.term_aliases",
+        "status.dictionary_fields",
+        "status.no_implicit_zero",
+        "status.sample_grid",
+        "status.account_registered"
+      ]
+    },
+    {
+      "id": "T06",
+      "title": "偏差分档与阈值判定",
+      "domain": "status",
+      "capabilities": [
+        "deviation"
+      ],
+      "procedure": "status_review.json",
+      "outputs": [
+        "evm-record"
+      ],
+      "gates": [
+        "GATE-STATUS"
+      ],
+      "checks": [
+        "deviation.thresholds_configured",
+        "deviation.dimensions",
+        "deviation.custom_metric",
+        "evm.formulas",
+        "evm.ev_measurement",
+        "evm.eac_method",
+        "evm.budget_consistent",
+        "evm.term_aliases",
+        "status.dictionary_fields",
+        "status.no_implicit_zero",
+        "status.sample_grid",
+        "status.account_registered"
+      ]
+    },
+    {
+      "id": "T07",
+      "title": "审计留痕与摘要链核验",
+      "domain": "audit",
+      "capabilities": [
+        "audit_trail"
+      ],
+      "procedure": "audit_review.json",
+      "outputs": [
+        "audit-trail"
+      ],
+      "gates": [
+        "GATE-AUDIT"
+      ],
+      "checks": [
+        "audit.required_fields",
+        "audit.chain_digest",
+        "audit.sequence_strict",
+        "audit.exit_code_valid",
+        "audit.evidence_present"
+      ]
+    }
+  ]
+}

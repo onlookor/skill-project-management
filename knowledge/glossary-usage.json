@@ -2851,7 +2851,7 @@
         },
         {
           "file": "GAP_LEDGER.md",
-          "line": 162,
+          "line": 186,
           "form": "code"
         },
         {
@@ -3752,7 +3752,7 @@
         },
         {
           "file": "GAP_LEDGER.md",
-          "line": 148,
+          "line": 172,
           "form": "code"
         },
         {
@@ -4730,7 +4730,7 @@
         },
         {
           "file": "spec/ACCESS_ZONES.md",
-          "line": 85,
+          "line": 88,
           "form": "code"
         }
       ]
@@ -4740,7 +4740,7 @@
       "locations": [
         {
           "file": "spec/ACCESS_ZONES.md",
-          "line": 87,
+          "line": 90,
           "form": "code"
         }
       ]
@@ -4750,7 +4750,7 @@
       "locations": [
         {
           "file": "spec/ACCESS_ZONES.md",
-          "line": 86,
+          "line": 89,
           "form": "code"
         }
       ]
@@ -4760,7 +4760,7 @@
       "locations": [
         {
           "file": "spec/ACCESS_ZONES.md",
-          "line": 88,
+          "line": 91,
           "form": "code"
         }
       ]
@@ -4795,7 +4795,7 @@
         },
         {
           "file": "spec/ACCESS_ZONES.md",
-          "line": 99,
+          "line": 102,
           "form": "code"
         }
       ]
@@ -5014,7 +5014,7 @@
         },
         {
           "file": "GAP_LEDGER.md",
-          "line": 156,
+          "line": 180,
           "form": "code"
         },
         {
@@ -5076,6 +5076,91 @@
     "T-F-008": {
       "term": "契约解析失败状态",
       "locations": []
+    },
+    "T-F-009": {
+      "term": "工件契约（artifact contract）",
+      "locations": [
+        {
+          "file": "CHANGELOG.md",
+          "line": 1607,
+          "form": "term_id"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 1625,
+          "form": "term_id"
+        }
+      ]
+    },
+    "T-F-010": {
+      "term": "任务目录（task catalog）",
+      "locations": [
+        {
+          "file": "CHANGELOG.md",
+          "line": 1625,
+          "form": "term_id"
+        }
+      ]
+    },
+    "T-F-011": {
+      "term": "工序卡（procedure card）",
+      "locations": [
+        {
+          "file": "CHANGELOG.md",
+          "line": 1625,
+          "form": "term_id"
+        }
+      ]
+    },
+    "T-F-012": {
+      "term": "签字关口（approval gate）",
+      "locations": [
+        {
+          "file": "CHANGELOG.md",
+          "line": 1625,
+          "form": "term_id"
+        }
+      ]
+    },
+    "T-F-013": {
+      "term": "算子闭集（operator closed set）",
+      "locations": [
+        {
+          "file": "CHANGELOG.md",
+          "line": 1625,
+          "form": "term_id"
+        }
+      ]
+    },
+    "T-F-014": {
+      "term": "配置摘要（config digest）",
+      "locations": [
+        {
+          "file": "CHANGELOG.md",
+          "line": 1625,
+          "form": "term_id"
+        }
+      ]
+    },
+    "T-F-015": {
+      "term": "五值退出码",
+      "locations": [
+        {
+          "file": "CHANGELOG.md",
+          "line": 1607,
+          "form": "term_id"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 1612,
+          "form": "code"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 1625,
+          "form": "term_id"
+        }
+      ]
     }
   }
 }

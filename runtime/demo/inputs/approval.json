@@ -1,0 +1,42 @@
+[
+  {
+    "gate": "GATE-SCHEDULE",
+    "actor": "onlookor",
+    "role": "pm",
+    "decision": "approve",
+    "seen": ["S2", "S3"],
+    "at": "2026-11-16T19:10:00+08:00"
+  },
+  {
+    "gate": "GATE-COST",
+    "actor": "onlookor",
+    "role": "pm",
+    "decision": "approve",
+    "seen": ["S2", "S3"],
+    "at": "2026-11-16T19:12:00+08:00"
+  },
+  {
+    "gate": "GATE-RISK",
+    "actor": "onlookor",
+    "role": "sponsor",
+    "decision": "approve",
+    "seen": ["S3", "S4"],
+    "at": "2026-11-16T19:14:00+08:00"
+  },
+  {
+    "gate": "GATE-STATUS",
+    "actor": "onlookor",
+    "role": "pm",
+    "decision": "approve",
+    "seen": ["S2", "S5", "S7"],
+    "at": "2026-11-16T19:16:00+08:00"
+  },
+  {
+    "gate": "GATE-AUDIT",
+    "actor": "onlookor",
+    "role": "reviewer",
+    "decision": "approve",
+    "seen": ["S2", "S3"],
+    "at": "2026-11-16T19:18:00+08:00"
+  }
+]

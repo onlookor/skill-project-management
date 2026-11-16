@@ -1,0 +1,67 @@
+{
+  "procedure": "cost_baseline",
+  "version": 1,
+  "task": "cost_baseline",
+  "steps": [
+    {
+      "id": "S1",
+      "op": "fill_schema",
+      "schema": "cost-budget",
+      "input": "budget.json",
+      "slot": "budget",
+      "fails": "block"
+    },
+    {
+      "id": "S2",
+      "op": "compute",
+      "method": "budget.rollup",
+      "inputs": [
+        "budget"
+      ],
+      "slot": "rollup",
+      "needs": [
+        "S1"
+      ]
+    },
+    {
+      "id": "S3",
+      "op": "check",
+      "checks": [
+        "budget.accounts_registered",
+        "budget.package_unique",
+        "budget.total_conserved",
+        "budget.time_phased_sum",
+        "budget.currency_match"
+      ],
+      "input": "budget",
+      "slot": "budget_checks",
+      "fails": "block",
+      "needs": [
+        "S2"
+      ]
+    },
+    {
+      "id": "S4",
+      "op": "human_approve",
+      "gate": "GATE-COST",
+      "must_see": [
+        "S2",
+        "S3"
+      ],
+      "fails": "block",
+      "needs": [
+        "S3"
+      ]
+    },
+    {
+      "id": "S5",
+      "op": "render",
+      "template": "cost_baseline.md",
+      "input": "rollup",
+      "out": "cost-baseline.md",
+      "needs": [
+        "S4"
+      ]
+    }
+  ]
+}

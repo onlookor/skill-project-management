@@ -550,6 +550,42 @@
 - `first_used_in`：`contracts/resolver.md` 第 4 节
 - `status`：`active`
 
+**T-F-009 工件契约（artifact contract）**
+- 定义：一份工件类型在运行期的机器可读契约，由 JSON Schema 子集声明的字段集、必填性、引用关系，以及不参与实例校验的 `x-checks`（本类型必须通过的检查名）与 `x-provenance.requires`（生成该工件所必需的上游工件类型）。定义见 `spec/D6_REBASELINE_PROPOSAL.md` 第 4 节与 `runtime/artifacts/`。
+- `relations`：由算子 `fill_schema` 强制；与 T-B-010 契约（领域槽位契约）不是同一对象
+- `first_used_in`：`runtime/artifacts/dependency-graph.schema.json`
+- `status`：`active`
+
+**T-F-010 任务目录（task catalog）**
+- 定义：运行期把“任务卡”与工序、工件类型、签字关口绑定起来的单一登记文件（`runtime/task-catalog.json`）。任务卡声明其覆盖的检查与产出工件；目录级校验要求每张卡的过程存在、过程检查被任务卡覆盖、能力被覆盖、过程无孤儿、工件契约有产出方。
+- `first_used_in`：`runtime/task-catalog.json`
+- `status`：`active`
+
+**T-F-011 工序卡（procedure card）**
+- 定义：一次可执行工序的声明，由有序步骤组成，每步指定六个算子之一、输入、参数与依赖（`needs`）。工序卡是解释器的输入，不是代码：解释器只执行闭集内的算子，未注册算子按输入非法处理（退出码 2）。定义见 `spec/D6_REBASELINE_PROPOSAL.md` 第 6 节。
+- `first_used_in`：`runtime/procedures/status_review.json`
+- `status`：`active`
+
+**T-F-012 签字关口（approval gate）**
+- 定义：需要人类批准才能继续的工序步骤，由算子 `human_approve` 执行。判定依据为 `<inputs>/approval.json` 中的签字记录（JSON 数组）：无记录判 `cannot_evaluate`（退出码 3）、拒绝或未看到 `must_see` 指定字段判 `fail`（退出码 1）、签批角色与 `CFG-12` 映射不符判 `fail`。签字人的自然人身份不可由本机制验证。
+- `first_used_in`：`runtime/procedures/status_review.json`
+- `status`：`active`
+
+**T-F-013 算子闭集（operator closed set）**
+- 定义：解释器可执行的六个工序算子：`fill_schema`、`compute`、`lookup`、`check`、`human_approve`、`render`。闭集之外没有算子；新增算子属于改变运行语义，须走提案而非在实现中扩张。
+- `first_used_in`：`scripts/pm_check.py`
+- `status`：`active`
+
+**T-F-014 配置摘要（config digest）**
+- 定义：运行配置的规范化字节串的 sha256（`config_digest`），以及逐项摘要（`item_digests`）与取默认值的键清单（`defaulted`）。工件以其 `config_ref` 声明生成时的配置摘要；摘要不同即判不可比，不得跨配置比较通过率或偏差结论。
+- `first_used_in`：`scripts/pm_config.py`
+- `status`：`active`
+
+**T-F-015 五值退出码**
+- 定义：解释器与工件校验的退出码语义：`0` 全部通过；`1` 存在违规（含配置漂移 `config_drift`）；`2` 输入或配置非法（含 `config_invalid`/`config_incomplete`）；`3` 存在无法机械判定项（`cannot_evaluate`，含判定性配置缺失）；`4` 解释器不可用（如引用了未注册的检查或工件契约缺失）。多结论聚合优先级为 `4 > 2 > 1 > 3 > 0`。
+- `first_used_in`：`scripts/pm_check.py`
+- `status`：`active`
+
 ### 4. 与 `knowledge/anchored-entries.jsonl` 的同步规则
 
 - **A 类条目**（领域无关核心概念）必须与 `anchored-entries.jsonl` 中的对应条目**定义一致**。本文件 A 类条目的 `anchored_entry` 字段指向 JSONL 条目名。
@@ -669,4 +705,11 @@
 | T-F-006 | subject_group_extension | [`CHANGELOG.md`](CHANGELOG.md)、[`GAP_LEDGER.md`](GAP_LEDGER.md)、[`GRAMMAR.md`](GRAMMAR.md)、[`adr/0008-reanchor-dimension-rules.md`](adr/0008-reanchor-dimension-rules.md)、[`adr/0013-unified-adjudication-of-check-semantics.md`](adr/0013-unified-adjudication-of-check-semantics.md)、[`contracts/resolver.md`](contracts/resolver.md)、[`spec/CHECKER_INPUT_SCHEMA.md`](spec/CHECKER_INPUT_SCHEMA.md)、[`spec/INTERFACE_CONTRACT_SPEC.md`](spec/INTERFACE_CONTRACT_SPEC.md)、[`spec/methods/deterministic-checker.md`](spec/methods/deterministic-checker.md) |
 | T-F-007 | 扁平快照（flat snapshot） | （无） |
 | T-F-008 | 契约解析失败状态 | （无） |
+| T-F-009 | 工件契约（artifact contract） | [`CHANGELOG.md`](CHANGELOG.md) |
+| T-F-010 | 任务目录（task catalog） | [`CHANGELOG.md`](CHANGELOG.md) |
+| T-F-011 | 工序卡（procedure card） | [`CHANGELOG.md`](CHANGELOG.md) |
+| T-F-012 | 签字关口（approval gate） | [`CHANGELOG.md`](CHANGELOG.md) |
+| T-F-013 | 算子闭集（operator closed set） | [`CHANGELOG.md`](CHANGELOG.md) |
+| T-F-014 | 配置摘要（config digest） | [`CHANGELOG.md`](CHANGELOG.md) |
+| T-F-015 | 五值退出码 | [`CHANGELOG.md`](CHANGELOG.md) |
 <!-- END GLOSSARY USAGE -->

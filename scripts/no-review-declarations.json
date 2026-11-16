@@ -15,9 +15,52 @@
       "due": "M1 出口前",
       "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
       "todo": "T-149"
+    },
+    "scripts/pm_schema.py": {
+      "reason": "批次 0095 新增的 JSON Schema 子集校验内核，落地时无复核产物；`IMPLEMENTED` 白名单与 `x-checks`/`x-provenance` 契约约束均由本批自定",
+      "missing_review": "对白名单关键字闭集、本地 $ref 解析与契约元数据强制口径的非同源复核",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-167"
+    },
+    "scripts/pm_config.py": {
+      "reason": "批次 0095 新增的配置解释器（CFG-01～CFG-15），判定性项无默认、采样网格与可比性口径均为本批落地，无复核产物",
+      "missing_review": "对 CFG 逐条求值、`cannot_evaluate`/`config_invalid`/`config_incomplete`/`config_drift` 分派与采样点计算的非同源复核",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-167"
+    },
+    "scripts/pm_caps.py": {
+      "reason": "批次 0095 新增的七项机械能力与 33 个检查注册表，CPM/预算/风险/状态/偏差/EVM/审计口径均为本批落地，无复核产物",
+      "missing_review": "对七项能力算法（含前后推、科目汇总、采样比对、EVM 三法、摘要链）与检查注册表的非同源复核",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-167"
+    },
+    "scripts/pm_check.py": {
+      "reason": "批次 0095 新增的六算子解释器与五值退出码聚合器，算子闭集、工序校验与 `human_approve` 判定均为本批落地，无复核产物",
+      "missing_review": "对算子闭集、退出码聚合优先级、工序 `needs` 校验与签字关口判定的非同源复核",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-167"
+    },
+    "scripts/test_pm_runtime.py": {
+      "reason": "批次 0095 新增的 33 项自测，样例与实现同源编写，不构成独立证据",
+      "missing_review": "非同源复核：由复核方按 `spec/D6_REBASELINE_PROPOSAL.md` 第 3/6/9 节独立构造正反例，比对退出码结论",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-167"
     }
   },
-  "spec": {},
+  "spec": {
+    "spec/ACCESS_ZONES.md": {
+      "reason": "批次 0095 为新增的 `runtime/` 顶层目录登记归区（C 区 22 个 JSON、P/P2 10 个 Markdown），区段指纹已重冻；新增归区内容无复核产物",
+      "missing_review": "对 `runtime/` 归区与 P2 分级是否符合 `ACCESS_ZONES` 第 3/4 节的非同源复核",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-167"
+    }
+  },
   "date_unverified": {
     "spec/methods/deterministic-checker.md#A.2": {
       "reason": "签收行日期 2026-11-16 与登记项 review_date（origin: executor）一致，但复核产物 batch5/REVIEW-RECORD.md 中无专用记号 `<!-- 复核日期：2026-11-16 -->`。批次 0092 起不再接受独立日期记录或任意位置的同日子串，故 check_spec_pins 报“日期未核验”；该产物不可改字节（其复核记录被少数已登记 basis 引用，改字节会连带使这些 basis 失效）。",

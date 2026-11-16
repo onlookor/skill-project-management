@@ -1,0 +1,198 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "runtime/artifacts/dependency-graph.schema.json",
+  "title": "依赖图工件（CAP-13 / CAP-15）",
+  "description": "活动清单与四类逻辑关系（FS/SS/FF/SF + 提前/滞后）。`x-checks` 是强制字段：本契约的每次校验必须执行下列绑定检查，未注册的 check 名称由解释器拒绝加载。活动到 WBS 的映射属跨工件检查，WBS 节点清单由装配层作为 `data.wbs_node_ids` 注入；未注入时该检查判 `cannot_evaluate` 而非通过。",
+  "x-checks": [
+    "dep.ids_unique",
+    "dep.endpoints_exist",
+    "dep.acyclic",
+    "dep.types_valid",
+    "dep.wbs_mapping",
+    "schedule.critical_path"
+  ],
+  "x-provenance": {
+    "requires": [
+      "schedule.activities",
+      "schedule.dependencies"
+    ],
+    "$comment": "活动与依赖必须指回任务输入；`provenance` 中每个键的值是输入路径，不得写模型自述。"
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "artifact_version",
+    "project_id",
+    "config_ref",
+    "provenance",
+    "data"
+  ],
+  "properties": {
+    "artifact_type": {
+      "type": "string",
+      "const": "dependency-graph",
+      "maxLength": 40
+    },
+    "artifact_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "maxLength": 16
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+      "maxLength": 64
+    },
+    "config_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "config_digest",
+        "item_digests"
+      ],
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "config.schema/1",
+          "maxLength": 40
+        },
+        "config_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "maxLength": 72
+        },
+        "item_digests": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "maxLength": 64
+          }
+        },
+        "defaulted": {
+          "type": "array",
+          "maxItems": 2,
+          "items": {
+            "type": "string",
+            "pattern": "^(CFG-10|CFG-11)$",
+            "maxLength": 8
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      }
+    },
+    "unsupported": {
+      "type": "array",
+      "maxItems": 40,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      }
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "activities",
+        "dependencies"
+      ],
+      "properties": {
+        "activities": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1000,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "wbs_ref",
+              "duration_days"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$",
+                "maxLength": 32
+              },
+              "wbs_ref": {
+                "type": "string",
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,31}$",
+                "maxLength": 32
+              },
+              "duration_days": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 3650
+              },
+              "milestone": {
+                "type": "boolean"
+              },
+              "due_day": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 3650
+              }
+            }
+          }
+        },
+        "dependencies": {
+          "type": "array",
+          "maxItems": 5000,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "from",
+              "to",
+              "type"
+            ],
+            "properties": {
+              "from": {
+                "type": "string",
+                "maxLength": 32
+              },
+              "to": {
+                "type": "string",
+                "maxLength": 32
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "FS",
+                  "SS",
+                  "FF",
+                  "SF"
+                ],
+                "maxLength": 2
+              },
+              "lag": {
+                "type": "number",
+                "minimum": -365,
+                "maximum": 365
+              }
+            }
+          }
+        },
+        "wbs_node_ids": {
+          "type": "array",
+          "maxItems": 5000,
+          "items": {
+            "type": "string",
+            "maxLength": 32
+          }
+        }
+      }
+    }
+  }
+}

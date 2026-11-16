@@ -1,0 +1,129 @@
+{
+  "procedure": "status_review",
+  "version": 1,
+  "task": "status_review",
+  "steps": [
+    {
+      "id": "S1",
+      "op": "fill_schema",
+      "schema": "status-snapshot",
+      "input": "status.json",
+      "slot": "status",
+      "fails": "block"
+    },
+    {
+      "id": "S2",
+      "op": "check",
+      "checks": [
+        "status.dictionary_fields",
+        "status.no_implicit_zero",
+        "status.sample_grid",
+        "status.account_registered"
+      ],
+      "input": "status",
+      "slot": "status_checks",
+      "fails": "block",
+      "needs": [
+        "S1"
+      ]
+    },
+    {
+      "id": "S3",
+      "op": "compute",
+      "method": "status.collect",
+      "inputs": [
+        "status"
+      ],
+      "slot": "collection",
+      "needs": [
+        "S2"
+      ]
+    },
+    {
+      "id": "S4",
+      "op": "fill_schema",
+      "schema": "evm-record",
+      "input": "evm.json",
+      "slot": "evm",
+      "fails": "block",
+      "needs": [
+        "S3"
+      ]
+    },
+    {
+      "id": "S5",
+      "op": "check",
+      "checks": [
+        "evm.formulas",
+        "evm.ev_measurement",
+        "evm.eac_method",
+        "evm.budget_consistent",
+        "evm.term_aliases"
+      ],
+      "input": "evm",
+      "slot": "evm_checks",
+      "fails": "block",
+      "needs": [
+        "S4"
+      ]
+    },
+    {
+      "id": "S6",
+      "op": "compute",
+      "method": "evm.metrics",
+      "inputs": [
+        "evm"
+      ],
+      "slot": "evm_metrics",
+      "needs": [
+        "S5"
+      ]
+    },
+    {
+      "id": "S7",
+      "op": "compute",
+      "method": "deviation.map",
+      "inputs": [
+        "evm"
+      ],
+      "slot": "deviation",
+      "needs": [
+        "S6"
+      ]
+    },
+    {
+      "id": "S8",
+      "op": "lookup",
+      "table": "glossary",
+      "key": "EV",
+      "slot": "ev_term",
+      "needs": [
+        "S7"
+      ]
+    },
+    {
+      "id": "S9",
+      "op": "human_approve",
+      "gate": "GATE-STATUS",
+      "must_see": [
+        "S2",
+        "S5",
+        "S7"
+      ],
+      "fails": "block",
+      "needs": [
+        "S8"
+      ]
+    },
+    {
+      "id": "S10",
+      "op": "render",
+      "template": "status_review.md",
+      "input": "deviation",
+      "out": "status-review.md",
+      "needs": [
+        "S9"
+      ]
+    }
+  ]
+}

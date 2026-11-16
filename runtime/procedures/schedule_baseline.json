@@ -1,0 +1,64 @@
+{
+  "procedure": "schedule_baseline",
+  "version": 1,
+  "task": "schedule_network",
+  "steps": [
+    {
+      "id": "S1",
+      "op": "fill_schema",
+      "schema": "dependency-graph",
+      "input": "schedule.json",
+      "slot": "graph",
+      "fails": "block"
+    },
+    {
+      "id": "S2",
+      "op": "compute",
+      "method": "schedule.cpm",
+      "inputs": [
+        "graph"
+      ],
+      "slot": "cpm",
+      "needs": [
+        "S1"
+      ]
+    },
+    {
+      "id": "S3",
+      "op": "check",
+      "checks": [
+        "dep.acyclic",
+        "schedule.critical_path"
+      ],
+      "input": "graph",
+      "slot": "schedule_checks",
+      "fails": "block",
+      "needs": [
+        "S2"
+      ]
+    },
+    {
+      "id": "S4",
+      "op": "human_approve",
+      "gate": "GATE-SCHEDULE",
+      "must_see": [
+        "S2",
+        "S3"
+      ],
+      "fails": "block",
+      "needs": [
+        "S3"
+      ]
+    },
+    {
+      "id": "S5",
+      "op": "render",
+      "template": "schedule_baseline.md",
+      "input": "cpm",
+      "out": "schedule-baseline.md",
+      "needs": [
+        "S4"
+      ]
+    }
+  ]
+}

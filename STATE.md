@@ -32,6 +32,10 @@
 | `adr/` | `accepted` |
 | `scripts/` | `active` |
 | `validation/` | `active` |
+| `runtime/` | `active` |
+| `runtime/templates/` | `template` |
+| `runtime/demo/` | `example` |
+| `runtime/demo/out/` | `example` |
 
 ## 例外
 

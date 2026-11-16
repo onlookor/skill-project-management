@@ -1590,3 +1590,42 @@
 - **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-149 的“批次 0093 追记”；`scripts/no-review-declarations.json` 中 `check_checker_pins.py`、`no-review-declarations.json` 两项的 `reason`/`missing_review`；本节。
 - **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`。
 - **关联 ADR**：无
+
+---
+
+### 批次 0095 — 2026-11-16 — D6 解释器与七项机械能力落地（未复核）
+
+- **授权依据**：用户要求按 `spec/D6_REBASELINE_PROPOSAL.md` 第 3/4/6/7/9 节与 `ROADMAP.md` 的 D6 条目推进解释器与七项缺失机械能力；本批只落地，**不构成任何对象已获认可**。
+- **批次号**：`0094` 已由提交 `c24b950`（第九轮复核文字修正）占用但未形成 CHANGELOG 条目；按 `AGENTS.md` 3.1“已占用但未形成条目的编号不复用（批次 0017 先例）”，本批记为 **0095**。
+- **归区登记**：新增 `runtime/` 顶层目录，按 `spec/ACCESS_ZONES.md` 第 4 节登记——`runtime/` 为 C（代码与配置，22 个 JSON），`runtime/templates/` 与 `runtime/demo/out/` 为 P/P2（10 个 Markdown，非权威）。`spec/ACCESS_ZONES.md` 区段指纹已重冻，因新增内容未经外复核，basis 为无复核声明。
+- **与提案口径的偏离**：提案第 9 节计划 `runtime/glossary.jsonl` 与签字记录 `approval.jsonl`；本批改落为 `.json`（JSON 数组）。理由：`spec/ACCESS_ZONES.md` 的区表不接纳 `.jsonl` 进 C 区，而走 D 区需新增内容 schema 并登记为规格区段，后者要求改动已带“认可”依据的 `scripts/check_spec_pins.py`，本批不具备重新取证条件。语义不变，不新增检查能力。
+- **涉及文件**：
+  - 新建（解释器内核）：`scripts/pm_schema.py`（326 行）、`scripts/pm_config.py`（510 行）、`scripts/pm_check.py`（556 行）、`scripts/test_pm_runtime.py`（261 行）
+  - 新建（七项能力）：`scripts/pm_caps.py`（975 行）
+  - 新建（运行契约）：`runtime/artifacts/` 6 份工件 schema；`runtime/task-catalog.json`（7 张任务卡）；`runtime/procedures/` 5 张工序卡；`runtime/templates/` 5 份模板；`runtime/glossary.json`（RT-E-01～08）
+  - 新建（演示）：`runtime/demo/config.json`、`runtime/demo/config.lock.json`、`runtime/demo/inputs/` 7 份输入、`runtime/demo/out/` 5 份渲染产物
+  - 修改：`spec/ACCESS_ZONES.md`（新增 `runtime/` 归区）、`TODO.md`（T-151/T-158 追记、新增 T-167）、`GAP_LEDGER.md`（RG 段后新增“批次 0095 实施进展”）、`GLOSSARY.md`（T-F-009～T-F-015）、`STATE.md`（`runtime/` 及其子目录默认状态）、`knowledge/glossary-usage.json`（重新生成）、`scripts/checker-pins.json` 与 `scripts/no-review-declarations.json`（5 个新脚本逐条登记）、`scripts/spec-pins.json`（ACCESS_ZONES 区段重冻）
+  - **未改**：`CONSTITUTION.md`、`spec/D6_REBASELINE_PROPOSAL.md`、`GRAMMAR.md`、`spec/CHECKER_INPUT_SCHEMA.md`（受钉扎）、既有检查器逻辑
+- **一、解释器（六算子闭集）**
+  - 闭集固定为 `fill_schema` / `compute` / `lookup` / `check` / `human_approve` / `render`，无第七个算子；`--procedure` 执行 `工序卡`（`runtime/procedures/status_review.json` 等）时先做闭集与 `needs` 校验，越界算子或引用未执行/自身步骤判 `2`。
+  - 工件校验强制 `x-checks`/`x-provenance`；`x-checks` 中引用未注册检查名判 `4`（解释器不可用），缺 `provenance` 判 `2`。
+  - `五值退出码` 为 `0/1/2/3/4`，聚合优先级 `4 > 2 > 1 > 3 > 0`；`3` 专供 `cannot_evaluate`，含判定性配置缺失、缺人类签字、EAC 方法未声明等。
+  - 配置按 CFG-01～CFG-15 求值：判定性项**不取默认**，缺失即 `cannot_evaluate`（`3`）；`config_invalid`/`config_incomplete` 退 `2`；`config_drift` 退 `1`；仅 CFG-10/CFG-11 允许取默认并登记进 `defaulted`。配置只能调严调宽，不能关闭任何检查。
+  - 零第三方依赖，只读 JSON（不引入 YAML）；JSON Schema 子集内核 `pm_schema.py` 以 `IMPLEMENTED` 白名单拒绝未实现关键字，避免静默忽略。
+- **二、七项机械能力**（依赖图 → 预算汇总 → 风险登记册 → 状态采集 → 偏差阈值 → 挣值 → 审计留痕）
+  - 依赖图：FS/SS/FF/SF 四类逻辑关系 + lag 前后推、总浮时、关键路径；成环判 `1`。
+  - 预算汇总：科目树父=子和守恒、工作包唯一、分时段金额合计一致、货币与 CFG-09 一致。
+  - 风险登记册：必填字段、概率/影响在 CFG-14 刻度内、残余评分不高于初始、责任人角色已登记、分档一致。
+  - 状态采集：按 CFG-04～CFG-08 计算采样网格，采样点与配置口径不一致或缺失判 `cannot_evaluate`；缺数必须显式登记 `unavailable_reason`，不得隐式补零。
+  - 偏差阈值：按 CFG-01/02/03 分档，越界值判 `cannot_evaluate`，不内置任何阈值常量。
+  - 挣值：EV 按 CFG-13 复算、SV/CV/SPI/CPI、EAC 三法（按工件显式声明的方法）、BAC 与工作包预算一致、术语别名只认一套主名。
+  - 审计留痕：`prev_digest` 摘要链、序号严格递增连续、退出码合法、非零结论附证据路径。
+- **三、配置口径（不写死、不设默认）**
+  - 偏差阈值与状态采样口径全部来自配置；采样支持按科目分档、按里程碑计划周期分数采样与自然日/周/月/小时口径，均无内置默认值。未约定即 `cannot_evaluate`。
+- **术语登记**：新增 F 类条目 T-F-009、T-F-010、T-F-011、T-F-012、T-F-013、T-F-014、T-F-015（`工件契约`、`任务目录`、`工序卡`、`签字关口`、`算子闭集`、`配置摘要`、五值退出码）；使用位置由 `python3 scripts/check_glossary_usage.py --write` 重建。
+- **验证**：`python3 scripts/test_pm_runtime.py` 33/33 通过（配置 0/1/2/3、六工件正例、六类反例、5 工序跑通、缺签字 → 3、拒绝 → 1、算子越界 → 2、跳步 → 2、契约目录缺失 → 4、可复现性）；`python3 scripts/pm_check.py --catalog` 7 张任务卡通过；6 份工件逐件退出 `0`；5 张工序卡无模型跑通并渲染产物。
+- **规模偏离（如实登记）**：实现 2367 行 + 自测 261 行，高于提案口径（解释器 1000–1350 行、能力 900–1000 行）。超出部分集中在 `pm_caps.py` 的七项算法与 33 个检查注册；**算子闭集未扩张**，功能数未增加。是否接受该规模由复核裁定，本批不自我认可。
+- **未做**：T-158 的 A1–A6 旧工件契约未接入（`spec/CHECKER_INPUT_SCHEMA.md` 受钉扎，本批不改）；`human_approve` 只校验记录/角色/`must_see`，不证明签字人为自然人。
+- **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-167；`scripts/no-review-declarations.json` 中 `pm_schema.py`、`pm_config.py`、`pm_caps.py`、`pm_check.py`、`test_pm_runtime.py` 五条；本节。
+- **钩子绕过**：本批提交携带 `Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149,T-166,T-167`（新脚本与规格区段未经非同源复核）。
+- **关联 ADR**：无

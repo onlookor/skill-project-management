@@ -1,0 +1,50 @@
+[
+  {
+    "term_id": "RT-E-01",
+    "term": "EV",
+    "aliases": ["挣值", "BCWP"],
+    "definition": "已完成工作的预算价值；本项目按 CFG-13 计量。"
+  },
+  {
+    "term_id": "RT-E-02",
+    "term": "PV",
+    "aliases": ["计划值", "BCWS"],
+    "definition": "计划工作的预算价值。"
+  },
+  {
+    "term_id": "RT-E-03",
+    "term": "AC",
+    "aliases": ["实际成本", "ACWP"],
+    "definition": "已完成工作的实际成本。"
+  },
+  {
+    "term_id": "RT-E-04",
+    "term": "SPI",
+    "aliases": ["进度绩效指数"],
+    "definition": "EV 与 PV 之比；偏差点定义由 CFG-03 决定。"
+  },
+  {
+    "term_id": "RT-E-05",
+    "term": "CPI",
+    "aliases": ["成本绩效指数"],
+    "definition": "EV 与 AC 之比。"
+  },
+  {
+    "term_id": "RT-E-06",
+    "term": "WBS",
+    "aliases": ["工作分解结构"],
+    "definition": "按交付物逐层分解的工作包层级。"
+  },
+  {
+    "term_id": "RT-E-07",
+    "term": "关键路径",
+    "aliases": ["critical path"],
+    "definition": "总浮时为零的活动序列；由 schedule.cpm 纯函数计算。"
+  },
+  {
+    "term_id": "RT-E-08",
+    "term": "残余风险",
+    "aliases": ["residual risk"],
+    "definition": "采取应对措施后仍保留的风险水平；不得高于初始评分。"
+  }
+]

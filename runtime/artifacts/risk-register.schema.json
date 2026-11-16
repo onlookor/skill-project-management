@@ -1,0 +1,216 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "runtime/artifacts/risk-register.schema.json",
+  "title": "风险登记册工件（CAP-25 / CAP-23）",
+  "description": "字段集是判据、刻度是项目参数：概率与影响的取值上限由 CFG-14 的刻度尺寸决定（3×3 或 5×5），分档标签由 CFG-14.bands 决定。本 schema 只约束形状与封闭枚举；刻度一致性与残余风险不高于初始风险由 `x-checks` 绑定检查执行。",
+  "x-checks": [
+    "risk.required_fields",
+    "risk.scale_in_range",
+    "risk.residual_le_initial",
+    "risk.owner_registered",
+    "risk.band_consistent"
+  ],
+  "x-provenance": {
+    "requires": [
+      "risk.identified",
+      "risk.assessment"
+    ],
+    "$comment": "风险条目必须指回识别记录与评估输入；触发条件不得由模型改写为不可观测的叙述。"
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "artifact_type",
+    "artifact_version",
+    "project_id",
+    "config_ref",
+    "provenance",
+    "data"
+  ],
+  "properties": {
+    "artifact_type": {
+      "type": "string",
+      "const": "risk-register",
+      "maxLength": 40
+    },
+    "artifact_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "maxLength": 16
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$",
+      "maxLength": 64
+    },
+    "config_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "config_digest",
+        "item_digests"
+      ],
+      "properties": {
+        "schema_version": {
+          "type": "string",
+          "const": "config.schema/1",
+          "maxLength": 40
+        },
+        "config_digest": {
+          "type": "string",
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "maxLength": 72
+        },
+        "item_digests": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$",
+            "maxLength": 64
+          }
+        },
+        "defaulted": {
+          "type": "array",
+          "maxItems": 2,
+          "items": {
+            "type": "string",
+            "pattern": "^(CFG-10|CFG-11)$",
+            "maxLength": 8
+          }
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      }
+    },
+    "unsupported": {
+      "type": "array",
+      "maxItems": 40,
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 200
+      }
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "risks",
+        "roles"
+      ],
+      "properties": {
+        "roles": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 200,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          }
+        },
+        "risks": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 500,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "category",
+              "probability",
+              "impact",
+              "trigger",
+              "response_strategy",
+              "owner_role",
+              "status",
+              "residual_score",
+              "objective_refs"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^R-[A-Za-z0-9._-]{1,28}$",
+                "maxLength": 32
+              },
+              "category": {
+                "type": "string",
+                "enum": [
+                  "technical",
+                  "resource",
+                  "external",
+                  "organizational",
+                  "scope"
+                ],
+                "maxLength": 20
+              },
+              "probability": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5
+              },
+              "impact": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5
+              },
+              "trigger": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              },
+              "response_strategy": {
+                "type": "string",
+                "enum": [
+                  "avoid",
+                  "transfer",
+                  "mitigate",
+                  "accept"
+                ],
+                "maxLength": 16
+              },
+              "owner_role": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "identified",
+                  "analyzed",
+                  "responding",
+                  "closed"
+                ],
+                "maxLength": 16
+              },
+              "residual_score": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 25
+              },
+              "objective_refs": {
+                "type": "array",
+                "minItems": 1,
+                "maxItems": 20,
+                "items": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 80
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

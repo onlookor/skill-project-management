@@ -1,0 +1,77 @@
+{
+  "procedure": "risk_review",
+  "version": 1,
+  "task": "risk_register",
+  "steps": [
+    {
+      "id": "S1",
+      "op": "fill_schema",
+      "schema": "risk-register",
+      "input": "risk.json",
+      "slot": "risk",
+      "fails": "block"
+    },
+    {
+      "id": "S2",
+      "op": "lookup",
+      "table": "glossary",
+      "key": "残余风险",
+      "slot": "residual_term",
+      "needs": [
+        "S1"
+      ]
+    },
+    {
+      "id": "S3",
+      "op": "check",
+      "checks": [
+        "risk.required_fields",
+        "risk.scale_in_range",
+        "risk.residual_le_initial",
+        "risk.owner_registered",
+        "risk.band_consistent"
+      ],
+      "input": "risk",
+      "slot": "risk_checks",
+      "fails": "block",
+      "needs": [
+        "S2"
+      ]
+    },
+    {
+      "id": "S4",
+      "op": "compute",
+      "method": "risk.ranking",
+      "inputs": [
+        "risk"
+      ],
+      "slot": "ranking",
+      "needs": [
+        "S3"
+      ]
+    },
+    {
+      "id": "S5",
+      "op": "human_approve",
+      "gate": "GATE-RISK",
+      "must_see": [
+        "S3",
+        "S4"
+      ],
+      "fails": "block",
+      "needs": [
+        "S4"
+      ]
+    },
+    {
+      "id": "S6",
+      "op": "render",
+      "template": "risk_review.md",
+      "input": "ranking",
+      "out": "risk-review.md",
+      "needs": [
+        "S5"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+{
+  "procedure": "audit_review",
+  "version": 1,
+  "task": "audit_trail",
+  "steps": [
+    {
+      "id": "S1",
+      "op": "fill_schema",
+      "schema": "audit-trail",
+      "input": "audit.json",
+      "slot": "audit",
+      "fails": "block"
+    },
+    {
+      "id": "S2",
+      "op": "check",
+      "checks": [
+        "audit.required_fields",
+        "audit.chain_digest",
+        "audit.sequence_strict",
+        "audit.exit_code_valid",
+        "audit.evidence_present"
+      ],
+      "input": "audit",
+      "slot": "audit_checks",
+      "fails": "block",
+      "needs": [
+        "S1"
+      ]
+    },
+    {
+      "id": "S3",
+      "op": "compute",
+      "method": "audit.append",
+      "inputs": [
+        "audit"
+      ],
+      "record": {
+        "run_id": "run-demo-003",
+        "ts": "2026-11-16T20:00:00+08:00",
+        "actor": "onlookor",
+        "artifact_type": "audit-trail",
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "config_digest": "sha256:5c04f1f7e229b2b76aca9bf6ed876a14a796b9f325c59ee77faef64730669db8",
+        "rule_version": "batch-0095",
+        "checks_run": [
+          "audit.chain_digest"
+        ],
+        "exit_code": 0,
+        "evidence_paths": [
+          "runtime/demo/out/status-review.md"
+        ]
+      },
+      "slot": "appended",
+      "needs": [
+        "S2"
+      ]
+    },
+    {
+      "id": "S4",
+      "op": "human_approve",
+      "gate": "GATE-AUDIT",
+      "must_see": [
+        "S2",
+        "S3"
+      ],
+      "fails": "block",
+      "needs": [
+        "S3"
+      ]
+    },
+    {
+      "id": "S5",
+      "op": "render",
+      "template": "audit_review.md",
+      "input": "appended",
+      "out": "audit-review.md",
+      "needs": [
+        "S4"
+      ]
+    }
+  ]
+}

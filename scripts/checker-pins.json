@@ -78,7 +78,7 @@
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：scripts/test_dependency_pins.py；结论：认可"
     },
     "scripts/no-review-declarations.json": {
-      "sha256": "5593d88a7cbc56e56d6635985915db13f43081c1336aa19669ef7afd1b930d25",
+      "sha256": "c4aecdce87082fa1d32905da29192985fad28dd851eae7e71c1ae69b3c3ede8d",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "validation/pinned/checker.py": {
@@ -88,6 +88,26 @@
     "scripts/config_codes.py": {
       "sha256": "6cd5abaf685f98aa468a63f868bba6fdf4d1aee8d51dbf5bd137be1365fbef37",
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：scripts/config_codes.py；结论：认可"
+    },
+    "scripts/pm_caps.py": {
+      "sha256": "4646e7448ff66c6b620a38954de59cb8710299604891fcb7b2469676b1ae2dd2",
+      "basis": "无复核声明（不构成认可，不放行）"
+    },
+    "scripts/pm_check.py": {
+      "sha256": "bac3983bf8f36d839bd61b4806cbd772bb1cd1706cd02d865b12133d1f75e1bb",
+      "basis": "无复核声明（不构成认可，不放行）"
+    },
+    "scripts/pm_config.py": {
+      "sha256": "5576fdd05f76300bc7c93cad70d010853a5caa451ffe9761b26701225605a87d",
+      "basis": "无复核声明（不构成认可，不放行）"
+    },
+    "scripts/pm_schema.py": {
+      "sha256": "884ef3529b4dd786f431bc4ea74bea9980414d1a652bc37d84681f45c33ed43b",
+      "basis": "无复核声明（不构成认可，不放行）"
+    },
+    "scripts/test_pm_runtime.py": {
+      "sha256": "8eee0fb40fcb81a31baba7fdfcc926cb386c2c5f6008d26ce74c448014a594ba",
+      "basis": "无复核声明（不构成认可，不放行）"
     }
   },
   "note": "受保护脚本的哈希登记：全仓 .py（含本脚本）、.githooks/pre-commit、validation/checker-prototype/checker.py 与 scripts/no-review-declarations.json。改动必须 --write --basis 并附非同源复核记录；无复核时只能写固定声明并以 --no-verify 提交。本文件与快照检测都不提供权限分离。"
