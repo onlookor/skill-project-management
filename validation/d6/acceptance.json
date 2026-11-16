@@ -1,0 +1,61 @@
+{
+  "acceptance_version": "0.1.0",
+  "status": "skeleton",
+  "baseline_models": {
+    "weak": {
+      "family": "Qwen2.5-Instruct",
+      "size": "7B",
+      "quantization": "Q4_K_M",
+      "bits": 4,
+      "context_tokens": 32768,
+      "skill_mounted": true,
+      "execution_status": "defined_not_executed"
+    },
+    "control": {
+      "family": "Qwen2.5-Instruct",
+      "size": "72B",
+      "quantization": "Q4_K_M",
+      "bits": 4,
+      "context_tokens": 32768,
+      "skill_mounted": true,
+      "execution_status": "defined_not_executed"
+    },
+    "no_skill_arm": {
+      "family": "Qwen2.5-Instruct",
+      "size": "7B",
+      "quantization": "Q4_K_M",
+      "bits": 4,
+      "context_tokens": 32768,
+      "skill_mounted": false,
+      "execution_status": "defined_not_executed"
+    }
+  },
+  "thresholds": {
+    "mechanical_pass_rate_min": 0.9,
+    "human_review_pass_rate_min": 0.7,
+    "control_arm_delta_pp_min": 20,
+    "treat_cannot_evaluate_as": "not_passed",
+    "require_error_list": true,
+    "unconfigured": "cannot_evaluate"
+  },
+  "config": {
+    "primary": "validation/d6/acceptance-config.json",
+    "lock": "validation/d6/acceptance-config.lock.json",
+    "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+    "rule": "双臂锁同一快照；跨配置不可比；变体题单列"
+  },
+  "sensitivity": {
+    "S0_model": "weak_with_skill vs control_with_skill",
+    "S1_skill": "weak_with_skill vs weak_no_skill",
+    "S2_config_variants": [
+      "V-CFG03",
+      "V-CFG05",
+      "V-CFG14",
+      "V-CFG15",
+      "V-CFG09"
+    ],
+    "flip_requires_declaration": true
+  },
+  "task_set": "validation/d6/tasks/task-set.json",
+  "case_manifest": "validation/cases/MANIFEST.md"
+}

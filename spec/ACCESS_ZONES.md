@@ -45,6 +45,15 @@
 | `validation/pinned/` | C | — | 冻结的检查器快照 |
 | `validation/reviews/` | P | P2 | 复核与授权转录（非权威） |
 | `validation/test-cases/` | P | P2 | 测试用例说明 |
+| `validation/cases/MANIFEST.md` | P | P1 | 案例素材台账（ADR-0020 / T-156） |
+| `validation/cases/` | C | — | 案例改造输入（运行期工件 JSON，非原始资料） |
+| `validation/d6/` | P | P1 | D6 验收说明与基准（非权威） |
+| `validation/d6/acceptance.json` | C | — | D6 验收配置（档位/阈值/敏感性） |
+| `validation/d6/acceptance-config.json` | C | — | D6 验收运行时配置快照 |
+| `validation/d6/acceptance-config.lock.json` | C | — | D6 验收配置摘要 |
+| `validation/d6/tasks/` | C | — | D6 任务集（结构化） |
+| `validation/d6/results/` | P | P2 | D6 运行记录（非权威） |
+| `validation/d6/results/phase1-synthetic/run.json` | C | — | D6 批次 1 机器可读运行记录 |
 | `validation/` | P | P1 | 验证与复核材料 |
 
 ## 2. 数据区准入登记

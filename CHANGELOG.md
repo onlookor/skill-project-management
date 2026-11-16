@@ -1765,3 +1765,19 @@
 - **未做**：不改 `check_checker_pins.py` 的对象级锚（本轮范围为规格区段）；不另造 basis（`AGENTS.md#3.5` 只落库复核方产物）。
 - **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-171；`scripts/no-review-declarations.json` 的 `scripts/check_spec_pins.py`、`scripts/test_spec_pins.py`、`scripts/no-review-declarations.json` 条目；本节。
 - **关联 ADR**：无
+
+---
+
+### 批次 0103 — 2026-11-16 — D6 验收件阶段 1：任务集骨架、基准档位与配置快照
+
+- **涉及文件**：`validation/d6/README.md`、`validation/d6/BASELINE.md`、`validation/d6/acceptance.json`、`validation/d6/acceptance-config.json`、`validation/d6/acceptance-config.lock.json`、`validation/d6/tasks/task-set.json`、`validation/d6/results/phase1-synthetic/run.json`、`validation/d6/results/phase1-synthetic/SUMMARY.md`、`validation/cases/MANIFEST.md`、`validation/cases/synthetic/**/inputs/*.json`、`spec/ACCESS_ZONES.md`、`scripts/no-review-declarations.json`、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`knowledge/glossary-usage.json`、`TODO.md`、`CHANGELOG.md`
+- **变更摘要**：
+  - 按 `ROADMAP.md` D6 要件 1–3 与 `spec/D6_REBASELINE_PROPOSAL.md` 第 7 节建立验收件骨架：三档基准（弱档 7B / 对照档 72B / 无技能臂，均 Q4_K_M、32768，`defined_not_executed`）、阈值（机械 90% / 人评 70% / 控制臂差 ≥20 个百分点）、S0/S1/S2 敏感性口径与跨配置不可比规则；阈值写入验收配置实例，不作为技能常量。
+  - 任务集 32 题：公开案例改造 22 题（NAO Crossrail 6、Universal Credit 5、HS2 6、NPfIT 5）+ 合成 10 题；逐题含出处、期望五值、绑定检查 id、`input_status` 与改造说明。公开案例素材台账按 ADR-0020 / T-156 建立在 `validation/cases/MANIFEST.md`，不复制原文，只记录来源、许可、访问日期、已用事实、改造方式与局限。
+  - 合成 10 题输入由运行期工件契约构造，配置指纹锁 `sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c`；经 `pm_check --artifact` 跑通并落 `phase1-synthetic/run.json`，9 题符合期望，1 题（D6-SYN-02）检出 `dep.acyclic` 违规但聚合退出码为 3，而规范 4.5 的“1=存在违规”未定义与 `cannot_evaluate` 同时成立时的优先级，按不符记录，不放宽判据。
+  - `spec/ACCESS_ZONES.md` 登记 `validation/cases/`（C 区 JSON）与 `validation/d6/` 的 P/C 混合归区；该规格区段属钉扎面，本批无新复核，按 3.5.3 保留无复核声明并以 `--no-verify` 提交。
+- **实测**：`check_no_raw_material` 0；`check_anchors` 0；`check_ledger_landings` 0；`check_three_table` 0；`check_coverage_gate` 0；`check_gap_ledger --staged` 0；`check_glossary_usage` 0（已 `--write` 同步陈旧位置）；`check_state` 0；`check_checker_pins` 7（不变，全部无复核声明）；`check_spec_pins` 7（A.2 日期未核验 + `ACCESS_ZONES` 等无复核声明）。合成运行：10/10 执行，9 符合期望，1 不符（退出码聚合优先级未定义）。
+- **钩子绕过**：本批提交携带 `Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-172`（`spec/ACCESS_ZONES.md` 归区改动与 `scripts/no-review-declarations.json` 未取得非同源复核；0103 的欠账单独记为 T-172，按 3.5.3 第 3 条每次 `--no-verify` 新建到期项）。
+- **未做**：公开案例 22 题的输入 JSON 尚未改造（`input_status: planned`）；模型双档双臂未执行（本机无权重）；未修退出码聚合优先级，仅登记现象；未宣称 D6 达标。
+- **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-172（归区改动与登记表同步）、T-150 / T-156（阶段进展）；`scripts/no-review-declarations.json` 的 `spec/ACCESS_ZONES.md` 与 `scripts/no-review-declarations.json` 条目；本节。
+- **关联 ADR**：ADR-0020（案例素材处理）

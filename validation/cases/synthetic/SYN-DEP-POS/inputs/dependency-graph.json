@@ -1,0 +1,84 @@
+{
+  "artifact_type": "dependency-graph",
+  "artifact_version": "1.0.0",
+  "project_id": "D6-SYN-DEP-POS",
+  "config_ref": {
+    "schema_version": "config.schema/1",
+    "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+    "item_digests": {
+      "CFG-01": "a43268cfab6b05bf9f12a9026013f49b1db587e7e60e527ad043dfe9758cfe4a",
+      "CFG-02": "02244f77b2e46d30d97e5058fae685f9a4cf8cadb123e9ca84e2c3a64499737c",
+      "CFG-03": "d9060adef7299e011a69c0f82685fb37b23921319451dac94d29f517cfa8b02b",
+      "CFG-04": "6534f24738d4ccd6755e22c7e1209deec895a5007e41086bb2cef6a4ece4d98c",
+      "CFG-05": "8dfcd18738d2f8ffdf2a01803e54a4b96e863de26035dbe4d396befb9b7bae0d",
+      "CFG-06": "ee208552d9b0d3a72b62eaa8795c104043c4c82e4772965e6bcab3439bf37a8f",
+      "CFG-08": "8eda1362bd8b232eb452b18d3cfa974f7e68636d758862a5e5f919c4216106db",
+      "CFG-09": "8e06735c89d493d78ff5f12b2e47a5f055f1334b7a540bd6c58345195ee9c153",
+      "CFG-10": "88d262f272255cbaabbef3eb4ce3d0333b28380e379acb164fb361587ce38885",
+      "CFG-11": "bd8032c1e74620935cf561da140b664664b34592a2c3d5cf39bc5412e3cdba0a",
+      "CFG-12": "82da498b44fde96a83c2a4695b1545fdcc20b3e734ddf2e2b82feb9e9addbe2e",
+      "CFG-13": "ff85c36abbcd1ad9af70a3987bd1ea3f7a6c07fafbcf34c015d05e8be4960a61",
+      "CFG-14": "323310ff32ff3e64c3343571052daddd56449a309c696b2c3eb85d8f3f5c986c",
+      "CFG-15": "c3463e409fa1532f5ac068b1afc87f89ffc0162ada1a38361450a4e5f8ba11ce"
+    },
+    "defaulted": []
+  },
+  "provenance": {
+    "schedule.activities": "input:schedule-input.json#/activities",
+    "schedule.dependencies": "input:schedule-input.json#/dependencies"
+  },
+  "data": {
+    "activities": [
+      {
+        "id": "A",
+        "wbs_ref": "W1",
+        "duration_days": 3
+      },
+      {
+        "id": "B",
+        "wbs_ref": "W1",
+        "duration_days": 4
+      },
+      {
+        "id": "C",
+        "wbs_ref": "W2",
+        "duration_days": 2
+      },
+      {
+        "id": "D",
+        "wbs_ref": "W2",
+        "duration_days": 3
+      }
+    ],
+    "dependencies": [
+      {
+        "from": "A",
+        "to": "B",
+        "type": "FS",
+        "lag": 0
+      },
+      {
+        "from": "A",
+        "to": "C",
+        "type": "FS",
+        "lag": 0
+      },
+      {
+        "from": "B",
+        "to": "D",
+        "type": "FS",
+        "lag": 0
+      },
+      {
+        "from": "C",
+        "to": "D",
+        "type": "FS",
+        "lag": 0
+      }
+    ],
+    "wbs_node_ids": [
+      "W1",
+      "W2"
+    ]
+  }
+}

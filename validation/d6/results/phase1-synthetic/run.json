@@ -1,0 +1,647 @@
+{
+  "summary": {
+    "run_id": "phase1-synthetic",
+    "generated_at": "2026-11-16T22:58:25+08:00",
+    "task_set_version": "0.1.0-skeleton",
+    "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+    "models": "not_executed",
+    "total": 10,
+    "pass": 9,
+    "mismatch": 1,
+    "exit_codes": {
+      "0": 4,
+      "1": 4,
+      "2": 0,
+      "3": 2,
+      "4": 0
+    },
+    "observations": [
+      "依赖图缺少 lag 字段时 schedule.critical_path 判 cannot_evaluate（无法区分“无滞后”与“未声明”）；正例需显式写 lag: 0。",
+      "SYN-DEP-CYCLE 检出 dep.acyclic 违规，但聚合退出码为 3；按规范 4.5“1=存在违规”应记 1。两者同时成立时优先级未定义，本批按 1 期望并记不符，不据此放宽判据。",
+      "SYN-BUD-TIMESUM 同时触发 budget.total_conserved 与 budget.time_phased_sum；两者是不同口径的守恒检查，均保留。",
+      "本批 10 题全部为合成题；公开案例改造题尚未进入运行，模型双臂 not_executed。"
+    ]
+  },
+  "results": [
+    {
+      "task_id": "D6-SYN-01",
+      "case_id": "SYN-DEP-POS",
+      "title": "依赖图正例：显式零滞后、WBS 映射完整、关键路径可算",
+      "artifact": "validation/cases/synthetic/SYN-DEP-POS/inputs/dependency-graph.json",
+      "checks": [
+        "dep.ids_unique",
+        "dep.endpoints_exist",
+        "dep.acyclic",
+        "dep.types_valid",
+        "dep.wbs_mapping",
+        "schedule.critical_path"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": []
+      },
+      "actual": {
+        "exit_code": 0,
+        "findings": [
+          {
+            "check": "dep.ids_unique",
+            "detail": "4 个活动 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.endpoints_exist",
+            "detail": "4 条依赖端点闭合",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.acyclic",
+            "detail": "DAG 无环",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.types_valid",
+            "detail": "依赖类型均在 FS/SS/FF/SF 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.wbs_mapping",
+            "detail": "活动↔工作包映射完整",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "schedule.critical_path",
+            "detail": "总工期 10.0；关键活动 ['A', 'B', 'D']",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [],
+        "artifact_digest": "sha256:9943ff441b65a36f86552806af06438f6f16a7ae4817c004e78b0a183a292200"
+      },
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null
+    },
+    {
+      "task_id": "D6-SYN-02",
+      "case_id": "SYN-DEP-CYCLE",
+      "title": "依赖图负例：A→B→C→D→A 成环",
+      "artifact": "validation/cases/synthetic/SYN-DEP-CYCLE/inputs/dependency-graph.json",
+      "checks": [
+        "dep.ids_unique",
+        "dep.endpoints_exist",
+        "dep.acyclic",
+        "dep.types_valid",
+        "dep.wbs_mapping",
+        "schedule.critical_path"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "dep.acyclic"
+        ]
+      },
+      "actual": {
+        "exit_code": 3,
+        "findings": [
+          {
+            "check": "dep.ids_unique",
+            "detail": "4 个活动 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.endpoints_exist",
+            "detail": "5 条依赖端点闭合",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.acyclic",
+            "detail": "存在环：['A', 'B', 'C', 'D']",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "dep.types_valid",
+            "detail": "依赖类型均在 FS/SS/FF/SF 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.wbs_mapping",
+            "detail": "活动↔工作包映射完整",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "schedule.critical_path",
+            "detail": "依赖图成环：['A', 'B', 'C', 'D']",
+            "path": "",
+            "status": "cannot_evaluate"
+          }
+        ],
+        "failed_checks": [
+          "dep.acyclic",
+          "schedule.critical_path"
+        ],
+        "artifact_digest": "sha256:3f948bccd335f9154b9baad6ef9f6020c73c97f5b53740cd09ca5c07df024d60"
+      },
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "mismatch",
+      "mismatch_reason": "exit_code_precedence_undefined"
+    },
+    {
+      "task_id": "D6-SYN-03",
+      "case_id": "SYN-DEP-NOWBS",
+      "title": "依赖图不能判定例：未注入 WBS 节点清单",
+      "artifact": "validation/cases/synthetic/SYN-DEP-NOWBS/inputs/dependency-graph.json",
+      "checks": [
+        "dep.ids_unique",
+        "dep.endpoints_exist",
+        "dep.acyclic",
+        "dep.types_valid",
+        "dep.wbs_mapping",
+        "schedule.critical_path"
+      ],
+      "expected": {
+        "outcome": "cannot_evaluate",
+        "exit_code": 3,
+        "must_flag": [
+          "dep.wbs_mapping"
+        ]
+      },
+      "actual": {
+        "exit_code": 3,
+        "findings": [
+          {
+            "check": "dep.ids_unique",
+            "detail": "4 个活动 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.endpoints_exist",
+            "detail": "4 条依赖端点闭合",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.acyclic",
+            "detail": "DAG 无环",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.types_valid",
+            "detail": "依赖类型均在 FS/SS/FF/SF 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "dep.wbs_mapping",
+            "detail": "未注入 WBS 节点清单，活动↔工作包映射无法判定",
+            "path": "",
+            "status": "cannot_evaluate"
+          },
+          {
+            "check": "schedule.critical_path",
+            "detail": "总工期 10.0；关键活动 ['A', 'B', 'D']",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [
+          "dep.wbs_mapping"
+        ],
+        "artifact_digest": "sha256:9cc4fe621cef8fd4383253db1ceb3f6ea13abcb14142413616dfcd99d9775090"
+      },
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null
+    },
+    {
+      "task_id": "D6-SYN-04",
+      "case_id": "SYN-BUD-POS",
+      "title": "预算正例：科目登记、总额守恒、分时段求和一致、币种一致",
+      "artifact": "validation/cases/synthetic/SYN-BUD-POS/inputs/cost-budget.json",
+      "checks": [
+        "budget.accounts_registered",
+        "budget.package_unique",
+        "budget.total_conserved",
+        "budget.time_phased_sum",
+        "budget.currency_match"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": []
+      },
+      "actual": {
+        "exit_code": 0,
+        "findings": [
+          {
+            "check": "budget.accounts_registered",
+            "detail": "全部工作包科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.package_unique",
+            "detail": "3 个工作包 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.total_conserved",
+            "detail": "每个科目与总额均守恒，合计 10000.0",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.time_phased_sum",
+            "detail": "每个工作包的分时段金额之和等于总额",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.currency_match",
+            "detail": "货币与 CFG-09 一致",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [],
+        "artifact_digest": "sha256:c0ee402b81fd02f8a0a2ee3d3489af6a3c44c734183917ea5ca066083e0c95fe"
+      },
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null
+    },
+    {
+      "task_id": "D6-SYN-05",
+      "case_id": "SYN-BUD-TIMESUM",
+      "title": "预算负例：WP1 分时段合计 4000 ≠ 工作包金额 5000",
+      "artifact": "validation/cases/synthetic/SYN-BUD-TIMESUM/inputs/cost-budget.json",
+      "checks": [
+        "budget.accounts_registered",
+        "budget.package_unique",
+        "budget.total_conserved",
+        "budget.time_phased_sum",
+        "budget.currency_match"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "budget.time_phased_sum"
+        ]
+      },
+      "actual": {
+        "exit_code": 1,
+        "findings": [
+          {
+            "check": "budget.accounts_registered",
+            "detail": "全部工作包科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.package_unique",
+            "detail": "3 个工作包 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.total_conserved",
+            "detail": "分时段合计 9000.0 与工作包合计 10000.0 不等",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "budget.time_phased_sum",
+            "detail": "分时段金额与工作包金额不一致或缺分时段：['WP1']",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "budget.currency_match",
+            "detail": "货币与 CFG-09 一致",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [
+          "budget.time_phased_sum",
+          "budget.total_conserved"
+        ],
+        "artifact_digest": "sha256:e0fe8731ed8da0aa36a0bd484cbc19f7d7b4a05d18a299b4a9df6af94373a88b"
+      },
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null
+    },
+    {
+      "task_id": "D6-SYN-06",
+      "case_id": "SYN-RISK-POS",
+      "title": "风险正例：字段齐备、刻度内、残余不高于初始、责任人已登记",
+      "artifact": "validation/cases/synthetic/SYN-RISK-POS/inputs/risk-register.json",
+      "checks": [
+        "risk.required_fields",
+        "risk.scale_in_range",
+        "risk.residual_le_initial",
+        "risk.owner_registered",
+        "risk.band_consistent"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": []
+      },
+      "actual": {
+        "exit_code": 0,
+        "findings": [
+          {
+            "check": "risk.required_fields",
+            "detail": "3 条风险字段齐备",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.scale_in_range",
+            "detail": "概率与影响均在 3×3 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.residual_le_initial",
+            "detail": "残余评分均不高于初始评分",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.owner_registered",
+            "detail": "风险责任人角色均已登记",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.band_consistent",
+            "detail": "初始评分均落在 CFG-14 分档内",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [],
+        "artifact_digest": "sha256:5b831af7b85088b2cfc0c8a47a45a7dcc48024e7fa81c812049a849d18095602"
+      },
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null
+    },
+    {
+      "task_id": "D6-SYN-07",
+      "case_id": "SYN-RISK-RESIDUAL",
+      "title": "风险负例：R-001 残余评分 7 高于初始评分 6",
+      "artifact": "validation/cases/synthetic/SYN-RISK-RESIDUAL/inputs/risk-register.json",
+      "checks": [
+        "risk.required_fields",
+        "risk.scale_in_range",
+        "risk.residual_le_initial",
+        "risk.owner_registered",
+        "risk.band_consistent"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "risk.residual_le_initial"
+        ]
+      },
+      "actual": {
+        "exit_code": 1,
+        "findings": [
+          {
+            "check": "risk.required_fields",
+            "detail": "3 条风险字段齐备",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.scale_in_range",
+            "detail": "概率与影响均在 3×3 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.residual_le_initial",
+            "detail": "残余评分高于初始评分：['R-001']",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "risk.owner_registered",
+            "detail": "风险责任人角色均已登记",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.band_consistent",
+            "detail": "初始评分均落在 CFG-14 分档内",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [
+          "risk.residual_le_initial"
+        ],
+        "artifact_digest": "sha256:68184d48d143e6514851408b80a08527159b13f9fe6da8bed96c37bb91cb2e77"
+      },
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null
+    },
+    {
+      "task_id": "D6-SYN-08",
+      "case_id": "SYN-STATUS-POS",
+      "title": "状态正例：字典齐备、无隐式零、采样点合网格、科目已登记",
+      "artifact": "validation/cases/synthetic/SYN-STATUS-POS/inputs/status-snapshot.json",
+      "checks": [
+        "status.dictionary_fields",
+        "status.no_implicit_zero",
+        "status.sample_grid",
+        "status.account_registered"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": []
+      },
+      "actual": {
+        "exit_code": 0,
+        "findings": [
+          {
+            "check": "status.dictionary_fields",
+            "detail": "数据字典齐备且测量指标均已登记",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.no_implicit_zero",
+            "detail": "缺数均显式登记了 unavailable_reason",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.sample_grid",
+            "detail": "2 个采样点均与配置口径一致",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.account_registered",
+            "detail": "测量科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [],
+        "artifact_digest": "sha256:240547a342afd4f2de6b4827cca315960efbc9ed3d232debde621894863a74ac"
+      },
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null
+    },
+    {
+      "task_id": "D6-SYN-09",
+      "case_id": "SYN-EVM-BUDGET",
+      "title": "挣值负例：BAC 9000 ≠ 工作包预算合计 10000",
+      "artifact": "validation/cases/synthetic/SYN-EVM-BUDGET/inputs/evm-record.json",
+      "checks": [
+        "evm.formulas",
+        "evm.ev_measurement",
+        "evm.eac_method",
+        "evm.budget_consistent",
+        "evm.term_aliases"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "evm.budget_consistent"
+        ]
+      },
+      "actual": {
+        "exit_code": 1,
+        "findings": [
+          {
+            "check": "evm.formulas",
+            "detail": "逐期复算完成；EAC 方法 cpi，共 1 期",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "evm.ev_measurement",
+            "detail": "EV 按 CFG-13 复算一致（0/100）",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "evm.eac_method",
+            "detail": "EAC 方法显式登记为 cpi",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "evm.budget_consistent",
+            "detail": "BAC=9000 与工作包预算合计 10000.0 不等",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "evm.term_aliases",
+            "detail": "只使用 EV/PV/AC 一套主名",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [
+          "evm.budget_consistent"
+        ],
+        "artifact_digest": "sha256:7539963c00b59843d113f50653807db26afbf435d3bcf64dfeb51cfff5ef72df"
+      },
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null
+    },
+    {
+      "task_id": "D6-SYN-10",
+      "case_id": "SYN-AUDIT-SEQ",
+      "title": "审计负例：序号 1、3 不连续，但哈希链本身闭合",
+      "artifact": "validation/cases/synthetic/SYN-AUDIT-SEQ/inputs/audit-trail.json",
+      "checks": [
+        "audit.required_fields",
+        "audit.chain_digest",
+        "audit.sequence_strict",
+        "audit.exit_code_valid",
+        "audit.evidence_present"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "audit.sequence_strict"
+        ]
+      },
+      "actual": {
+        "exit_code": 1,
+        "findings": [
+          {
+            "check": "audit.required_fields",
+            "detail": "2 条记录字段齐备",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "audit.chain_digest",
+            "detail": "2 条记录首尾相接",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "audit.sequence_strict",
+            "detail": "序号不是从 1 起的连续整数：[1, 3]",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "audit.exit_code_valid",
+            "detail": "退出码均在 0–4 内",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "audit.evidence_present",
+            "detail": "非零结论均附证据路径",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [
+          "audit.sequence_strict"
+        ],
+        "artifact_digest": "sha256:cbcdd573a0ae77e1162573d933af173229f4de4414d6926cad70bfebb933054d"
+      },
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null
+    }
+  ]
+}
