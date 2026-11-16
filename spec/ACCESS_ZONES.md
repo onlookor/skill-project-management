@@ -37,6 +37,7 @@
 | `spec/pilot/pilot-contract.yaml` | D | — | 试点契约样例 |
 | `spec/pilot/pilot-entries.json` | D | — | 试点知识条目 |
 | `spec/pilot/pilot-id-map.json` | D | — | 试点 ID 映射（生成） |
+| `spec/clause-registry.json` | D | — | 条款登记表（原文由生成器提取） |
 | `spec/pilot/` | P | P2 | 试点说明与报告（非权威） |
 | `spec/` | P | P1 | 规范正文 |
 | `validation/checker-prototype/coverage.json` | D | — | 覆盖矩阵（生成） |
@@ -63,6 +64,7 @@
 | `spec/pilot/pilot-conflicts.jsonl` | jsonl | `contracts/schema/pilot-conflict.schema.json` |
 | `spec/pilot/pilot-artifact.json` | json-object | `contracts/schema/pilot-artifact.schema.json` |
 | `spec/pilot/pilot-id-map.json` | json-object | `contracts/schema/pilot-id-map.schema.json` |
+| `spec/clause-registry.json` | json-object | 生成器 `scripts/check_clause_basis.py --write` |
 | `spec/pilot/pilot-contract.yaml` | yaml-object | `contracts/schema/pm-slot-contract.schema.json` |
 | `contracts/examples/` | yaml-object | `contracts/schema/pm-slot-contract.schema.json` |
 | `contracts/schema/pm-slot-contract.schema.json` | schema-doc | — |

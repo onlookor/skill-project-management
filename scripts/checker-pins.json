@@ -2,8 +2,8 @@
   "version": 1,
   "scripts": {
     ".githooks/pre-commit": {
-      "sha256": "c61fb651b1a63053adf86bde425f7f44f46cb7479d42144e40e65c68e1cff67f",
-      "basis": "非同源复核：第七批（基线 74cd8ed）仓库外只读外复核，实跑钩子：当前树在两个 pins 检查器均在链内，于 check_checker_pins 处 rc=1 阻断；复核产物：/home/wgz/projects/skills/2026-11-16/pm-governance-review/batch7/REVIEW-RECORD.md；sha256：7984ac6f4a9bf6b9a8211c8e325ffeeb01f9f4e490575676bcde6eb995f44879；复核基线：74cd8ed8c5d96e4966e4e517ebe8a6ad351a6ff1；区段：.githooks/pre-commit；结论：认可"
+      "sha256": "e91ce0f52e24693d1605d9881a17da2065869cb8691710f9e00d561b8f870dc7",
+      "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/check_anchors.py": {
       "sha256": "6aa0caa82d38e7f0cfd43303a0f6f798c4291ecbf4ee553d617b954906f6a8a2",
@@ -78,7 +78,7 @@
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：scripts/test_dependency_pins.py；结论：认可"
     },
     "scripts/no-review-declarations.json": {
-      "sha256": "d20d237e47555b57f2820f1cc87aed0ae198edb27ded3157730e089d222358d5",
+      "sha256": "d646dd7fa981654a98d7bdd04fc3d6ef68cb1d2d0ecd9dce641e45e70af6979d",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "validation/pinned/checker.py": {
@@ -106,7 +106,11 @@
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/test_pm_runtime.py": {
-      "sha256": "9810bd5f0ab301f7f7588c6865c82939c213451e248ff76dd829cb2bf40411f4",
+      "sha256": "56f6cfa6a203b02d46c716d07ac901001d0ca5033403457c9376f36c0c10f60f",
+      "basis": "无复核声明（不构成认可，不放行）"
+    },
+    "scripts/check_clause_basis.py": {
+      "sha256": "6fc05dcd780990e0196c5764646186853c53fbf354644a0f30eabb5d5beec130",
       "basis": "无复核声明（不构成认可，不放行）"
     }
   },

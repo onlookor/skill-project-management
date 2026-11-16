@@ -10,6 +10,7 @@
 | `check_ledger_landings.py` | 核对 `SOURCE_LEDGER.md` 每个 active 来源条目是否声明编译落点，且落点在 `GRAMMAR.md`、`knowledge/`、方法条目或检查项中真实存在 | 无独立规格（规则见 `CONSTITUTION.md` 第 2.6 条） | 已实现 |
 | `check_anchors.py` | 解析并校验全仓锚点：禁止行号 locator、文件/稳定 ID/章节号/标题路径可解析、规则 `grounding_ref` 与知识条目 `evidence.source_id` 指向 active 来源、规则与来源文本块指纹未漂移 | `spec/ANCHOR_SPEC.md` | 已实现 |
 | `anchor_baseline.json` | `check_anchors.py` 的指纹基线（`rule:*` 与 `source:*`），内容变更后重冻 | `spec/ANCHOR_SPEC.md` 第 5 节 | 数据文件 |
+| `check_clause_basis.py` | 条款依据检查：`spec/clause-registry.json` 每条按（源文件、章节、锚点或 JSON 指针）从原文逐字提取，运行期重新提取并比对；用例只认 `条款：<id>` 标记，引用未登记条款、判定性条款无覆盖、依据行缺标记、原文漂移均退出 1；`--write` 重提取，`--self-test` 五条正负例。**它只证明条款文字与源文件一致，不证明用例真的覆盖了该条款语义** | `spec/clause-registry.json` 的 `note`、`AGENTS.md` 3.6 | 已实现（未复核） |
 | `check_glossary_sync` | 检查 `GLOSSARY.md` 的 A 类条目与 `knowledge/anchored-entries.jsonl` 的定义一致性 | `check_glossary_sync.md` | 未实现（T-090） |
 | `check_no_raw_material.py` | 按目录分区执行原始资料准入（`CONSTITUTION.md` 第 13.3 条）：未归类路径 fail-closed；数据区必须过 schema 与字段配额；散文区只执行硬约束；本体区按 13.6 的谓词分档。形态推断判据（行长/行数/句末标点/空格比例）已退役 | `CONSTITUTION.md` 第 13 条、`spec/ACCESS_ZONES.md` | 已实现 |
 | `check_gap_ledger.py` | 核查 `GAP_LEDGER.md`：字段枚举、核查矩阵与附录 A 全覆盖、`open` 缺口被矩阵引用、TODO 交叉引用、按里程碑计算到期；`closed` 的关闭依据必须是 `外部复核：<路径>；sha256：<64hex>`，机械核对路径存在、是文件、哈希一致（`--self-test` 的 E01–E05 为正负例）；**“需求缺口（RG）与配置改判”表**：改判列与剩余缺口列非空、状态合法且不得 `closed`（关闭只能走主表关闭依据）、`RG→CFG` 必须指向配置 schema 真实存在的键、RG 行引用 `G-NNN` 时与缺口主表状态一致（R01–R05 为正负例）；`--staged` 要求规则/判定文件与台账同批更新。到期未裁定退出 1 | `AGENTS.md` 3.6 / 3.6.6、`adr/0012-gap-ledger-and-adjudication.md` | 已实现 |

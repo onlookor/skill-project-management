@@ -38,6 +38,8 @@ run_check "scripts/validate_ontology.py --matrix" python3 scripts/validate_ontol
 run_check "scripts/check_spec_pins.py" python3 scripts/check_spec_pins.py
 run_check "scripts/check_spec_pins.py 负例" python3 scripts/test_spec_pins.py
 run_check "scripts/check_glossary_usage.py" python3 scripts/check_glossary_usage.py
+run_check "scripts/check_clause_basis.py" python3 scripts/check_clause_basis.py
+run_check "scripts/check_clause_basis.py 负例" python3 scripts/check_clause_basis.py --self-test
 run_check "scripts/check_state.py" python3 scripts/check_state.py
 
 echo "[pre-commit] 全套检查器、准入自测与原型样例/关键扫描全部通过。"

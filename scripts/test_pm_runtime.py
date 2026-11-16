@@ -66,8 +66,10 @@ def main() -> int:
     try:
         print("[配置求值]")
         state = pm_config.evaluate(CONFIG, LOCK)
+        # 依据：条款：T-F-015-EXIT（五值退出码，齐备配置退 0）
         check("齐备配置退出码", state.exit_code, 0)
         check("未取默认值", state.defaulted, ())
+        # 依据：条款：D6-9.2-DEFAULT、CFG-10-DEFAULT（默认值只允许落在非判定性项且须登记）
         check(
             "默认值登记",
             pm_config.effective_config(
@@ -82,6 +84,7 @@ def main() -> int:
             temp / "config-missing.json",
             lambda body: body["config"].pop("CFG-01"),
         )
+        # 依据：条款：D6-9.3-CANNOT、CFG-01-JUDGE（判定性配置缺失即 cannot_evaluate）
         check("判定性项缺失 → 3", pm_config.evaluate(missing, None).exit_code, 3)
 
         broken = mutate(
@@ -89,6 +92,7 @@ def main() -> int:
             temp / "config-broken.json",
             lambda body: body["config"].__setitem__("CFG-04", "fortnightly"),
         )
+        # 依据：条款：D6-9.3-INVALID（配置值越界/类型错/分档不覆盖退 2）
         check("非法枚举 → 2", pm_config.evaluate(broken, None).exit_code, 2)
 
         drifted = mutate(
@@ -96,6 +100,7 @@ def main() -> int:
             temp / "config-drift.json",
             lambda body: body["config"].__setitem__("CFG-09", "USD"),
         )
+        # 依据：条款：D6-9.3-DRIFT、CFG-09-JUDGE（配置被改但锁未更新退 1）
         check("摘要漂移 → 1", pm_config.evaluate(drifted, LOCK).exit_code, 1)
 
         gap = mutate(
@@ -103,7 +108,24 @@ def main() -> int:
             temp / "config-gap.json",
             lambda body: body["config"]["CFG-03"]["boundaries"][1].__setitem__("lower", 0.85),
         )
+        # 依据：条款：D6-9.3-INVALID（分档不覆盖退 2）
         check("分档不连续 → 2", pm_config.evaluate(gap, None).exit_code, 2)
+
+        unregistered = mutate(
+            CONFIG,
+            temp / "config-unregistered.json",
+            lambda body: body["config"].__setitem__("CFG-99", {"x": 1}),
+        )
+        # 依据：条款：D6-9.3-UNREGISTERED、CFG-REGISTRY（未注册配置项不得被当成新参数）
+        check("未注册配置项 → 2", pm_config.evaluate(unregistered, None).exit_code, 2)
+
+        def make_contradictory(body: dict) -> None:
+            body["config"]["CFG-04"] = "milestone_fraction"
+            body["config"].pop("CFG-05")
+
+        contradictory = mutate(CONFIG, temp / "config-contradictory.json", make_contradictory)
+        # 依据：条款：D6-9.3-INCOMPLETE（配置项相互矛盾退 2）
+        check("配置项相互矛盾 → 2", pm_config.evaluate(contradictory, None).exit_code, 2)
 
         print("[工件契约：正例]")
         for name in ("schedule", "budget", "risk", "status", "evm", "audit"):
@@ -118,7 +140,7 @@ def main() -> int:
                 {"from": "D", "to": "A", "type": "FS", "lag": 0}
             ),
         )
-        # 依据：pm_check.py 文件头“聚合优先级 4 > 2 > 3 > 1 > 0；不可判定优先于显式违规”。
+        # 依据：条款：D6-8.3-RG06（依赖图 CAP-13）、T-F-015-EXIT（聚合优先级 4 > 2 > 3 > 1 > 0，不可判定优先于显式违规）。
         check("依赖成环（违规+不可判定）→ 3", pm_check.validate_artifact(read(cyclic), state)["exit_code"], 3)
 
         residual = mutate(
@@ -126,6 +148,7 @@ def main() -> int:
             temp / "risk-residual.json",
             lambda body: body["data"]["risks"][0].__setitem__("residual_score", 9),
         )
+        # 依据：条款：D6-8.3-RG08（风险登记册 CAP-25 的字段与残余口径）
         check("残余高于初始 → 1", pm_check.validate_artifact(read(residual), state)["exit_code"], 1)
 
         implicit = mutate(
@@ -133,6 +156,7 @@ def main() -> int:
             temp / "status-implicit.json",
             lambda body: body["data"]["samples"][1]["measurements"][0].pop("value"),
         )
+        # 依据：条款：D6-8.3-RG09（状态采集 CAP-35：缺数不得默认通过）
         check("隐式缺数 → 1", pm_check.validate_artifact(read(implicit), state)["exit_code"], 1)
 
         wrong_ev = mutate(
@@ -140,6 +164,7 @@ def main() -> int:
             temp / "evm-wrong.json",
             lambda body: body["data"]["measurements"][0].__setitem__("ev", 4000),
         )
+        # 依据：条款：D6-8.3-RG11、CFG-13-JUDGE（挣值 CAP-20 与计量规则）
         check("EV 与 CFG-13 不符 → 1", pm_check.validate_artifact(read(wrong_ev), state)["exit_code"], 1)
 
         chain = mutate(
@@ -147,6 +172,7 @@ def main() -> int:
             temp / "audit-chain.json",
             lambda body: body["data"]["records"][1].__setitem__("prev_digest", "sha256:" + "3" * 64),
         )
+        # 依据：条款：D6-8.3-RG12（审计留痕 CAP-42 的 prev_digest 链）
         check("摘要链断 → 1", pm_check.validate_artifact(read(chain), state)["exit_code"], 1)
 
         provenance = mutate(
@@ -154,6 +180,7 @@ def main() -> int:
             temp / "schedule-no-provenance.json",
             lambda body: body["provenance"].pop("schedule.dependencies"),
         )
+        # 依据：条款：D6-4.3-XCHECKS（工件契约强制 x-checks 与 x-provenance）
         check("缺来源引用 → 2", pm_check.validate_artifact(read(provenance), state)["exit_code"], 2)
 
         wrong_type = mutate(
@@ -161,9 +188,11 @@ def main() -> int:
             temp / "schedule-wrong-type.json",
             lambda body: body.__setitem__("artifact_type", "unknown-artifact"),
         )
+        # 依据：条款：D6-4.3-XCHECKS（未注册工件类型不得进入运行期）
         check("未注册工件类型 → 2", pm_check.main(["--artifact", str(wrong_type)]), 2)
 
         print("[工序：正例]")
+        # 依据：条款：D6-4.3-OPS、PROC-STATUS-STEP1（工序卡首步 fill_schema 与六算子闭集）
         for name in ("schedule_baseline", "cost_baseline", "risk_review", "status_review", "audit_review"):
             out = temp / f"out-{name}"
             code = pm_check.main(
@@ -187,6 +216,7 @@ def main() -> int:
         no_approval = temp / "inputs-no-approval"
         shutil.copytree(INPUTS, no_approval)
         (no_approval / "approval.json").unlink()
+        # 依据：条款：D6-4.3-MUSTSEE、PROC-STATUS-GATE（签字前必须看到的证据是固定清单）
         check(
             "缺人类签字 → 3",
             pm_check.main(
@@ -202,6 +232,7 @@ def main() -> int:
         (rejected / "approval.json").write_text(
             json.dumps(records, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
+        # 依据：条款：D6-4.3-MUSTSEE（人类拒绝即违规）
         check(
             "签字拒绝 → 1",
             pm_check.main(
@@ -215,6 +246,7 @@ def main() -> int:
             temp / "procedure-unknown-op.json",
             lambda body: body["steps"][1].__setitem__("op", "summon"),
         )
+        # 依据：条款：D6-4.3-OPS（闭集之外的算子即 procedure_invalid）
         check(
             "算子越界 → 2",
             pm_check.main(["--procedure", str(unknown_op), "--inputs", str(INPUTS), "--config", str(CONFIG), "--lock", str(LOCK)]),
@@ -226,6 +258,7 @@ def main() -> int:
             temp / "procedure-skip.json",
             lambda body: body["steps"][2].__setitem__("needs", ["S9"]),
         )
+        # 依据：条款：D6-4.3-OPS（工序步骤顺序与依赖）
         check(
             "跳步/乱序 → 2",
             pm_check.main(["--procedure", str(skipped), "--inputs", str(INPUTS), "--config", str(CONFIG), "--lock", str(LOCK)]),
@@ -233,8 +266,7 @@ def main() -> int:
         )
 
         print("[契约派生回归：外复核 10 条]")
-        # 依据：`spec/D6_REBASELINE_PROPOSAL.md` 8.3（预算汇总 CAP-19 / RG-07）
-        # 与批次 0096 外复核阻断 1：上卷后每个父节点都必须拿到完整子树，总数相等不够。
+        # 依据：条款：D6-8.3-RG07（预算汇总 CAP-19）；批次 0096 外复核阻断 1：上卷后每个父节点都必须拿到完整子树，总数相等不够。
         cfg3 = copy.deepcopy(state.config)
         cfg3["CFG-15"] = {
             "accounts": [
@@ -267,7 +299,7 @@ def main() -> int:
             ["pass"],
         )
 
-        # 依据：`scripts/pm_check.py` 文件头退出码段（输入/配置/工序不合法 = 2；
+        # 依据：条款：T-F-015-EXIT（输入/配置/工序不合法 = 2；
         # 无法机械判定 = 3）与 `GLOSSARY.md` T-F-015。
         def procedure(name: str, steps: list[dict]) -> Path:
             path = temp / name
@@ -333,7 +365,7 @@ def main() -> int:
             3,
         )
 
-        # 依据：`spec/D6_REBASELINE_PROPOSAL.md` 9.2/9.3（配置 finding 随判定出具；
+        # 依据：条款：D6-9.3-DRIFT、D6-9.3-CANNOT（配置 finding 随判定出具；
         # 9.3 第二列“阻断”）与批次 0096 外复核严重 3。
         drift_artifact = mutate(
             INPUTS / "schedule.json",
@@ -348,7 +380,7 @@ def main() -> int:
             True,
         )
 
-        # 依据：`spec/D6_REBASELINE_PROPOSAL.md` 9.1 安全边界 B1、9.3 第一行，
+        # 依据：条款：D6-9.1-NO-DEFAULT、AG-1BIS-NOCONFIG（缺配置不得默认通过；未配置即 cannot_evaluate），
         # 以及 `AGENTS.md` 1bis“未配置即 cannot_evaluate，不得回落为通过”。
         check(
             "缺 --config 的工件 → 3",
@@ -356,7 +388,7 @@ def main() -> int:
             3,
         )
 
-        # 依据：`spec/D6_REBASELINE_PROPOSAL.md` 9.4（item_digests 用于诊断可比性）
+        # 依据：条款：D6-9.4-ITEM、D6-9.4-DIGEST（item_digests 用于诊断可比性）
         # 与 `AGENTS.md` 1bis“跨配置不得比较”。
         lock_body = copy.deepcopy(read(LOCK))
         first_key = sorted(lock_body["item_digests"])[0]
@@ -371,7 +403,7 @@ def main() -> int:
             True,
         )
 
-        # 依据：`contracts/schema/runtime-config.schema.json` CFG-12 的 description
+        # 依据：条款：CFG-12-GATE（`runtime-config.schema.json` CFG-12 的 description）
         # “角色未解析则 blocked”与 `spec/D6_REBASELINE_PROPOSAL.md` 9.2 CFG-12 行。
         empty_gate = copy.deepcopy(state.config)
         empty_gate["CFG-12"] = {}
@@ -383,7 +415,7 @@ def main() -> int:
             3,
         )
 
-        # 依据：`GAP_LEDGER.md` 外复核派生条（批次 0096 严重 7）；render 的
+        # 依据：条款：D6-4.3-XCHECKS（工件契约强制 x-checks）；render 越界的出处是 GAP_LEDGER.md 外复核派生条（批次 0096 严重 7），提案无此规定；render 的
         # `out` 必须相对 `--out-dir` 解析，不得写出输出目录。
         escape_proc = procedure(
             "procedure-render-escape.json",
@@ -411,8 +443,8 @@ def main() -> int:
             2,
         )
 
-        # 依据：`spec/D6_REBASELINE_PROPOSAL.md` 9.1（判定性项无默认）、9.2 的
-        # CFG-03/CFG-13 行、9.3 第一行；`AGENTS.md` 1bis“不设默认值”。
+        # 依据：条款：D6-9.1-NO-DEFAULT、D6-9.2-DEFAULT（判定性项无默认）与 9.2 的
+        # 依据：条款：CFG-03-JUDGE、CFG-13-JUDGE、D6-9.3-CANNOT、AG-1BIS-NOCONFIG（不设默认值）。
         no_metric = copy.deepcopy(state.config)
         no_metric["CFG-03"].pop("metric")
         check(
@@ -448,7 +480,7 @@ def main() -> int:
             workdays_error = str(exc)
         check("CFG-08.workdays 缺失即拒绝", "workdays" in workdays_error, True)
 
-        # 依据：`spec/D6_REBASELINE_PROPOSAL.md` 9.2 CFG-06“基准必须显式，不能由实现猜”
+        # 依据：条款：CFG-04-JUDGE、CFG-06-EXPLICIT（采样口径与基准必须显式，不能由实现猜）
         # 与 9.3；两种采样模式共用同一配置口径。
         sample_cfg = copy.deepcopy(state.config)
         sample_cfg["CFG-04"] = "calendar_day"
@@ -475,7 +507,7 @@ def main() -> int:
             basis_error = str(exc)
         check("固定间隔缺 CFG-06 即拒绝", "CFG-06" in basis_error, True)
 
-        # 依据：`spec/D6_REBASELINE_PROPOSAL.md` 4.3(2) 工件契约与 `pm_schema.py`
+        # 依据：条款：D6-4.3-XCHECKS（工件契约强制 x-checks）与 `pm_schema.py`
         # 文件头“关键字闭集”：未实现关键字出现在任何分支都必须拒绝。
         keyword_errors = []
         for schema in (
@@ -490,7 +522,7 @@ def main() -> int:
                 keyword_errors.append(False)
         check("未实现关键字在任意分支均拒绝", keyword_errors, [True, True])
 
-        # 依据：`spec/D6_REBASELINE_PROPOSAL.md` 9.4（逐项摘要用于可比性）与
+        # 依据：条款：D6-9.4-DIGEST、D6-9.4-ITEM（逐项摘要用于可比性）与
         # 批次 0097 外复核一：整体摘要之外，逐项摘要的单条/缺项/加塞/换序都必须拦。
         base_items = read(INPUTS / "schedule.json")["config_ref"]["item_digests"]
         items_cases = {
@@ -520,7 +552,7 @@ def main() -> int:
                 expected_items_codes[label],
             )
 
-        # 依据：批次 0097 外复核二；模板不可读属解释器资源问题（4），
+        # 依据：条款：D6-4.3-OPS（render 属闭集算子）；模板不可读属解释器资源问题（4），路径越界属输入不合法（2），出处为 GAP_LEDGER.md 外复核派生条；
         # 模板路径越出模板目录属输入不合法（2）。
         template_root = temp / "templates"
         template_root.mkdir()
@@ -594,7 +626,7 @@ def main() -> int:
         finally:
             pm_check.TEMPLATE_DIR = original_template_dir
 
-        # 依据：`spec/D6_REBASELINE_PROPOSAL.md` 9.1（判定性项无默认）与 9.2
+        # 依据：条款：D6-9.1-NO-DEFAULT、D6-9.2-DEFAULT、D6-8.3-RG10（判定性项无默认；偏差阈值 CAP-16）与 9.2
         # CFG-01/CFG-03/CFG-13 行；批次 0097 外复核三。
         lagless = read(INPUTS / "schedule.json")
         for dep in lagless["data"]["dependencies"]:

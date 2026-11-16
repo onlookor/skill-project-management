@@ -1675,3 +1675,20 @@
 - **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-151、T-167 的批次 0097 追记；`scripts/no-review-declarations.json` 中 `pm_caps.py`、`pm_check.py`、`test_pm_runtime.py` 三条的 `reason`/`missing_review`；`GAP_LEDGER.md`“批次 0097 实施进展”；本节。
 - **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149,T-166,T-167`。
 - **关联 ADR**：无
+
+---
+
+### 批次 0098 — 2026-11-16 — 契约条款登记与依据检查（未复核）
+
+- **授权依据**：用户要求在批次 0097 之后把契约条款编号化，并写检查器查“依据”，起因是外复核抽查发现一条用例把依据注成提案不存在的“4.3(1)”。本批新增对象均**未获任何认可**，须再走外复核。
+- **新增对象（位置 → 作用）**：
+  1. `spec/clause-registry.json`：38 条条款，`judgmental` 32 条、`textual` 5 条、`external` 1 条。每条只用 `(source, locator, section, anchor)` 定位；`quote` 由检查器 `--write` 从源文件逐字提取，不手打。覆盖提案（2.3、4.1、4.3、5、7、8.3 的 RG-06～RG-12、9.1～9.4、10）、`AGENTS.md` 1bis、`GLOSSARY.md` T-F-015、`contracts/schema/runtime-config.schema.json` 的 CFG-01/03/04/06/09/10/12/13 与键注册说明、`runtime/procedures/status_review.json` 的首步与关口、`spec/CHECKER_INPUT_SCHEMA.md` 1.2。
+  2. `scripts/check_clause_basis.py`：查三件事——用例引用的条款必须在登记表；`judgmental` 条款至少被一条用例以 `条款：<id>` 引用；登记表指向的源文件、章节、原文重新提取后必须一致。`--write` 重提取，`--self-test` 五条正负例。`textual` 必须写 `why`，`external` 必须写 `why` 与仓库内存活的 `witness`。
+  3. `scripts/test_pm_runtime.py`：66 项增至 68 项。全部 `依据：` 行改为带 `条款：<id>` 标记（不再允许自由文本依据）；新增“未注册配置项 → 2”“配置项相互矛盾 → 2”两条用例。
+- **准入与钉扎**：`spec/ACCESS_ZONES.md` 第 1 节登记 `spec/clause-registry.json` 为 D 区，第 2 节登记生成器 `scripts/check_clause_basis.py --write`；`scripts/checker-pins.json` 纳入新检查器；`scripts/no-review-declarations.json` 为 `check_clause_basis.py` 与 `clause-registry.json` 增加“无复核”条目；pre-commit 与 `scripts/README.md` 已接入。
+- **实测**：`check_clause_basis.py` 对当前仓库 38 条登记、缺陷 0；`--self-test` 5/5；在 `scripts/test_fabricated_tmp.py` 写入 `# 依据：条款：D6-4.3(1)` 后检查器退出 1，报“引用了登记表没有的条款 D6-4.3”，删除该文件后恢复 0；把登记表 `quote` 改成与源文件不一致时退出 1（自测内覆盖）。
+- **能力边界（不许当作已合规）**：检查器只证明条款文字与源文件一致，不证明用例断言真的检验了该条款；标记可被贴在任意断言上；登记表与源文件同批改动可同步漂移（R-0098-01～03）。
+- **未做**：不改 `CONSTITUTION.md` 与 `spec/D6_REBASELINE_PROPOSAL.md`；不修改既有 0097 修复语义；三条 0097 残余仍未修。
+- **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-168；`scripts/no-review-declarations.json` 的 `check_clause_basis.py`、`spec/clause-registry.json` 条目；`GAP_LEDGER.md`“批次 0098 实施进展”与 R-0098-01～03；本节。
+- **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149,T-166,T-167,T-168`。
+- **关联 ADR**：无
