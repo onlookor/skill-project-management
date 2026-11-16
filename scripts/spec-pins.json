@@ -10,7 +10,7 @@
     "spec/methods/deterministic-checker.md#A.2": {
       "sha256": "9c8e7de6b90eae7f04829e7327fabcb5c3b024f02e29ca3fa865381602085def",
       "path": "spec/methods/deterministic-checker.md",
-      "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：spec/methods/deterministic-checker.md#A.2 结论：认可"
+      "basis": "非同源复核：第五批（基线 c6fa1cd）只读外复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch5/REVIEW-RECORD.md；sha256：8b8581d37c58ee916672a0863b0598cb1317f811e4471ccb328161d66833a935；复核基线：c6fa1cd50955302c207402c454abf91db22e6082；区段：spec/methods/deterministic-checker.md#A.2；结论：认可"
     },
     "spec/methods/deterministic-checker.md#A.1": {
       "sha256": "1c7ef44a14dd2d7bc0e3ae279baade81c3b6d2a5ea6c221e644362337f23b3bc",

@@ -35,7 +35,7 @@
     },
     "scripts/check_spec_pins.py": {
       "sha256": "b20914eceb56e471fa3309c10fc6b3d2f040ca001fca6625d9f770927088554d",
-      "basis": "无复核声明（不构成认可，不放行）"
+      "basis": "非同源复核：第五批（基线 c6fa1cd）只读外复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch5/REVIEW-RECORD.md；sha256：8b8581d37c58ee916672a0863b0598cb1317f811e4471ccb328161d66833a935；复核基线：c6fa1cd50955302c207402c454abf91db22e6082；区段：scripts/check_spec_pins.py；结论：认可"
     },
     "scripts/check_state.py": {
       "sha256": "cb62284b0b5e813bd254deaa24fcb54a9d2a98f5b566feeedee6752796bea6e4",
@@ -43,7 +43,7 @@
     },
     "scripts/check_three_table.py": {
       "sha256": "1452f5a281a9d46d802102284c3682256016a7bceeb4bd73fb5640c9e2553fcb",
-      "basis": "无复核声明（不构成认可，不放行）"
+      "basis": "非同源复核：第五批（基线 c6fa1cd）只读外复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch5/REVIEW-RECORD.md；sha256：8b8581d37c58ee916672a0863b0598cb1317f811e4471ccb328161d66833a935；复核基线：c6fa1cd50955302c207402c454abf91db22e6082；区段：scripts/check_three_table.py；结论：认可"
     },
     "scripts/test_check_table_mutations.py": {
       "sha256": "90b08d7325497fdda6ab6e8fa39166df532573ca5b5e45a29ad5df53df8b98da",
@@ -78,7 +78,7 @@
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/no-review-declarations.json": {
-      "sha256": "43152d135b8e533468181a547f221a7fb1c73b9f43f642929f3fb797f3c544e4",
+      "sha256": "2aa4d4351e5399fa11a33334af86b8a1355d034f0b7102ce4abdbd8a17d79d03",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "validation/pinned/checker.py": {

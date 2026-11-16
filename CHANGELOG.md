@@ -1457,3 +1457,18 @@
 - **验证**：`-W error` 编译通过（`\`` 转义已清，全仓 `scripts/*.py` 计数 0）；`test_spec_pins.py` 30 条（提交后复跑 30/30；提交前 SP03/SP25 因基线 HEAD 仍含旧格式签收行而失败 2 条）；`test_check_table_mutations.py` 11 变异全抓到、S01/S02 符合预期；`check_three_table.py` 通过；`test_checker_pins.py` 21/21；九个常规检查器 rc=0；`check_checker_pins` rc=1（问题 19：16 项无复核声明 + 3 项 basis 失效）、`check_spec_pins` rc=1（提交前 15：A.2 的“指纹未更新/缺少复核记录”两条与 basis 失效；提交后 14，仅余 A.2 basis 失效），均为下一轮外复核前的预期债务。
 - **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`。
 - **关联 ADR**：无
+
+---
+
+### 批次 0089 — 2026-11-16 — 第五轮外复核：三条 basis 落库清账
+
+- **授权依据**：第五轮非同源外复核（基线 `c6fa1cd`，41 例探针全部 PASS）八项全部认可、未认可清单为空；责任方要求把复核方出具的三条五要素 basis 落库清账。
+- **涉及文件**：修改 `scripts/spec-pins.json`、`scripts/checker-pins.json`、`scripts/no-review-declarations.json`、`TODO.md`、`CHANGELOG.md`；未改任何检查器脚本。
+- **变更摘要**：
+  1. **三条 basis 逐字转写落库**：来源 `/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch5/REPORT.md` 第 5 节，对象为 `spec/methods/deterministic-checker.md#A.2`（`spec-pins.json`）、`scripts/check_spec_pins.py` 与 `scripts/check_three_table.py`（`checker-pins.json`）。未改写、未补写、未另造；落库前用两个检查器自带的 `valid_basis()` 逐条回灌，均为 `True`（无错误信息）。
+  2. **登记表清账**：从 `scripts/no-review-declarations.json` 删除 `scripts/check_spec_pins.py`、`scripts/check_three_table.py` 两条缺复核声明；A.2 本不在该表（其旧 basis 被新 basis 整条替换）。其余对象一律维持原状。
+- **边界遵守**：未改 `CONSTITUTION.md`、未改 `spec/D6_REBASELINE_PROPOSAL.md`；未顺手认定任何未复核对象；未改检查器逻辑。
+- **台账同步**：无复核/失效登记对象数 **22 → 20（checker 14 + spec 6）**；受钉对象键总数不变（checker 22 + spec 16）；`TODO.md` T-149 追记同步。
+- **验证**：`check_spec_pins` rc=1，问题由 14 降为 **13**（6 项无复核声明 + 7 项 basis 失效）；`check_checker_pins` rc=1，问题由 19 降为 **17**（14 项无复核声明 + 3 项 basis 失效：`.githooks/pre-commit`、`scripts/check_no_raw_material.py`、`scripts/test_check_table_mutations.py`）。
+- **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`。
+- **关联 ADR**：无
