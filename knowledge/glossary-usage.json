@@ -2851,7 +2851,7 @@
         },
         {
           "file": "GAP_LEDGER.md",
-          "line": 242,
+          "line": 265,
           "form": "code"
         },
         {
@@ -3752,7 +3752,7 @@
         },
         {
           "file": "GAP_LEDGER.md",
-          "line": 228,
+          "line": 251,
           "form": "code"
         },
         {
@@ -5019,7 +5019,7 @@
         },
         {
           "file": "GAP_LEDGER.md",
-          "line": 236,
+          "line": 259,
           "form": "code"
         },
         {
@@ -5179,6 +5179,31 @@
           "file": "CHANGELOG.md",
           "line": 1685,
           "form": "term_id"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 1702,
+          "form": "glossary_link"
+        },
+        {
+          "file": "CHANGELOG.md",
+          "line": 1704,
+          "form": "term_id"
+        },
+        {
+          "file": "GAP_LEDGER.md",
+          "line": 229,
+          "form": "glossary_link"
+        },
+        {
+          "file": "GAP_LEDGER.md",
+          "line": 239,
+          "form": "glossary_link"
+        },
+        {
+          "file": "TODO.md",
+          "line": 163,
+          "form": "glossary_link"
         }
       ]
     }

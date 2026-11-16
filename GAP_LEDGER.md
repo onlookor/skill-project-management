@@ -206,7 +206,7 @@
 
 | 新增对象 | 位置 | 准入与钉扎 | 仍不机械化（缺口成立的原因） |
 |---|---|---|---|
-| 条款登记表 | `spec/clause-registry.json`：38 条，`quote` 由 `check_clause_basis.py --write` 从源文件逐字提取 | `spec/ACCESS_ZONES.md` 第 1/2 节登记为 D 区，生成器登记；`scripts/checker-pins.json` 钉扎 | 手写部分只剩 `(source, locator, section, anchor, kind)`；`kind` 的判定性/文字性分类由人判断 |
+| 条款登记表 | `spec/clause-registry.json`：38 条，`quote` 由 `check_clause_basis.py --write` 从源文件逐字提取 | `spec/ACCESS_ZONES.md` 第 1/2 节登记为 D 区，生成器登记；**未钉扎**（0098 原写“`checker-pins.json` 钉扎”不实，0099 纳入 `spec-pins.json`） | 手写部分只剩 `(source, locator, section, anchor, kind)`；`kind` 的判定性/文字性分类由人判断 |
 | 条款依据检查器 | `scripts/check_clause_basis.py`：三查（引用存在、判定性条款有覆盖、源文件/章节/原文一致）+ 五条 `--self-test` | `checker-pins.json`、`no-review-declarations.json`、pre-commit、`scripts/README.md` | 只认 `条款：<id>` 标记；不判断用例断言是否真的检验了该条款语义 |
 | 用例标记 | `scripts/test_pm_runtime.py` 由 66 项增至 68 项，全部 `依据：` 行改带条款标记；新增未注册配置项、配置项相互矛盾两例 | — | 标记可被贴在任意断言上，检查器无法核对标记与断言的对应关系 |
 
@@ -217,6 +217,29 @@
 | R-0098-01 | 登记表 `quote` 与源文件的一致性由生成器自证：源文件与登记表同批改动即可同步漂移，无外部锚定（与 G-021/G-022 同属信任边界） | 登记，不修 |
 | R-0098-02 | 覆盖判定只要求“至少一条用例引用”，不判断断言是否真的检验该条款；“覆盖 ≠ 充分”的方法论残留仍在 | 登记，不修 |
 | R-0098-03 | `条款：` 标记与测试断言的对应关系无法机械核验，只能由外复核抽查 | 登记，不修 |
+
+---
+
+## 批次 0099 实施进展（不关闭任何条目）
+
+**性质**：第三轮外复核五项修复。新增钉扎与判定规则均未经非同源复核，**不构成任何认可**，也不构成任何 `G-NNN` 的关闭依据。
+
+| 修复 | 位置 | 后果 | 仍不机械化 |
+|---|---|---|---|
+| 一 钉扎缺口 | `scripts/check_spec_pins.py` 的 `SECTIONS` + `scripts/spec-pins.json` + `no-review-declarations.json`：提案整篇、`AGENTS.md#1bis`、`GLOSSARY.md#T-F-015`、`spec/clause-registry.json` 整篇 | 改源必留失效痕迹；改源 + 改 anchor + `--write` 会使登记表指纹失效 | 纳入时的现行文本没有复核产物，只有声明（R-0099-01） |
+| 二 三处虚报更正 | `CHANGELOG.md` 0098 条目、`GAP_LEDGER.md` 0098 表、`TODO.md` T-168 | 三处均改为“当时未钉扎/未登记”并注明由 0099 补正 | 无（文字更正） |
+| 三 textual 引文 | `spec/clause-registry.json` 5 条改取正文句；`check_clause_basis.py` 增 `section_digest` 与“textual 禁取标题” | 改标题外正文也报“章节正文已变动” | 摘要仍由同源生成器计算（R-0099-02） |
+| 四 硬链接 | `scripts/pm_check.py` 的 `_render()` 按 `st_nlink` 拒绝 | 模板目录内硬链接指向外部 → 2，不写出 | 同 inode 的 bind mount 等未覆盖（R-0099-03） |
+| 五 聚合与默认 | `pm_check.validate_artifact()` 逐项摘要并入聚合；`pm_caps.compute_risk/compute_status` 缺配置改不可判定 | 配置不可判定不再被工件违规掩盖；键序不再判违规 | 各 `compute_*` 调用点是否都把 `cannot_evaluate` 正确上抛未逐点核验（R-0099-04） |
+
+**新增欠账（登记，不修）**：
+
+| 编号 | 残余 | 状态 |
+|---|---|---|
+| R-0099-01 | 提案、`AGENTS.md#1bis`、`GLOSSARY.md#T-F-015`、`clause-registry.json` 纳入钉扎时只有无复核声明，没有对“纳入了正确版本”的外部确认 | 登记，不修 |
+| R-0099-02 | `quote`/`section_digest` 与源文件的一致性仍由同一生成器自证；同批改源、改 anchor、`--write`、重冻钉扎可以自洽推进 | 登记，不修 |
+| R-0099-03 | 硬链接按 `st_nlink` 拒绝，bind mount / overlay 等同 inode 的其他形态未覆盖 | 登记，不修 |
+| R-0099-04 | `compute_risk`、`compute_status` 已改判不可判定，但其他 `compute_*` 的缺配置路径与调用方上抛未逐点核验 | 登记，不修 |
 
 ---
 

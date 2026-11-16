@@ -711,5 +711,5 @@
 | T-F-012 | 签字关口（approval gate） | [`CHANGELOG.md`](CHANGELOG.md) |
 | T-F-013 | 算子闭集（operator closed set） | [`CHANGELOG.md`](CHANGELOG.md) |
 | T-F-014 | 配置摘要（config digest） | [`CHANGELOG.md`](CHANGELOG.md) |
-| T-F-015 | 五值退出码 | [`CHANGELOG.md`](CHANGELOG.md) |
+| T-F-015 | 五值退出码 | [`CHANGELOG.md`](CHANGELOG.md)、[`GAP_LEDGER.md`](GAP_LEDGER.md)、[`TODO.md`](TODO.md) |
 <!-- END GLOSSARY USAGE -->

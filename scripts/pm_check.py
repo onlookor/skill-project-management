@@ -227,42 +227,29 @@ def validate_artifact(instance: object, config_state: pm_config.ConfigState | No
         for key in set(artifact_items) & set(state_items)
         if artifact_items[key] != state_items[key]
     )
-    # 键序也在比对范围内：调换顺序说明工件不是按快照生成，不能当作可比。
-    reordered = not extra and not missing and list(artifact_items) != list(state_items)
+    # 键序不计入合规：JSON 对象无序，纯调换顺序仍可视为同快照。
+    item_findings: list[dict] = []
     if extra:
-        return {
-            "exit_code": 2,
-            "artifact_type": artifact_type,
-            "digest": digest(instance),
-            "findings": findings
-            + config_results
-            + [
-                {
-                    "check": "config.item_digests",
-                    "status": "invalid",
-                    "detail": f"config_ref.item_digests 含配置快照没有的键：{extra}",
-                }
-            ],
-        }
-    if missing or mismatched or reordered:
-        return {
-            "exit_code": 1,
-            "artifact_type": artifact_type,
-            "digest": digest(instance),
-            "findings": findings
-            + config_results
-            + [
-                {
-                    "check": "config.item_digests",
-                    "status": "violation",
-                    "detail": (
-                        "config_ref.item_digests 与配置快照不一致"
-                        f"（缺失 {missing}，摘要不符 {mismatched}，键序不符 {reordered}；"
-                        f"comparability.differing={comparison['differing']}）"
-                    ),
-                }
-            ],
-        }
+        item_findings.append(
+            {
+                "check": "config.item_digests",
+                "status": "invalid",
+                "detail": f"config_ref.item_digests 含配置快照没有的键：{extra}",
+            }
+        )
+    if missing or mismatched:
+        item_findings.append(
+            {
+                "check": "config.item_digests",
+                "status": "violation",
+                "detail": (
+                    "config_ref.item_digests 与配置快照不一致"
+                    f"（缺失 {missing}，摘要不符 {mismatched}；"
+                    f"comparability.differing={comparison['differing']}）"
+                ),
+            }
+        )
+    findings.extend(item_findings)
 
     ctx = {
         "config": config_state.config,
@@ -484,6 +471,16 @@ class ProcedureRunner:
         path = (TEMPLATE_DIR / candidate).resolve()
         if template_root not in path.parents:
             raise InputInvalid(f"{step['id']}：render.template 越出模板目录：{raw_template}")
+        try:
+            info = path.stat()
+        except OSError as exc:
+            raise RuntimeBroken(f"{step['id']}：模板不可读：{path}：{exc}") from exc
+        # 硬链接与模板目录内的普通文件同 inode，仅靠路径前缀拦不住；按链接计数拒绝。
+        if not path.is_file() or info.st_nlink > 1:
+            raise InputInvalid(
+                f"{step['id']}：render.template 必须是模板目录内的单一链接普通文件"
+                f"（链接数 {info.st_nlink}）：{raw_template}"
+            )
         try:
             text = path.read_text(encoding="utf-8")
         except (OSError, UnicodeDecodeError) as exc:

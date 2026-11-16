@@ -7,20 +7,22 @@
       "source": "spec/D6_REBASELINE_PROPOSAL.md",
       "locator": "heading",
       "section": "2.3",
-      "anchor": "验收判据",
+      "anchor": "**D6 的验收需要且只需要三样东西**",
       "kind": "textual",
-      "why": "验收判据描述基准模型、任务集与测量装置，不含运行期判定条件，无法派生退出码用例。",
-      "quote": "### 2.3 验收判据（D6 怎么量）"
+      "why": "验收判据规定 D6 验收只认 V1 基准模型、V2 任务集、V3 达标判据三样，缺任一项只能记“未验收”。这是 D6 验收层面的口径，运行期解释器不消费；其机械用例须等 R4 基准任务集落地后另行登记，当前不适用。",
+      "quote": "**D6 的验收需要且只需要三样东西**，缺任一项即只能记\"未验收\"：",
+      "section_digest": "893cc81dd1281e46786906e72171126e6bb84acfb72f7b532d6463e1069993be"
     },
     {
       "id": "D6-4.1-LAYERS",
       "source": "spec/D6_REBASELINE_PROPOSAL.md",
       "locator": "heading",
       "section": "4.1",
-      "anchor": "分层",
+      "anchor": "**为什么要单列 L1**",
       "kind": "textual",
-      "why": "分层是架构归属说明，规定模块放在哪一层，不产生可观测的判定结果。",
-      "quote": "### 4.1 分层"
+      "why": "分层说明 L1 运行契约层为运行期必载、L4 档案层运行期不载；它是加载边界与架构归属，不产生可观测的判定结果。",
+      "quote": "**为什么要单列 L1**：没有 L1，\"挂上即可\"只能靠模型的规划能力，等于把 G0-a/G0-c 交还给模型。L1 是唯一能让弱模型\"知道下一步做什么\"的东西。【推断】",
+      "section_digest": "b316346172f746cc5b6b1fd4e6381a47e07b76aff319d9fe77304189523bd914"
     },
     {
       "id": "D6-4.3-OPS",
@@ -30,7 +32,8 @@
       "anchor": "**算子闭集（6 个）**",
       "kind": "judgmental",
       "why": "",
-      "quote": "**算子闭集（6 个）**：`fill_schema`、`compute`、`lookup`、`check`、`human_approve`、`render`。理由：闭集使得\"模型是否按工序执行\"可被机械核对；一旦允许模型自造算子，工序就不再约束流程。【推断】这是防止 F2 的主要手段。"
+      "quote": "**算子闭集（6 个）**：`fill_schema`、`compute`、`lookup`、`check`、`human_approve`、`render`。理由：闭集使得\"模型是否按工序执行\"可被机械核对；一旦允许模型自造算子，工序就不再约束流程。【推断】这是防止 F2 的主要手段。",
+      "section_digest": "bb355f4593d7cc6a85d203f654d6081e3b4cb484560d5fe42aa4741dd96951ae"
     },
     {
       "id": "D6-4.3-XCHECKS",
@@ -40,7 +43,8 @@
       "anchor": "`x-checks` 是强制字段",
       "kind": "judgmental",
       "why": "",
-      "quote": "`x-checks` 是强制字段：**没有绑定校验的 schema 不得进入运行期**（防 F1）。`x-provenance` 要求每个内容字段可指回输入，防止模型无源生成。"
+      "quote": "`x-checks` 是强制字段：**没有绑定校验的 schema 不得进入运行期**（防 F1）。`x-provenance` 要求每个内容字段可指回输入，防止模型无源生成。",
+      "section_digest": "bb355f4593d7cc6a85d203f654d6081e3b4cb484560d5fe42aa4741dd96951ae"
     },
     {
       "id": "D6-4.3-MUSTSEE",
@@ -50,27 +54,30 @@
       "anchor": "`must_see` 是 F3 的防线",
       "kind": "judgmental",
       "why": "",
-      "quote": "`must_see` 是 F3 的防线：签字前必须看到的证据是固定清单，不可由模型选择。"
+      "quote": "`must_see` 是 F3 的防线：签字前必须看到的证据是固定清单，不可由模型选择。",
+      "section_digest": "bb355f4593d7cc6a85d203f654d6081e3b4cb484560d5fe42aa4741dd96951ae"
     },
     {
       "id": "D6-5-MILESTONES",
       "source": "spec/D6_REBASELINE_PROPOSAL.md",
       "locator": "heading",
       "section": "5.",
-      "anchor": "里程碑与出口",
+      "anchor": "原则：每条出口都是**可判真假的命令或检查**",
       "kind": "textual",
-      "why": "里程碑与出口是排期与验收节奏，不含运行期判定条件。",
-      "quote": "## 5. 里程碑与出口"
+      "why": "里程碑出口规定每条出口必须是可判真假的命令或检查、不接受“阶段性推进”；这是项目流程口径，不针对运行期工件判定。",
+      "quote": "原则：每条出口都是**可判真假的命令或检查**，不接受\"阶段性推进\"\"基本完成\"。里程碑按依赖排序；R4 是 D6 的唯一验收出口，其余都是它的前置条件或收尾。",
+      "section_digest": "d0f03893ca28125edda4103edca256fc388651798275a9e62caf80bbd0b310b6"
     },
     {
       "id": "D6-7-DECISIONS",
       "source": "spec/D6_REBASELINE_PROPOSAL.md",
       "locator": "heading",
       "section": "7.",
-      "anchor": "需要用户裁定",
+      "anchor": "未裁定时，本提案第 5 节的 R1–R3 可先推进",
       "kind": "textual",
-      "why": "裁定清单记录待人类决策的事项，其结论尚未成为判定条件。",
-      "quote": "## 7. 需要用户裁定的决策清单"
+      "why": "决策清单记录待人类裁定的事项及其“不定的后果”；未裁定前不构成可机械判定的条件。",
+      "quote": "每条给出\"不定的后果\"。未裁定时，本提案第 5 节的 R1–R3 可先推进（不依赖裁定），**R4 与 R6 必须等裁定**。",
+      "section_digest": "7164e32ce5afc25f1a0e956b483f11c56585dda34b1cc938578e22d120f7c86b"
     },
     {
       "id": "D6-8.3-RG06",
@@ -80,7 +87,8 @@
       "anchor": "| RG-06 |",
       "kind": "judgmental",
       "why": "",
-      "quote": "| RG-06 | 依赖图（CAP-13） | 依赖类型口径（FS/SS/FF/SF + 提前滞后）、悬挂依赖定义 | ISO 21502 §7.6 有进度管理实践，无类型定义 | 公开可得（A） | GAO 进度评估指南、NASA 进度管理手册给出四类逻辑关系；算法本身自研（DFS/拓扑） |"
+      "quote": "| RG-06 | 依赖图（CAP-13） | 依赖类型口径（FS/SS/FF/SF + 提前滞后）、悬挂依赖定义 | ISO 21502 §7.6 有进度管理实践，无类型定义 | 公开可得（A） | GAO 进度评估指南、NASA 进度管理手册给出四类逻辑关系；算法本身自研（DFS/拓扑） |",
+      "section_digest": "c8d863c8639079e591243b12866708265cf36a2834f12e126fa51ff811edd573"
     },
     {
       "id": "D6-8.3-RG07",
@@ -90,7 +98,8 @@
       "anchor": "| RG-07 |",
       "kind": "judgmental",
       "why": "",
-      "quote": "| RG-07 | 预算汇总（CAP-19） | 成本科目与 WBS 的对应口径、汇总守恒规则 | 无 | 公开可得（A，但科目表需自定） | GAO-20-195G 的 WBS—成本映射与\"估算应可追溯\"要求；组织科目表无法外部获取，登记为项目参数 |"
+      "quote": "| RG-07 | 预算汇总（CAP-19） | 成本科目与 WBS 的对应口径、汇总守恒规则 | 无 | 公开可得（A，但科目表需自定） | GAO-20-195G 的 WBS—成本映射与\"估算应可追溯\"要求；组织科目表无法外部获取，登记为项目参数 |",
+      "section_digest": "c8d863c8639079e591243b12866708265cf36a2834f12e126fa51ff811edd573"
     },
     {
       "id": "D6-8.3-RG08",
@@ -100,7 +109,8 @@
       "anchor": "| RG-08 |",
       "kind": "judgmental",
       "why": "",
-      "quote": "| RG-08 | 风险登记册完备性（CAP-25） | 字段集（ID/类别/概率/影响/触发/应对/责任人/状态/残余） | 无 | 公开可得（A，但刻度需自定） | NASA 风险管理手册（NASA/SP-2011-3422）与 DOE 风险管理指南给字段与流程；3×3 或 5×5 刻度无统一标准，必须自定并登记 |"
+      "quote": "| RG-08 | 风险登记册完备性（CAP-25） | 字段集（ID/类别/概率/影响/触发/应对/责任人/状态/残余） | 无 | 公开可得（A，但刻度需自定） | NASA 风险管理手册（NASA/SP-2011-3422）与 DOE 风险管理指南给字段与流程；3×3 或 5×5 刻度无统一标准，必须自定并登记 |",
+      "section_digest": "c8d863c8639079e591243b12866708265cf36a2834f12e126fa51ff811edd573"
     },
     {
       "id": "D6-8.3-RG09",
@@ -110,7 +120,8 @@
       "anchor": "| RG-09 |",
       "kind": "judgmental",
       "why": "",
-      "quote": "| RG-09 | 状态采集（CAP-35） | 数据字典：采什么、多久采、口径如何一致 | 无 | **无法替代**（D） | 无权威通用字典；只能由责任方设定最小集，技能负责\"必须显式登记 + 缺数不得默认通过\" |"
+      "quote": "| RG-09 | 状态采集（CAP-35） | 数据字典：采什么、多久采、口径如何一致 | 无 | **无法替代**（D） | 无权威通用字典；只能由责任方设定最小集，技能负责\"必须显式登记 + 缺数不得默认通过\" |",
+      "section_digest": "c8d863c8639079e591243b12866708265cf36a2834f12e126fa51ff811edd573"
     },
     {
       "id": "D6-8.3-RG10",
@@ -120,7 +131,8 @@
       "anchor": "| RG-10 |",
       "kind": "judgmental",
       "why": "",
-      "quote": "| RG-10 | 偏差阈值（CAP-16） | 阈值表（如 SPI 区间 → 状态/动作） | 无 | **无法替代**（D） | 政府指南只给\"应设阈值并复核\"，不给数值；阈值必须由责任方设定并记录来源，技能不得内置默认值 |"
+      "quote": "| RG-10 | 偏差阈值（CAP-16） | 阈值表（如 SPI 区间 → 状态/动作） | 无 | **无法替代**（D） | 政府指南只给\"应设阈值并复核\"，不给数值；阈值必须由责任方设定并记录来源，技能不得内置默认值 |",
+      "section_digest": "c8d863c8639079e591243b12866708265cf36a2834f12e126fa51ff811edd573"
     },
     {
       "id": "D6-8.3-RG11",
@@ -130,7 +142,8 @@
       "anchor": "| RG-11 |",
       "kind": "judgmental",
       "why": "",
-      "quote": "| RG-11 | 挣值（CAP-20） | PV/EV/AC 定义、偏差与绩效指数、EAC 三法、术语别名 | 无 | 付费不可得，但有等效公开替代（C） | 见 8.6 专项判定 |"
+      "quote": "| RG-11 | 挣值（CAP-20） | PV/EV/AC 定义、偏差与绩效指数、EAC 三法、术语别名 | 无 | 付费不可得，但有等效公开替代（C） | 见 8.6 专项判定 |",
+      "section_digest": "c8d863c8639079e591243b12866708265cf36a2834f12e126fa51ff811edd573"
     },
     {
       "id": "D6-8.3-RG12",
@@ -140,7 +153,8 @@
       "anchor": "| RG-12 |",
       "kind": "judgmental",
       "why": "",
-      "quote": "| RG-12 | 审计留痕（CAP-42） | 记录字段：输入指纹、规则/契约版本、结论、时间、执行者、证据路径 | 无 | 无需外部（E：自研） | ISO 19011 一类审计指南为付费且过重；字段集自研即可 |"
+      "quote": "| RG-12 | 审计留痕（CAP-42） | 记录字段：输入指纹、规则/契约版本、结论、时间、执行者、证据路径 | 无 | 无需外部（E：自研） | ISO 19011 一类审计指南为付费且过重；字段集自研即可 |",
+      "section_digest": "c8d863c8639079e591243b12866708265cf36a2834f12e126fa51ff811edd573"
     },
     {
       "id": "D6-9.1-NO-DEFAULT",
@@ -150,7 +164,8 @@
       "anchor": "1. 缺配置不得默认通过",
       "kind": "judgmental",
       "why": "",
-      "quote": "1. 缺配置不得默认通过（见 9.3）；"
+      "quote": "1. 缺配置不得默认通过（见 9.3）；",
+      "section_digest": "b4b4fa294aded91c22cbda96110d1f7179d3e1100d49bc99f3123dc97458be87"
     },
     {
       "id": "D6-9.2-DEFAULT",
@@ -160,7 +175,8 @@
       "anchor": "**默认值规则**",
       "kind": "judgmental",
       "why": "",
-      "quote": "**默认值规则**：只有**非判定性**配置才允许有默认值；判定性配置一律\"无默认，缺失即 `cannot_evaluate`\"。这条规则同时满足\"逐项给默认值\"与\"未配置不等于取默认\"两个要求，不靠逐项约定。"
+      "quote": "**默认值规则**：只有**非判定性**配置才允许有默认值；判定性配置一律\"无默认，缺失即 `cannot_evaluate`\"。这条规则同时满足\"逐项给默认值\"与\"未配置不等于取默认\"两个要求，不靠逐项约定。",
+      "section_digest": "d689427e440775c3456742dd40de4d08ea980f4d2f3ae2bf4019aea2c838257b"
     },
     {
       "id": "D6-9.3-CANNOT",
@@ -170,7 +186,8 @@
       "anchor": "| 配置项缺失（判定性） |",
       "kind": "judgmental",
       "why": "",
-      "quote": "| 配置项缺失（判定性） | `cannot_evaluate`，列出缺失项编号；**不取默认** | 3 |"
+      "quote": "| 配置项缺失（判定性） | `cannot_evaluate`，列出缺失项编号；**不取默认** | 3 |",
+      "section_digest": "6bcf414a382272b4cb682192952f3b402070cc3b551da9c725d2268960bcc69f"
     },
     {
       "id": "D6-9.3-INVALID",
@@ -180,7 +197,8 @@
       "anchor": "| 配置值越界/类型错/分档不覆盖 |",
       "kind": "judgmental",
       "why": "",
-      "quote": "| 配置值越界/类型错/分档不覆盖 | 配置 schema 校验失败，`config_invalid`，不执行任何检查 | 2 |"
+      "quote": "| 配置值越界/类型错/分档不覆盖 | 配置 schema 校验失败，`config_invalid`，不执行任何检查 | 2 |",
+      "section_digest": "6bcf414a382272b4cb682192952f3b402070cc3b551da9c725d2268960bcc69f"
     },
     {
       "id": "D6-9.3-UNREGISTERED",
@@ -190,7 +208,8 @@
       "anchor": "| 配置引用了未注册的配置项 |",
       "kind": "judgmental",
       "why": "",
-      "quote": "| 配置引用了未注册的配置项 | `config_invalid`（防止拼写错误被当成新参数） | 2 |"
+      "quote": "| 配置引用了未注册的配置项 | `config_invalid`（防止拼写错误被当成新参数） | 2 |",
+      "section_digest": "6bcf414a382272b4cb682192952f3b402070cc3b551da9c725d2268960bcc69f"
     },
     {
       "id": "D6-9.3-INCOMPLETE",
@@ -200,7 +219,8 @@
       "anchor": "| 配置项存在但相互矛盾",
       "kind": "judgmental",
       "why": "",
-      "quote": "| 配置项存在但相互矛盾（如 CFG-04=milestone_fraction 而 CFG-05 缺失） | `config_incomplete` | 2 |"
+      "quote": "| 配置项存在但相互矛盾（如 CFG-04=milestone_fraction 而 CFG-05 缺失） | `config_incomplete` | 2 |",
+      "section_digest": "6bcf414a382272b4cb682192952f3b402070cc3b551da9c725d2268960bcc69f"
     },
     {
       "id": "D6-9.3-DRIFT",
@@ -210,7 +230,8 @@
       "anchor": "| 配置文件被改但未更新",
       "kind": "judgmental",
       "why": "",
-      "quote": "| 配置文件被改但未更新 `config.lock.json`（计划创建） | `config_drift`，阻断 | 1 |"
+      "quote": "| 配置文件被改但未更新 `config.lock.json`（计划创建） | `config_drift`，阻断 | 1 |",
+      "section_digest": "6bcf414a382272b4cb682192952f3b402070cc3b551da9c725d2268960bcc69f"
     },
     {
       "id": "D6-9.4-DIGEST",
@@ -220,7 +241,8 @@
       "anchor": "- **digest 相同**",
       "kind": "judgmental",
       "why": "",
-      "quote": "- **digest 相同** → 结果可比；**digest 不同** → 结果表必须标 `incomparable: true`，且不得把两组数据画进同一条趋势线或合并通过率。"
+      "quote": "- **digest 相同** → 结果可比；**digest 不同** → 结果表必须标 `incomparable: true`，且不得把两组数据画进同一条趋势线或合并通过率。",
+      "section_digest": "e7d6cccf3145be380c5dcb6a57ab25abc11e7517e6a86f8292671c3913bf43d4"
     },
     {
       "id": "D6-9.4-ITEM",
@@ -230,17 +252,19 @@
       "anchor": "- **item_digests 用于诊断**",
       "kind": "judgmental",
       "why": "",
-      "quote": "- **item_digests 用于诊断**：能指出\"是哪一项变了导致不可比\"，而不是只给一个模糊的\"配置不同\"。"
+      "quote": "- **item_digests 用于诊断**：能指出\"是哪一项变了导致不可比\"，而不是只给一个模糊的\"配置不同\"。",
+      "section_digest": "e7d6cccf3145be380c5dcb6a57ab25abc11e7517e6a86f8292671c3913bf43d4"
     },
     {
       "id": "D6-10-UNACCEPTED",
       "source": "spec/D6_REBASELINE_PROPOSAL.md",
       "locator": "heading",
       "section": "10.",
-      "anchor": "未验收声明",
+      "anchor": "**声明**：截至本提案撰写",
       "kind": "textual",
-      "why": "未验收声明是状态描述与残余风险清单，不构成判定条件。",
-      "quote": "## 10. 未验收声明与残余风险"
+      "why": "未验收声明记录 D6 未验收的事实与残余风险；它是状态描述，不是判定条件。",
+      "quote": "**声明**：截至本提案撰写，D6 **未验收**。理由是 2.3 的 V1–V3 全部空缺。任何\"已可由小模型完成项目管理任务\"的表述，在当前证据下不成立。",
+      "section_digest": "7d180d58504c93a254bae2a652fe3a6e157e799ef328684d6edda399adba72c2"
     },
     {
       "id": "AG-1BIS-NOCONFIG",
@@ -250,7 +274,8 @@
       "anchor": "- **未配置即 `cannot_evaluate`**",
       "kind": "judgmental",
       "why": "",
-      "quote": "- **未配置即 `cannot_evaluate`**：任何依赖未配置参数的检查，返回 `cannot_evaluate`，**不得回落为通过**，也不得用“常见做法”顶替。"
+      "quote": "- **未配置即 `cannot_evaluate`**：任何依赖未配置参数的检查，返回 `cannot_evaluate`，**不得回落为通过**，也不得用“常见做法”顶替。",
+      "section_digest": "f42507e9b25f65aee14170cfe7d9618875a82121da6ec6a49c40029e03ec5430"
     },
     {
       "id": "T-F-015-EXIT",
@@ -260,7 +285,8 @@
       "anchor": "- 定义：解释器与工件校验的退出码语义",
       "kind": "judgmental",
       "why": "",
-      "quote": "- 定义：解释器与工件校验的退出码语义：`0` 全部通过；`1` 存在违规（含配置漂移 `config_drift`）；`2` 输入或配置非法（含 `config_invalid`/`config_incomplete`）；`3` 存在无法机械判定项（`cannot_evaluate`，含判定性配置缺失）；`4` 解释器不可用（如引用了未注册的检查或工件契约缺失）。多结论聚合优先级为 `4 > 2 > 3 > 1 > 0`：输入非法优先于不可判定，不可判定优先于显式违规，避免“判不了”被“已发现的违规”掩盖。"
+      "quote": "- 定义：解释器与工件校验的退出码语义：`0` 全部通过；`1` 存在违规（含配置漂移 `config_drift`）；`2` 输入或配置非法（含 `config_invalid`/`config_incomplete`）；`3` 存在无法机械判定项（`cannot_evaluate`，含判定性配置缺失）；`4` 解释器不可用（如引用了未注册的检查或工件契约缺失）。多结论聚合优先级为 `4 > 2 > 3 > 1 > 0`：输入非法优先于不可判定，不可判定优先于显式违规，避免“判不了”被“已发现的违规”掩盖。",
+      "section_digest": "5380d24454243dc124c57599ed8231428f65de7f5c67bac8bfe11e05177fbc41"
     },
     {
       "id": "CFG-01-JUDGE",
@@ -270,7 +296,8 @@
       "anchor": "",
       "kind": "judgmental",
       "why": "",
-      "quote": "偏差按哪些对象维度分档。至少 1 项，取值必须来自封闭枚举。判定性：缺失即 cannot_evaluate（退出码 3），不取默认。"
+      "quote": "偏差按哪些对象维度分档。至少 1 项，取值必须来自封闭枚举。判定性：缺失即 cannot_evaluate（退出码 3），不取默认。",
+      "section_digest": "de211c65fb8f38fd48e64f612fca0f1412d958bc750cefc55acc078bee5b879e"
     },
     {
       "id": "CFG-03-JUDGE",
@@ -280,7 +307,8 @@
       "anchor": "",
       "kind": "judgmental",
       "why": "",
-      "quote": "分档边界须升序、无重叠、覆盖声明区间，并写明偏差点定义（SPI / CPI / 自定义）。形状与枚举由本 schema 校验；升序与覆盖性由配置解释器在求值时判定（本批不实现）。判定性：缺失即 cannot_evaluate（退出码 3）。"
+      "quote": "分档边界须升序、无重叠、覆盖声明区间，并写明偏差点定义（SPI / CPI / 自定义）。形状与枚举由本 schema 校验；升序与覆盖性由配置解释器在求值时判定（本批不实现）。判定性：缺失即 cannot_evaluate（退出码 3）。",
+      "section_digest": "418604ec72368e690a903935696d81b3b6bf46b6ea2cf749c84da89b44ca9fed"
     },
     {
       "id": "CFG-04-JUDGE",
@@ -290,7 +318,8 @@
       "anchor": "",
       "kind": "judgmental",
       "why": "",
-      "quote": "状态按里程碑周期分数、自然日、周、月或小时采样。判定性：缺失即 cannot_evaluate（退出码 3）。口径决定 CFG-05/CFG-06 或 CFG-07 的必填性，约束见顶层 allOf。"
+      "quote": "状态按里程碑周期分数、自然日、周、月或小时采样。判定性：缺失即 cannot_evaluate（退出码 3）。口径决定 CFG-05/CFG-06 或 CFG-07 的必填性，约束见顶层 allOf。",
+      "section_digest": "21a01dc532a880b633af68e3292cfec1e607cc75d8d6ec7a0a906a09f03e7e34"
     },
     {
       "id": "CFG-06-EXPLICIT",
@@ -300,7 +329,8 @@
       "anchor": "",
       "kind": "judgmental",
       "why": "",
-      "quote": "决定 1/3 的分母是 5（工作日）还是 7（自然日）。必须显式，不得由实现猜。仅当 CFG-04=milestone_fraction 时必填，缺失即 cannot_evaluate（退出码 3）。"
+      "quote": "决定 1/3 的分母是 5（工作日）还是 7（自然日）。必须显式，不得由实现猜。仅当 CFG-04=milestone_fraction 时必填，缺失即 cannot_evaluate（退出码 3）。",
+      "section_digest": "47b1a1cc7e297aaca5ecc69d2be7a71909e70ea1f5286a791fe3ce28095d4a20"
     },
     {
       "id": "CFG-09-JUDGE",
@@ -310,7 +340,8 @@
       "anchor": "",
       "kind": "judgmental",
       "why": "",
-      "quote": "ISO 4217 三位币种码。判定性：缺失即 cannot_evaluate（退出码 3）。"
+      "quote": "ISO 4217 三位币种码。判定性：缺失即 cannot_evaluate（退出码 3）。",
+      "section_digest": "ab40427d8414d5258d317c5cfc34cfc991217adb7ea9c5c0d01860b8e6425700"
     },
     {
       "id": "CFG-10-DEFAULT",
@@ -320,7 +351,8 @@
       "anchor": "",
       "kind": "judgmental",
       "why": "",
-      "quote": "非判定性：缺失时取子字段默认值（2 位小数、half-even、中间计算不舍入），并在产物 config_used.defaulted 中登记 CFG-10。舍入会传导到 CPI/EAC，故跨配置不可比。"
+      "quote": "非判定性：缺失时取子字段默认值（2 位小数、half-even、中间计算不舍入），并在产物 config_used.defaulted 中登记 CFG-10。舍入会传导到 CPI/EAC，故跨配置不可比。",
+      "section_digest": "cd752240e139488d8f81356b48ecc580914fdbc101db422c164b786656ea035c"
     },
     {
       "id": "CFG-12-GATE",
@@ -330,7 +362,8 @@
       "anchor": "",
       "kind": "judgmental",
       "why": "",
-      "quote": "只能增加关口或映射 approver_role，不可移除任务卡声明的 mandatory gate——本 schema 不含任何删除表达，additionalProperties=false，故“删除关口”在结构上不可能。缺失时不增加额外关口（任务卡的 mandatory gate 仍全启用），角色未解析则 blocked；因此不取默认值、也不回落为通过。"
+      "quote": "只能增加关口或映射 approver_role，不可移除任务卡声明的 mandatory gate——本 schema 不含任何删除表达，additionalProperties=false，故“删除关口”在结构上不可能。缺失时不增加额外关口（任务卡的 mandatory gate 仍全启用），角色未解析则 blocked；因此不取默认值、也不回落为通过。",
+      "section_digest": "28062098192b8159249584a90232d28044202cb7a800b8dd8a885d85ca9092d6"
     },
     {
       "id": "CFG-13-JUDGE",
@@ -340,7 +373,8 @@
       "anchor": "",
       "kind": "judgmental",
       "why": "",
-      "quote": "挣值计量规则（0/100、50/50、百分比完成、加权里程碑）。判定性：用到挣值时必填，缺失即 cannot_evaluate（退出码 3）。公式、EAC 三法与术语别名属技能判据，不在本配置内。"
+      "quote": "挣值计量规则（0/100、50/50、百分比完成、加权里程碑）。判定性：用到挣值时必填，缺失即 cannot_evaluate（退出码 3）。公式、EAC 三法与术语别名属技能判据，不在本配置内。",
+      "section_digest": "7b5a9bc957ea063882709c9a30d50491246e64f7fb29050dbb1fe3286bfd7a9b"
     },
     {
       "id": "CFG-REGISTRY",
@@ -350,7 +384,8 @@
       "anchor": "",
       "kind": "judgmental",
       "why": "",
-      "quote": "配置项集合。键只允许 CFG-01～CFG-15；任何未注册键（含 SKILL-*、ACCEPT-*、SWITCH-* 前缀）按 config_invalid（退出码 2）处理，防止拼写错误被当成新参数。"
+      "quote": "配置项集合。键只允许 CFG-01～CFG-15；任何未注册键（含 SKILL-*、ACCEPT-*、SWITCH-* 前缀）按 config_invalid（退出码 2）处理，防止拼写错误被当成新参数。",
+      "section_digest": "87717e00f70912b53b45b48e6a0545751c10b127565ee21ca1837dc3d6a69ee7"
     },
     {
       "id": "PROC-STATUS-STEP1",
@@ -360,7 +395,8 @@
       "anchor": "",
       "kind": "judgmental",
       "why": "",
-      "quote": "fill_schema"
+      "quote": "fill_schema",
+      "section_digest": "d7ef584952a138742c3bf4aeb375d2aa48d496895326ffff273e1fd0efec8723"
     },
     {
       "id": "PROC-STATUS-GATE",
@@ -370,7 +406,8 @@
       "anchor": "",
       "kind": "judgmental",
       "why": "",
-      "quote": "GATE-STATUS"
+      "quote": "GATE-STATUS",
+      "section_digest": "9a244827b9e0e3e86bf3b1915446c2a3b21efe682db85879f7f36368a61d9cd5"
     },
     {
       "id": "CIS-1.2-MISSING",
@@ -381,7 +418,8 @@
       "kind": "external",
       "why": "本条约束校验器原型（validation/checker-prototype/checker.py）的入口归一化；运行期解释器不消费该 schema，其机械用例由原型 68 条样例承接，不在运行期用例的覆盖面内。",
       "witness": "validation/checker-prototype/checker.py",
-      "quote": "2. **缺键即不可判定**：判定所需的顶层键缺失，或键的值为 `null`，原型输出 `cannot_evaluate` / `missing_input`，不得当作 `pass`。归一化在 `run_case` 入口一次完成，覆盖**顶层键、嵌套对象键、数组元素**三种 `null` 情形；各 `check` 函数不再单独兜底。嵌套归一化规则：第 3 节登记的实体集合（`actors`、`outcomes`、`commitments`、`constraints`、`deliverables`、`assertions`、`changes`、`projects`、`charters`、`contracts`、`tailoring_actions`、`tailoring_records`、`management_items`、`autonomy_grants`）中，每个元素必须带 `id`；缺 `id` 与顶层缺键同出口。内嵌对象（如 `deliverables[].assertions[]`、`evidence_assertions[]`）不要求 `id`。"
+      "quote": "2. **缺键即不可判定**：判定所需的顶层键缺失，或键的值为 `null`，原型输出 `cannot_evaluate` / `missing_input`，不得当作 `pass`。归一化在 `run_case` 入口一次完成，覆盖**顶层键、嵌套对象键、数组元素**三种 `null` 情形；各 `check` 函数不再单独兜底。嵌套归一化规则：第 3 节登记的实体集合（`actors`、`outcomes`、`commitments`、`constraints`、`deliverables`、`assertions`、`changes`、`projects`、`charters`、`contracts`、`tailoring_actions`、`tailoring_records`、`management_items`、`autonomy_grants`）中，每个元素必须带 `id`；缺 `id` 与顶层缺键同出口。内嵌对象（如 `deliverables[].assertions[]`、`evidence_assertions[]`）不要求 `id`。",
+      "section_digest": "a66da93f9206db4ce88254e25bdde7b100c71264878a2b9f1b793dcfc7284abe"
     }
   ]
 }

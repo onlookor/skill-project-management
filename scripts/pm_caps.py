@@ -537,6 +537,9 @@ def _check_risk_band(data: dict, ctx: dict) -> list[dict]:
 
 
 def compute_risk(data: dict, config: dict) -> dict:
+    settings = config.get("CFG-14")
+    if not isinstance(settings, dict) or not settings.get("bands"):
+        return {"status": CANNOT, "detail": "风险分档需要 CFG-14.bands，配置未给出"}
     rows = []
     for risk in data.get("risks", []):
         score, why = _risk_initial_score(risk, config)
@@ -566,7 +569,13 @@ def _point_key(at: str, mode: str) -> str:
 
 def compute_status(data: dict, config: dict) -> dict:
     """按采样口径核对时点，并把每个科目/指标的最后一个有效值汇总。"""
-    grid = sample_points(data["period"]["start"], data["period"]["end"], config)
+    missing_cfg = [key for key in ("CFG-04", "CFG-06", "CFG-08") if key not in config]
+    if missing_cfg:
+        return {"status": CANNOT, "detail": f"状态采样需要 {missing_cfg}，配置未给出"}
+    try:
+        grid = sample_points(data["period"]["start"], data["period"]["end"], config)
+    except RuntimeError as exc:
+        return {"status": CANNOT, "detail": f"采样网格无法建立：{exc}"}
     allowed = {_point_key(point["at"], grid["mode"]) for point in grid["points"]}
     latest: dict[tuple[str, str], float] = {}
     missing: list[str] = []

@@ -153,6 +153,30 @@ SECTIONS = (
         "start": None,
         "end": None,
     },
+    {
+        "key": "spec/D6_REBASELINE_PROPOSAL.md",
+        "path": "spec/D6_REBASELINE_PROPOSAL.md",
+        "start": None,
+        "end": None,
+    },
+    {
+        "key": f"{AGENTS}#1bis",
+        "path": AGENTS,
+        "start": "### 1bis ",
+        "end": "### 2. ",
+    },
+    {
+        "key": "GLOSSARY.md#T-F-015",
+        "path": "GLOSSARY.md",
+        "start": "**T-F-015 ",
+        "end": "### 4. ",
+    },
+    {
+        "key": "spec/clause-registry.json",
+        "path": "spec/clause-registry.json",
+        "start": None,
+        "end": None,
+    },
 )
 
 

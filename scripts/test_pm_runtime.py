@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import copy
 import json
+import os
 import shutil
 import sys
 import tempfile
@@ -538,7 +539,8 @@ def main() -> int:
             "单条篡改": 1,
             "删除一条": 1,
             "新增一条": 2,
-            "调换顺序": 1,
+            # 键序不计入合规：JSON 对象无序，纯调换顺序仍是同一快照。
+            "调换顺序": 0,
         }
         for label, items in items_cases.items():
             artifact = mutate(
@@ -551,6 +553,30 @@ def main() -> int:
                 pm_check.validate_artifact(read(artifact), state)["exit_code"],
                 expected_items_codes[label],
             )
+
+        # 依据：条款：D6-9.4-ITEM、D6-9.3-CANNOT（配置层不可判定不得被工件违规掩盖）
+        degraded_cfg = mutate(
+            CONFIG,
+            temp / "config-degraded.json",
+            lambda body: body["config"].pop("CFG-01"),
+        )
+        degraded_state = pm_config.evaluate(degraded_cfg, None)
+        merged_items = {
+            key: value
+            for key, value in read(INPUTS / "schedule.json")["config_ref"]["item_digests"].items()
+            if key != "CFG-01"
+        }
+        merged_items["CFG-04"] = "0" * 64
+        merged_artifact = mutate(
+            INPUTS / "schedule.json",
+            temp / "schedule-merged.json",
+            lambda body: body["config_ref"].__setitem__("item_digests", merged_items),
+        )
+        check(
+            "逐项摘要违规与配置不可判定合并 → 3",
+            pm_check.validate_artifact(read(merged_artifact), degraded_state)["exit_code"],
+            3,
+        )
 
         # 依据：条款：D6-4.3-OPS（render 属闭集算子）；模板不可读属解释器资源问题（4），路径越界属输入不合法（2），出处为 GAP_LEDGER.md 外复核派生条；
         # 模板路径越出模板目录属输入不合法（2）。
@@ -623,6 +649,47 @@ def main() -> int:
                     ),
                     2,
                 )
+            # 硬链接与模板目录内的普通文件同 inode：仅靠路径前缀拦不住（批次 0099 四）。
+            outside = temp / "outside.md"
+            outside.write_text("外部内容", encoding="utf-8")
+            os.link(outside, template_root / "linked.md")
+            render_proc.write_text(
+                json.dumps(
+                    {
+                        "procedure": "procedure-template",
+                        "version": 1,
+                        "steps": [
+                            {
+                                "id": "S1",
+                                "op": "render",
+                                "template": "linked.md",
+                                "input": "audit.json",
+                                "out": "x.md",
+                            }
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            check(
+                "模板为硬链接 → 2",
+                pm_check.main(
+                    [
+                        "--procedure",
+                        str(render_proc),
+                        "--inputs",
+                        str(INPUTS),
+                        "--config",
+                        str(CONFIG),
+                        "--lock",
+                        str(LOCK),
+                        "--out-dir",
+                        str(temp / "out-template"),
+                    ]
+                ),
+                2,
+            )
+            check("硬链接内容未被写出", not (temp / "out-template" / "x.md").exists(), True)
         finally:
             pm_check.TEMPLATE_DIR = original_template_dir
 
@@ -664,6 +731,24 @@ def main() -> int:
         )
         empty_rule, empty_reason = pm_caps._ev_rule({"CFG-13": {}})
         check("CFG-13 缺 rule → 无规则且有理由", (empty_rule, bool(empty_reason)), (None, True))
+
+        # 依据：条款：D6-9.3-CANNOT（缺配置即不可判定，不得按乘积评分或抛异常）
+        no_band_cfg = {key: value for key, value in state.config.items() if key != "CFG-14"}
+        check(
+            "缺 CFG-14 的风险排序 → cannot_evaluate",
+            pm_caps.compute_risk(read(INPUTS / "risk.json")["data"], no_band_cfg)["status"],
+            "cannot_evaluate",
+        )
+        no_status_cfg = {
+            key: value
+            for key, value in state.config.items()
+            if key not in ("CFG-04", "CFG-06", "CFG-08")
+        }
+        check(
+            "缺 CFG-04/06/08 的状态采集 → cannot_evaluate",
+            pm_caps.compute_status(read(INPUTS / "status.json")["data"], no_status_cfg)["status"],
+            "cannot_evaluate",
+        )
 
         print("[解释器不可用]")
         original = pm_check.ARTIFACT_DIR

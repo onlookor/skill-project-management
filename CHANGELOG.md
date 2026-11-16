@@ -1685,10 +1685,38 @@
   1. `spec/clause-registry.json`：38 条条款，`judgmental` 32 条、`textual` 5 条、`external` 1 条。每条只用 `(source, locator, section, anchor)` 定位；`quote` 由检查器 `--write` 从源文件逐字提取，不手打。覆盖提案（2.3、4.1、4.3、5、7、8.3 的 RG-06～RG-12、9.1～9.4、10）、`AGENTS.md` 1bis、`GLOSSARY.md` T-F-015、`contracts/schema/runtime-config.schema.json` 的 CFG-01/03/04/06/09/10/12/13 与键注册说明、`runtime/procedures/status_review.json` 的首步与关口、`spec/CHECKER_INPUT_SCHEMA.md` 1.2。
   2. `scripts/check_clause_basis.py`：查三件事——用例引用的条款必须在登记表；`judgmental` 条款至少被一条用例以 `条款：<id>` 引用；登记表指向的源文件、章节、原文重新提取后必须一致。`--write` 重提取，`--self-test` 五条正负例。`textual` 必须写 `why`，`external` 必须写 `why` 与仓库内存活的 `witness`。
   3. `scripts/test_pm_runtime.py`：66 项增至 68 项。全部 `依据：` 行改为带 `条款：<id>` 标记（不再允许自由文本依据）；新增“未注册配置项 → 2”“配置项相互矛盾 → 2”两条用例。
-- **准入与钉扎**：`spec/ACCESS_ZONES.md` 第 1 节登记 `spec/clause-registry.json` 为 D 区，第 2 节登记生成器 `scripts/check_clause_basis.py --write`；`scripts/checker-pins.json` 纳入新检查器；`scripts/no-review-declarations.json` 为 `check_clause_basis.py` 与 `clause-registry.json` 增加“无复核”条目；pre-commit 与 `scripts/README.md` 已接入。
+- **准入与钉扎**：`spec/ACCESS_ZONES.md` 第 1 节登记 `spec/clause-registry.json` 为 D 区，第 2 节登记生成器 `scripts/check_clause_basis.py --write`；`scripts/checker-pins.json` 纳入新检查器；`scripts/no-review-declarations.json` 当时只为 `check_clause_basis.py` 增加了“无复核”条目——**`spec/clause-registry.json` 既没有 no-review 条目，也没有纳入任何钉扎，本条原写“与 clause-registry.json 增加条目”不实**，实际状态由批次 0099 第一条补正（见 0099 条目“更正来由”）。pre-commit 与 `scripts/README.md` 已接入。
 - **实测**：`check_clause_basis.py` 对当前仓库 38 条登记、缺陷 0；`--self-test` 5/5；在 `scripts/test_fabricated_tmp.py` 写入 `# 依据：条款：D6-4.3(1)` 后检查器退出 1，报“引用了登记表没有的条款 D6-4.3”，删除该文件后恢复 0；把登记表 `quote` 改成与源文件不一致时退出 1（自测内覆盖）。
 - **能力边界（不许当作已合规）**：检查器只证明条款文字与源文件一致，不证明用例断言真的检验了该条款；标记可被贴在任意断言上；登记表与源文件同批改动可同步漂移（R-0098-01～03）。
 - **未做**：不改 `CONSTITUTION.md` 与 `spec/D6_REBASELINE_PROPOSAL.md`；不修改既有 0097 修复语义；三条 0097 残余仍未修。
 - **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-168；`scripts/no-review-declarations.json` 的 `check_clause_basis.py`、`spec/clause-registry.json` 条目；`GAP_LEDGER.md`“批次 0098 实施进展”与 R-0098-01～03；本节。
 - **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149,T-166,T-167,T-168`。
+- **关联 ADR**：无
+
+---
+
+### 批次 0099 — 2026-11-16 — 第三轮外复核五项修复（未复核）
+
+- **授权依据**：外复核对基线 `4bf7df2` 判零阻断、5 项认可、5 项不认可。本批逐条修复，**不构成任何认可**，须再走外复核。
+- **一 钉扎缺口（最重要）**：
+  - `scripts/check_spec_pins.py` 的 `SECTIONS` 新增 4 个区段：`spec/D6_REBASELINE_PROPOSAL.md`（整篇）、`AGENTS.md#1bis`、`GLOSSARY.md#T-F-015`、`spec/clause-registry.json`（整篇）。
+  - `scripts/spec-pins.json` 已重冻这 4 个指纹（20 个区段，本次新增 4 个），basis 一律为无复核声明；`scripts/no-review-declarations.json` 的 `spec` 组逐对象登记 reason / missing_review / T-169。
+  - 后果：改提案、改 1bis 正文、改 T-F-015 定义、改登记表任一字节，`check_spec_pins.py` 均退出 1；“改源 + 改登记表 anchor + `--write` 重新提取”会先让 `spec/clause-registry.json` 的区段指纹失效，不再自洽通过。
+- **二 三处虚报登记更正**：
+  - `CHANGELOG.md` 批次 0098“准入与钉扎”删去“为 clause-registry.json 增加 no-review 条目”的不实表述，改为实际状态并注明由 0099 补正。
+  - `GAP_LEDGER.md` 批次 0098 表把“`checker-pins.json` 钉扎”更正为“未钉扎（0098 误报，0099 纳入 spec-pins）”。
+  - `TODO.md` T-168 把“两条各占一条”更正为“当时只登记检查器，登记表无条目、未钉扎”。
+- **三 textual 归类与引文**：
+  - 5 条 `textual` 的 `anchor` 由章节标题改为正文实质句（2.3 的三样要件、4.1 的 L1 加载边界、5 的出口可判真假原则、7 的未裁定推进范围、10 的未验收声明）。
+  - 检查器新增两条硬约束：`textual` 的引文不得以 `#` 开头（禁取标题）；每条登记新增 `section_digest`（章节/指针值的 sha256），任何正文变动都报“章节正文已变动”，须 `--write` 留痕。
+  - 逐条复核归类：2.3、4.1、5、7、10 均不含运行期判定条件，维持 `textual`；理由写在各条 `why`（2.3 另注明机械用例须等 R4 基准任务集）。
+- **四 硬链接绕过**：`scripts/pm_check.py` 的 `_render()` 在路径前缀检查后取 `stat()`，`st_nlink > 1` 或非普通文件即 `InputInvalid`（2）；新增 `linked.md` 负例。
+- **五 退出码与剩余默认**：
+  - `pm_check.validate_artifact()` 的逐项摘要分支不再直接 return，改为把 finding 并入 `findings` 后统一按 `4 > 2 > 3 > 1 > 0` 聚合；纯键序差异不再判违规（键序不进入比较），删除、单条不符仍为 1，多余键仍为 2。
+  - `pm_caps.compute_risk()` 缺 `CFG-14.bands` 返回 `cannot_evaluate`；`compute_status()` 缺 `CFG-04/CFG-06/CFG-08` 返回 `cannot_evaluate`，`sample_points` 的 `RuntimeError` 也转为 `cannot_evaluate`。
+- **测试**：`scripts/test_pm_runtime.py` 68 → 73 项，新增：逐项摘要与配置不可判定合并 → 3、硬链接模板 → 2、缺 CFG-14 的风险排序 → cannot、缺 CFG-04/06/08 的状态采集 → cannot；调换顺序改为期望 0。`check_clause_basis.py --self-test` 5 → 7 条（新增章节正文变动、textual 取标题两条负例）。
+- **实测**：`test_pm_runtime` 73/73；`check_clause_basis` 自测 7/7、仓库 38 条缺陷 0；临时把 2.3 正文插一句 → rc=1 报“章节正文已变动”，还原后 rc=0；临时写入 `# 依据：条款：D6-4.3(1)` → rc=1（沿用 0098 的负例，本批自测仍覆盖）。
+- **未做**：不关闭任何既有缺口；不改提案正文（只纳入钉扎）；0097 三条残余仍未修。
+- **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-169；`no-review-declarations.json` 的 4 条 spec 声明；`GAP_LEDGER.md`“批次 0099 实施进展”与 R-0099-01～04；本节。
+- **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149,T-166,T-167,T-168,T-169`。
 - **关联 ADR**：无

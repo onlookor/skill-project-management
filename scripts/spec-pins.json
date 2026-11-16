@@ -85,6 +85,26 @@
       "sha256": "e21f5c30ab3d8552385fccbf506b4a45dbb599761e6a05af62c06a1cd2a51ca6",
       "path": "spec/ACCESS_ZONES.md",
       "basis": "无复核声明（不构成认可，不放行）"
+    },
+    "spec/D6_REBASELINE_PROPOSAL.md": {
+      "sha256": "bc50490bd85a1e453b4cad609e96fb5f5f1b31f7232607d8bbfe1faea7fbb4aa",
+      "path": "spec/D6_REBASELINE_PROPOSAL.md",
+      "basis": "无复核声明（不构成认可，不放行）"
+    },
+    "AGENTS.md#1bis": {
+      "sha256": "96539f2020a0a57fac6135fd5d9a7599769880745b9f4b7c50ad21d370a8dcb2",
+      "path": "AGENTS.md",
+      "basis": "无复核声明（不构成认可，不放行）"
+    },
+    "GLOSSARY.md#T-F-015": {
+      "sha256": "08b9661c3bedd942870ddfb079b243bf67628605edb74bfea232ee939a55fdfa",
+      "path": "GLOSSARY.md",
+      "basis": "无复核声明（不构成认可，不放行）"
+    },
+    "spec/clause-registry.json": {
+      "sha256": "bcff1dc76459bdeccea8950e0102051341b2ea7e24d0217a4d509ec3d2fcfdde",
+      "path": "spec/clause-registry.json",
+      "basis": "无复核声明（不构成认可，不放行）"
     }
   }
 }

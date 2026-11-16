@@ -27,6 +27,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import shutil
@@ -71,7 +72,9 @@ def _bold_span(lines: list[str], section: str) -> tuple[int, int] | None:
     if start is None:
         return None
     end = start + 1
-    while end < len(lines) and not re.match(r"^\*\*T-", lines[end]):
+    # 条目正文到下一个术语条目或下一个标题为止：否则末条会把后面的
+    # “使用位置”表一并算进摘要，无关改动也会被判成正文变动。
+    while end < len(lines) and not re.match(r"^\*\*T-|^#{1,6}\s", lines[end]):
         end += 1
     return start, end
 
@@ -89,8 +92,8 @@ def _pointer_get(document: object, pointer: str) -> object:
     return node
 
 
-def _derive(entry: dict, root: Path) -> str:
-    """按定位信息从源文件取回条款原文。取不到即抛错。"""
+def _locate(entry: dict, root: Path) -> tuple[str, str]:
+    """按定位信息取回 (条款原文, 章节正文)。正文用于整章比对，防只改标题外文字。"""
     source = root / entry["source"]
     if not source.is_file():
         raise ValueError(f"源文件不存在：{entry['source']}")
@@ -100,7 +103,7 @@ def _derive(entry: dict, root: Path) -> str:
         value = _pointer_get(document, entry["section"])
         if not isinstance(value, str) or not value.strip():
             raise ValueError(f"指针不是非空字符串：{entry['section']}")
-        return value
+        return value, value
     lines = _read(source).splitlines()
     span = _heading_span(lines, entry["section"]) if locator == "heading" else _bold_span(lines, entry["section"])
     if span is None:
@@ -108,12 +111,17 @@ def _derive(entry: dict, root: Path) -> str:
     anchor = entry.get("anchor", "")
     if not anchor:
         raise ValueError("heading/bold 定位必须给出 anchor")
-    hits = [line.strip() for line in lines[span[0] : span[1]] if anchor in line]
+    body = lines[span[0] : span[1]]
+    hits = [line.strip() for line in body if anchor in line]
     if len(hits) != 1:
         raise ValueError(
             f"锚点在该章节命中 {len(hits)} 行（应为 1）：{entry['source']}#{entry['section']} :: {anchor}"
         )
-    return hits[0]
+    return hits[0], "\n".join(body)
+
+
+def _digest(text: str) -> str:
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
 def _registry_errors(registry: dict, root: Path) -> list[str]:
@@ -146,13 +154,19 @@ def _registry_errors(registry: dict, root: Path) -> list[str]:
             elif not (root / witness).exists():
                 errors.append(f"{clause_id}：witness 指向的路径不存在：{witness}")
         try:
-            derived = _derive(entry, root)
+            derived, body = _locate(entry, root)
         except (OSError, ValueError, KeyError, IndexError, json.JSONDecodeError) as exc:
             errors.append(f"{clause_id}：{exc}")
             continue
+        if kind == "textual" and derived.lstrip().startswith("#"):
+            errors.append(f"{clause_id}：textual 的引文不得取章节标题，须取正文实质句")
         if entry.get("quote") != derived:
             errors.append(
                 f"{clause_id}：登记原文与源文件不一致（登记 {entry.get('quote')!r} / 源文件 {derived!r}）"
+            )
+        if entry.get("section_digest") != _digest(body):
+            errors.append(
+                f"{clause_id}：章节正文已变动（{entry['source']}#{entry['section']}），需 --write 并留下复核痕迹"
             )
     return errors
 
@@ -201,21 +215,27 @@ def evaluate(root: Path, registry_path: Path) -> list[str]:
 def _write(root: Path, registry_path: Path) -> int:
     registry = json.loads(_read(registry_path))
     changed = 0
+    touched = 0
     errors: list[str] = []
     for entry in registry.get("clauses", []):
         try:
-            derived = _derive(entry, root)
+            derived, body = _locate(entry, root)
         except (OSError, ValueError, KeyError, IndexError, json.JSONDecodeError) as exc:
             errors.append(f"{entry.get('id')}：{exc}")
             continue
         if entry.get("quote") != derived:
             entry["quote"] = derived
             changed += 1
+        body_digest = _digest(body)
+        if entry.get("section_digest") != body_digest:
+            entry["section_digest"] = body_digest
+            changed += 1
+        touched += 1
     if errors:
         print("\n".join(errors))
         return 1
     registry_path.write_text(json.dumps(registry, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"已刷新 {changed} 条条款原文；未改动 {len(registry.get('clauses', [])) - changed} 条")
+    print(f"已刷新 {changed} 处（原文/章节摘要）；核对 {touched} 条")
     return 0
 
 
@@ -253,6 +273,10 @@ def _self_test() -> int:
                 },
             ]
         }
+        for entry in registry["clauses"]:
+            quote, body = _locate(entry, temp)
+            entry["quote"] = quote
+            entry["section_digest"] = _digest(body)
         registry_path = temp / "spec" / "registry.json"
         registry_path.write_text(json.dumps(registry, ensure_ascii=False), encoding="utf-8")
         case = temp / "scripts" / "test_demo.py"
@@ -279,6 +303,40 @@ def _self_test() -> int:
 
         registry["clauses"][0]["quote"] = "- **规则一**：必须拒绝。"
         registry_path.write_text(json.dumps(registry, ensure_ascii=False), encoding="utf-8")
+
+        (temp / "spec" / "src.md").write_text(
+            "# 源文件\n\n## 1 规则\n\n- **规则一**：必须拒绝。\n\n## 2 说明\n\n正文。\n\n附加说明。\n",
+            encoding="utf-8",
+        )
+        errors = evaluate(temp, registry_path)
+        results.append(
+            ("负例：章节正文变动被拒", any("章节正文已变动" in item for item in errors), str(errors))
+        )
+        (temp / "spec" / "src.md").write_text(
+            "# 源文件\n\n## 1 规则\n\n- **规则一**：必须拒绝。\n\n## 2 说明\n\n正文。\n",
+            encoding="utf-8",
+        )
+
+        heading_clause = {
+            "id": "SRC-1-H",
+            "source": "spec/src.md",
+            "locator": "heading",
+            "section": "1",
+            "anchor": "## 1 规则",
+            "kind": "textual",
+            "why": "测试用：故意取标题。",
+            "quote": "## 1 规则",
+            "section_digest": _digest("\n".join(_read(temp / "spec" / "src.md").splitlines()[2:5])),
+        }
+        registry["clauses"].append(heading_clause)
+        registry_path.write_text(json.dumps(registry, ensure_ascii=False), encoding="utf-8")
+        errors = evaluate(temp, registry_path)
+        results.append(
+            ("负例：textual 引文取标题被拒", any("不得取章节标题" in item for item in errors), str(errors))
+        )
+        registry["clauses"].pop()
+        registry_path.write_text(json.dumps(registry, ensure_ascii=False), encoding="utf-8")
+
         case.write_text("# 无引用\n", encoding="utf-8")
         errors = evaluate(temp, registry_path)
         results.append(
