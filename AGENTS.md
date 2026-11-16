@@ -129,7 +129,7 @@ Hook-Bypass-Items: <T-xxx[,T-yyy]>                      # 仅 pin-review-debt，
 
 #### 3.5.3 钉扎面未复核例外（临时通道）
 
-**适用对象**：`scripts/checker-pins.json` 与 `scripts/spec-pins.json` 登记的一切对象——检查器脚本（全仓 `.py` 除 `PY_EXCLUDE`）、`.githooks/pre-commit`、`scripts/no-review-declarations.json`（登记表自身），以及 `spec-pins.json` 的 16 个规格区段（`GRAMMAR.md` 全文、方法文件 A.2、方法文件 A.1、`spec/CHECKER_INPUT_SCHEMA.md` 整文件、`AGENTS.md` §3.5、`validation/checker-prototype/coverage.json`、9 份数据 schema、`spec/ACCESS_ZONES.md`）。`contracts/schema/` 下新增文件由检查器自动发现并纳入，区段数随 schema 增加而增加，不写死。
+**适用对象**：`scripts/checker-pins.json` 与 `scripts/spec-pins.json` 登记的一切对象——检查器脚本（全仓 `.py` 除 `PY_EXCLUDE`）、`.githooks/pre-commit`、`scripts/no-review-declarations.json`（登记表自身），以及 `scripts/spec-pins.json` 登记的全部规格区段（清单与数量以该文件为准）。`contracts/schema/` 下新增文件由检查器自动发现并纳入，区段数随 schema 增加而增加，不写死。
 
 **硬规则**：
 
@@ -241,7 +241,7 @@ Hook-Bypass-Items: <T-xxx[,T-yyy]>                      # 仅 pin-review-debt，
 - **无复核例外的登记**：钉扎面改动缺复核时，`basis` 写无复核字面量，并在 `scripts/no-review-declarations.json` 逐对象登记 `reason` / `missing_review` / `due` / `owner` / `todo`。检查器交叉校验：登记项必须是受保护对象、字段齐全、已存在合格复核却仍登记即报错。该文件本身纳入 pins，改表与改检查器同等受约束。通道规则见 3.5.3。
 - **验收快照**：`validation/pinned/checker.py` 是工作区 `validation/checker-prototype/checker.py` 的只读快照；`check_checker_pins.py` 检测两者是否漂移。**这是漂移检测，不是权限分离**：两份文件仍在同一工作区，同一方可以同改；真正的分离需要 CI/受保护分支，本机无 CI 时做不到，ADR-0014 已记录该限制与残余风险。
 - **不可机械化部分**：签收人身份、签收人与改动人是否同源、复核记录是否真实执行，机器都无法验证；只能靠 3.6.6/3.6.7 的评审流程与提交评审约束。**残余风险明确外置**：伪造复核记录、同一方持有写权限，均由外部控制（真 CI + 受保护分支 + 复核方独立持有工具链）承接，不以“打不穿”作为关闭条件。
-- **正负例**：`scripts/test_checker_pins.py`（CP01–CP21：含无复核字面量、结论词括号补充、无关基线、基线内容已变、新增 helper 未登记、登记表被改）与 `scripts/test_spec_pins.py`（SP01–SP28：含自我声明、结论词括号补充、无关基线、基线区段内容已变、schema 末尾追加、登记表冲突、伪签收行、多行签收、签收行内注入叙述、签收行不在区段尾部）固定验证阻断与放行。
+- **正负例**：`scripts/test_checker_pins.py`（CP01–CP21：含无复核字面量、结论词括号补充、无关基线、基线内容已变、新增 helper 未登记、登记表被改）与 `scripts/test_spec_pins.py`（每个规格区段至少一条，条数与清单以该文件为准：含自我声明、结论词括号补充、无关基线、基线区段内容已变、schema 末尾追加、登记表冲突、伪签收行、多行签收、签收行内注入叙述、签收行不在区段尾部）固定验证阻断与放行。
 - **pre-commit 额外执行**：A.1 全部 68 条样例、聚合顺序无关性、缺键快检（43 键）、`null` 快检子集、嵌套缺键快检（53 项）、封闭枚举快检（5 项）。改 `aggregate()` 或入口归一化后，仅靠原有十个检查器无法全绿。
 
 ### 4. 目录结构（唯一权威）
@@ -363,7 +363,7 @@ project-management-grounding/
 │   ├── test_check_table_mutations.py   # A.2 固定变异集 + 签收正负例（可运行）
 │   ├── test_coverage_gate.py       # 覆盖闸门四条负例（可运行）
 │   ├── test_checker_pins.py        # 检查器绑定 CP01–CP21 正负例（可运行）
-│   ├── test_spec_pins.py           # 规格区段绑定 SP01–SP28 正负例（可运行）
+│   ├── test_spec_pins.py           # 规格区段绑定正负例（条数以该文件为准，可运行）
 │   ├── check_glossary_usage.py     # 术语使用位置生成与陈旧引用校验（可运行）
 │   ├── validate_ontology.py        # 本体与 SHACL 形状校验，含逐形状负例矩阵（可选依赖）
 │   └── check_state.py              # STATE 与 git 跟踪文件的对账脚本（可运行）

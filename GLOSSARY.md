@@ -671,7 +671,7 @@
 | T-D-003 | GRAMMAR | [`TODO.md`](TODO.md) |
 | T-D-004 | SOURCE_LEDGER | [`CONSTITUTION.md`](CONSTITUTION.md)、[`GAP_LEDGER.md`](GAP_LEDGER.md)、[`TODO.md`](TODO.md)、[`spec/M3_M4_PLAN.md`](spec/M3_M4_PLAN.md)、[`spec/ONTOLOGY_FEASIBILITY.md`](spec/ONTOLOGY_FEASIBILITY.md) |
 | T-D-005 | ADR | [`CHANGELOG.md`](CHANGELOG.md) |
-| T-D-006 | CHANGELOG | [`CHANGELOG.md`](CHANGELOG.md)、[`GAP_LEDGER.md`](GAP_LEDGER.md) |
+| T-D-006 | CHANGELOG | [`CHANGELOG.md`](CHANGELOG.md)、[`GAP_LEDGER.md`](GAP_LEDGER.md)、[`TODO.md`](TODO.md) |
 | T-D-007 | TODO | [`CHANGELOG.md`](CHANGELOG.md) |
 | T-D-008 | 四层结构 | （无） |
 | T-D-009 | 三权分立 | （无） |

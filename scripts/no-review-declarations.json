@@ -66,6 +66,13 @@
       "due": "M1 出口前",
       "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
       "todo": "T-169"
+    },
+    "AGENTS.md#3.5": {
+      "reason": "批次 0101 第五轮外复核不认可项收口：`§3.5.3` 删除写死的规格区段数量及逐项枚举，改为“以 `scripts/spec-pins.json` 登记为准”；改动落在 `AGENTS.md#3.5` 钉扎区内，当前无新复核，按 3.5.3 登记并以 `--no-verify` 提交",
+      "missing_review": "非同源复核：① 删除枚举后的 §3.5.3 是否仍完整表达钉扎适用对象；② 以 `scripts/spec-pins.json` 作为清单与数量的单一来源是否足够；③ 与批次 0100 三处计数改动、T-161 口径更正的一致性",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-170"
     }
   },
   "date_unverified": {

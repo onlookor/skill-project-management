@@ -239,7 +239,7 @@
 | R-0099-01 | 提案、`AGENTS.md#1bis`、`GLOSSARY.md#T-F-015`、`clause-registry.json` 纳入钉扎时只有无复核声明，没有对“纳入了正确版本”的外部确认 | 登记，不修 |
 | R-0099-02 | `quote`/`section_digest` 与源文件的一致性仍由同一生成器自证；同批改源、改 anchor、`--write`、重冻钉扎可以自洽推进 | 登记，不修 |
 | R-0099-03 | 硬链接按 `st_nlink` 拒绝，bind mount / overlay 等同 inode 的其他形态未覆盖 | 登记，不修 |
-| R-0099-04 | `compute_risk`、`compute_status` 已改判不可判定，但其他 `compute_*` 的缺配置路径与调用方上抛未逐点核验 | 登记，不修 |
+| R-0099-04 | `compute_risk`、`compute_status` 已改判不可判定，但其他 `compute_*` 的缺配置路径与调用方上抛未逐点核验。**批次 0101 补列两处库层默认**：`scripts/pm_config.py` 的 `sample_points()` 用 `config.get("CFG-05", [])` 静默取空列表（`milestone_fraction` 模式下会得到零采样点而不报错）；`scripts/pm_caps.py` 的 `compute_budget` 用 `config.get("CFG-15") or {}` 静默取空科目表 | 登记，不修 |
 
 ---
 

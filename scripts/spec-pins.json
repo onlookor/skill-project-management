@@ -27,9 +27,9 @@
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：spec/CHECKER_INPUT_SCHEMA.md；结论：认可"
     },
     "AGENTS.md#3.5": {
-      "sha256": "f398093a81b17b9814f7e2ba7f270b324cd4838d34ba54fd396f2425172e5b54",
+      "sha256": "a1dd58513b30fa256e4d3ad4fdcb9f93ba6c401bbb7e4d8d3c29c23b32d1b7d1",
       "path": "AGENTS.md",
-      "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：AGENTS.md#3.5；结论：认可"
+      "basis": "无复核声明（不构成认可，不放行）"
     },
     "validation/checker-prototype/coverage.json": {
       "sha256": "bda6c5da3e06790c5af0dab6a591020c3f9cf06ed394dd6b51b137f7010a5e7a",
