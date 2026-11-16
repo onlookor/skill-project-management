@@ -14,9 +14,12 @@
    新增字段未标注即报错。
 7. 输入域闭包：样例中实际出现的引用目标集合必须在 §3 的必需顶层键中声明。
 8. A.2 复核签收：A.2 区段内的“复核签收”行（应为区段最后一条非空行）必须携带当前
-   A.2 区段指纹，且所载基线/日期须与 `scripts/spec-pins.json` 中 A.2 basis 自洽
-   （基线等于 `复核基线：` 且存在于仓库；日期为合法日历日期且见于 `复核产物：` 文本）；
-   只改 A.2 再跑 `--write` 会使 A 表自洽，本条是唯一能阻断该绕过的机械检查（AGENTS 3.6.7）。
+   A.2 区段指纹，且所载基线/日期须与 `scripts/spec-pins.json` 中 A.2 登记项自洽
+   （基线等于 `复核基线：` 且存在于仓库；日期为合法日历日期且等于同级字段
+   `review_date.value`）；只改 A.2 再跑 `--write` 会使 A 表自洽，本条是唯一能阻断该
+   绕过的机械检查（AGENTS 3.6.7）。日期**证据**（复核产物中的专用记号）只在
+   `scripts/check_spec_pins.py` 单点核验，不在这里重复：若这里也报“日期未核验”，
+   “改 A.2 + 更新签收 → 通过”会结构性不可达。
    签收行只接受固定模板整行匹配：`> 复核签收：外部复核基线 `<7–40 hex>`；`
    `<YYYY-MM-DD>；A.2 指纹 `<12 hex>``，行内不得含自由文本（批次 0088 甲方案）。
 
@@ -191,72 +194,19 @@ def resolve_commit(root: Path, ref: str) -> str | None:
     return result.stdout.strip() or None if result.returncode == 0 else None
 
 
-A2_DATE_FIELD_RE = re.compile(r"复核日期：\s*`?(\d{4}-\d{2}-\d{2})`?")
-A2_DATE_RECORD_RE = re.compile(r"日期记录：`?([^`\s；，、]+)`?")
-
-
-def a2_date_marker(text: str, stamp: str) -> bool:
-    """行首专用记号：整行只写 `复核日期：<日期>`，不是任意位置的子串。"""
-    return re.search(rf"^复核日期：\s*`?{re.escape(stamp)}`?\s*$", text, re.M) is not None
-
-
-def a2_date_corroboration_issues(root: Path, stamp: str, basis: str) -> list[str]:
-    """日期须有行首 `复核日期：` 记号佐证（复核产物，或 basis 的 `日期记录：`）。
-
-    与 `check_spec_pins.a2_date_corroboration_errors` 同一口径；历史产物不可改字节时
-    走 `日期记录：<仓库外文件> sha256：<64 位>` 支路，路径、存在性、哈希、记号四者缺一即报错。
-    """
-    artifact = re.search(r"复核产物：`?([^`\s；，、]+)`?", basis)
-    if artifact is None:
-        return [f"A.2 basis 无 `复核产物：`，签收行日期 `{stamp}` 无法核对"]
-    path = Path(artifact.group(1))
-    if not path.is_file():
-        return [f"A.2 复核产物不存在，无法核对签收行日期：{path}"]
-    if a2_date_marker(path.read_text(encoding="utf-8", errors="replace"), stamp):
-        return []
-    record = A2_DATE_RECORD_RE.search(basis)
-    if record is None:
-        return [
-            f"A.2 签收行日期 `{stamp}` 未在复核产物 {path.name} 中以行首 `复核日期：`"
-            "记号出现，且 basis 无 `日期记录：<仓库外文件> sha256：<64 位>` 佐证"
-            "（日期与复核记录不自洽）"
-        ]
-    record_path = Path(record.group(1))
-    try:
-        record_path.resolve().relative_to(root.resolve())
-    except ValueError:
-        pass
-    else:
-        return [f"A.2 日期记录位于本仓库内，不能作为日期佐证：{record_path}"]
-    if not record_path.is_file():
-        return [f"A.2 日期记录不存在，无法核对签收行日期：{record_path}"]
-    errors: list[str] = []
-    recorded_sha = re.search(r"sha256：`?([0-9a-f]{64})`?", basis[record.end() :])
-    if recorded_sha is None:
-        errors.append("A.2 basis 的 `日期记录：` 缺少 `sha256：<64 位十六进制>`")
-    elif hashlib.sha256(record_path.read_bytes()).hexdigest() != recorded_sha.group(1):
-        errors.append(f"A.2 `日期记录` 的 sha256 与文件实算不一致：{record_path}")
-    if not a2_date_marker(record_path.read_text(encoding="utf-8", errors="replace"), stamp):
-        errors.append(
-            f"A.2 日期记录 {record_path.name} 中无行首 `复核日期：{stamp}` 记号"
-            "（日期与复核记录不自洽）"
-        )
-    return errors
-
-
 def a2_signoff_fact_issues(root: Path, signoff: tuple[str, str, str]) -> list[str]:
-    """签收行的 `外部复核基线` 与日期必须与 A.2 basis 自洽（批次 0090，0091 收紧）。
+    """签收行基线须与 A.2 basis 一致且存在；日期须等于登记日期（批次 0092）。
 
-    - 基线须与 `scripts/spec-pins.json` 中 A.2 basis 的 `复核基线：` 解析为同一提交且存在于仓库；
-    - 日期须为合法日历日期、必须等于 basis 的 `复核日期：` 字段，并有行首专用记号佐证
-      （见 `a2_date_corroboration_issues`）。
+    日期证据（复核产物中的专用记号）由 `check_spec_pins.py` 单点核验；这里只做
+    内部一致性：签收行日期 == `spec-pins.json` 同级字段 `review_date.value`。
     """
     baseline, signed_at, _ = signoff
     pins_path = root / "scripts" / "spec-pins.json"
     key = f"{METHOD}#A.2"
     try:
         pins = json.loads(pins_path.read_text(encoding="utf-8"))
-        basis = (pins.get("sections") or {}).get(key, {}).get("basis")
+        entry = (pins.get("sections") or {}).get(key, {})
+        basis = entry.get("basis") if isinstance(entry, dict) else None
     except (OSError, json.JSONDecodeError) as exc:
         return [f"无法读取 {pins_path.name} 核验 A.2 签收行：{exc}"]
     if not basis:
@@ -279,22 +229,19 @@ def a2_signoff_fact_issues(root: Path, signoff: tuple[str, str, str]) -> list[st
         date.fromisoformat(signed_at)
     except ValueError:
         errors.append(f"A.2 签收行日期不是合法日历日期：{signed_at}")
-    field = A2_DATE_FIELD_RE.search(basis)
-    if field is None:
-        errors.append(
-            f"A.2 basis 缺少 `复核日期：<YYYY-MM-DD>`，签收行日期 `{signed_at}` 无法核验"
-        )
+    registered = entry.get("review_date")
+    value = registered.get("value") if isinstance(registered, dict) else None
+    if not value:
+        errors.append("A.2 登记项缺少 `review_date`，签收行日期无法核验")
     else:
-        recorded_at = field.group(1)
         try:
-            date.fromisoformat(recorded_at)
-        except ValueError:
-            errors.append(f"A.2 basis 的 `复核日期：` 不是合法日历日期：{recorded_at}")
-        if recorded_at != signed_at:
+            date.fromisoformat(value)
+        except (TypeError, ValueError):
+            errors.append(f"A.2 登记的 `review_date.value` 不是合法日历日期：{value}")
+        if value != signed_at:
             errors.append(
-                f"A.2 签收行日期 `{signed_at}` 与 basis `复核日期：{recorded_at}` 不一致"
+                f"A.2 签收行日期 `{signed_at}` 与登记日期 `{value}` 不一致"
             )
-    errors.extend(a2_date_corroboration_issues(root, signed_at, basis))
     return errors
 
 

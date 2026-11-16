@@ -10,7 +10,11 @@
     "spec/methods/deterministic-checker.md#A.2": {
       "sha256": "bc16ec2ada40983188a7d1672ac1c2771334dd6aa8927458033d47e75f78ff89",
       "path": "spec/methods/deterministic-checker.md",
-      "basis": "非同源复核：第五批（基线 c6fa1cd）只读外复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch5/REVIEW-RECORD.md；sha256：8b8581d37c58ee916672a0863b0598cb1317f811e4471ccb328161d66833a935；复核基线：c6fa1cd50955302c207402c454abf91db22e6082；区段：spec/methods/deterministic-checker.md#A.2；复核日期：2026-11-16；日期记录：/home/wgz/projects/skills/2026-11-16/pm-governance-review/a2-signoff-date-record.md sha256：fcfa618a064a46b23fffef68f6696099aba5746c760f2fc6482a87476c7abb18；结论：认可"
+      "basis": "非同源复核：第五批（基线 c6fa1cd）只读外复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch5/REVIEW-RECORD.md；sha256：8b8581d37c58ee916672a0863b0598cb1317f811e4471ccb328161d66833a935；复核基线：c6fa1cd50955302c207402c454abf91db22e6082；区段：spec/methods/deterministic-checker.md#A.2；结论：认可",
+      "review_date": {
+        "value": "2026-11-16",
+        "origin": "executor"
+      }
     },
     "spec/methods/deterministic-checker.md#A.1": {
       "sha256": "1c7ef44a14dd2d7bc0e3ae279baade81c3b6d2a5ea6c221e644362337f23b3bc",

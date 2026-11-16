@@ -1531,3 +1531,37 @@
 - **“这批改动尚未经外复核”的登记位置**：`scripts/checker-pins.json` 中 `check_spec_pins.py`、`check_three_table.py`、`test_check_table_mutations.py` 三项的 `invalidated`；`scripts/no-review-declarations.json` 中 `check_checker_pins.py`、`test_spec_pins.py`、`no-review-declarations.json` 三项的 `reason`/`missing_review`（均已补“本批改动尚未复核”）；`TODO.md` T-149 的“批次 0091 追记”；本节。
 - **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`。
 - **关联 ADR**：无
+
+---
+
+### 批次 0092 — 2026-11-16 — 关闭 `日期记录` 自证通道；还原复核方 basis 原文
+
+- **授权依据**：第七轮外复核（基线 `74cd8ed`）49 例全过，账目口径与回归两项认可，三项不认可（均为核验声明失真，无阻断级），另有 T-164 一处括注失实；本批按裁定修复。
+- **涉及文件**：
+  - 修改：`scripts/check_spec_pins.py`、`scripts/check_three_table.py`、`scripts/test_spec_pins.py`、`scripts/test_check_table_mutations.py`、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`scripts/no-review-declarations.json`、`TODO.md`、`CHANGELOG.md`
+  - 删除（**仓库外**，批次 0091 自建）：`/home/wgz/projects/skills/2026-11-16/pm-governance-review/a2-signoff-date-record.md`
+  - 未改：`CONSTITUTION.md`、`spec/D6_REBASELINE_PROPOSAL.md`、全部历史复核产物字节（含 A.2 basis 引用的 `batch5/REVIEW-RECORD.md`）
+- **一、关闭 `日期记录` 自证通道（不认可项）**
+  - 复核方实测「改 basis 日期 → 改签收日期 → `/tmp` 新建带行首记号的记录 → 自建复核产物 → `--write` → `--review`」全链 rc=0：`日期记录：` 由执行方持有，等于自证。
+  - `check_spec_pins.py` 删除 `A2_DATE_RECORD_RE` 与整条 `日期记录：` 支路，同时不再接受“任意位置出现同日子串”。日期证据**只能**来自 `复核产物：` 所指文件自身；该文件缺专用记号即报“日期未核验”，该项不计为合规。
+  - 日期证据检查从 `a2_signoff_errors()`（`--write` 结构门）拆出为 `a2_signoff_date_errors()`，只在 `evaluate()` 调用：否则“日期未核验”会让 A.2 的指纹刷新结构性不可达（同 0088 甲方案论证）。
+- **二、还回复核方 basis 原文（不认可项）**
+  - `scripts/spec-pins.json` 的 A.2 basis 逐字还原为第五批原文（`复核产物：…batch5/REVIEW-RECORD.md`、`sha256：8b8581d3…a935`、`复核基线：c6fa1cd…6082`、结论词“认可”），0091 追加的 `复核日期：` 与 `日期记录：… sha256：…` 已移出 basis。
+  - 日期改存同级字段 `review_date = {"value": "2026-11-16", "origin": "executor"}`，明示由执行方登记；`--write` 原样保留该字段，不生成也不删除。
+  - `check_three_table.py` 删除日期证据核验，只保留“签收日期 == `review_date.value`”的内部一致性：若三表也报“日期未核验”，S02「改 A.2 并更新签收 → 通过」将结构性不可达。S05 负例语义随之改为“与登记日期不一致”。
+  - 预期与实测一致：`check_spec_pins` 对 A.2 报 **1 项**“日期未核验”显式欠账，未自造日期文件充数。
+- **三、记号规则收紧（不认可项）**
+  - 专用记号固定为独立 HTML 注释 `<!-- 复核日期：YYYY-MM-DD -->`，须独占一行、恰好出现一次、不在围栏代码块内（`a2_marker_dates()` 逐行扫描并按 ``` / ~~~ 围栏切换状态），并与登记日期一一绑定。
+  - 新增负例 **SP34**（记号只在围栏代码块内）、**SP35**（两个记号）、**SP36**（缺记号），期望均为“日期未核验”；SP31 改为“登记项缺 `review_date`”，SP32 改为“签收日期与 `review_date.value` 不一致”，SP33 改为“签收日期、`review_date` 与产物记号同步变更 → 通过”。`test_spec_pins` 由 35 例增至 **38 例**。
+- **四、文档失实更正**
+  - T-164 括注改为“两处实现都把短哈希解析为同一 commit，未出现行为差异；风险在于将来只改一处”；并注明 0092 已把日期证据收为 `check_spec_pins` 单点，三表只留内部一致性。
+- **五、`.githooks/pre-commit` 的第七批 basis 落库**
+  - 该文件自 `74cd8ed` 未改动（`git diff 74cd8ed..HEAD -- .githooks/pre-commit` 为空），按其 `batch7/REPORT.md` 给出的五要素**逐字**转写落库，落库前以 `valid_basis()` 回灌为真；`checker-pins.json` 中该项已无报错。
+  - `scripts/test_spec_pins.py` 与 `scripts/test_check_table_mutations.py` 两条候选 basis **本批不落**（本批改动这两个文件），留待下一轮。
+- **验证**：`test_spec_pins` 38/38；`test_checker_pins` 21/21；`test_check_table_mutations` 11 变异 + 5 条签收正负例全部符合预期；`test_coverage_gate` 4/4；`check_three_table`、`check_anchors`、`check_glossary_usage`、`check_no_raw_material`、`check_coverage_gate`、`check_ledger_landings`、`check_gap_ledger`、`check_state`、`check_dependency_pins`、`config_codes --self-check` 均 rc=0。
+- **新问题数与构成**：`check_spec_pins` **1** 项（A.2“日期未核验”，显式欠账，登记于 `date_unverified` 与 T-166）；`check_checker_pins` **6** 项（3 项无复核声明：`check_checker_pins.py`、`test_spec_pins.py`、`no-review-declarations.json`；3 项 basis 失效且带 `invalidated`：`check_spec_pins.py`、`check_three_table.py`、`test_check_table_mutations.py`）。受钉对象键总数不变（checker 22 + spec 16）。
+- **台账同步**：T-149 欠账对象仍为 **6**，另立 T-166 登记 A.2 的 1 项“日期未核验”显式欠账；新增 T-165（`basis` 的 `复核产物：` 无外部锚定、可被整体替换，只登记不修）；纠正 T-164 括注。
+- **自证链闭合状态**：`日期记录：` 旁路已关闭；日期只能由产物自身记号佐证。**未闭合部分**：`basis` 的 `复核产物：` 路径与 `sha256：` 仍由执行方持有，可整体替换为自建产物——这在仓内无法自查，须外部锚定（CI 白名单/受保护分支/时间戳），已登记为 T-165，不在本批范围。
+- **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-149 的“批次 0092 追记”；`scripts/checker-pins.json` 中 `check_spec_pins.py`、`check_three_table.py`、`test_check_table_mutations.py` 三项的 `invalidated`；`scripts/no-review-declarations.json` 中 `test_spec_pins.py`、`no-review-declarations.json` 两项的 `reason`/`missing_review`；`scripts/no-review-declarations.json` 的 `date_unverified`；本节。
+- **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`。
+- **关联 ADR**：无

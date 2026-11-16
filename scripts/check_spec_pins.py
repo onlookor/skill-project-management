@@ -26,12 +26,14 @@
      理由与范围见 `validation/reviews/2026-11-15-a2-comparison-scope.md`。
      `--write` 只登记区段指纹，不生成也不改写签收行；签收行只能按上述固定模板人工写入，
      因而不存在“由工具重写签收行”的路径。
-     另核验签收行事实（批次 0090，0091 收紧）：所载基线必须与登记 basis 的 `复核基线：`
-     解析为同一提交且在仓库存在；日期须为合法日历日期、必须等于 basis 的 `复核日期：`
-     `<YYYY-MM-DD>` 字段，并且该日期必须有**行首专用 `复核日期：` 记号**佐证——优先取自
-     `复核产物：` 文件；历史产物不可改字节时，可改由 basis 的
-     `日期记录：<仓库外文件> sha256：<64 位>` 指向一份独立记录（路径须在仓库外、文件须
-     存在、sha256 须实算一致，记录内须有同一行首记号）。任意位置出现的同日子串不算佐证。
+     另核验签收行事实（批次 0090；0092 收紧）：所载基线必须与登记 basis 的 `复核基线：`
+     解析为同一提交且在仓库存在；日期须为合法日历日期，并与登记项同级字段
+     `review_date`（`{"value": "YYYY-MM-DD", "origin": "executor"}`）一致。日期证据
+     **只能**来自 `复核产物：` 所指文件自身：该文件须含**恰好一个**独占一行的专用记号
+     `<!-- 复核日期：YYYY-MM-DD -->`，且该记号不得位于围栏代码块内；缺记号即报
+     “日期未核验”。批次 0091 的独立 `日期记录：` 文件与任意位置的同日子串一律不再算
+     佐证——执行方可以自建这类文件，等于自证。日期证据只在 `evaluate()` 中检查，
+     不进入 `--write` 的结构门，否则“日期未核验”会让指纹刷新结构性不可达。
   6. 已判失效的对象可在登记项上带 `invalidated`（字符串原因）作为**显示层**标记：
      它不改变 basis 原文，也不改变判定（`valid_basis()` 仍是唯一依据）；检查器报错时
      附出该标记，且 basis 又变得可验证通过时会要求人工核实并移除标记。`--write` 原样
@@ -174,17 +176,34 @@ A2_SIGNOFF_RE = re.compile(
     r"> 复核签收：外部复核基线 `(?P<baseline>[0-9a-f]{7,40})`；"
     r"(?P<date>\d{4}-\d{2}-\d{2})；A\.2 指纹 `(?P<fingerprint>[0-9a-f]{12})`"
 )
-# 签收行日期的唯一凭据是 basis 里的 `复核日期：` 字段，且该日期必须有**行首专用记号**
-# 佐证（批次 0091）。历史上“日期恰好作为子串出现在产物任意位置”不算佐证：探针表里
-# 碰巧写到同一天即可蒙混（第六轮复核 Q1.9 正是如此）。
-A2_DATE_FIELD_RE = re.compile(r"复核日期：\s*`?(\d{4}-\d{2}-\d{2})`?")
-# 历史产物不可改字节时的替代佐证：basis 指向一份独立的日期记录，并载其自身 sha256。
-A2_DATE_RECORD_RE = re.compile(r"日期记录：`?([^`\s；，、]+)`?")
+# 日期证据的唯一形态（批次 0092）：复核产物中**恰好一个**独占一行的专用记号
+#   <!-- 复核日期：YYYY-MM-DD -->
+# 且不在围栏代码块内。执行方可以自建任何旁路文件（批次 0091 的 `日期记录：` 通道、
+# 在 `/tmp` 造一份带行首记号的记录再改写 basis 与签收日期，全链 rc=0），因此除产物
+# 自身记号外的佐证一律不认。
+A2_MARKER_RE = re.compile(
+    r"^[ \t]*<!--\s*复核日期：\s*(\d{4}-\d{2}-\d{2})\s*-->[ \t]*$"
+)
+FENCE_OPEN_RE = re.compile(r"^(```+|~~~+)")
 
 
-def a2_date_marker(text: str, stamp: str) -> bool:
-    """行首专用记号：整行只写 `复核日期：<日期>`，不是任意位置的子串。"""
-    return re.search(rf"^复核日期：\s*`?{re.escape(stamp)}`?\s*$", text, re.M) is not None
+def a2_marker_dates(text: str) -> list[str]:
+    """复核产物中围栏代码块之外的专用记号日期（逐行扫描，围栏内不计）。"""
+    stamps: list[str] = []
+    fence: str | None = None
+    for line in text.splitlines():
+        stripped = line.strip()
+        if fence is None:
+            opened = FENCE_OPEN_RE.match(stripped)
+            if opened:
+                fence = opened.group(1)
+                continue
+            found = A2_MARKER_RE.fullmatch(line)
+            if found:
+                stamps.append(found.group(1))
+        elif len(stripped) >= len(fence) and set(stripped) == {fence[0]}:
+            fence = None
+    return stamps
 
 
 def resolve_commit(root: Path, ref: str) -> str | None:
@@ -198,57 +217,43 @@ def resolve_commit(root: Path, ref: str) -> str | None:
     return result.stdout.strip() or None if result.returncode == 0 else None
 
 
-def a2_date_corroboration_errors(
-    root: Path, key: str, stamp: str, text: str
+def a2_date_evidence_errors(
+    root: Path, key: str, basis: str | None, stamp: str
 ) -> list[str]:
-    """日期须有行首专用 `复核日期：` 记号佐证：优先复核产物，其次 basis 的 `日期记录：`。
-
-    `日期记录：` 支路是为“历史产物不可改字节”准备的：basis 额外载明一份独立记录的
-    路径与其自身 sha256，该记录内须有同一行首记号。它不是豁免——路径必须在仓库外、
-    文件必须存在、sha256 必须实算一致，缺一项即报错。
-    """
-    artifact = re.search(r"复核产物：`?([^`\s；，、]+)`?", text)
+    """登记日期须由 `复核产物：` 文件自身**恰好一个**专用记号佐证；否则“日期未核验”。"""
+    artifact = re.search(r"复核产物：`?([^`\s；，、]+)`?", basis or "")
     if artifact is None:
-        return [f"{key}：basis 无 `复核产物：`，签收行日期 `{stamp}` 无法核对"]
+        return [f"{key}：日期未核验：basis 无 `复核产物：`，无法核对日期 `{stamp}`"]
     path = Path(artifact.group(1))
     if not path.is_file():
-        return [f"{key}：复核产物不存在，无法核对签收行日期：{path}"]
-    if a2_date_marker(path.read_text(encoding="utf-8", errors="replace"), stamp):
-        return []
-    record = A2_DATE_RECORD_RE.search(text)
-    if record is None:
+        return [f"{key}：日期未核验：复核产物不存在，无法核对日期：{path}"]
+    stamps = a2_marker_dates(path.read_text(encoding="utf-8", errors="replace"))
+    if not stamps:
         return [
-            f"{key}：签收行日期 `{stamp}` 未在复核产物 {path.name} 中以行首 `复核日期：`"
-            "记号出现，且 basis 无 `日期记录：<仓库外文件> sha256：<64 位>` 佐证"
-            "（日期与复核记录不自洽）"
+            f"{key}：日期未核验：复核产物 {path.name} 中缺少专用记号"
+            f" `<!-- 复核日期：{stamp} -->`（须独占一行且不在围栏代码块内）"
         ]
-    record_path = Path(record.group(1))
-    try:
-        record_path.resolve().relative_to(root.resolve())
-    except ValueError:
-        pass
-    else:
-        return [f"{key}：日期记录位于本仓库内，不能作为日期佐证：{record_path}"]
-    if not record_path.is_file():
-        return [f"{key}：日期记录不存在，无法核对签收行日期：{record_path}"]
-    errors: list[str] = []
-    recorded_sha = re.search(r"sha256：`?([0-9a-f]{64})`?", text[record.end() :])
-    if recorded_sha is None:
-        errors.append(f"{key}：basis 的 `日期记录：` 缺少 `sha256：<64 位十六进制>`")
-    elif digest(record_path) != recorded_sha.group(1):
-        errors.append(f"{key}：`日期记录` 的 sha256 与文件实算不一致：{record_path}")
-    if not a2_date_marker(record_path.read_text(encoding="utf-8", errors="replace"), stamp):
-        errors.append(
-            f"{key}：日期记录 {record_path.name} 中无行首 `复核日期：{stamp}` 记号"
-            "（日期与复核记录不自洽）"
-        )
-    return errors
+    if len(stamps) > 1:
+        return [
+            f"{key}：日期未核验：复核产物 {path.name} 中出现 {len(stamps)} 个专用记号"
+            "（只认恰好一个）"
+        ]
+    if stamps[0] != stamp:
+        return [
+            f"{key}：日期未核验：复核产物 {path.name} 的记号为 `{stamps[0]}`，"
+            f"与登记日期 `{stamp}` 不一致"
+        ]
+    return []
 
 
 def a2_signoff_fact_errors(
     root: Path, key: str, match: re.Match, basis: str | None
 ) -> list[str]:
-    """签收行事实核验：基线与 basis 一致、存在；日期与 basis `复核日期：` 一致且有记号佐证。"""
+    """签收行的结构核验：基线与 basis 一致且存在；日期为合法日历日期。
+
+    日期是否有凭据属于证据核验，放在 `a2_signoff_date_errors()`，只在 `evaluate()`
+    调用：若并入门内，“日期未核验”会让 A.2 的指纹刷新结构性不可达。
+    """
     errors: list[str] = []
     text = basis or ""
     signed_baseline = match.group("baseline")
@@ -274,23 +279,44 @@ def a2_signoff_fact_errors(
         date.fromisoformat(signed_at)
     except ValueError:
         errors.append(f"{key}：签收行日期不是合法日历日期：{signed_at}")
-    field = A2_DATE_FIELD_RE.search(text)
-    if field is None:
+    return errors
+
+
+def a2_signoff_date_errors(
+    root: Path, spec: dict, text: str, entry: dict | None
+) -> list[str]:
+    """日期核验（仅 evaluate）：登记日期、签收日期、产物记号三者一致。"""
+    if spec["key"] != A2_KEY or not isinstance(entry, dict):
+        return []
+    body = section_text(text, spec["start"], spec["end"])
+    match = next(
+        (found for line in body.splitlines() if (found := A2_SIGNOFF_RE.fullmatch(line))),
+        None,
+    )
+    if match is None:
+        return []
+    key = spec["key"]
+    signed_at = match.group("date")
+    registered = entry.get("review_date")
+    value = registered.get("value") if isinstance(registered, dict) else None
+    origin = registered.get("origin") if isinstance(registered, dict) else None
+    if not value or not origin:
+        return [
+            f"{key}：日期未核验：登记项缺少 `review_date`"
+            "（`{\"value\": \"YYYY-MM-DD\", \"origin\": \"executor\"}`）"
+        ]
+    errors: list[str] = []
+    try:
+        date.fromisoformat(value)
+    except (TypeError, ValueError):
+        errors.append(f"{key}：日期未核验：登记的 `review_date.value` 不是合法日历日期：{value}")
+    if value != signed_at:
         errors.append(
-            f"{key}：basis 缺少 `复核日期：<YYYY-MM-DD>`，签收行日期 `{signed_at}` 无法核验"
+            f"{key}：日期未核验：签收行日期 `{signed_at}` 与登记日期 `{value}` 不一致"
         )
-    else:
-        recorded_at = field.group(1)
-        try:
-            date.fromisoformat(recorded_at)
-        except ValueError:
-            errors.append(f"{key}：basis 的 `复核日期：` 不是合法日历日期：{recorded_at}")
-        if recorded_at != signed_at:
-            errors.append(
-                f"{key}：签收行日期 `{signed_at}` 与 basis "
-                f"`复核日期：{recorded_at}` 不一致"
-            )
-    errors.extend(a2_date_corroboration_errors(root, key, signed_at, text))
+    errors.extend(
+        a2_date_evidence_errors(root, key, entry.get("basis"), value)
+    )
     return errors
 
 
@@ -517,6 +543,10 @@ def evaluate(
                 entry.get("basis") if isinstance(entry, dict) else None,
             )
         )
+        # 日期证据只在 evaluate 中核验，不进 --write 的结构门（批次 0092）。
+        errors.extend(
+            a2_signoff_date_errors(root, spec, current[key], entry)
+        )
         if isinstance(entry, dict):
             basis = entry.get("basis")
             if not basis:
@@ -682,6 +712,10 @@ def main() -> int:
                 # 显式失效标记只能人工增删；--write 原样保留，不自动抹掉。
                 if isinstance(old, dict) and old.get("invalidated"):
                     sections[key]["invalidated"] = old["invalidated"]
+                # 日期属于登记方的同级字段（origin: executor），basis 只放复核方原文；
+                # --write 不生成也不删除该字段。
+                if isinstance(old, dict) and old.get("review_date"):
+                    sections[key]["review_date"] = old["review_date"]
             pins = {
                 "version": 1,
                 "note": (

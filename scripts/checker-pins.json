@@ -3,7 +3,7 @@
   "scripts": {
     ".githooks/pre-commit": {
       "sha256": "c61fb651b1a63053adf86bde425f7f44f46cb7479d42144e40e65c68e1cff67f",
-      "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：.githooks/pre-commit；结论：认可"
+      "basis": "非同源复核：第七批（基线 74cd8ed）仓库外只读外复核，实跑钩子：当前树在两个 pins 检查器均在链内，于 check_checker_pins 处 rc=1 阻断；复核产物：/home/wgz/projects/skills/2026-11-16/pm-governance-review/batch7/REVIEW-RECORD.md；sha256：7984ac6f4a9bf6b9a8211c8e325ffeeb01f9f4e490575676bcde6eb995f44879；复核基线：74cd8ed8c5d96e4966e4e517ebe8a6ad351a6ff1；区段：.githooks/pre-commit；结论：认可"
     },
     "scripts/check_anchors.py": {
       "sha256": "6aa0caa82d38e7f0cfd43303a0f6f798c4291ecbf4ee553d617b954906f6a8a2",
@@ -34,23 +34,23 @@
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：scripts/check_no_raw_material.py；结论：认可"
     },
     "scripts/check_spec_pins.py": {
-      "sha256": "0e0a9058afcc20ddda259da2e2c396eda85b15e2748311b82697fe0538db2a3d",
+      "sha256": "83a633a55e07971195b2702f4347b0459d43c073beda2302c794dc36b3af1590",
       "basis": "非同源复核：第五批（基线 c6fa1cd）只读外复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch5/REVIEW-RECORD.md；sha256：8b8581d37c58ee916672a0863b0598cb1317f811e4471ccb328161d66833a935；复核基线：c6fa1cd50955302c207402c454abf91db22e6082；区段：scripts/check_spec_pins.py；结论：认可",
-      "invalidated": "批次 0090 新增签收行基线/日期事实核验与 invalidated 显示层；0091 收紧为 basis `复核日期：` 凭据 + 行首记号 + `日期记录：` 佐证；第五轮 basis（基线 c6fa1cd）不覆盖这些改动，待重新取证"
+      "invalidated": "批次 0090 新增签收行基线/日期事实核验与 invalidated 显示层；0091 收紧为 basis `复核日期：` 凭据 + 行首记号 + `日期记录：` 佐证；第五轮 basis（基线 c6fa1cd）不覆盖这些改动，待重新取证；0092 删除 `日期记录：` 支路，日期证据改为复核产物自身恰好一个、排除围栏代码块的专用记号，第五轮 basis 不覆盖这些改动，待重新取证"
     },
     "scripts/check_state.py": {
       "sha256": "cb62284b0b5e813bd254deaa24fcb54a9d2a98f5b566feeedee6752796bea6e4",
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：scripts/check_state.py；结论：认可"
     },
     "scripts/check_three_table.py": {
-      "sha256": "df38e37ba41f4358724bcd7c67c3a16173b0e647b75a31d9f7d0973e33395a53",
+      "sha256": "ffa159d71d4e749d79444f202eaf3ed792700908169ea1efd0fd80e9771bb466",
       "basis": "非同源复核：第五批（基线 c6fa1cd）只读外复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch5/REVIEW-RECORD.md；sha256：8b8581d37c58ee916672a0863b0598cb1317f811e4471ccb328161d66833a935；复核基线：c6fa1cd50955302c207402c454abf91db22e6082；区段：scripts/check_three_table.py；结论：认可",
-      "invalidated": "批次 0090 新增签收行基线与日期自洽校验；0091 同步收紧为 `复核日期：` 凭据 + 行首记号 + `日期记录：` 佐证；第五轮 basis（基线 c6fa1cd）不覆盖这些改动，待重新取证"
+      "invalidated": "批次 0090 新增签收行基线与日期自洽校验；0091 同步收紧为 `复核日期：` 凭据 + 行首记号 + `日期记录：` 佐证；第五轮 basis（基线 c6fa1cd）不覆盖这些改动，待重新取证；0092 删除日期证据核验，改为签收日期与 `review_date` 的内部一致性，第五轮 basis 不覆盖这些改动，待重新取证"
     },
     "scripts/test_check_table_mutations.py": {
-      "sha256": "9fd99581b1ccdc7c7412e8ce7fc665009e5c7adb394a42cee794b8e860233cbe",
+      "sha256": "69b0a1c58879cb69a6d86be7de0b9f4379860d1c53ee0d5b1615105b69471e1c",
       "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：scripts/test_check_table_mutations.py 结论：认可",
-      "invalidated": "批次 0090 新增 S03/S04 签收行基线负例；0091 新增 S05 日期不一致负例；原 basis（基线 a9ff5bb）不覆盖这些改动，待重新取证"
+      "invalidated": "批次 0090 新增 S03/S04 签收行基线负例；0091 新增 S05 日期不一致负例；原 basis（基线 a9ff5bb）不覆盖这些改动，待重新取证；0092 仅改 S05 描述，原 basis 仍不覆盖"
     },
     "scripts/test_checker_pins.py": {
       "sha256": "7abba7449200b7ba487c1a037bd0bb5a21584537d0f184c29e13ca1fa9dd3de9",
@@ -61,7 +61,7 @@
       "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：scripts/test_coverage_gate.py 结论：认可"
     },
     "scripts/test_spec_pins.py": {
-      "sha256": "3a6ee554c4e59adad2ac66d8b4f4f0be0ef406652efdba5c696e20cf10d55bd3",
+      "sha256": "47a6dc08071fb528af00a2d02a2b63442c7e2403bc2fa2af5a9cf007abc4062e",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/validate_ontology.py": {
@@ -81,7 +81,7 @@
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：scripts/test_dependency_pins.py；结论：认可"
     },
     "scripts/no-review-declarations.json": {
-      "sha256": "44fd9747a29e4c2c711e847228c39b0f7edc14b65bb1fb8b5ce829ae87a2adfa",
+      "sha256": "818b42b5cf74851c9b9f6cd07bc5ff0bb476125a493ca48cf4f7e5e41aee9efc",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "validation/pinned/checker.py": {

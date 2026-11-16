@@ -22,15 +22,18 @@ SP17 对**白名单**区段用“初始登记：任意…” → 必须阻断（
 SP23 复核基线处的区段内容已变 → 必须阻断；
 SP24 在 A.2 插入只带 `复核签收：` 前缀的伪签收行（正文伪装成签收说明）→ 必须阻断（前缀不得成为剔除通道）；
 SP24b 格式不完整的 `复核签收：` 行（缺日期/指纹）→ 同样参与比较，必须阻断；
-SP25 签收日期只出现在复核产物的无关位置（非行首记号）→ 必须阻断（第六轮复核裁定，批次 0091）；
+SP25 签收日期只出现在复核产物的无关位置（无专用记号）→ 必须阻断（第六轮复核裁定，批次 0091）；
 SP26 出现第二行完整格式签收行 → 必须阻断（至多一行）；
 SP27 模板签收行内注入叙述文字 → 不再匹配模板、参与比较，A.2 必须判 basis 失效；
 SP28 签收行不在区段尾部 → 必须阻断；
 SP29 签收行基线改为 `deadbee` → 必须阻断（与 basis 的 `复核基线：` 不一致且不存在）；
 SP30 签收行基线改为另一个真实提交 `be974fe` → 必须阻断（与 basis 不一致）；
-SP31 basis 缺 `复核日期：` 字段 → 必须阻断（签收日期无凭据）；
-SP32 签收日期与 basis 的 `复核日期：` 不一致 → 必须阻断；
-SP33 签收日期与 basis 的 `复核日期：` 同步变更且有行首记号 → 必须通过（签收行仍不参与比较）。
+SP31 登记项缺 `review_date` → 必须阻断（日期未核验）；
+SP32 签收日期与 `review_date.value` 不一致 → 必须阻断；
+SP33 签收日期、`review_date` 与产物记号同步变更 → 必须通过（签收行仍不参与比较）；
+SP34 专用记号只出现在围栏代码块内 → 必须阻断（日期未核验，批次 0092）；
+SP35 复核产物出现两个专用记号 → 必须阻断（只认恰好一个）；
+SP36 复核产物缺专用记号 → 必须阻断（日期未核验）。
 
 外部复核产物在系统临时目录中生成，不写入仓库。用法：
   python3 scripts/test_spec_pins.py [--root DIR]
@@ -65,7 +68,6 @@ RECORD = """非同源复核：独立复核者（测试）
 复核产物：{artifact}
 sha256：{sha}
 复核基线：{baseline}
-复核日期：{review_date}
 结论：实质收敛
 """
 
@@ -121,7 +123,7 @@ def main() -> int:
         artifact = Path(tmp) / "REPORT.md"
         artifact.write_text(
             "外部复核产物（测试用，不写入仓库）。\n"
-            f"复核日期：{signed_at}\n另见：2000-01-01\n",
+            f"<!-- 复核日期：{signed_at} -->\n另见：2000-01-01\n",
             encoding="utf-8",
         )
         sha = hashlib.sha256(artifact.read_bytes()).hexdigest()
@@ -147,9 +149,13 @@ def main() -> int:
                 artifact=artifact,
                 sha=sha,
                 baseline=baseline,
-                review_date=signed_at,
             )
-            return {"sha256": value, "path": "", "basis": basis}
+            return {
+                "sha256": value,
+                "path": "",
+                "basis": basis,
+                "review_date": {"value": signed_at, "origin": "executor"},
+            }
 
         pins = {
             item["key"]: reviewed_pin(
@@ -164,7 +170,7 @@ def main() -> int:
         )
 
         record = RECORD.format(
-            key=TARGET, artifact=artifact, sha=sha, baseline=baseline, review_date=signed_at
+            key=TARGET, artifact=artifact, sha=sha, baseline=baseline
         )
         in_repo = root / "validation/reviews/2026-11-15-admission-r2-review.md"
         in_repo_sha = hashlib.sha256(in_repo.read_bytes()).hexdigest()
@@ -388,7 +394,6 @@ def main() -> int:
             artifact=unrelated,
             sha=hashlib.sha256(unrelated.read_bytes()).hexdigest(),
             baseline=baseline,
-            review_date=signed_at,
         )
         unrelated_pins = dict(pins)
         unrelated_pins[TARGET] = {**pins[TARGET], "basis": unrelated_record}
@@ -399,7 +404,7 @@ def main() -> int:
             current,
             unrelated_pins,
             [unrelated_record],
-            "未在复核产物",
+            "缺少专用记号",
         )
 
         # SP26：第二行完整格式签收行即报错，不得当作可剔除内容。
@@ -487,18 +492,19 @@ def main() -> int:
                 "不一致",
             )
 
-        # SP31/SP32/SP33：签收日期以 basis 的 `复核日期：` 为唯一凭据，且须有行首记号（批次 0091）。
-        no_date_record = record.replace(f"复核日期：{signed_at}\n", "", 1)
+        # SP31/SP32/SP33：日期只由同级字段 `review_date` 与产物专用记号绑定（批次 0092）。
         no_date_pins = dict(pins)
-        no_date_pins[TARGET] = {**pins[TARGET], "basis": no_date_record}
+        no_date_pins[TARGET] = {
+            field: value for field, value in pins[TARGET].items() if field != "review_date"
+        }
         run(
             "SP31",
-            "basis 缺 `复核日期：`",
+            "登记项缺 `review_date`",
             current,
             current,
             no_date_pins,
-            [no_date_record],
-            "basis 缺少 `复核日期：",
+            [record],
+            "日期未核验",
         )
 
         drifted = dict(current)
@@ -517,7 +523,7 @@ def main() -> int:
         )
         run(
             "SP32",
-            "签收日期与 basis `复核日期：` 不一致",
+            "签收日期与 `review_date.value` 不一致",
             drifted,
             current,
             drifted_pins,
@@ -527,7 +533,7 @@ def main() -> int:
 
         dated = Path(tmp) / "REPORT-2000.md"
         dated.write_text(
-            "外部复核产物（测试用，不写入仓库）。\n复核日期：2000-01-01\n",
+            "外部复核产物（测试用，不写入仓库）。\n<!-- 复核日期：2000-01-01 -->\n",
             encoding="utf-8",
         )
         dated_record = RECORD.format(
@@ -535,7 +541,6 @@ def main() -> int:
             artifact=dated,
             sha=hashlib.sha256(dated.read_bytes()).hexdigest(),
             baseline=baseline,
-            review_date="2000-01-01",
         )
         dated_pins = dict(pins)
         dated_pins[TARGET] = {
@@ -543,15 +548,48 @@ def main() -> int:
                 TARGET, fingerprint(drifted[TARGET], spec["start"], spec["end"])
             ),
             "basis": dated_record,
+            "review_date": {"value": "2000-01-01", "origin": "executor"},
         }
         run(
             "SP33",
-            "签收日期与 basis `复核日期：` 同步变更",
+            "签收日期、登记日期与产物记号同步变更",
             drifted,
             current,
             dated_pins,
             [dated_record],
             None,
+        )
+
+        # SP34–SP36：记号规则收紧——只认恰好一个、独占一行、不在围栏代码块内（批次 0092）。
+        def marker_case(case_id: str, label: str, text: str) -> None:
+            path = Path(tmp) / f"REPORT-{case_id}.md"
+            path.write_text(text, encoding="utf-8")
+            basis = RECORD.format(
+                key=TARGET,
+                artifact=path,
+                sha=hashlib.sha256(path.read_bytes()).hexdigest(),
+                baseline=baseline,
+            )
+            pin_map = dict(pins)
+            pin_map[TARGET] = {**pins[TARGET], "basis": basis}
+            run(case_id, label, current, current, pin_map, [basis], "日期未核验")
+
+        marker_case(
+            "SP34",
+            "专用记号只在围栏代码块内",
+            "外部复核产物（测试用，不写入仓库）。\n```\n"
+            f"<!-- 复核日期：{signed_at} -->\n```\n",
+        )
+        marker_case(
+            "SP35",
+            "产物出现两个专用记号",
+            "外部复核产物（测试用，不写入仓库）。\n"
+            f"<!-- 复核日期：{signed_at} -->\n<!-- 复核日期：{signed_at} -->\n",
+        )
+        marker_case(
+            "SP36",
+            "产物缺专用记号",
+            "外部复核产物（测试用，不写入仓库）。\n" f"日期：{signed_at}\n",
         )
 
         schema_path = root / "spec" / "CHECKER_INPUT_SCHEMA.md"

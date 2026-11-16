@@ -226,7 +226,7 @@ def main() -> int:
             signoff_rows.append(("S02", "改 A.2 并更新签收", "通过", "未执行", "-", "变异锚点不唯一"))
             for case_id, forged in (("S03", "deadbee"), ("S04", "be974fe")):
                 signoff_rows.append((case_id, f"签收行基线改为 {forged}", "阻断", "未执行", "-", "变异锚点不唯一"))
-            signoff_rows.append(("S05", "签收行日期与 basis `复核日期：` 不一致", "阻断", "未执行", "-", "变异锚点不唯一"))
+            signoff_rows.append(("S05", "签收行日期与登记日期 `review_date` 不一致", "阻断", "未执行", "-", "变异锚点不唯一"))
             signoff_failures = 5
         else:
             mutated = original.replace(anchor, replacement)
@@ -238,7 +238,7 @@ def main() -> int:
                 signoff_rows.append(("S02", "改 A.2 并更新签收", "通过", "未执行", "-", "A 表重建失败"))
                 for case_id, forged in (("S03", "deadbee"), ("S04", "be974fe")):
                     signoff_rows.append((case_id, f"签收行基线改为 {forged}", "阻断", "未执行", "-", "A 表重建失败"))
-                signoff_rows.append(("S05", "签收行日期与 basis `复核日期：` 不一致", "阻断", "未执行", "-", "A 表重建失败"))
+                signoff_rows.append(("S05", "签收行日期与登记日期 `review_date` 不一致", "阻断", "未执行", "-", "A 表重建失败"))
                 signoff_failures = 5
             else:
                 negative = run_checker(root, target)
@@ -304,7 +304,7 @@ def main() -> int:
                                 evidence(drift.stdout, "不一致"),
                             )
                         )
-                    # S05：签收日期与 spec-pins.json 中 A.2 basis 的 `复核日期：` 不一致。
+                    # S05：签收日期与 spec-pins.json 中 A.2 登记项的 `review_date` 不一致。
                     date_drift_text = re.sub(
                         r"(；)\d{4}-\d{2}-\d{2}(；A\.2 指纹)",
                         r"\g<1>2000-01-01\g<2>",
@@ -322,7 +322,7 @@ def main() -> int:
                     signoff_rows.append(
                         (
                             "S05",
-                            "签收行日期与 basis `复核日期：` 不一致",
+                            "签收行日期与登记日期 `review_date` 不一致",
                             "阻断",
                             "阻断" if date_drift_ok else "未阻断",
                             str(date_drift.returncode),
