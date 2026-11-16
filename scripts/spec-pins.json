@@ -82,7 +82,7 @@
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：contracts/schema/runtime-config-lock.schema.json；结论：认可"
     },
     "spec/ACCESS_ZONES.md": {
-      "sha256": "344565fb17aa3fd1c344d5dc0590eab2739177aadc315524413973c346cc9905",
+      "sha256": "4ef6f0c42c9e4effbbaea0efa9d34bf67336462c9f77844955fead3264872f52",
       "path": "spec/ACCESS_ZONES.md",
       "basis": "无复核声明（不构成认可，不放行）"
     }
