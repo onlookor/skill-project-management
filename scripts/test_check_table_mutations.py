@@ -226,7 +226,8 @@ def main() -> int:
             signoff_rows.append(("S02", "改 A.2 并更新签收", "通过", "未执行", "-", "变异锚点不唯一"))
             for case_id, forged in (("S03", "deadbee"), ("S04", "be974fe")):
                 signoff_rows.append((case_id, f"签收行基线改为 {forged}", "阻断", "未执行", "-", "变异锚点不唯一"))
-            signoff_failures = 4
+            signoff_rows.append(("S05", "签收行日期与 basis `复核日期：` 不一致", "阻断", "未执行", "-", "变异锚点不唯一"))
+            signoff_failures = 5
         else:
             mutated = original.replace(anchor, replacement)
             target = Path(tmp) / "signoff.md"
@@ -237,7 +238,8 @@ def main() -> int:
                 signoff_rows.append(("S02", "改 A.2 并更新签收", "通过", "未执行", "-", "A 表重建失败"))
                 for case_id, forged in (("S03", "deadbee"), ("S04", "be974fe")):
                     signoff_rows.append((case_id, f"签收行基线改为 {forged}", "阻断", "未执行", "-", "A 表重建失败"))
-                signoff_failures = 4
+                signoff_rows.append(("S05", "签收行日期与 basis `复核日期：` 不一致", "阻断", "未执行", "-", "A 表重建失败"))
+                signoff_failures = 5
             else:
                 negative = run_checker(root, target)
                 negative_ok = (
@@ -302,13 +304,38 @@ def main() -> int:
                                 evidence(drift.stdout, "不一致"),
                             )
                         )
+                    # S05：签收日期与 spec-pins.json 中 A.2 basis 的 `复核日期：` 不一致。
+                    date_drift_text = re.sub(
+                        r"(；)\d{4}-\d{2}-\d{2}(；A\.2 指纹)",
+                        r"\g<1>2000-01-01\g<2>",
+                        updated,
+                        count=1,
+                    )
+                    target.write_text(date_drift_text, encoding="utf-8")
+                    date_drift = run_checker(root, target)
+                    date_drift_ok = (
+                        date_drift_text != updated
+                        and date_drift.returncode == 1
+                        and "不一致" in date_drift.stdout
+                    )
+                    signoff_failures += 0 if date_drift_ok else 1
+                    signoff_rows.append(
+                        (
+                            "S05",
+                            "签收行日期与 basis `复核日期：` 不一致",
+                            "阻断",
+                            "阻断" if date_drift_ok else "未阻断",
+                            str(date_drift.returncode),
+                            evidence(date_drift.stdout, "不一致"),
+                        )
+                    )
 
     print("| 编号 | 场景 | 预期 | 实际 | 退出码 | 证据 |")
     print("|---|---|---|---|---|---|")
     for row in signoff_rows:
         print("| " + " | ".join(row) + " |")
     print()
-    print(f"A.2 签收正负例 4 条，符合预期 {4 - signoff_failures} 条。")
+    print(f"A.2 签收正负例 5 条，符合预期 {5 - signoff_failures} 条。")
     if failures or signoff_failures:
         print("[失败] 存在未被检查器抓到或不符合预期的用例，第三层不通过。")
         return 1

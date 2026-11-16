@@ -1499,3 +1499,35 @@
 - **“这批改动尚未经外复核”的登记位置**：`scripts/checker-pins.json` 中 `check_spec_pins.py`、`check_three_table.py`、`test_check_table_mutations.py` 三项的 `invalidated`；`scripts/no-review-declarations.json` 中 `check_checker_pins.py`、`test_spec_pins.py`、`no-review-declarations.json` 三项的 `reason`/`missing_review`；`TODO.md` T-149 的“批次 0090 追记”；本节。
 - **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`。
 - **关联 ADR**：无
+
+---
+
+### 批次 0091 — 2026-11-16 — 收紧签收行日期校验；更正批次 0090 账目
+
+- **授权依据**：第六轮外复核（基线 `a5854e2`）七项中 5 项认可、2 项不认可，无阻断级缺陷；本批按裁定修复两项并登记两条附带发现。
+- **涉及文件**：
+  - 修改：`scripts/check_spec_pins.py`、`scripts/check_three_table.py`、`scripts/test_spec_pins.py`、`scripts/test_check_table_mutations.py`、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`scripts/no-review-declarations.json`、`TODO.md`、`CHANGELOG.md`
+  - 新增（**仓库外**，非历史产物）：`/home/wgz/projects/skills/2026-11-16/pm-governance-review/a2-signoff-date-record.md`
+  - 未改：`CONSTITUTION.md`、`spec/D6_REBASELINE_PROPOSAL.md`、全部历史复核产物（含 26 条 basis 引用的 16 份 `verify-*` 与 batch3/4/5 产物）
+- **一、日期校验过松（不认可项）**
+  - 根因：旧规则只要求签收日期以独立记号出现在复核产物**任意位置**，而 `2026-11-16` 恰好出现在 `batch5/REVIEW-RECORD.md` 的探针表 Q1.9 行；“合法模板行仅日期改为 2026-11-16”正是那一行的探针说明，等于未校验。旧 SP25 还把这个弱点固化为正例。
+  - 新规则（`check_spec_pins.py` 与 `check_three_table.py` 同口径）：
+    1. basis 必须载 `复核日期：<YYYY-MM-DD>`，签收行日期必须与之**相等**；缺失即报“basis 缺少 `复核日期：`”，不相等即报“不一致”。
+    2. 该日期必须有**行首专用记号**佐证——整行只写 `复核日期：<日期>`（正则 `^复核日期：\s*`?<日期>`?\s*$`，`re.M`）；任意位置的同日子串不再算佐证。
+    3. 佐证优先取 `复核产物：` 文件；历史产物不可改字节时，basis 可载 `日期记录：<仓库外文件> sha256：<64 位>`，指向一份独立记录，该记录内须有同一行首记号，且路径须在仓库外、文件须存在、sha256 须实算一致；四者缺一即报错。
+  - 回归用例：**SP25** 由“合法单行签收行变更通过”改为“日期只出现在产物无关位置即报错”；新增 **SP31**（basis 缺 `复核日期：`）、**SP32**（签收日期与 `复核日期：` 不一致）、**SP33**（两者同步变更且有行首记号 → 通过，仍证明签收行不参与内容比较）。`test_check_table_mutations.py` 新增 **S05**（签收行日期与 `复核日期：` 不一致）覆盖第二份实现。
+- **日期方案如何避免打断 26 条已落库 basis**
+  - 未改任何历史产物字节，也未改任何已落库 basis 的 `复核产物：`/`sha256：`/`复核基线：`/`区段：`/结论词——A.2 的 basis 只在结论词之前**追加** `；复核日期：2026-11-16；日期记录：<新文件> sha256：<新文件 sha>`。`valid_basis()` 取第一个 `sha256：`（仍是 `REVIEW-RECORD.md` 的 `8b8581d3…a935`），`区段：` 仍只出现一次，结论词仍在行尾，故 A.2 自身的 basis 仍然有效；其余 25 条 basis 一字未动。
+  - **显式登记、非静默 grandfather**：`batch5/REVIEW-RECORD.md` 无行首 `复核日期：` 记号这一事实被单列为本批条目（即本条），并记录在 T-149 追记里；它不是豁免——只是改走 `日期记录：` 支路，而该支路对所有 basis 一律适用，不是为历史产物特设的放行口。
+- **二、账目更正（不认可项）**
+  - 更正后的账目（取代批次 0090 条目中的数字）：**基线欠账 30（spec 13 + checker 17）→ 落库 26（spec 13 + checker 13）→ 本批自身改动新增 2 项失效（`check_spec_pins.py`、`check_three_table.py`）→ 当前 6；声明登记 20 → 3**。
+  - 复核产物份数由 17 更正为 **16**（`2026-11-14/pm-governance-review/verify-*/REPORT*.md` 共 16 份；连同 batch3/4/5 的 REPORT 与 REVIEW-RECORD 共 22 份、候选 basis 行 36 条）。
+  - 说明：按 `AGENTS.md` §3.1“禁止改写已登记批次”，**未改写批次 0090 的原文**，改以本条目更正并引用原批次；`TODO.md` T-149 的追记已就地更新（工作项说明，不属登记批次）。
+- **三、附带发现（只登记不修）**
+  - **T-163**：`git replace` 可绕过内容寻址，使 `git show <基线>:<对象>` 返回被替换内容；`resolve_commit()` 也接受纯十六进制命名 ref。
+  - **T-164**：签收事实核验在两个检查器里重复实现，宜日后再抽公共函数（本批按“只登记不修”处理，未重构）。
+- **验证**：`test_spec_pins` 35/35；`test_check_table_mutations` 11 变异 + 5 条签收正负例全部符合预期；`test_checker_pins` 21/21；`check_three_table` rc=0；`check_spec_pins` rc=0；`check_checker_pins` rc=1，问题仍为 **6**（3 项无复核声明 + 3 项 basis 失效，后者仍带 `invalidated`）；其余检查器 rc=0。
+- **台账同步**：T-149 欠账对象仍为 **6**（构成不变）；新增 T-163、T-164（`open`，只登记）；受钉对象键总数不变（checker 22 + spec 16）。
+- **“这批改动尚未经外复核”的登记位置**：`scripts/checker-pins.json` 中 `check_spec_pins.py`、`check_three_table.py`、`test_check_table_mutations.py` 三项的 `invalidated`；`scripts/no-review-declarations.json` 中 `check_checker_pins.py`、`test_spec_pins.py`、`no-review-declarations.json` 三项的 `reason`/`missing_review`（均已补“本批改动尚未复核”）；`TODO.md` T-149 的“批次 0091 追记”；本节。
+- **钩子绕过**：`Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-149`。
+- **关联 ADR**：无

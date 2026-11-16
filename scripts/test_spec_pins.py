@@ -22,12 +22,15 @@ SP17 对**白名单**区段用“初始登记：任意…” → 必须阻断（
 SP23 复核基线处的区段内容已变 → 必须阻断；
 SP24 在 A.2 插入只带 `复核签收：` 前缀的伪签收行（正文伪装成签收说明）→ 必须阻断（前缀不得成为剔除通道）；
 SP24b 格式不完整的 `复核签收：` 行（缺日期/指纹）→ 同样参与比较，必须阻断；
-SP25 合法单行签收行变更 → 仍按排除口径通过（签收行本身不参与比较）；
+SP25 签收日期只出现在复核产物的无关位置（非行首记号）→ 必须阻断（第六轮复核裁定，批次 0091）；
 SP26 出现第二行完整格式签收行 → 必须阻断（至多一行）；
 SP27 模板签收行内注入叙述文字 → 不再匹配模板、参与比较，A.2 必须判 basis 失效；
 SP28 签收行不在区段尾部 → 必须阻断；
 SP29 签收行基线改为 `deadbee` → 必须阻断（与 basis 的 `复核基线：` 不一致且不存在）；
-SP30 签收行基线改为另一个真实提交 `be974fe` → 必须阻断（与 basis 不一致）。
+SP30 签收行基线改为另一个真实提交 `be974fe` → 必须阻断（与 basis 不一致）；
+SP31 basis 缺 `复核日期：` 字段 → 必须阻断（签收日期无凭据）；
+SP32 签收日期与 basis 的 `复核日期：` 不一致 → 必须阻断；
+SP33 签收日期与 basis 的 `复核日期：` 同步变更且有行首记号 → 必须通过（签收行仍不参与比较）。
 
 外部复核产物在系统临时目录中生成，不写入仓库。用法：
   python3 scripts/test_spec_pins.py [--root DIR]
@@ -62,6 +65,7 @@ RECORD = """非同源复核：独立复核者（测试）
 复核产物：{artifact}
 sha256：{sha}
 复核基线：{baseline}
+复核日期：{review_date}
 结论：实质收敛
 """
 
@@ -139,7 +143,11 @@ def main() -> int:
 
         def reviewed_pin(key: str, value: str) -> dict:
             basis = RECORD.format(
-                key=key, artifact=artifact, sha=sha, baseline=baseline
+                key=key,
+                artifact=artifact,
+                sha=sha,
+                baseline=baseline,
+                review_date=signed_at,
             )
             return {"sha256": value, "path": "", "basis": basis}
 
@@ -155,7 +163,9 @@ def main() -> int:
             TARGET, fingerprint(mutated[TARGET], spec["start"], spec["end"])
         )
 
-        record = RECORD.format(key=TARGET, artifact=artifact, sha=sha, baseline=baseline)
+        record = RECORD.format(
+            key=TARGET, artifact=artifact, sha=sha, baseline=baseline, review_date=signed_at
+        )
         in_repo = root / "validation/reviews/2026-11-15-admission-r2-review.md"
         in_repo_sha = hashlib.sha256(in_repo.read_bytes()).hexdigest()
         in_repo_record = record.replace(str(artifact), str(in_repo)).replace(sha, in_repo_sha)
@@ -366,29 +376,30 @@ def main() -> int:
             f"{'未剔除，参与比较' if kept_partial else '被误剔除'} |"
         )
 
-        # SP25：合法的单行签收行变更仍被排除，不应导致 basis 失效。
-        resigned = dict(current)
-        resigned[TARGET] = re.sub(
-            r"(；)\d{4}-\d{2}-\d{2}(；A\.2 指纹)",
-            r"\g<1>2000-01-01\g<2>",
-            current[TARGET],
-            count=1,
+        # SP25：日期只作为子串出现在产物的无关位置（探针表一类）不算佐证，必须报错。
+        unrelated = Path(tmp) / "REPORT-unrelated.md"
+        unrelated.write_text(
+            "外部复核产物（测试用，不写入仓库）。\n"
+            f"| Q1.9 | 合法模板行仅日期改为 {signed_at} | 否 | 是 | rc=1 |\n",
+            encoding="utf-8",
         )
-        if resigned[TARGET] == current[TARGET]:
-            print("[错误] 签收行日期变异未命中，测试无意义。")
-            return 1
-        resigned_pins = dict(pins)
-        resigned_pins[TARGET] = reviewed_pin(
-            TARGET, fingerprint(resigned[TARGET], spec["start"], spec["end"])
+        unrelated_record = RECORD.format(
+            key=TARGET,
+            artifact=unrelated,
+            sha=hashlib.sha256(unrelated.read_bytes()).hexdigest(),
+            baseline=baseline,
+            review_date=signed_at,
         )
+        unrelated_pins = dict(pins)
+        unrelated_pins[TARGET] = {**pins[TARGET], "basis": unrelated_record}
         run(
             "SP25",
-            "合法单行签收行变更",
-            resigned,
+            "日期只出现在产物无关位置",
             current,
-            resigned_pins,
-            [record],
-            None,
+            current,
+            unrelated_pins,
+            [unrelated_record],
+            "未在复核产物",
         )
 
         # SP26：第二行完整格式签收行即报错，不得当作可剔除内容。
@@ -475,6 +486,73 @@ def main() -> int:
                 [record],
                 "不一致",
             )
+
+        # SP31/SP32/SP33：签收日期以 basis 的 `复核日期：` 为唯一凭据，且须有行首记号（批次 0091）。
+        no_date_record = record.replace(f"复核日期：{signed_at}\n", "", 1)
+        no_date_pins = dict(pins)
+        no_date_pins[TARGET] = {**pins[TARGET], "basis": no_date_record}
+        run(
+            "SP31",
+            "basis 缺 `复核日期：`",
+            current,
+            current,
+            no_date_pins,
+            [no_date_record],
+            "basis 缺少 `复核日期：",
+        )
+
+        drifted = dict(current)
+        drifted[TARGET] = re.sub(
+            r"(；)\d{4}-\d{2}-\d{2}(；A\.2 指纹)",
+            r"\g<1>2000-01-01\g<2>",
+            current[TARGET],
+            count=1,
+        )
+        if drifted[TARGET] == current[TARGET]:
+            print("[错误] 签收行日期变异未命中，测试无意义。")
+            return 1
+        drifted_pins = dict(pins)
+        drifted_pins[TARGET] = reviewed_pin(
+            TARGET, fingerprint(drifted[TARGET], spec["start"], spec["end"])
+        )
+        run(
+            "SP32",
+            "签收日期与 basis `复核日期：` 不一致",
+            drifted,
+            current,
+            drifted_pins,
+            [record],
+            "不一致",
+        )
+
+        dated = Path(tmp) / "REPORT-2000.md"
+        dated.write_text(
+            "外部复核产物（测试用，不写入仓库）。\n复核日期：2000-01-01\n",
+            encoding="utf-8",
+        )
+        dated_record = RECORD.format(
+            key=TARGET,
+            artifact=dated,
+            sha=hashlib.sha256(dated.read_bytes()).hexdigest(),
+            baseline=baseline,
+            review_date="2000-01-01",
+        )
+        dated_pins = dict(pins)
+        dated_pins[TARGET] = {
+            **reviewed_pin(
+                TARGET, fingerprint(drifted[TARGET], spec["start"], spec["end"])
+            ),
+            "basis": dated_record,
+        }
+        run(
+            "SP33",
+            "签收日期与 basis `复核日期：` 同步变更",
+            drifted,
+            current,
+            dated_pins,
+            [dated_record],
+            None,
+        )
 
         schema_path = root / "spec" / "CHECKER_INPUT_SCHEMA.md"
         extra = dict(current)

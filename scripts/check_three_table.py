@@ -191,11 +191,65 @@ def resolve_commit(root: Path, ref: str) -> str | None:
     return result.stdout.strip() or None if result.returncode == 0 else None
 
 
-def a2_signoff_fact_issues(root: Path, signoff: tuple[str, str, str]) -> list[str]:
-    """签收行的 `外部复核基线` 与日期必须与 A.2 basis 自洽（批次 0090）。
+A2_DATE_FIELD_RE = re.compile(r"复核日期：\s*`?(\d{4}-\d{2}-\d{2})`?")
+A2_DATE_RECORD_RE = re.compile(r"日期记录：`?([^`\s；，、]+)`?")
 
-    - 基线须与 `scripts/spec-pins.json` 中 A.2 basis 的 `复核基线：` 逐字相同且存在于仓库；
-    - 日期须为合法日历日期，且以独立 `YYYY-MM-DD` 记号出现在 basis 的 `复核产物：` 文本中。
+
+def a2_date_marker(text: str, stamp: str) -> bool:
+    """行首专用记号：整行只写 `复核日期：<日期>`，不是任意位置的子串。"""
+    return re.search(rf"^复核日期：\s*`?{re.escape(stamp)}`?\s*$", text, re.M) is not None
+
+
+def a2_date_corroboration_issues(root: Path, stamp: str, basis: str) -> list[str]:
+    """日期须有行首 `复核日期：` 记号佐证（复核产物，或 basis 的 `日期记录：`）。
+
+    与 `check_spec_pins.a2_date_corroboration_errors` 同一口径；历史产物不可改字节时
+    走 `日期记录：<仓库外文件> sha256：<64 位>` 支路，路径、存在性、哈希、记号四者缺一即报错。
+    """
+    artifact = re.search(r"复核产物：`?([^`\s；，、]+)`?", basis)
+    if artifact is None:
+        return [f"A.2 basis 无 `复核产物：`，签收行日期 `{stamp}` 无法核对"]
+    path = Path(artifact.group(1))
+    if not path.is_file():
+        return [f"A.2 复核产物不存在，无法核对签收行日期：{path}"]
+    if a2_date_marker(path.read_text(encoding="utf-8", errors="replace"), stamp):
+        return []
+    record = A2_DATE_RECORD_RE.search(basis)
+    if record is None:
+        return [
+            f"A.2 签收行日期 `{stamp}` 未在复核产物 {path.name} 中以行首 `复核日期：`"
+            "记号出现，且 basis 无 `日期记录：<仓库外文件> sha256：<64 位>` 佐证"
+            "（日期与复核记录不自洽）"
+        ]
+    record_path = Path(record.group(1))
+    try:
+        record_path.resolve().relative_to(root.resolve())
+    except ValueError:
+        pass
+    else:
+        return [f"A.2 日期记录位于本仓库内，不能作为日期佐证：{record_path}"]
+    if not record_path.is_file():
+        return [f"A.2 日期记录不存在，无法核对签收行日期：{record_path}"]
+    errors: list[str] = []
+    recorded_sha = re.search(r"sha256：`?([0-9a-f]{64})`?", basis[record.end() :])
+    if recorded_sha is None:
+        errors.append("A.2 basis 的 `日期记录：` 缺少 `sha256：<64 位十六进制>`")
+    elif hashlib.sha256(record_path.read_bytes()).hexdigest() != recorded_sha.group(1):
+        errors.append(f"A.2 `日期记录` 的 sha256 与文件实算不一致：{record_path}")
+    if not a2_date_marker(record_path.read_text(encoding="utf-8", errors="replace"), stamp):
+        errors.append(
+            f"A.2 日期记录 {record_path.name} 中无行首 `复核日期：{stamp}` 记号"
+            "（日期与复核记录不自洽）"
+        )
+    return errors
+
+
+def a2_signoff_fact_issues(root: Path, signoff: tuple[str, str, str]) -> list[str]:
+    """签收行的 `外部复核基线` 与日期必须与 A.2 basis 自洽（批次 0090，0091 收紧）。
+
+    - 基线须与 `scripts/spec-pins.json` 中 A.2 basis 的 `复核基线：` 解析为同一提交且存在于仓库；
+    - 日期须为合法日历日期、必须等于 basis 的 `复核日期：` 字段，并有行首专用记号佐证
+      （见 `a2_date_corroboration_issues`）。
     """
     baseline, signed_at, _ = signoff
     pins_path = root / "scripts" / "spec-pins.json"
@@ -225,20 +279,22 @@ def a2_signoff_fact_issues(root: Path, signoff: tuple[str, str, str]) -> list[st
         date.fromisoformat(signed_at)
     except ValueError:
         errors.append(f"A.2 签收行日期不是合法日历日期：{signed_at}")
-    artifact = re.search(r"复核产物：`?([^`\s；，、]+)`?", basis)
-    if artifact is None:
-        errors.append(f"A.2 basis 无 `复核产物：`，签收行日期 `{signed_at}` 无法核对")
+    field = A2_DATE_FIELD_RE.search(basis)
+    if field is None:
+        errors.append(
+            f"A.2 basis 缺少 `复核日期：<YYYY-MM-DD>`，签收行日期 `{signed_at}` 无法核验"
+        )
     else:
-        path = Path(artifact.group(1))
-        if not path.is_file():
-            errors.append(f"A.2 复核产物不存在，无法核对签收行日期：{path}")
-        else:
-            record = path.read_text(encoding="utf-8", errors="replace")
-            if re.search(rf"(?<![0-9]){re.escape(signed_at)}(?![0-9])", record) is None:
-                errors.append(
-                    f"A.2 签收行日期 `{signed_at}` 未出现在复核产物 {path.name} 中"
-                    "（日期与复核记录不自洽）"
-                )
+        recorded_at = field.group(1)
+        try:
+            date.fromisoformat(recorded_at)
+        except ValueError:
+            errors.append(f"A.2 basis 的 `复核日期：` 不是合法日历日期：{recorded_at}")
+        if recorded_at != signed_at:
+            errors.append(
+                f"A.2 签收行日期 `{signed_at}` 与 basis `复核日期：{recorded_at}` 不一致"
+            )
+    errors.extend(a2_date_corroboration_issues(root, signed_at, basis))
     return errors
 
 

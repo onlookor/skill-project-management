@@ -34,23 +34,23 @@
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：scripts/check_no_raw_material.py；结论：认可"
     },
     "scripts/check_spec_pins.py": {
-      "sha256": "ce6b1132247470ce21858916ecc1963d8e569c0d33fa441c49fad88284eb374f",
+      "sha256": "0e0a9058afcc20ddda259da2e2c396eda85b15e2748311b82697fe0538db2a3d",
       "basis": "非同源复核：第五批（基线 c6fa1cd）只读外复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch5/REVIEW-RECORD.md；sha256：8b8581d37c58ee916672a0863b0598cb1317f811e4471ccb328161d66833a935；复核基线：c6fa1cd50955302c207402c454abf91db22e6082；区段：scripts/check_spec_pins.py；结论：认可",
-      "invalidated": "批次 0090 新增签收行基线/日期事实核验与 invalidated 显示层；第五轮 basis（基线 c6fa1cd）不覆盖本批改动，待重新取证"
+      "invalidated": "批次 0090 新增签收行基线/日期事实核验与 invalidated 显示层；0091 收紧为 basis `复核日期：` 凭据 + 行首记号 + `日期记录：` 佐证；第五轮 basis（基线 c6fa1cd）不覆盖这些改动，待重新取证"
     },
     "scripts/check_state.py": {
       "sha256": "cb62284b0b5e813bd254deaa24fcb54a9d2a98f5b566feeedee6752796bea6e4",
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：scripts/check_state.py；结论：认可"
     },
     "scripts/check_three_table.py": {
-      "sha256": "40f4ba2fa3191c5e92ac3d9282f88b94fdb9b710b13a9d7dc95b82b537edbe94",
+      "sha256": "df38e37ba41f4358724bcd7c67c3a16173b0e647b75a31d9f7d0973e33395a53",
       "basis": "非同源复核：第五批（基线 c6fa1cd）只读外复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch5/REVIEW-RECORD.md；sha256：8b8581d37c58ee916672a0863b0598cb1317f811e4471ccb328161d66833a935；复核基线：c6fa1cd50955302c207402c454abf91db22e6082；区段：scripts/check_three_table.py；结论：认可",
-      "invalidated": "批次 0090 新增签收行基线与日期自洽校验；第五轮 basis（基线 c6fa1cd）不覆盖本批改动，待重新取证"
+      "invalidated": "批次 0090 新增签收行基线与日期自洽校验；0091 同步收紧为 `复核日期：` 凭据 + 行首记号 + `日期记录：` 佐证；第五轮 basis（基线 c6fa1cd）不覆盖这些改动，待重新取证"
     },
     "scripts/test_check_table_mutations.py": {
-      "sha256": "414374d66a5711440b1dc31912d962bfdbffb33135f8f70f9368b53eb37cd220",
+      "sha256": "9fd99581b1ccdc7c7412e8ce7fc665009e5c7adb394a42cee794b8e860233cbe",
       "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：scripts/test_check_table_mutations.py 结论：认可",
-      "invalidated": "批次 0090 新增 S03/S04 签收行基线负例；原 basis（基线 a9ff5bb）不覆盖本批改动，待重新取证"
+      "invalidated": "批次 0090 新增 S03/S04 签收行基线负例；0091 新增 S05 日期不一致负例；原 basis（基线 a9ff5bb）不覆盖这些改动，待重新取证"
     },
     "scripts/test_checker_pins.py": {
       "sha256": "7abba7449200b7ba487c1a037bd0bb5a21584537d0f184c29e13ca1fa9dd3de9",
@@ -61,7 +61,7 @@
       "basis": "非同源复核：G-018 r3（verify-g018-r3，基线 a9ff5bb） 复核产物：/home/wgz/projects/skills/2026-11-14/pm-governance-review/verify-g018-r3/REPORT.md sha256：2ce8107766068643d83a94bbbe1844c2c415d6e6c4f39f059f8a8851419602c6 复核基线：a9ff5bb 区段：scripts/test_coverage_gate.py 结论：认可"
     },
     "scripts/test_spec_pins.py": {
-      "sha256": "956dc071352bd3b47dc0364599afe14abb8f4320617e30c19c31cc04afe0c155",
+      "sha256": "3a6ee554c4e59adad2ac66d8b4f4f0be0ef406652efdba5c696e20cf10d55bd3",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/validate_ontology.py": {
@@ -81,7 +81,7 @@
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：scripts/test_dependency_pins.py；结论：认可"
     },
     "scripts/no-review-declarations.json": {
-      "sha256": "33f379c2a2ca1b06406457a2e44c5bfd5c7f151e358fa78eb3816643f62eef8b",
+      "sha256": "44fd9747a29e4c2c711e847228c39b0f7edc14b65bb1fb8b5ce829ae87a2adfa",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "validation/pinned/checker.py": {
