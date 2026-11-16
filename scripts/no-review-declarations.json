@@ -17,35 +17,35 @@
       "todo": "T-149"
     },
     "scripts/pm_schema.py": {
-      "reason": "批次 0095 新增的 JSON Schema 子集校验内核，落地时无复核产物；`IMPLEMENTED` 白名单与 `x-checks`/`x-provenance` 契约约束均由本批自定",
-      "missing_review": "对白名单关键字闭集、本地 $ref 解析与契约元数据强制口径的非同源复核",
+      "reason": "批次 0095 新增的 JSON Schema 子集校验内核，落地时无复核产物；`IMPLEMENTED` 白名单与 `x-checks`/`x-provenance` 契约约束均由本批自定。批次 0096 按外复核严重 10 改为入口全树预扫描（未实现关键字在任意分支都拒绝），该修复本身尚未经复核",
+      "missing_review": "对白名单关键字闭集、全树预扫描的拒绝边界、本地 $ref 解析与契约元数据强制口径的非同源复核",
       "due": "M1 出口前",
       "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
       "todo": "T-167"
     },
     "scripts/pm_config.py": {
-      "reason": "批次 0095 新增的配置解释器（CFG-01～CFG-15），判定性项无默认、采样网格与可比性口径均为本批落地，无复核产物",
-      "missing_review": "对 CFG 逐条求值、`cannot_evaluate`/`config_invalid`/`config_incomplete`/`config_drift` 分派与采样点计算的非同源复核",
+      "reason": "批次 0095 新增的配置解释器（CFG-01～CFG-15），判定性项无默认、采样网格与可比性口径均为本批落地，无复核产物。批次 0096 按外复核严重 3/5/8/9 调整聚合优先级、加入 `item_digests` 逐项重算、删除采样与 EV 的三处默认、统一两种采样口径，修复本身尚未经复核",
+      "missing_review": "对 CFG 逐条求值、`cannot_evaluate`/`config_invalid`/`config_incomplete`/`config_drift` 分派、逐项摘要重算与采样点计算的非同源复核",
       "due": "M1 出口前",
       "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
       "todo": "T-167"
     },
     "scripts/pm_caps.py": {
-      "reason": "批次 0095 新增的七项机械能力与 33 个检查注册表，CPM/预算/风险/状态/偏差/EVM/审计口径均为本批落地，无复核产物",
-      "missing_review": "对七项能力算法（含前后推、科目汇总、采样比对、EVM 三法、摘要链）与检查注册表的非同源复核",
+      "reason": "批次 0095 新增的七项机械能力与 33 个检查注册表，CPM/预算/风险/状态/偏差/EVM/审计口径均为本批落地，无复核产物。批次 0096 按外复核阻断 1 与严重 8 改为科目深度降序上卷、逐节点核对子树合计、删除 `metric`/`percent_complete` 默认，修复本身尚未经复核",
+      "missing_review": "对七项能力算法（含前后推、科目子树逐节点汇总、采样比对、EVM 三法、摘要链）与检查注册表的非同源复核",
       "due": "M1 出口前",
       "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
       "todo": "T-167"
     },
     "scripts/pm_check.py": {
-      "reason": "批次 0095 新增的六算子解释器与五值退出码聚合器，算子闭集、工序校验与 `human_approve` 判定均为本批落地，无复核产物",
-      "missing_review": "对算子闭集、退出码聚合优先级、工序 `needs` 校验与签字关口判定的非同源复核",
+      "reason": "批次 0095 新增的六算子解释器与五值退出码聚合器，算子闭集、工序校验与 `human_approve` 判定均为本批落地，无复核产物。批次 0096 按外复核阻断 2 与严重 3/4/6/7 修正退出码归位、配置 finding 并入、无配置不放行、`CFG-12` 空值、`render` 路径约束，修复本身尚未经复核",
+      "missing_review": "对算子闭集、退出码聚合优先级与 `invalid`/`cannot_evaluate` 边界、工序 `needs` 校验、签字关口判定与渲染路径约束的非同源复核",
       "due": "M1 出口前",
       "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
       "todo": "T-167"
     },
     "scripts/test_pm_runtime.py": {
-      "reason": "批次 0095 新增的 33 项自测，样例与实现同源编写，不构成独立证据",
+      "reason": "批次 0095 新增的 33 项自测，样例与实现同源编写，不构成独立证据。批次 0096 增至 55 项，新增用例改从契约条款派生并注明依据位置，但编写方仍是执行方，仍不构成非同源证据",
       "missing_review": "非同源复核：由复核方按 `spec/D6_REBASELINE_PROPOSAL.md` 第 3/6/9 节独立构造正反例，比对退出码结论",
       "due": "M1 出口前",
       "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",

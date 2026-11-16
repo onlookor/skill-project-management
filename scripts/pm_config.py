@@ -93,17 +93,19 @@ def _finding(code: str, detail: str) -> dict:
 
 
 def exit_for_findings(findings: list[dict]) -> int:
-    """求值优先级：结构非法(2) > 漂移/矛盾(1) > 不可判定(3) > 通过(0)。
+    """求值优先级：结构非法(2) > 不可判定(3) > 漂移/矛盾(1) > 通过(0)。
 
     `config_incomplete` 的退出码是 2（见 9.3），因此与结构非法同档。
+    判定性项缺失（`cannot_evaluate`）高于漂移：漂移是与既有快照的比对结论，
+    不可判定表示本轮结论没有机械依据，不能靠“漂移了”代替“判不了”。
     """
     codes = {item.get("code") for item in findings if item.get("code")}
     if codes & {"config_invalid", "config_incomplete"}:
         return EXIT_INVALID
-    if "config_drift" in codes:
-        return EXIT_VIOLATION
     if "cannot_evaluate" in codes:
         return EXIT_CANNOT
+    if "config_drift" in codes:
+        return EXIT_VIOLATION
     return EXIT_OK
 
 
@@ -296,6 +298,37 @@ def _interpreter_findings(config: dict) -> list[dict]:
     return findings
 
 
+def _lock_item_findings(lock: object, config: dict) -> list[dict]:
+    """逐项摘要重算：整体 `config_digest` 覆盖不到 `item_digests` 自身。
+
+    依据：`spec/D6_REBASELINE_PROPOSAL.md` 9.4——`item_digests` 是可比较性的
+    诊断凭据；单条被篡改时仅比对整体摘要发现不了，必须逐项重算。
+    """
+    if not isinstance(lock, dict):
+        return []
+    digests = lock.get("item_digests")
+    if not isinstance(digests, dict):
+        return []
+    findings: list[dict] = []
+    tampered = sorted(
+        key
+        for key in digests
+        if key in config and digests[key] != config_codes.item_digest(config[key])
+    )
+    if tampered:
+        findings.append(
+            _finding("config_drift", f"config.lock 的逐项摘要与配置不符：{tampered}")
+        )
+    missing = sorted(
+        key for key in config if key in config_codes.CFG_IDS and key not in digests
+    )
+    if missing:
+        findings.append(
+            _finding("config_drift", f"config.lock 缺少逐项摘要：{missing}")
+        )
+    return findings
+
+
 def evaluate(
     config_path: Path,
     lock_path: Path | None = None,
@@ -321,6 +354,7 @@ def evaluate(
         for item in config_codes.config_findings(config, lock, schema)
         if item.get("code")
     )
+    findings.extend(_lock_item_findings(lock, config))
     findings.extend(_interpreter_findings(config))
     # 同一缺陷可能被结构分类与项间关系各报一次，按 (类别, 说明) 去重。
     unique: list[dict] = []
@@ -401,7 +435,10 @@ def sample_points(start: str, end: str, config: dict) -> dict:
     last = _parse_moment(end, tz)
     if last < first:
         raise ValueError("采样区间的终点早于起点")
-    workdays = set(calendar.get("workdays", WEEKDAYS))
+    workdays = calendar.get("workdays")
+    if not isinstance(workdays, list) or not workdays:
+        raise RuntimeError("采样需要 CFG-08.workdays（项目工作周），配置未给出")
+    workdays = set(workdays)
     days, holidays = _calendar(calendar, first.date(), last.date())
     eligible = [
         day for day in days if WEEKDAYS[day.weekday()] in workdays and day.isoformat() not in holidays
@@ -409,15 +446,16 @@ def sample_points(start: str, end: str, config: dict) -> dict:
     if not eligible:
         raise RuntimeError("采样区间内没有符合项目日历的采样日")
     mode = config["CFG-04"]
+    # 两种采样模式共用同一日历口径：basis 只认配置，不内置“按工作日”。
+    basis = config.get("CFG-06")
+    if basis not in ("workday", "calendar"):
+        raise RuntimeError("采样需要 CFG-06（workday/calendar），配置未给出")
 
     def stamp(day: date) -> str:
         return datetime.combine(day, first.time(), tz).isoformat()
 
     points: list[dict] = []
     if mode == "milestone_fraction":
-        basis = config.get("CFG-06")
-        if basis is None:
-            raise RuntimeError("CFG-04=milestone_fraction 需要 CFG-06")
         domain = eligible if basis == "workday" else days
         total = len(domain)
         for fraction in config.get("CFG-05", []):
@@ -429,10 +467,11 @@ def sample_points(start: str, end: str, config: dict) -> dict:
         step = config.get("CFG-07")
         if not isinstance(step, dict):
             raise RuntimeError("固定间隔采样需要 CFG-07")
+        allowed = set(eligible if basis == "workday" else days)
         unit, size = step["unit"], step["n"]
         cursor = first
         while cursor <= last:
-            if WEEKDAYS[cursor.date().weekday()] in workdays:
+            if cursor.date() in allowed:
                 points.append({"label": f"{size}{unit}", "at": cursor.isoformat()})
             if unit == "hour":
                 cursor += timedelta(hours=size)

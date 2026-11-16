@@ -78,7 +78,7 @@
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：scripts/test_dependency_pins.py；结论：认可"
     },
     "scripts/no-review-declarations.json": {
-      "sha256": "3d6de1f7435fc79087ec7d7e2f702fc60dc71aa2278eb22030b5dfbeb9d6df0f",
+      "sha256": "8abf4a9cfbe6f90037682613f708c80072e4ad32d6d0489fab2a9842b1be5370",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "validation/pinned/checker.py": {
@@ -90,23 +90,23 @@
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：scripts/config_codes.py；结论：认可"
     },
     "scripts/pm_caps.py": {
-      "sha256": "4646e7448ff66c6b620a38954de59cb8710299604891fcb7b2469676b1ae2dd2",
+      "sha256": "62dd459c2dfd5a6acfbdd9cac1fa92af7845b469f5373bb6d0e98a8b731b2cd8",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/pm_check.py": {
-      "sha256": "e4c7445d510bfa74b10819b17f4e3c0f5a7f5b05e3616de870b3b78bd365b175",
+      "sha256": "fc20ab851144b1da0b23ef98550977276d98b1d698c581aeebc055806ddc1cc5",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/pm_config.py": {
-      "sha256": "5576fdd05f76300bc7c93cad70d010853a5caa451ffe9761b26701225605a87d",
+      "sha256": "22432042a06d3faf9e2f19be6ab36cbc14361bea146b46acd21c2d837ba2f3ec",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/pm_schema.py": {
-      "sha256": "884ef3529b4dd786f431bc4ea74bea9980414d1a652bc37d84681f45c33ed43b",
+      "sha256": "1afc98e1b31099c187a18beefcb8ab89029cb9d40f80a8cc91fd93ad89146468",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/test_pm_runtime.py": {
-      "sha256": "5dc25e086e2d258c51969c991490de6b8f9c0cb40b8e13570474d43e7cae8e26",
+      "sha256": "6b0f72d3a50d70ef33798527cd3f8be35b9d31e0392f43c066656c946367ac3f",
       "basis": "无复核声明（不构成认可，不放行）"
     }
   },

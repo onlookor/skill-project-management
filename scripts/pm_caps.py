@@ -257,6 +257,19 @@ def _account_map(config: dict) -> dict[str, str | None]:
     }
 
 
+def _account_depths(accounts: dict[str, str | None]) -> dict[str, int]:
+    """按 parent 链计算每个科目的深度；成环时停在已见节点（配置层已判非法）。"""
+    depths: dict[str, int] = {}
+    for code in accounts:
+        depth, seen, cursor = 0, {code}, accounts.get(code)
+        while cursor is not None and cursor not in seen:
+            seen.add(cursor)
+            depth += 1
+            cursor = accounts.get(cursor)
+        depths[code] = depth
+    return depths
+
+
 def compute_budget(data: dict, config: dict) -> dict:
     """按成本科目树与 WBS 双向汇总；科目树来自 CFG-15。"""
     accounts = _account_map(config)
@@ -274,8 +287,10 @@ def compute_budget(data: dict, config: dict) -> dict:
                 period["amount"]
             )
     rolled = dict(direct)
-    # 自底向上把子科目金额加到父科目；科目表已在配置求值阶段保证无环。
-    for code in sorted(accounts, key=lambda item: (accounts[item] is not None, item)):
+    # 深度降序上卷：叶子先于父节点处理，父节点被累加时其子树已完整。
+    # 单趟按“(是否根, code)”排序不够——A←B←C 时 B 可能排在 C 之前。
+    depths = _account_depths(accounts)
+    for code in sorted(accounts, key=lambda item: (-depths[item], item)):
         parent = accounts[code]
         if parent in rolled:
             rolled[parent] += rolled[code]
@@ -314,27 +329,67 @@ def _check_budget_unique(data: dict, ctx: dict) -> list[dict]:
     return [_ok("budget.package_unique", f"{len(ids)} 个工作包 id 唯一")]
 
 
+def _subtree_expected(
+    accounts: dict[str, str | None], direct: dict[str, float]
+) -> dict[str, float]:
+    """按子树递归求每个科目的应有金额（与上卷实现独立，用于交叉核验）。"""
+    children: dict[str | None, list[str]] = {}
+    for code, parent in accounts.items():
+        children.setdefault(parent, []).append(code)
+    memo: dict[str, float] = {}
+
+    def total(code: str) -> float:
+        if code not in memo:
+            memo[code] = direct.get(code, 0.0) + sum(
+                total(child) for child in children.get(code, [])
+            )
+        return memo[code]
+
+    return {code: total(code) for code in accounts}
+
+
 def _check_budget_total(data: dict, ctx: dict) -> list[dict]:
     rollup = compute_budget(data, ctx["config"])
+    findings: list[dict] = []
+    # 每个节点单独核对：总数相等不代表父节点正确（A←B←C 曾出现 A=0）。
+    accounts = _account_map(ctx["config"])
+    if accounts:
+        expected = _subtree_expected(accounts, rollup["by_account_direct"])
+        wrong = [
+            code
+            for code in accounts
+            if abs(rollup["by_account"].get(code, 0.0) - expected[code]) > 1e-6
+        ]
+        if wrong:
+            findings.append(
+                _bad(
+                    "budget.total_conserved",
+                    f"科目汇总与子树合计不等：{sorted(wrong)}（总数相等不覆盖单节点）",
+                )
+            )
     if rollup["period_total"] == 0:
-        return [_unknown("budget.total_conserved", "未提供分时段预算，总额守恒无法判定")]
-    if abs(rollup["period_total"] - rollup["total"]) > 1e-6:
-        return [
+        findings.append(
+            _unknown("budget.total_conserved", "未提供分时段预算，总额守恒无法判定")
+        )
+    elif abs(rollup["period_total"] - rollup["total"]) > 1e-6:
+        findings.append(
             _bad(
                 "budget.total_conserved",
                 f"分时段合计 {rollup['period_total']} 与工作包合计 {rollup['total']} 不等",
             )
-        ]
+        )
     evm = ctx["artifacts"].get("evm_record")
     if isinstance(evm, dict) and "bac" in evm:
         if abs(float(evm["bac"]) - rollup["total"]) > 1e-6:
-            return [
+            findings.append(
                 _bad(
                     "budget.total_conserved",
                     f"预算合计 {rollup['total']} 与挣值基线 BAC {evm['bac']} 不等",
                 )
-            ]
-    return [_ok("budget.total_conserved", f"总额守恒，合计 {rollup['total']}")]
+            )
+    if findings:
+        return findings
+    return [_ok("budget.total_conserved", f"每个科目与总额均守恒，合计 {rollup['total']}")]
 
 
 def _check_budget_periods(data: dict, ctx: dict) -> list[dict]:
@@ -605,7 +660,10 @@ def _check_status_account(data: dict, ctx: dict) -> list[dict]:
 
 
 def _deviation_values(evm: dict, config: dict) -> tuple[list[dict], str]:
-    metric = (config.get("CFG-03") or {}).get("metric", "SPI")
+    # metric 是判定性项：不回落 SPI，未给出即无法判定。
+    metric = (config.get("CFG-03") or {}).get("metric")
+    if metric not in ("SPI", "CPI", "custom"):
+        return [], "CFG-03.metric 未给出，偏差点算法无法判定"
     rows = []
     for point in evm.get("measurements", []):
         pv, ev, ac = float(point["pv"]), float(point["ev"]), float(point["ac"])
@@ -708,12 +766,16 @@ def _earned_value(data: dict, config: dict) -> tuple[float | None, str]:
     for package in data.get("work_packages", []):
         budget = float(package["budget"])
         status = package["status"]
-        percent = float(package.get("percent_complete", 0))
         if rule == "0/100":
             total += budget if status == "complete" else 0.0
         elif rule == "50/50":
             total += budget * (1.0 if status == "complete" else 0.5 if status == "in_progress" else 0.0)
         else:
+            # percent_complete 是判定性输入：缺省 0 会把“没填”算成“没干”，
+            # 不取默认，缺失即无法判定。
+            if package.get("percent_complete") is None:
+                return None, f"{package.get('id')} 缺少 percent_complete，EV 无法复算"
+            percent = float(package["percent_complete"])
             total += budget * max(0.0, min(100.0, percent)) / 100.0
     return total, ""
 

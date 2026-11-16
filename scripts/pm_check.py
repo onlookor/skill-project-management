@@ -17,7 +17,8 @@
   2 输入/配置/工序不合法（含工件未过 schema、缺槽、跳步）
   3 存在无法机械判定项（配置缺项、跨工件证据缺失、待人类签字）
   4 解释器自身不可用（运行契约或 schema 缺失/非法）
-聚合优先级：4 > 2 > 1 > 3 > 0；显式违规优先于“不可判定”。
+聚合优先级：4 > 2 > 3 > 1 > 0；输入非法优先于不可判定，
+不可判定优先于显式违规（“判不了”不能被“已发现的违规”掩盖）。
 
 零第三方依赖：只用标准库。
 """
@@ -42,8 +43,9 @@ GLOSSARY = RUNTIME / "glossary.json"
 CATALOG = RUNTIME / "task-catalog.json"
 
 OPERATORS = ("fill_schema", "compute", "lookup", "check", "human_approve", "render")
-STATUS_EXIT = {"pass": 0, "violation": 1, "cannot_evaluate": 3}
-PRECEDENCE = {0: 0, 3: 1, 1: 2, 2: 3, 4: 4}
+STATUS_EXIT = {"pass": 0, "violation": 1, "invalid": 2, "cannot_evaluate": 3}
+PRECEDENCE = {0: 0, 1: 1, 3: 2, 2: 3, 4: 4}
+EXIT_STATUS = {1: "violation", 2: "invalid", 3: "cannot_evaluate"}
 CAPABILITY_IDS = (
     "dependency_graph",
     "cost_budget",
@@ -74,6 +76,39 @@ def load_json(path: Path) -> dict:
         raise InputInvalid(f"{path}：不可读取：{exc}") from exc
     except json.JSONDecodeError as exc:
         raise InputInvalid(f"{path}：不可解析：{exc}") from exc
+    except RecursionError as exc:
+        raise InputInvalid(f"{path}：嵌套过深，无法解析：{exc}") from exc
+
+
+CONFIG_STATUS = {
+    "config_invalid": "invalid",
+    "config_incomplete": "invalid",
+    "config_drift": "violation",
+    "cannot_evaluate": "cannot_evaluate",
+}
+
+
+def config_findings(config_state: pm_config.ConfigState) -> list[dict]:
+    """把配置层 finding 转成报告 finding；聚合前必须并入，不许只改退出码。
+
+    依据：`spec/D6_REBASELINE_PROPOSAL.md` 9.2（配置层结论随判定一起出具）。
+    """
+    results: list[dict] = []
+    for item in config_state.findings:
+        code = str(item.get("code", "config_unknown"))
+        status = CONFIG_STATUS.get(code, "cannot_evaluate")
+        results.append(
+            {
+                "check": f"config.{code}",
+                "status": status,
+                "detail": str(item.get("detail", "")),
+            }
+        )
+    return results
+
+
+def status_code(status: str) -> int:
+    return STATUS_EXIT.get(status, 4)
 
 
 def _schema_cache() -> dict[str, dict]:
@@ -97,8 +132,18 @@ def _schema_cache() -> dict[str, dict]:
     return schemas
 
 
-def validate_artifact(instance: dict, config_state: pm_config.ConfigState | None) -> dict:
-    """校验一件工件，返回 {exit_code, findings, digest, type}。"""
+def validate_artifact(instance: object, config_state: pm_config.ConfigState | None) -> dict:
+    """校验一件工件，返回 {exit_code, findings, digest, type}。
+
+    契约要求（`spec/D6_REBASELINE_PROPOSAL.md` 3.2、9.2）：
+
+    - 工件必须是对象；数组/标量属于输入不合法（2），不得抛 `AttributeError`。
+    - 没有 `--config` 就无法比对 `config_ref.config_digest`，跨配置可比性无法建立，
+      一律 `cannot_evaluate`（3），不存在“跳过比对后工件退 0”的路径。
+    - 配置层 finding 必须并入报告后再聚合，不许只改退出码。
+    """
+    if not isinstance(instance, dict):
+        raise InputInvalid(f"工件顶层必须是对象，实际是 {type(instance).__name__}")
     schemas = _schema_cache()
     artifact_type = instance.get("artifact_type")
     if not isinstance(artifact_type, str) or artifact_type not in schemas:
@@ -108,7 +153,7 @@ def validate_artifact(instance: dict, config_state: pm_config.ConfigState | None
     structural = validate(instance, schema)
     for error in structural:
         findings.append(
-            {"check": "schema.shape", "status": "violation", "detail": f"{error['path']}：{error['message']}"}
+            {"check": "schema.shape", "status": "invalid", "detail": f"{error['path']}：{error['message']}"}
         )
     if structural:
         return {
@@ -124,7 +169,7 @@ def validate_artifact(instance: dict, config_state: pm_config.ConfigState | None
             findings.append(
                 {
                     "check": "provenance.required",
-                    "status": "violation",
+                    "status": "invalid",
                     "detail": f"缺少来源引用：{key}",
                 }
             )
@@ -136,35 +181,40 @@ def validate_artifact(instance: dict, config_state: pm_config.ConfigState | None
             "findings": findings,
         }
 
-    if config_state is not None:
-        if config_state.exit_code == pm_config.EXIT_INVALID:
-            raise InputInvalid("配置不合法，工件判定不启动")
-        if config_state.exit_code == pm_config.EXIT_VIOLATION:
-            return {
-                "exit_code": 1,
-                "artifact_type": artifact_type,
-                "digest": digest(instance),
-                "findings": [
-                    {"check": "config.drift", "status": "violation", "detail": "配置摘要漂移"}
-                ],
+    if config_state is None:
+        return {
+            "exit_code": 3,
+            "artifact_type": artifact_type,
+            "digest": digest(instance),
+            "findings": [
+                {
+                    "check": "config.missing",
+                    "status": "cannot_evaluate",
+                    "detail": "未提供 --config：config_ref/config_digest 无法比对，跨配置可比性无法建立",
+                }
+            ],
+        }
+
+    config_results = config_findings(config_state)
+    if config_state.exit_code == pm_config.EXIT_INVALID:
+        return {
+            "exit_code": 2,
+            "artifact_type": artifact_type,
+            "digest": digest(instance),
+            "findings": findings + config_results,
+        }
+    declared = instance.get("config_ref", {}).get("config_digest")
+    if declared != config_state.snapshot["config_digest"]:
+        config_results.append(
+            {
+                "check": "config.drift",
+                "status": "violation",
+                "detail": "工件携带的配置摘要与当前配置不一致（跨配置不可比）",
             }
-        declared = instance.get("config_ref", {}).get("config_digest")
-        if declared != config_state.snapshot["config_digest"]:
-            return {
-                "exit_code": 1,
-                "artifact_type": artifact_type,
-                "digest": digest(instance),
-                "findings": [
-                    {
-                        "check": "config.drift",
-                        "status": "violation",
-                        "detail": "工件携带的配置摘要与当前配置不一致（跨配置不可比）",
-                    }
-                ],
-            }
+        )
 
     ctx = {
-        "config": config_state.config if config_state is not None else {},
+        "config": config_state.config,
         "artifacts": {artifact_type: instance["data"]},
     }
     results = pm_caps.run_checks(schema["x-checks"], instance["data"], ctx)
@@ -178,15 +228,11 @@ def validate_artifact(instance: dict, config_state: pm_config.ConfigState | None
                 "detail": f"工件自报无法机械判定项：{unsupported}",
             }
         )
-    statuses = {item["status"] for item in findings}
-    if "violation" in statuses:
-        code = 1
-    elif "cannot_evaluate" in statuses:
-        code = 3
-    else:
-        code = 0
+    findings.extend(config_results)
+    codes = [status_code(item["status"]) for item in findings]
+    codes.append(config_state.exit_code)
     return {
-        "exit_code": code,
+        "exit_code": aggregate(codes),
         "artifact_type": artifact_type,
         "digest": digest(instance),
         "findings": findings,
@@ -274,7 +320,7 @@ class ProcedureRunner:
         if result["exit_code"] != 0 and step.get("fails", "block") == "block":
             self.slots[step["slot"]] = instance
             detail = "；".join(item["detail"] for item in result["findings"])
-            return ("violation" if result["exit_code"] == 1 else "cannot_evaluate", detail)
+            return (EXIT_STATUS[result["exit_code"]], detail)
         self.slots[step["slot"]] = instance
         return ("pass", f"schema={schema_name} digest={result['digest']}")
 
@@ -340,10 +386,27 @@ class ProcedureRunner:
 
     def _human_approve(self, step: dict) -> tuple[str, str]:
         path = self.inputs / "approval.json"
+        if self.config_state is None:
+            return (
+                "cannot_evaluate",
+                f"未提供 --config：{step['gate']} 的签字角色映射（CFG-12）无法比对",
+            )
+        role_map = (self.config_state.config.get("CFG-12") or {}).get("approver_role_map")
+        if not isinstance(role_map, dict) or step["gate"] not in role_map:
+            return (
+                "cannot_evaluate",
+                f"CFG-12 未给出 {step['gate']} 的签字角色映射，角色一致性无法判定",
+            )
         if not path.is_file():
             return ("cannot_evaluate", f"待人类签字：{step['gate']}（无 approval.json）")
-        records = json.loads(path.read_text(encoding="utf-8"))
-        matches = [record for record in records if record.get("gate") == step["gate"]]
+        records = load_json(path)
+        if not isinstance(records, list):
+            raise InputInvalid(f"{path}：顶层必须是签字记录数组")
+        matches = [
+            record
+            for record in records
+            if isinstance(record, dict) and record.get("gate") == step["gate"]
+        ]
         if not matches:
             return ("cannot_evaluate", f"待人类签字：{step['gate']}")
         latest = matches[-1]
@@ -353,12 +416,11 @@ class ProcedureRunner:
         unseen = [item for item in step["must_see"] if item not in seen]
         if unseen:
             return ("violation", f"{step['gate']} 未见证据步骤：{unseen}")
-        expected = (self.config_state.config.get("CFG-12") or {}).get("approver_role_map", {})
         role = latest.get("role")
-        if step["gate"] in expected and role != expected[step["gate"]]:
+        if role != role_map[step["gate"]]:
             return (
                 "violation",
-                f"{step['gate']} 的签字角色 {role!r} 与 CFG-12 映射 {expected[step['gate']]!r} 不符",
+                f"{step['gate']} 的签字角色 {role!r} 与 CFG-12 映射 {role_map[step['gate']]!r} 不符",
             )
         return ("pass", f"{step['gate']} 由 {latest.get('actor')}（{role}）签字")
 
@@ -379,7 +441,13 @@ class ProcedureRunner:
         if self.out_dir is None:
             raise InputInvalid(f"{step['id']}：render 需要 --out-dir")
         self.out_dir.mkdir(parents=True, exist_ok=True)
-        target = self.out_dir / step["out"]
+        base = self.out_dir.resolve()
+        target = (self.out_dir / step["out"]).resolve()
+        if base not in target.parents:
+            raise InputInvalid(
+                f"{step['id']}：render.out 越出 --out-dir（{step['out']} → {target}）"
+            )
+        target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(text, encoding="utf-8")
         return ("pass", f"渲染至 {target}")
 
@@ -396,7 +464,7 @@ class ProcedureRunner:
             except RuntimeBroken:
                 raise
             except InputInvalid as exc:
-                status, detail = "violation", str(exc)
+                status, detail = "invalid", str(exc)
             code = STATUS_EXIT[status]
             self.steps.append(
                 {"id": step["id"], "op": step["op"], "status": status, "exit_code": code, "detail": detail}
@@ -472,6 +540,23 @@ def check_catalog(config_state: pm_config.ConfigState | None = None) -> dict:
     return {"exit_code": 2 if findings else 0, "findings": findings, "tasks": len(tasks)}
 
 
+def _merge_config(result: dict, config_state: pm_config.ConfigState | None) -> None:
+    """把配置层 finding 并入判定报告后再聚合退出码。
+
+    依据：`spec/D6_REBASELINE_PROPOSAL.md` 9.2；不许出现“退 1 但 findings 里
+    一条 `config.*` 都没有”的报告。
+    """
+    if config_state is None:
+        return
+    merged = config_findings(config_state)
+    if not merged:
+        return
+    result.setdefault("findings", []).extend(merged)
+    codes = [int(result.get("exit_code", 0))]
+    codes.extend(status_code(item["status"]) for item in merged)
+    result["exit_code"] = aggregate(codes)
+
+
 def _emit(result: dict) -> None:
     print(json.dumps(result, ensure_ascii=False, indent=2, sort_keys=True))
 
@@ -500,22 +585,18 @@ def main(argv: list[str] | None = None) -> int:
                     _emit(
                         {
                             "exit_code": 2,
-                            "findings": config_state.findings,
+                            "findings": config_findings(config_state),
                             "detail": "配置不合法，判定不启动",
                         }
                     )
                     return 2
         if args.catalog:
             result = check_catalog(config_state)
-            if config_state is not None and config_state.exit_code == 1:
-                result["exit_code"] = aggregate([result["exit_code"], 1])
-                result["findings"].append({"detail": "配置摘要漂移"})
+            _merge_config(result, config_state)
             _emit(result)
             return result["exit_code"]
         if args.artifact:
             result = validate_artifact(load_json(Path(args.artifact)), config_state)
-            if config_state is not None and config_state.exit_code == 3:
-                result["exit_code"] = aggregate([result["exit_code"], 3])
             _emit(result)
             return result["exit_code"]
         if args.procedure:
@@ -529,8 +610,7 @@ def main(argv: list[str] | None = None) -> int:
                 Path(args.out_dir) if args.out_dir else None,
             )
             result = runner.run()
-            if config_state is not None and config_state.exit_code in (1, 3):
-                result["exit_code"] = aggregate([result["exit_code"], config_state.exit_code])
+            _merge_config(result, config_state)
             _emit(result)
             return result["exit_code"]
         if config_state is not None:
@@ -541,6 +621,9 @@ def main(argv: list[str] | None = None) -> int:
         return 4
     except InputInvalid as exc:
         _emit({"exit_code": 2, "findings": [{"detail": str(exc)}]})
+        return 2
+    except RecursionError as exc:
+        _emit({"exit_code": 2, "findings": [{"detail": f"输入嵌套过深：{exc}"}]})
         return 2
     except SchemaError as exc:
         _emit({"exit_code": 4, "findings": [{"detail": f"schema 内核不可用：{exc}"}]})

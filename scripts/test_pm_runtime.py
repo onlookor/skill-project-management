@@ -24,6 +24,7 @@ from pathlib import Path
 import pm_caps
 import pm_check
 import pm_config
+import pm_schema
 
 ROOT = Path(__file__).resolve().parent.parent
 DEMO = ROOT / "runtime/demo"
@@ -115,7 +116,8 @@ def main() -> int:
             temp / "schedule-cycle.json",
             lambda body: body["data"]["dependencies"].append({"from": "D", "to": "A", "type": "FS"}),
         )
-        check("依赖成环 → 1", pm_check.validate_artifact(read(cyclic), state)["exit_code"], 1)
+        # 依据：pm_check.py 文件头“聚合优先级 4 > 2 > 3 > 1 > 0；不可判定优先于显式违规”。
+        check("依赖成环（违规+不可判定）→ 3", pm_check.validate_artifact(read(cyclic), state)["exit_code"], 3)
 
         residual = mutate(
             INPUTS / "risk.json",
@@ -227,6 +229,264 @@ def main() -> int:
             pm_check.main(["--procedure", str(skipped), "--inputs", str(INPUTS), "--config", str(CONFIG), "--lock", str(LOCK)]),
             2,
         )
+
+        print("[契约派生回归：外复核 10 条]")
+        # 依据：`spec/D6_REBASELINE_PROPOSAL.md` 8.3（预算汇总 CAP-19 / RG-07）
+        # 与批次 0096 外复核阻断 1：上卷后每个父节点都必须拿到完整子树，总数相等不够。
+        cfg3 = copy.deepcopy(state.config)
+        cfg3["CFG-15"] = {
+            "accounts": [
+                {"code": "A"},
+                {"code": "B", "parent_code": "A"},
+                {"code": "C", "parent_code": "B"},
+            ]
+        }
+        budget_data = {
+            "currency": "CNY",
+            "work_packages": [
+                {
+                    "id": "W1",
+                    "wbs_ref": "N1",
+                    "account_code": "C",
+                    "amount": 100,
+                    "periods": [{"period": "2026-01", "amount": 100}],
+                }
+            ],
+        }
+        rollup3 = pm_caps.compute_budget(budget_data, cfg3)
+        check(
+            "三级科目逐节点上卷",
+            rollup3["by_account"],
+            {"A": 100.0, "B": 100.0, "C": 100.0},
+        )
+        check(
+            "三级科目逐节点核验",
+            [item["status"] for item in pm_caps._check_budget_total(budget_data, {"config": cfg3, "artifacts": {}})],
+            ["pass"],
+        )
+
+        # 依据：`scripts/pm_check.py` 文件头退出码段（输入/配置/工序不合法 = 2；
+        # 无法机械判定 = 3）与 `GLOSSARY.md` T-F-015。
+        def procedure(name: str, steps: list[dict]) -> Path:
+            path = temp / name
+            write(path, {"procedure": name, "version": 1, "steps": steps})
+            return path
+
+        missing_slot = procedure(
+            "procedure-missing-slot.json",
+            [{"id": "S1", "op": "compute", "method": "audit.append", "inputs": ["nope"], "slot": "x", "record": {}}],
+        )
+        check(
+            "缺槽位 → 2",
+            pm_check.main(["--procedure", str(missing_slot), "--inputs", str(INPUTS), "--config", str(CONFIG), "--lock", str(LOCK)]),
+            2,
+        )
+
+        wrong_decl = procedure(
+            "procedure-wrong-schema.json",
+            [{"id": "S1", "op": "fill_schema", "schema": "audit-trail", "input": "schedule.json", "slot": "a", "fails": "block"}],
+        )
+        check(
+            "工件类型与声明不符 → 2",
+            pm_check.main(["--procedure", str(wrong_decl), "--inputs", str(INPUTS), "--config", str(CONFIG), "--lock", str(LOCK)]),
+            2,
+        )
+
+        render_only = procedure(
+            "procedure-render.json",
+            [
+                {"id": "S1", "op": "fill_schema", "schema": "audit-trail", "input": "audit.json", "slot": "a", "fails": "block"},
+                {"id": "S2", "op": "render", "template": "audit_review.md", "input": "a", "out": "x.md", "needs": ["S1"]},
+            ],
+        )
+        check(
+            "render 缺 --out-dir → 2",
+            pm_check.main(["--procedure", str(render_only), "--inputs", str(INPUTS), "--config", str(CONFIG), "--lock", str(LOCK)]),
+            2,
+        )
+
+        array_artifact = temp / "artifact-array.json"
+        array_artifact.write_text('[{"gate": "GATE-AUDIT"}]', encoding="utf-8")
+        check(
+            "非对象工件 → 2",
+            pm_check.main(["--artifact", str(array_artifact), "--config", str(CONFIG), "--lock", str(LOCK)]),
+            2,
+        )
+
+        deep_artifact = temp / "artifact-deep.json"
+        deep_artifact.write_text("[" * 4000 + "]" * 4000, encoding="utf-8")
+        check(
+            "深嵌套 JSON → 2",
+            pm_check.main(["--artifact", str(deep_artifact), "--config", str(CONFIG), "--lock", str(LOCK)]),
+            2,
+        )
+
+        gate_only = procedure(
+            "procedure-gate.json",
+            [{"id": "S1", "op": "human_approve", "gate": "GATE-AUDIT", "must_see": ["S1"]}],
+        )
+        check(
+            "无 --config 的人审关口 → 3",
+            pm_check.main(["--procedure", str(gate_only), "--inputs", str(INPUTS)]),
+            3,
+        )
+
+        # 依据：`spec/D6_REBASELINE_PROPOSAL.md` 9.2/9.3（配置 finding 随判定出具；
+        # 9.3 第二列“阻断”）与批次 0096 外复核严重 3。
+        drift_artifact = mutate(
+            INPUTS / "schedule.json",
+            temp / "schedule-drift.json",
+            lambda body: body["config_ref"].__setitem__("config_digest", "sha256:" + "0" * 64),
+        )
+        drift_result = pm_check.validate_artifact(read(drift_artifact), state)
+        check("配置摘要漂移 → 1", drift_result["exit_code"], 1)
+        check(
+            "退 1 时 findings 含 config.*",
+            any(item["check"].startswith("config.") for item in drift_result["findings"]),
+            True,
+        )
+
+        # 依据：`spec/D6_REBASELINE_PROPOSAL.md` 9.1 安全边界 B1、9.3 第一行，
+        # 以及 `AGENTS.md` 1bis“未配置即 cannot_evaluate，不得回落为通过”。
+        check(
+            "缺 --config 的工件 → 3",
+            pm_check.main(["--artifact", str(INPUTS / "schedule.json")]),
+            3,
+        )
+
+        # 依据：`spec/D6_REBASELINE_PROPOSAL.md` 9.4（item_digests 用于诊断可比性）
+        # 与 `AGENTS.md` 1bis“跨配置不得比较”。
+        lock_body = copy.deepcopy(read(LOCK))
+        first_key = sorted(lock_body["item_digests"])[0]
+        lock_body["item_digests"][first_key] = "0" * 64
+        tampered_lock = temp / "config-lock-tampered.json"
+        write(tampered_lock, lock_body)
+        tampered_state = pm_config.evaluate(CONFIG, tampered_lock)
+        check("item_digests 篡改 → 1", tampered_state.exit_code, 1)
+        check(
+            "item_digests 篡改登记 config_drift",
+            any(item.get("code") == "config_drift" for item in tampered_state.findings),
+            True,
+        )
+
+        # 依据：`contracts/schema/runtime-config.schema.json` CFG-12 的 description
+        # “角色未解析则 blocked”与 `spec/D6_REBASELINE_PROPOSAL.md` 9.2 CFG-12 行。
+        empty_gate = copy.deepcopy(state.config)
+        empty_gate["CFG-12"] = {}
+        empty_gate_path = temp / "config-empty-gate.json"
+        write(empty_gate_path, {"schema_version": "config.schema/1", "config": empty_gate})
+        check(
+            "CFG-12 为空 → 3",
+            pm_check.main(["--procedure", str(gate_only), "--inputs", str(INPUTS), "--config", str(empty_gate_path)]),
+            3,
+        )
+
+        # 依据：批次 0096 外复核严重 7；render 的 `out` 必须相对 `--out-dir` 解析，
+        # 不得写出输出目录（`spec/D6_REBASELINE_PROPOSAL.md` 4.3(1) 的工序副作用边界）。
+        escape_proc = procedure(
+            "procedure-render-escape.json",
+            [
+                {"id": "S1", "op": "fill_schema", "schema": "audit-trail", "input": "audit.json", "slot": "a", "fails": "block"},
+                {"id": "S2", "op": "render", "template": "audit_review.md", "input": "a", "out": "/tmp/escape-test.md", "needs": ["S1"]},
+            ],
+        )
+        check(
+            "render.out 越出 out-dir → 2",
+            pm_check.main(
+                [
+                    "--procedure",
+                    str(escape_proc),
+                    "--inputs",
+                    str(INPUTS),
+                    "--config",
+                    str(CONFIG),
+                    "--lock",
+                    str(LOCK),
+                    "--out-dir",
+                    str(temp / "out-escape"),
+                ]
+            ),
+            2,
+        )
+
+        # 依据：`spec/D6_REBASELINE_PROPOSAL.md` 9.1（判定性项无默认）、9.2 的
+        # CFG-03/CFG-13 行、9.3 第一行；`AGENTS.md` 1bis“不设默认值”。
+        no_metric = copy.deepcopy(state.config)
+        no_metric["CFG-03"].pop("metric")
+        check(
+            "CFG-03.metric 缺失 → cannot_evaluate",
+            pm_caps.compute_deviation(
+                {"measurements": [{"period": "P1", "pv": 100, "ev": 80, "ac": 90}]}, no_metric
+            )["status"],
+            "cannot_evaluate",
+        )
+        percent_cfg = copy.deepcopy(state.config)
+        percent_cfg["CFG-13"] = {"rule": "percent_complete"}
+        check(
+            "percent_complete 缺失 → cannot_evaluate",
+            [
+                item["status"]
+                for item in pm_caps.run_checks(
+                    ["evm.ev_measurement"],
+                    {
+                        "work_packages": [{"id": "W1", "budget": 100, "status": "in_progress"}],
+                        "measurements": [{"period": "P1", "pv": 100, "ev": 0, "ac": 0}],
+                    },
+                    {"config": percent_cfg, "artifacts": {}},
+                )
+            ],
+            ["cannot_evaluate"],
+        )
+        no_workdays = copy.deepcopy(state.config)
+        no_workdays["CFG-08"].pop("workdays")
+        workdays_error = ""
+        try:
+            pm_config.sample_points("2026-01-05", "2026-01-07", no_workdays)
+        except RuntimeError as exc:
+            workdays_error = str(exc)
+        check("CFG-08.workdays 缺失即拒绝", "workdays" in workdays_error, True)
+
+        # 依据：`spec/D6_REBASELINE_PROPOSAL.md` 9.2 CFG-06“基准必须显式，不能由实现猜”
+        # 与 9.3；两种采样模式共用同一配置口径。
+        sample_cfg = copy.deepcopy(state.config)
+        sample_cfg["CFG-04"] = "calendar_day"
+        sample_cfg["CFG-07"] = {"unit": "day", "n": 1}
+        sample_cfg["CFG-06"] = "workday"
+        workday_points = [point["at"][:10] for point in pm_config.sample_points("2026-01-05", "2026-01-11", sample_cfg)["points"]]
+        sample_cfg["CFG-06"] = "calendar"
+        calendar_points = [point["at"][:10] for point in pm_config.sample_points("2026-01-05", "2026-01-11", sample_cfg)["points"]]
+        check(
+            "固定间隔按 workday 排除周末",
+            workday_points,
+            ["2026-01-05", "2026-01-06", "2026-01-07", "2026-01-08", "2026-01-09"],
+        )
+        check(
+            "固定间隔按 calendar 不排除",
+            calendar_points,
+            ["2026-01-05", "2026-01-06", "2026-01-07", "2026-01-08", "2026-01-09", "2026-01-10", "2026-01-11"],
+        )
+        sample_cfg.pop("CFG-06")
+        basis_error = ""
+        try:
+            pm_config.sample_points("2026-01-05", "2026-01-07", sample_cfg)
+        except RuntimeError as exc:
+            basis_error = str(exc)
+        check("固定间隔缺 CFG-06 即拒绝", "CFG-06" in basis_error, True)
+
+        # 依据：`spec/D6_REBASELINE_PROPOSAL.md` 4.3(2) 工件契约与 `pm_schema.py`
+        # 文件头“关键字闭集”：未实现关键字出现在任何分支都必须拒绝。
+        keyword_errors = []
+        for schema in (
+            {"type": "object", "properties": {"x": {"type": "string", "format": "email"}}},
+            {"type": "array", "items": {"type": "string", "format": "email"}},
+        ):
+            try:
+                pm_schema.validate({}, schema)
+            except pm_schema.SchemaError:
+                keyword_errors.append(True)
+            else:
+                keyword_errors.append(False)
+        check("未实现关键字在任意分支均拒绝", keyword_errors, [True, True])
 
         print("[解释器不可用]")
         original = pm_check.ARTIFACT_DIR

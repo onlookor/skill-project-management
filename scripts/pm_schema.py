@@ -14,6 +14,9 @@
 `default`、`$comment`、`description`、`title`、`examples`、`x-checks`、
 `x-provenance` 不参与实例校验：它们是给装配层与解释器读的元数据。
 遇到未实现关键字直接报错，不静默忽略——静默忽略会让“schema 通过”变成假绿。
+批次 0096 起在 `validate()` 入口先做整棵 schema 预扫描：无论实例是否走到该分支，
+`format` 等未实现关键字出现在任何位置（含 `properties`/`items`/`additionalProperties`
+与组合分支内部）都拒绝。
 
 用法（被 `scripts/pm_check.py` 与 `scripts/pm_config.py` 引用）：
   from pm_schema import validate, contract_errors, canonical_bytes, digest
@@ -145,6 +148,50 @@ def _check_keywords(schema: dict) -> None:
         for name in names:
             if name not in TYPE_NAMES:
                 raise SchemaError(f"非法的 type：{name!r}")
+
+
+SUBSCHEMA_MAP_KEYS = ("properties", "definitions", "$defs")
+SUBSCHEMA_KEYS = (
+    "additionalProperties",
+    "propertyNames",
+    "items",
+    "if",
+    "then",
+    "else",
+)
+SUBSCHEMA_LIST_KEYS = ("allOf", "anyOf", "oneOf")
+
+
+def _scan_schema(schema: Any, where: str, depth: int = 0) -> None:
+    """在实例校验之前遍历整棵 schema，任何位置出现未实现关键字都拒绝。
+
+    仅在 `_validate` 命中分支时检查是不够的：未被实例触达的分支（例如
+    `if` 未命中、可选属性缺失）里的 `format` 等关键字会被静默放过。
+    本函数只沿 schema 位置下钻，不把 `enum`/`const`/`default`/`examples`
+    里的值当 schema 扫描，因此不会误判数据字面量。
+    """
+    if depth > MAX_DEPTH:
+        raise SchemaError("schema 嵌套超过上限（疑似循环 $ref）")
+    if not isinstance(schema, dict):
+        raise SchemaError(f"{where} 的 schema 不是对象")
+    _check_keywords(schema)
+    for key in SUBSCHEMA_MAP_KEYS:
+        sub = schema.get(key)
+        if isinstance(sub, dict):
+            for name, child in sub.items():
+                _scan_schema(child, f"{where}.{key}.{name}", depth + 1)
+    for key in SUBSCHEMA_KEYS:
+        sub = schema.get(key)
+        if isinstance(sub, dict):
+            _scan_schema(sub, f"{where}.{key}", depth + 1)
+        elif key == "items" and isinstance(sub, list):
+            for index, child in enumerate(sub):
+                _scan_schema(child, f"{where}.items[{index}]", depth + 1)
+    for key in SUBSCHEMA_LIST_KEYS:
+        sub = schema.get(key)
+        if isinstance(sub, list):
+            for index, child in enumerate(sub):
+                _scan_schema(child, f"{where}.{key}[{index}]", depth + 1)
 
 
 def _validate(
@@ -296,6 +343,7 @@ def validate(instance: Any, schema: dict) -> list[dict]:
     """返回错误清单；空清单表示通过。schema 自身非法时抛 `SchemaError`。"""
     if not isinstance(schema, dict):
         raise SchemaError("schema 顶层必须是对象")
+    _scan_schema(schema, "$")
     return _validate(instance, schema, schema, "$", 0)
 
 
