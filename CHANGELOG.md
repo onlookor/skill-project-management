@@ -1885,3 +1885,21 @@
 - **未做**：未宣称 D6 达标；模型三档未执行；本地权重口径待裁定三处理；未把 S2 结果并入主运行通过率。
 - **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-178、T-150；`scripts/no-review-declarations.json` 的 `spec/ACCESS_ZONES.md` 条目；本节。
 - **关联 ADR**：无（S2 口径已在既有 `BASELINE.md` 内，无新增规范层变更）
+
+---
+
+### 批次 0110 — 2026-11-17 — D6 裁定三：模型档位改走外部 API，本地权重线独立待定
+
+- **涉及文件**：`validation/d6/BASELINE.md`、`validation/d6/acceptance.json`、`GAP_LEDGER.md`、`TODO.md`、`CHANGELOG.md`
+- **变更摘要**：
+  - 三档（弱档 / 对照档 / 无技能臂）改为**外部 API** 口径。`BASELINE.md` §1 重写为：档位定义、固定参数（`temperature=0`、`top_p=1`，`max_output_tokens` / `stop` / `seed` 待定且未定前不得运行）、版本锁定与调用日期记录字段（`provider`、`endpoint`、`model_id`、`model_version`、`api_version`、`call_started_at`、`request_params_digest`、`response_id`）。
+  - **未编造任何 provider、端点或模型名**：三档一律写“待填”，状态 `pending_provider_selection`；`acceptance.json#/baseline_models` 同步改为 `mode: external_api`，`arms` 下 provider/endpoint/model_id 均为“待填”，无占位假名。
+  - 本地权重口径（`Qwen2.5-Instruct` 7B/72B、`Q4_K_M` 4-bit、`32768` tokens）移出主档位，打包为独立待定任务 **T-179**，并在 `GAP_LEDGER.md` 登记 **G-026**（`representation-defect`/L3，锚定核查矩阵首行）。
+  - **依赖边界**：T-179 与 G-026 均写明“本地权重可用时作为独立任务推进，不阻断编译主流程与最终发布；主流程不等待该任务”。受影响下游：全部 32 题的模型臂（S0/S1，当前一次未跑）、`BASELINE.md` §1.4 与 `acceptance.json#/baseline_models/local_weights_line` 的历史字段、“本地可部署/离线可用”类结论（当前不存在，T-179 完成前不得产出）。
+  - `runtime_evidence.model_arms` 改为说明外部 API 待填状态与 T-179/G-026 指向，不再写“无权重”。
+  - 未改任何受钉扎 schema、未改检查器、未宣称 D6 达标。
+- **实测**：无模型调用（未选定 provider/模型）；机械臂证据仍为 32/32，见批次 0108。
+- **钩子绕过**：既有未复核欠账使两个 pins 检查器 rc=1；按 3.5.3 第 3 条新建 T-180 后携带 `Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-180` 提交。本批未新增归区、未改检查器。
+- **未做**：未执行模型臂；未接入任何外部 API；未把“待填”结构解释为已定义档位；未关闭 G-026（须非同源复核或人工签收）。
+- **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-180、T-179、T-150；`GAP_LEDGER.md` G-026；本节。
+- **关联 ADR**：无（档位口径变更属验收配置层，未改规范正文）

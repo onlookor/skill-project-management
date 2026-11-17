@@ -2,32 +2,66 @@
   "acceptance_version": "0.1.0",
   "status": "mechanical_runtime_verified_models_pending",
   "baseline_models": {
-    "weak": {
-      "family": "Qwen2.5-Instruct",
-      "size": "7B",
-      "quantization": "Q4_K_M",
-      "bits": 4,
-      "context_tokens": 32768,
-      "skill_mounted": true,
-      "execution_status": "defined_not_executed"
+    "mode": "external_api",
+    "definition_status": "pending_provider_selection",
+    "common_request_params": {
+      "temperature": 0,
+      "top_p": 1,
+      "max_output_tokens": "待填",
+      "stop": "待填",
+      "seed": "待填",
+      "stream": false,
+      "other_sampling_params": "provider_default_not_overridden"
     },
-    "control": {
-      "family": "Qwen2.5-Instruct",
-      "size": "72B",
-      "quantization": "Q4_K_M",
-      "bits": 4,
-      "context_tokens": 32768,
-      "skill_mounted": true,
-      "execution_status": "defined_not_executed"
+    "version_lock": {
+      "record_fields": [
+        "provider",
+        "endpoint",
+        "model_id",
+        "model_version",
+        "api_version",
+        "call_started_at",
+        "request_params_digest",
+        "response_id"
+      ],
+      "rule": "三档使用同一组请求参数（模型标识除外）；每次调用记录实际请求参数与摘要；model_version 变化即整轮重测，旧结果不得用于宣称新版本达标。"
     },
-    "no_skill_arm": {
-      "family": "Qwen2.5-Instruct",
-      "size": "7B",
-      "quantization": "Q4_K_M",
-      "bits": 4,
-      "context_tokens": 32768,
-      "skill_mounted": false,
-      "execution_status": "defined_not_executed"
+    "arms": {
+      "weak": {
+        "provider": "待填",
+        "endpoint": "待填",
+        "model_id": "待填",
+        "skill_mounted": true,
+        "execution_status": "pending_provider_selection"
+      },
+      "control": {
+        "provider": "待填",
+        "endpoint": "待填",
+        "model_id": "待填",
+        "skill_mounted": true,
+        "execution_status": "pending_provider_selection"
+      },
+      "no_skill_arm": {
+        "provider": "与 weak 同一 provider",
+        "endpoint": "与 weak 同一 endpoint",
+        "model_id": "与 weak 同一 model_id",
+        "skill_mounted": false,
+        "execution_status": "pending_provider_selection"
+      }
+    },
+    "local_weights_line": {
+      "moved_out_of_main_tiers": true,
+      "original_caliber": {
+        "family": "Qwen2.5-Instruct",
+        "sizes": ["7B", "72B"],
+        "quantization": "Q4_K_M",
+        "bits": 4,
+        "context_tokens": 32768
+      },
+      "task": "T-179",
+      "gap": "G-026",
+      "blocking": false,
+      "boundary": "本地权重可用时作为独立任务推进，不阻断编译主流程与最终发布；主流程不等待该任务。"
     }
   },
   "thresholds": {
@@ -91,6 +125,6 @@
     "mismatch_history": [
       "D6-SYN-02：2026-11-17 裁定前，实际聚合退出码 3、规范期望 1，记为不符。裁定“违规与 cannot_evaluate 同时成立时取 3”（优先级 4>2>3>1>0）后，期望改为 3 并重跑，实际 3 与期望一致。受钉扎的 `spec/D6_REBASELINE_PROPOSAL.md` §4.5 只定义五值语义、未定义 1 与 3 的优先级，未改动该提案正文。"
     ],
-    "model_arms": "not_executed（无权重；需外部 API 或本地权重）"
+    "model_arms": "not_executed（外部 API 档位的 provider 与模型标识待填、状态 pending_provider_selection；本地权重线为独立待定任务 T-179 / G-026，不阻断主流程）"
   }
 }
