@@ -34,7 +34,7 @@
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：scripts/check_no_raw_material.py；结论：认可"
     },
     "scripts/check_spec_pins.py": {
-      "sha256": "bf0048266ffa8eb169275844d49a61cac362787bb23a88aa310218545ca5706e",
+      "sha256": "9548b0919ea8fefb71daf61e828aae01f276602c00981f9d3ad1424a8d462093",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/check_state.py": {
@@ -78,7 +78,7 @@
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：scripts/test_dependency_pins.py；结论：认可"
     },
     "scripts/no-review-declarations.json": {
-      "sha256": "d48814d905e2f009a1bb2d27af6ff1da211b1e6acca5a3107de88c643a8da75c",
+      "sha256": "2cb21fc327c56a2a80f3d24335d60a49062eefed0a199f9e6b0d4938eab6e714",
       "basis": "无复核声明（不构成认可，不放行）"
     },
     "validation/pinned/checker.py": {
@@ -90,8 +90,8 @@
       "basis": "非同源复核：第三批（基线 fb6f1d9）只读复核，针对当前内容独立取证；复核产物：/home/wgz/projects/skills/2026-11-15/pm-governance-review/batch3/REVIEW-RECORD.md；sha256：67343eda2c5b6642aa042f17a5353c4cf124421b9f2299d0c250edcf66579add；复核基线：fb6f1d938551053de3a3f86e8a4ee28a53a88afb；区段：scripts/config_codes.py；结论：认可"
     },
     "scripts/pm_caps.py": {
-      "sha256": "b6ecb056cba9f314a02677e9248516df3b413a8cd29d2e33f2a72fd7faacd9ce",
-      "basis": "非同源复核：d6c/d6d 独立复核会话（非执行方）；复核产物：/home/wgz/projects/skills/2026-11-16/pm-governance-review/d6d/probes/basis_c6_defaults.txt；sha256：3146a5511e1fcb05ad6529536270f35acb77419c09afc53d2e6945ba813c0900；复核基线：8dfbb86；区段：scripts/pm_caps.py；结论：认可"
+      "sha256": "e2d05a8f58eb0cdf6c22d05f3e894913a218e1fd1692b7ab598cf073bca4f6fd",
+      "basis": "无复核声明（不构成认可，不放行）"
     },
     "scripts/pm_check.py": {
       "sha256": "0963773cf2e567420c4e6919427c88c244615c78c8345987de2d9eba0aee78fc",

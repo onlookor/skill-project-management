@@ -184,6 +184,12 @@ SECTIONS = (
         "start": None,
         "end": None,
     },
+    {
+        "key": "runtime/artifacts/deviation-report.schema.json",
+        "path": "runtime/artifacts/deviation-report.schema.json",
+        "start": None,
+        "end": None,
+    },
 )
 
 

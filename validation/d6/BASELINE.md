@@ -100,9 +100,9 @@
 
 | 变体 | 变更项 | 实际影响面 | 运行结果 | 记录 |
 |---|---|---|---|---|
-| V-CFG03 | CFG-03 偏差分档边界整体位移（档数与标签不变） | 偏差分档题（`deviation.*`） | 全题集无 `deviation.*` 消费者，0 题可跑 | `validation/d6/results/s2-v-cfg03/run.json` |
+| V-CFG03 | CFG-03 偏差分档边界整体位移（档数与标签不变） | 偏差分档题（`deviation.*`） | 1 题 pass→violation（D6-PUB-23，已声明）；批次 0112 前为 0 题 | `validation/d6/results/s2-v-cfg03/run.json` |
 | V-CFG05 | CFG-05 采样分数 `[0.5, 1.0]` → `[1.0]` | 状态采样题（`status.sample_grid`） | 3 题 pass→violation | `validation/d6/results/s2-v-cfg05/run.json` |
-| V-CFG14 | CFG-14 风险刻度 3×3 → 5×5（分档连续覆盖 1..25） | 风险题（`risk.*`） | 5 题结论全部不变 | `validation/d6/results/s2-v-cfg14/run.json` |
+| V-CFG14 | CFG-14 风险刻度 3×3 → 5×5（分档连续覆盖 1..25） | 风险题（`risk.*`） | 6 题：5 题结论不变，1 题 violation→pass（D6-PUB-24，已声明） | `validation/d6/results/s2-v-cfg14/run.json` |
 | V-CFG15 | CFG-15 科目表移除 2100（采购） | 成本题（`budget.accounts_registered`） | 1 题 pass→violation，1 题失败项扩大 | `validation/d6/results/s2-v-cfg15/run.json` |
 | V-CFG09-GBP | CFG-09 币种 CNY → GBP | 成本题（`budget.currency_match`） | 主运行的基础变体（6 题） | `validation/d6/results/phase2-public-crossrail/run.json` 等 |
 | V-CFG09-GBP-CFG05 | 在 V-CFG09-GBP 上再改采样分数 | GBP 基准的状态题 | 2 题 pass→violation | `validation/d6/results/s2-v-cfg09-gbp-cfg05/run.json` |
@@ -115,6 +115,10 @@
 **稳定性判据**：若某题在主配置下为 `pass`、在变体配置下翻转，而该题未在 `expected.sensitivity_flip` 中声明，记为**不稳定**，必须查因；不得靠调整期望值掩盖。
 
 **敏感性对照现状（2026-11-17，批次 0109–0111）**：已实测变体 7 个（V-CFG03、V-CFG05、V-CFG14、V-CFG15、V-CFG09-GBP 及其与 CFG05/CFG15 的两条组合）；共 22 个题次，其中 pass→violation 10 个（45.5%）、失败项扩大但退出码不变 2 个、结论不变 10 个、pass→`cannot_evaluate` 0 个；V-CFG03 因零消费者为 0 题。**尚无任何变体的配置**：CFG-01、CFG-02、CFG-04、CFG-06、CFG-08、CFG-10、CFG-11、CFG-12、CFG-13（9 项）。因此敏感性对照目前只有 5 条独立腿（CFG-03/05/09/14/15），其中 CFG-03 因覆盖缺口无可跑题、CFG-14 未产生差异（见 G-027/G-028），**实际观测到差异的只有 CFG-05、CFG-09、CFG-15**。不得据此宣称配置稳健，也不得把“无差异”当作“无风险”。
+
+**批次 0112 补题后的更新（2026-11-17）**：V-CFG03 因新增 `deviation-report` 契约与 D6-PUB-23，自 0 题变为 1 题，pass→violation 1 个（已在任务卡 `expected.sensitivity_flip` 中声明）；V-CFG14 因新增 D6-PUB-24，自 5 题变为 6 题，violation→pass 1 个（已声明）。合计 24 个题次：pass→violation 11 个、violation→pass 1 个、失败项扩大 2 个、结论不变 10 个、pass→`cannot_evaluate` 0 个。CFG-03 与 CFG-14 自此各有 1 题可观测，但 CFG-14 的分档标签**仍不参与判定**（见 `runtime/artifacts/CONTRACTS.md`）。
+
+**引用边界（写在稳定性段末尾）**：批次 0111 末的稳定性现状——22 题次、45.5% 翻转、只有 CFG-05/CFG-09/CFG-15 三条腿测出差异、9 项配置无变体——**不得被引用为“配置稳健”的证据**。批次 0112 后题次与翻转数虽已变化，该结论不变：无差异只说明题集未覆盖该配置，不说明该配置无风险；不得以本段任何数字反向推断配置稳健。
 
 ## 5. 报告必须包含
 

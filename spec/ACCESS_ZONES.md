@@ -23,6 +23,7 @@
 | `ontology/README.md` | P | P1 | 本体说明 |
 | `ontology/fixtures/manifest.json` | D | — | 本体夹具清单（数据） |
 | `ontology/` | O | — | 本体序列化文件 |
+| `runtime/artifacts/CONTRACTS.md` | P | P2 | 工件契约说明（含 doc-only 边界，非权威） |
 | `runtime/demo/out/` | P | P2 | D6 演示渲染产物（生成，非权威） |
 | `runtime/templates/` | P | P2 | D6 工序渲染模板（非权威） |
 | `runtime/` | C | — | D6 运行期工件契约、配置、工序卡与演示输入（JSON） |

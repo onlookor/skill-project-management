@@ -1920,3 +1920,23 @@
 - **未做**：未补题、未改受钉 schema、未改检查器、未宣称 CFG-03/CFG-14 已获敏感性覆盖；模型臂仍 `pending_provider_selection`。
 - **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-181、T-150；`GAP_LEDGER.md` G-027/G-028；本节。
 - **关联 ADR**：无（台账条目与基准文档现状说明，不产生规范层变更）
+
+---
+
+### 批次 0112 — 2026-11-17 — G-027 取 B：新建 deviation 契约；G-028 补刻度尺寸题并声明 band doc-only
+
+- **涉及文件**：
+  - 新建：`runtime/artifacts/deviation-report.schema.json`、`runtime/artifacts/CONTRACTS.md`、`validation/cases/NAO-UNIVERSAL-CREDIT/inputs/deviation-report.json`、`validation/cases/NAO-HS2/inputs/risk-register-scale45.json`、`validation/d6/variants/V-CFG03/inputs/D6-PUB-23-deviation-report.json`、`validation/d6/variants/V-CFG14/inputs/D6-PUB-24-risk-register.json`、`validation/d6/results/phase6-contract-gaps/{run.json,SUMMARY.md}`
+  - 修改：`scripts/pm_caps.py`（新增 `deviation.band_consistent`）、`scripts/check_spec_pins.py`（`SECTIONS` 增区段）、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`scripts/no-review-declarations.json`、`runtime/task-catalog.json`、`spec/ACCESS_ZONES.md`、`validation/d6/tasks/task-set.json`（D6-PUB-23/24，计数 34）、`validation/d6/variants/PLAN.json`、`validation/d6/results/s2-v-cfg03/run.json`、`validation/d6/results/s2-v-cfg14/run.json`、`validation/d6/BASELINE.md`、`validation/d6/acceptance.json`、`validation/cases/MANIFEST.md`、`GAP_LEDGER.md`、`TODO.md`、`CHANGELOG.md`
+- **变更摘要**：
+  - **G-027 按裁定取 B**：新增 `deviation-report` 契约，**未**往 `cost-budget.schema.json` 的 `x-checks` 里塞。新 schema 在 `scripts/check_spec_pins.py` 的 `SECTIONS` 登记为规格区段并重冻指纹，不静默加文件。`x-checks` 绑定三项既有检查（`deviation.thresholds_configured` / `dimensions` / `custom_metric`），并新增 `deviation.band_consistent`：由 `pv`/`ev`/`ac` 复算偏差值，按 CFG-03.boundaries 映射档位，且标签必须落在 CFG-02.labels 内——CFG-01/02/03 的实际消费点在运行期可达。配套输入 `NAO-UNIVERSAL-CREDIT/inputs/deviation-report.json`（SPI 0.88、声明 amber）与任务卡 D6-PUB-23；主配置实测退出码 0、四项全部通过。
+  - **G-028 按裁定取“补题 + 标签 doc-only”**：新增任务卡 D6-PUB-24 与 `NAO-HS2/inputs/risk-register-scale45.json`（概率 4、影响 1，初始评分 4），覆盖刻度尺寸这一唯一可观测通道；主配置实测退出码 1，仅 `risk.scale_in_range` 违规。`band` 标签“仅展示、不参与判定”写入 `runtime/artifacts/CONTRACTS.md`，并写明后果：生产者可任意填写或省略标签而仍通过、展示层可贴任意标签而不被检查发现、CFG-14.bands 的标签变更不可验证；**未改动 `risk-register.schema.json`**。
+  - **既有 32 题一件未动，未为任何新契约修改既有期望**；任务集计数更新为 34 题（公开案例 24 + 合成 10），期望分布随新增两题更新。
+  - S2 变体重跑：V-CFG03 自 0 题变为 1 题（D6-PUB-23 pass→violation），V-CFG14 自 5 题变为 6 题（D6-PUB-24 violation→pass），两处翻转均在任务卡 `expected.sensitivity_flip` 中预先声明，不计入 10 个未声明翻转。
+  - `BASELINE.md` 稳定性段**末尾**写入引用边界：批次 0111 末的现状（22 题次、45.5% 翻转、只有 CFG-05/09/15 三条腿测出差异、9 项配置无变体）不得被引用为“配置稳健”的证据；并说明批次 0112 后数字虽变、结论不变。
+  - G-027/G-028 追加实现说明，仍 `open`、处置出口列为空（须非同源复核或人工签收）。
+- **实测**：`phase6-contract-gaps` 两题均符合期望（累计 34/34）；V-CFG03 变体退出码 1（`deviation.band_consistent` 违规）、V-CFG14 变体退出码 0；`check_gap_ledger.py`、`check_anchors.py`、`check_state.py` 等通过；两个 pins 检查器仍为既有欠账 rc=1。
+- **钩子绕过**：本批改受钉扎对象（新增规格区段、改钉扎清单、改检查器）且无复核产物，两个 pins 检查器 rc≠0；按 3.5.3 第 3 条新建 T-182 后携带 `Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-182` 提交。
+- **未做**：未宣称 D6 达标；未改 `risk-register.schema.json`；未宣称 CFG-14 标签已覆盖；模型三档仍未执行。
+- **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-182、T-150；`scripts/no-review-declarations.json` 的 `spec/ACCESS_ZONES.md`、`runtime/artifacts/deviation-report.schema.json`、`scripts/pm_caps.py`、`scripts/check_spec_pins.py`、`scripts/no-review-declarations.json` 五条；`GAP_LEDGER.md` G-027/G-028；本节。
+- **关联 ADR**：无（新增运行期契约按 T-151 的既有契约层口径落地；未改规范正文）

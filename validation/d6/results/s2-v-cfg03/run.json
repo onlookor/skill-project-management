@@ -2,16 +2,16 @@
   "summary": {
     "run_id": "s2-v-cfg03",
     "kind": "S2-sensitivity-variant",
-    "generated_at": "2026-11-17T20:41:11+08:00",
+    "generated_at": "2026-11-17T21:00:30+08:00",
     "config_variant": "V-CFG03",
     "config_digest": "sha256:b7b6b79988e107cdad9247495b6399cd5e410b0878001cac397aed14e0e27c19",
     "base_config": "primary",
-    "tasks": 0,
+    "tasks": 1,
     "counted_in_main_run": false,
     "models": "not_executed",
     "deltas": {
       "unchanged": 0,
-      "pass_to_violation": 0,
+      "pass_to_violation": 1,
       "pass_to_cannot_evaluate": 0,
       "violation_to_pass": 0,
       "cannot_evaluate_to_pass": 0,
@@ -19,8 +19,57 @@
     },
     "observations": [
       "本变体只改 CFG-03 的 SPI 分档边界（档数与标签不变）。全题集检查项中没有任何 `deviation.*` 消费者（对 task-set.json 的 checks 枚举为 0 条），因此无题可跑、差异为空。",
-      "这是覆盖缺口，不是敏感性为 0：说明现有 32 题没有一题检验偏差分档口径，改 CFG-03 不会暴露任何结果变化。已写入运行记录，未据此宣称配置安全。"
+      "这是覆盖缺口，不是敏感性为 0：说明现有 32 题没有一题检验偏差分档口径，改 CFG-03 不会暴露任何结果变化。已写入运行记录，未据此宣称配置安全。",
+      "批次 0112 补入 D6-PUB-23（deviation-report 契约）。CFG-03 边界位移后 SPI 0.88 由 amber 落入 red，deviation.band_consistent 判违规：主配置 pass → 变体 violation，已在任务卡 expected.sensitivity_flip 中预先声明。该变体自本批起有 1 题可跑，不再为零消费者。"
     ]
   },
-  "results": []
+  "results": [
+    {
+      "task_id": "D6-PUB-23",
+      "title": "Universal Credit 偏差分档：SPI 0.88 按 CFG-03 映射为 amber",
+      "main": {
+        "run": "validation/d6/results/phase6-contract-gaps/run.json",
+        "variant": null,
+        "outcome": "pass",
+        "exit_code": 0,
+        "failed_checks": []
+      },
+      "variant": {
+        "exit_code": 1,
+        "failed_checks": [
+          "deviation.band_consistent"
+        ],
+        "findings": [
+          {
+            "check": "deviation.thresholds_configured",
+            "detail": "分档维度 ['cost_account', 'wbs_node'] 的配置齐备",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "deviation.dimensions",
+            "detail": "工件含配置要求的分档维度字段",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "deviation.custom_metric",
+            "detail": "偏差点使用 SPI/CPI，可机械计算",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "deviation.band_consistent",
+            "detail": "偏差档位与 CFG-03/CFG-02 不一致：['2020-03:amber≠red']",
+            "path": "",
+            "status": "violation"
+          }
+        ],
+        "artifact_digest": "sha256:a4ee2891c0451b2f72bdc926f9adb3ddb004f161c17841edb2a0903084f5ac07"
+      },
+      "delta": "pass_to_violation",
+      "declared": true,
+      "explanation": "CFG-03 边界整体位移使 SPI 0.88 从 amber 落到 red；工件声明 amber 与复算档位不一致，触发 deviation.band_consistent。"
+    }
+  ]
 }

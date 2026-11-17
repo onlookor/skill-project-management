@@ -1,0 +1,168 @@
+{
+  "summary": {
+    "run_id": "phase6-contract-gaps",
+    "generated_at": "2026-11-17T21:00:09+08:00",
+    "task_set_version": "0.1.0-skeleton",
+    "models": "not_executed",
+    "total": 2,
+    "pass": 2,
+    "mismatch": 0,
+    "exit_codes": {
+      "0": 1,
+      "1": 1
+    },
+    "observations": [
+      "D6-PUB-23 是 G-027 方案 B 的 deviation-report 契约首跑：CFG-01 维度（cost_account/wbs_node）与 CFG-03.metric 进入 thresholds_configured/dimensions，CFG-03.boundaries 与 CFG-02.labels 由新增 deviation.band_consistent 消费；主配置 SPI 0.88 映射为 amber，四项全部通过。",
+      "D6-PUB-24 是 G-028 的刻度尺寸观测题：概率 4、影响 1，初始评分 4；3×3 下仅 risk.scale_in_range 违规（退出 1），5×5 下全部通过。band 标签仅展示、不参与判定，本批未改动 risk-register.schema.json。",
+      "既有 32 题未改动；本批两题均为公开案例改造，合成题仍为 10 道。",
+      "模型弱档/对照档/无技能臂仍未执行（provider 与模型标识待填）。"
+    ]
+  },
+  "results": [
+    {
+      "task_id": "D6-PUB-23",
+      "case_id": "NAO-UNIVERSAL-CREDIT",
+      "title": "Universal Credit 偏差分档：SPI 0.88 按 CFG-03 映射为 amber",
+      "artifact": "validation/cases/NAO-UNIVERSAL-CREDIT/inputs/deviation-report.json",
+      "checks": [
+        "deviation.thresholds_configured",
+        "deviation.dimensions",
+        "deviation.custom_metric",
+        "deviation.band_consistent"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "deviation.thresholds_configured",
+          "deviation.dimensions",
+          "deviation.custom_metric",
+          "deviation.band_consistent"
+        ],
+        "sensitivity_flip": [
+          {
+            "variant": "V-CFG03",
+            "from": "pass",
+            "to": "violation",
+            "reason": "CFG-03 边界整体位移后 SPI 0.88 由 amber 落入 red，工件声明的 amber 与复算档位不再一致"
+          }
+        ]
+      },
+      "config": "validation/d6/acceptance-config.json",
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 0,
+        "findings": [
+          {
+            "check": "deviation.thresholds_configured",
+            "detail": "分档维度 ['cost_account', 'wbs_node'] 的配置齐备",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "deviation.dimensions",
+            "detail": "工件含配置要求的分档维度字段",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "deviation.custom_metric",
+            "detail": "偏差点使用 SPI/CPI，可机械计算",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "deviation.band_consistent",
+            "detail": "偏差点档位均与 CFG-03 边界、CFG-02 标签一致",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:3b054c89c28d40edb1277371dc3f6cf71486f4f9072607c8b3954a8449a7ec1a"
+      }
+    },
+    {
+      "task_id": "D6-PUB-24",
+      "case_id": "NAO-HS2",
+      "title": "HS2 范围风险：概率 4、影响 1 的刻度尺寸观测题",
+      "artifact": "validation/cases/NAO-HS2/inputs/risk-register-scale45.json",
+      "checks": [
+        "risk.required_fields",
+        "risk.scale_in_range",
+        "risk.residual_le_initial",
+        "risk.owner_registered",
+        "risk.band_consistent"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "risk.scale_in_range"
+        ],
+        "must_pass": [
+          "risk.required_fields",
+          "risk.residual_le_initial",
+          "risk.owner_registered",
+          "risk.band_consistent"
+        ],
+        "sensitivity_flip": [
+          {
+            "variant": "V-CFG14",
+            "from": "violation",
+            "to": "pass",
+            "reason": "主配置 3×3 下概率 4 越界；5×5 刻度内合法，初始评分 4 落入 green 分档，故结论翻转为 pass"
+          }
+        ]
+      },
+      "config": "validation/d6/acceptance-config.json",
+      "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
+      "outcome": "pass",
+      "mismatch_reason": null,
+      "actual": {
+        "exit_code": 1,
+        "findings": [
+          {
+            "check": "risk.required_fields",
+            "detail": "1 条风险字段齐备",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.scale_in_range",
+            "detail": "概率/影响超出 3×3 刻度：['R-HS2-04']",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "risk.residual_le_initial",
+            "detail": "残余评分均不高于初始评分",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.owner_registered",
+            "detail": "风险责任人角色均已登记",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "risk.band_consistent",
+            "detail": "初始评分均落在 CFG-14 分档内",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "failed_checks": [
+          "risk.scale_in_range"
+        ],
+        "cannot_evaluate_checks": [],
+        "artifact_digest": "sha256:a476d589d61164265b3c3203e6d7160a50de9b287712511cf3a4c3eb76eca556"
+      }
+    }
+  ]
+}

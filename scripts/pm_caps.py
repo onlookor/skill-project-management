@@ -775,6 +775,85 @@ def _check_deviation_unsupported(data: dict, ctx: dict) -> list[dict]:
     return [_ok("deviation.custom_metric", "偏差点使用 SPI/CPI，可机械计算")]
 
 
+def _check_deviation_bands(data: dict, ctx: dict) -> list[dict]:
+    """核对工件声明的偏差档位与 CFG-03 边界、CFG-02 标签集一致。
+
+    这是 CFG-03.boundaries 与 CFG-02.labels 在工件面的实际消费点：值由
+    工件给出的 PV/EV/AC 复算，标签必须等于 `band_for()` 的结果，且必须
+    落在 CFG-02 声明的标签集内；自定义算法不在此处猜测。
+    """
+    settings = ctx["config"].get("CFG-03")
+    if not isinstance(settings, dict) or "metric" not in settings:
+        return [
+            _unknown("deviation.band_consistent", "CFG-03.metric 缺失，偏差分档无法判定")
+        ]
+    metric = settings["metric"]
+    if metric not in ("SPI", "CPI"):
+        return [
+            _unknown(
+                "deviation.band_consistent",
+                f"CFG-03.metric={metric} 无机械分档算法",
+            )
+        ]
+    palette = ctx["config"].get("CFG-02")
+    labels = palette.get("labels") if isinstance(palette, dict) else None
+    if not labels:
+        return [
+            _unknown(
+                "deviation.band_consistent",
+                "CFG-02.labels 缺失，档位标签集无法判定",
+            )
+        ]
+    declared_metric = data.get("metric")
+    if declared_metric != metric:
+        return [
+            _bad(
+                "deviation.band_consistent",
+                f"工件声明 metric={declared_metric}，与 CFG-03.metric={metric} 不一致",
+            )
+        ]
+    points = data.get("points") or []
+    if not points:
+        return [_bad("deviation.band_consistent", "工件没有偏差点，分档无法核对")]
+    mismatches = []
+    for point in points:
+        pv, ev, ac = float(point["pv"]), float(point["ev"]), float(point["ac"])
+        if metric == "SPI":
+            if pv == 0:
+                return [
+                    _unknown(
+                        "deviation.band_consistent",
+                        f"{point.get('period')} 的 PV 为 0，SPI 无法计算",
+                    )
+                ]
+            value = _round(ev / pv, ctx["config"])
+        else:
+            if ac == 0:
+                return [
+                    _unknown(
+                        "deviation.band_consistent",
+                        f"{point.get('period')} 的 AC 为 0，CPI 无法计算",
+                    )
+                ]
+            value = _round(ev / ac, ctx["config"])
+        band = band_for(value, ctx["config"])
+        if band["status"] != PASS:
+            return [_unknown("deviation.band_consistent", band["detail"])]
+        declared = point.get("band")
+        if declared not in labels:
+            mismatches.append(f"{point.get('period')}:{declared} 不在 CFG-02.labels")
+        elif declared != band["label"]:
+            mismatches.append(f"{point.get('period')}:{declared}≠{band['label']}")
+    if mismatches:
+        return [
+            _bad(
+                "deviation.band_consistent",
+                f"偏差档位与 CFG-03/CFG-02 不一致：{mismatches}",
+            )
+        ]
+    return [_ok("deviation.band_consistent", "偏差点档位均与 CFG-03 边界、CFG-02 标签一致")]
+
+
 # ---------------------------------------------------------------- 挣值
 
 
@@ -1029,6 +1108,7 @@ CHECK_REGISTRY = {
     "deviation.thresholds_configured": _check_deviation_config,
     "deviation.dimensions": _check_deviation_dimensions,
     "deviation.custom_metric": _check_deviation_unsupported,
+    "deviation.band_consistent": _check_deviation_bands,
     "evm.formulas": _check_evm_formulas,
     "evm.ev_measurement": _check_evm_measurement,
     "evm.eac_method": _check_evm_eac,

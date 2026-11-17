@@ -9,11 +9,11 @@
     "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c"
   },
   "counts": {
-    "total": 32,
-    "public_case": 22,
+    "total": 34,
+    "public_case": 24,
     "synthetic": 10,
     "synthetic_ready": 10,
-    "public_inputs_ready": 22,
+    "public_inputs_ready": 24,
     "public_inputs_planned": 0
   },
   "sources": {
@@ -1174,6 +1174,89 @@
       "input": "validation/cases/synthetic/SYN-AUDIT-SEQ/inputs/audit-trail.json",
       "input_status": "ready",
       "run_ref": "validation/d6/results/phase1-synthetic/run.json#D6-SYN-10"
+    },
+    {
+      "id": "D6-PUB-23",
+      "title": "Universal Credit 偏差分档：SPI 0.88 按 CFG-03 映射为 amber",
+      "origin": "public_case",
+      "case_id": "NAO-UNIVERSAL-CREDIT",
+      "domain": "deviation",
+      "capability": "CAP-16 偏差阈值",
+      "mode": "artifact",
+      "artifact_type": "deviation-report",
+      "checks": [
+        "deviation.thresholds_configured",
+        "deviation.dimensions",
+        "deviation.custom_metric",
+        "deviation.band_consistent"
+      ],
+      "expected": {
+        "outcome": "pass",
+        "exit_code": 0,
+        "must_flag": [],
+        "must_pass": [
+          "deviation.thresholds_configured",
+          "deviation.dimensions",
+          "deviation.custom_metric",
+          "deviation.band_consistent"
+        ],
+        "sensitivity_flip": [
+          {
+            "variant": "V-CFG03",
+            "from": "pass",
+            "to": "violation",
+            "reason": "CFG-03 边界整体位移后 SPI 0.88 由 amber 落入 red，工件声明的 amber 与复算档位不再一致"
+          }
+        ]
+      },
+      "input": "validation/cases/NAO-UNIVERSAL-CREDIT/inputs/deviation-report.json",
+      "input_status": "ready",
+      "transformation": "按公开的 2020 年成本预测 2,850m 与 93% 完成度推导 PV=2,850m、EV=2,508m、AC=2,400m（SPI 0.88）；工作包按设计与系统拆分，非官方 WBS。",
+      "source_ref": "NAO-UNIVERSAL-CREDIT",
+      "run_batch": "phase6-contract-gaps"
+    },
+    {
+      "id": "D6-PUB-24",
+      "title": "HS2 范围风险：概率 4、影响 1 的刻度尺寸观测题",
+      "origin": "public_case",
+      "case_id": "NAO-HS2",
+      "domain": "risk",
+      "capability": "CAP-25/CAP-23 风险登记",
+      "mode": "artifact",
+      "artifact_type": "risk-register",
+      "checks": [
+        "risk.required_fields",
+        "risk.scale_in_range",
+        "risk.residual_le_initial",
+        "risk.owner_registered",
+        "risk.band_consistent"
+      ],
+      "expected": {
+        "outcome": "violation",
+        "exit_code": 1,
+        "must_flag": [
+          "risk.scale_in_range"
+        ],
+        "must_pass": [
+          "risk.required_fields",
+          "risk.residual_le_initial",
+          "risk.owner_registered",
+          "risk.band_consistent"
+        ],
+        "sensitivity_flip": [
+          {
+            "variant": "V-CFG14",
+            "from": "violation",
+            "to": "pass",
+            "reason": "主配置 3×3 下概率 4 越界；5×5 刻度内合法，初始评分 4 落入 green 分档，故结论翻转为 pass"
+          }
+        ]
+      },
+      "input": "validation/cases/NAO-HS2/inputs/risk-register-scale45.json",
+      "input_status": "ready",
+      "transformation": "把公开的范围变更风险改造为概率 4、影响 1 的单条风险，初始评分 4、残余 2；仅用于观测 CFG-14 刻度尺寸。",
+      "source_ref": "NAO-HS2",
+      "run_batch": "phase6-contract-gaps"
     }
   ],
   "gap_register": [

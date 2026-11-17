@@ -129,7 +129,8 @@
       ],
       "procedure": "status_review.json",
       "outputs": [
-        "evm-record"
+        "evm-record",
+        "deviation-report"
       ],
       "gates": [
         "GATE-STATUS"
@@ -138,6 +139,7 @@
         "deviation.thresholds_configured",
         "deviation.dimensions",
         "deviation.custom_metric",
+        "deviation.band_consistent",
         "evm.formulas",
         "evm.ev_measurement",
         "evm.eac_method",

@@ -101,11 +101,12 @@
         "validation/d6/results/s2-v-cfg09-gbp-cfg05/run.json",
         "validation/d6/results/s2-v-cfg09-gbp-cfg15/run.json"
       ],
-      "pass_to_violation": 10,
+      "pass_to_violation": 11,
+      "violation_to_pass": 1,
       "pass_to_cannot_evaluate": 0,
       "changed_other": 2,
       "undeclared_flips": 10,
-      "note": "变体工件仅同步 config_ref 为变体快照，其余内容与主运行一致；V-CFG03 因题集无 deviation.* 消费者而 0 题可跑。10 个翻转均未在任务卡 expected.sensitivity_flip 中预先声明，按 BASELINE.md 稳定性判据记为未声明翻转，逐题原因见对应 run.json 的 explanation；未回溯修改期望，未并入主运行。"
+      "note": "变体工件仅同步 config_ref 为变体快照，其余内容与主运行一致；批次 0112 后 V-CFG03 因偏差契约补题有 1 题可跑（D6-PUB-23，pass→violation，已声明），V-CFG14 增至 6 题（D6-PUB-24，violation→pass，已声明）。10 个未声明翻转（均为 pass→violation）仍未在任务卡 expected.sensitivity_flip 中预先声明，按 BASELINE.md 稳定性判据记为未声明翻转，逐题原因见对应 run.json 的 explanation；未回溯修改期望，未并入主运行。"
     },
     "flip_requires_declaration": true
   },
@@ -117,10 +118,11 @@
       "phase2-public-crossrail",
       "phase3-public-uc",
       "phase4-public-hs2",
-      "phase5-public-npfit"
+      "phase5-public-npfit",
+      "phase6-contract-gaps"
     ],
-    "tasks_executed": 32,
-    "tasks_matching_expectation": 32,
+    "tasks_executed": 34,
+    "tasks_matching_expectation": 34,
     "tasks_mismatching": 0,
     "mismatch_history": [
       "D6-SYN-02：2026-11-17 裁定前，实际聚合退出码 3、规范期望 1，记为不符。裁定“违规与 cannot_evaluate 同时成立时取 3”（优先级 4>2>3>1>0）后，期望改为 3 并重跑，实际 3 与期望一致。受钉扎的 `spec/D6_REBASELINE_PROPOSAL.md` §4.5 只定义五值语义、未定义 1 与 3 的优先级，未改动该提案正文。"

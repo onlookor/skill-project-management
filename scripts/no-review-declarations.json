@@ -17,11 +17,11 @@
       "todo": "T-149"
     },
     "scripts/check_spec_pins.py": {
-      "reason": "批次 0102 按第五轮外复核阻断项为无复核声明加内容锚：登记项新增 `anchor`，内容变动时 `--write` 追加 `history`（from/to/reason/at/commit）且无复核声明下强制 `--change-reason`，`evaluate()` 校验历史链。原第八批 basis 只对旧内容负责，改动后失效，按 3.5.3 改为无复核声明",
-      "missing_review": "对内容锚/变更历史机制的非同源复核：① `--write` 默认拒绝是否真的无法静默重冻；② 历史链校验（anchor→history[].to→登记指纹）能否识别删改历史；③ `AGENTS.md#3.5` 这类无复核声明对象是否因此可被区分“未改动”与“改动后重冻”",
+      "reason": "批次 0102 按第五轮外复核阻断项为无复核声明加内容锚：登记项新增 `anchor`，内容变动时 `--write` 追加 `history`（from/to/reason/at/commit）且无复核声明下强制 `--change-reason`，`evaluate()` 校验历史链。原第八批 basis 只对旧内容负责，改动后失效，按 3.5.3 改为无复核声明。批次 0112 在 `SECTIONS` 新增 `runtime/artifacts/deviation-report.schema.json` 区段，改动本身未经复核",
+      "missing_review": "对内容锚/变更历史机制的非同源复核：① `--write` 默认拒绝是否真的无法静默重冻；② 历史链校验（anchor→history[].to→登记指纹）能否识别删改历史；③ `AGENTS.md#3.5` 这类无复核声明对象是否因此可被区分“未改动”与“改动后重冻”；④ 批次 0112 新增 `runtime/artifacts/` 区段是否应纳入钉扎面、以及 `SECTIONS` 路径口径是否正确",
       "due": "M1 出口前",
       "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
-      "todo": "T-171"
+      "todo": "T-182"
     },
     "scripts/test_spec_pins.py": {
       "reason": "批次 0102 新增 SP37–SP40（内容未变可刷新、已变无理由拒绝、已变给理由追加历史、二次变更历史链），并给测试夹具补 `anchor`。原第八批 basis 只对旧测试内容负责，改动后失效，按 3.5.3 改为无复核声明",
@@ -31,11 +31,11 @@
       "todo": "T-171"
     },
     "scripts/no-review-declarations.json": {
-      "reason": "0079 起新纳入钉扎面，纳入时无复核产物；0090/0091/0092 多次增删登记项；0093 移出已获复核的 `scripts/test_spec_pins.py` 登记项，本批改动尚未经外复核；批次 0099 按第三轮外复核修复本对象（见 CHANGELOG 0099），改动仍未取得非同源复核；批次 0100 落库第四轮复核 basis 时，本对象因删条目而改变内容（基线 8dfbb86 处的内容与当前不一致），其七条之一按“回灌失败即不落”未落库，仍保留本声明；批次 0102 为 `check_spec_pins.py` 与 `test_spec_pins.py` 各增一条登记并改写 `AGENTS.md#3.5` 说明；批次 0103 改写 `spec/ACCESS_ZONES.md` 条目的 `reason`/`missing_review`（D6 验收件归区），该批欠账单独记为 T-172，0095–0098 的欠账仍由 T-167/T-169 跟踪",
-      "missing_review": "对新增受保护对象的非同源复核；含 0090/0091/0092/0093 的登记表增删；批次 0100 删除条目后的当前内容需重新取证（原 basis 只对 8dfbb86 处内容负责）",
+      "reason": "0079 起新纳入钉扎面，纳入时无复核产物；0090/0091/0092 多次增删登记项；0093 移出已获复核的 `scripts/test_spec_pins.py` 登记项，本批改动尚未经外复核；批次 0099 按第三轮外复核修复本对象（见 CHANGELOG 0099），改动仍未取得非同源复核；批次 0100 落库第四轮复核 basis 时，本对象因删条目而改变内容（基线 8dfbb86 处的内容与当前不一致），其七条之一按“回灌失败即不落”未落库，仍保留本声明；批次 0102 为 `check_spec_pins.py` 与 `test_spec_pins.py` 各增一条登记并改写 `AGENTS.md#3.5` 说明；批次 0103 改写 `spec/ACCESS_ZONES.md` 条目的 `reason`/`missing_review`（D6 验收件归区），该批欠账单独记为 T-172，0095–0098 的欠账仍由 T-167/T-169 跟踪；批次 0112 增 `runtime/artifacts/deviation-report.schema.json` 条目、改写 `spec/ACCESS_ZONES.md` 与 `scripts/check_spec_pins.py` 条目并新增 `scripts/pm_caps.py` 条目，欠账见 T-182",
+      "missing_review": "对新增受保护对象的非同源复核；含 0090/0091/0092/0093 的登记表增删；批次 0100 删除条目后的当前内容需重新取证（原 basis 只对 8dfbb86 处内容负责）；批次 0112 需复核新增条目与宣称的改动范围一致",
       "due": "M1 出口前",
       "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
-      "todo": "T-172"
+      "todo": "T-182"
     },
     "scripts/pm_schema.py": {
       "reason": "批次 0095 新增的 JSON Schema 子集校验内核，落地时无复核产物；`IMPLEMENTED` 白名单与 `x-checks`/`x-provenance` 契约约束均由本批自定。批次 0096 按外复核严重 10 改为入口全树预扫描（未实现关键字在任意分支都拒绝），该修复本身尚未经复核",
@@ -50,15 +50,29 @@
       "due": "M1 出口前",
       "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
       "todo": "T-167"
+    },
+    "scripts/pm_caps.py": {
+      "reason": "批次 0095 新增的机械能力实现与检查注册表，落地时无复核产物。批次 0112 按 G-027 方案 B 新增 `deviation.band_consistent`，让 CFG-03.boundaries 与 CFG-02.labels 在工件面可消费；该检查本身尚未经复核",
+      "missing_review": "对 `deviation.band_consistent` 的非同源复核：确认只从 PV/EV/AC 复算、`band_for` 边界口径与 CFG-03 一致、标签同时受 CFG-02.labels 约束，且 cannot_evaluate 分支不会把缺口变成通过",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-182"
     }
   },
   "spec": {
     "spec/ACCESS_ZONES.md": {
-      "reason": "批次 0095 为新增的 `runtime/` 顶层目录登记归区（C 区 22 个 JSON、P/P2 10 个 Markdown），区段指纹已重冻；新增归区内容无复核产物。批次 0098 又为 `spec/clause-registry.json` 增加 D 区登记与生成器登记（第 1/2 节），同属未复核改动。批次 0103 为 D6 验收件登记 `validation/cases/`（C 区 JSON）与 `validation/d6/` 的 P/C 混合归区，仍无复核产物；批次 0104 增 `validation/d6/configs/` 与批次 2 运行记录两行 C 区归区，欠账见 T-173；批次 0105 增批次 3 运行记录一行，欠账见 T-174；批次 0106 增批次 4 运行记录一行，欠账见 T-175；批次 0107 增批次 5 运行记录一行，欠账见 T-176；批次 0109 增 `validation/d6/variants/` 与 6 条 S2 运行记录归区，欠账见 T-178",
-      "missing_review": "对 `runtime/` 归区、P2 分级与 0098 新增 D 区/生成器登记是否符合 `ACCESS_ZONES` 第 2/3/4 节的非同源复核；批次 0103 另需复核 D6 验收件把案例输入归 C 区、说明文档归 P 区是否成立，以及 `validation/d6/results/` 的 P2 口径；批次 0104 需复核变体配置目录与运行记录归 C 区是否成立；批次 0105 需复核逐批登记运行记录是否成立；批次 0106 需复核 G-023/G-024/G-025 的台账写法（含锚定首行与待裁定表述）；批次 0107 需复核批次 5 运行记录归区与 `acceptance.json` 的 `runtime_evidence` 字段表述；批次 0109 需复核 S2 变体工件副本（仅同步 config_ref）归 C 区、以及变体结果单列不进主运行的口径",
+      "reason": "批次 0095 为新增的 `runtime/` 顶层目录登记归区（C 区 22 个 JSON、P/P2 10 个 Markdown），区段指纹已重冻；新增归区内容无复核产物。批次 0098 又为 `spec/clause-registry.json` 增加 D 区登记与生成器登记（第 1/2 节），同属未复核改动。批次 0103 为 D6 验收件登记 `validation/cases/`（C 区 JSON）与 `validation/d6/` 的 P/C 混合归区，仍无复核产物；批次 0104 增 `validation/d6/configs/` 与批次 2 运行记录两行 C 区归区，欠账见 T-173；批次 0105 增批次 3 运行记录一行，欠账见 T-174；批次 0106 增批次 4 运行记录一行，欠账见 T-175；批次 0107 增批次 5 运行记录一行，欠账见 T-176；批次 0109 增 `validation/d6/variants/` 与 6 条 S2 运行记录归区，欠账见 T-178；批次 0112 增 `runtime/artifacts/CONTRACTS.md` 的 P2 归区与批次 6 运行记录归区，欠账见 T-182",
+      "missing_review": "对 `runtime/` 归区、P2 分级与 0098 新增 D 区/生成器登记是否符合 `ACCESS_ZONES` 第 2/3/4 节的非同源复核；批次 0103 另需复核 D6 验收件把案例输入归 C 区、说明文档归 P 区是否成立，以及 `validation/d6/results/` 的 P2 口径；批次 0104 需复核变体配置目录与运行记录归 C 区是否成立；批次 0105 需复核逐批登记运行记录是否成立；批次 0106 需复核 G-023/G-024/G-025 的台账写法（含锚定首行与待裁定表述）；批次 0107 需复核批次 5 运行记录归区与 `acceptance.json` 的 `runtime_evidence` 字段表述；批次 0109 需复核 S2 变体工件副本（仅同步 config_ref）归 C 区、以及变体结果单列不进主运行的口径；批次 0112 需复核 `runtime/artifacts/CONTRACTS.md` 归 P2、以及 doc-only 声明是否越出契约说明的边界",
       "due": "M1 出口前",
       "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
-      "todo": "T-178"
+      "todo": "T-182"
+    },
+    "runtime/artifacts/deviation-report.schema.json": {
+      "reason": "批次 0112 按 G-027 方案 B 新增 deviation-report 契约，并登记为规格区段；同一批新增 `deviation.band_consistent` 检查以消费 CFG-03.boundaries 与 CFG-02.labels。新增契约与检查均无复核产物",
+      "missing_review": "对 deviation-report 的字段集、x-checks 绑定（三项既有 + band_consistent）与 x-provenance.requires 做非同源复核：确认分档值只从 PV/EV/AC 复算、标签必须同时满足 CFG-03 边界与 CFG-02 标签集，且不存在绕过理由",
+      "due": "M1 出口前",
+      "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
+      "todo": "T-182"
     },
     "spec/D6_REBASELINE_PROPOSAL.md": {
       "reason": "批次 0099 按第三轮外复核第一条把提案整体纳入钉扎；此前未钉扎，改动只靠禁改约定。纳入时提案内容未改，但没有针对“整篇指纹”的复核产物",
