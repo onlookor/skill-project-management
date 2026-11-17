@@ -1903,3 +1903,20 @@
 - **未做**：未执行模型臂；未接入任何外部 API；未把“待填”结构解释为已定义档位；未关闭 G-026（须非同源复核或人工签收）。
 - **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-180、T-179、T-150；`GAP_LEDGER.md` G-026；本节。
 - **关联 ADR**：无（档位口径变更属验收配置层，未改规范正文）
+
+---
+
+### 批次 0111 — 2026-11-17 — S2 覆盖缺口正式入台账，补敏感性对照现状
+
+- **涉及文件**：`GAP_LEDGER.md`、`validation/d6/BASELINE.md`、`TODO.md`、`CHANGELOG.md`
+- **变更摘要**：
+  - 新增 **G-027**（L2，`representation-defect`）：V-CFG03 零消费者。**性质判定**：三项 `deviation.*` 检查与 `compute_deviation` **均已实现**，不是检查缺口；根因有两层——没有任何工件 schema 在 `x-checks` 中声明 `deviation.*`（`pm_check` 只执行 schema 声明的检查），且 32 题无一题覆盖偏差分档。补一题的最小代价两选一：A. 在 `cost-budget.schema.json` 的 x-checks 增加三项（复用现有输入，但会改变既有成本题检查集合，须整批重跑）；B. 新建 deviation 契约（成本更高）。两者均需裁定，未自行改受钉 schema。
+  - 新增 **G-028**（L3，`representation-defect`）：V-CFG14 全部不变。**分层判定**：① 分档标签不可观测，属“**契约未要求比对标签**”——`risk-register.schema.json` 无 `band` 字段，`_check_risk_band` 只验证评分落入某个连续分档区间，不是检查实现漏写；② 刻度尺寸并非完全不可观测——`risk.scale_in_range` 可按 CFG-14 上限判定，题中出现取值 4–5 即可观测；现有 5 题取值 1–3，故本轮无差异。修法不同：契约变更（加 `band` 字段并比对）或补一道取值 4–5 的题（最小，约 1 题）或 `doc-only` 声明标签仅展示。
+  - `BASELINE.md` 稳定性判据旁补**敏感性对照现状**：已实测 7 个变体、22 个题次、pass→violation 10 个（45.5%）、失败项扩大 2 个、不变 10 个、pass→`cannot_evaluate` 0 个；CFG-01/02/04/06/08/10/11/12/13 尚无变体；实际观测到差异的只有 CFG-05/09/15，不得据此宣称配置稳健。
+  - G-027/G-028 锚定核查矩阵首行，台账现为 28 条（open 7 / closed 21）。
+  - 10 个未声明翻转继续按“不稳定”记录，**未回溯修改任何任务卡期望**；未改 `acceptance.json`、未改模型档位结构（继续等待 provider 与模型名）。
+- **实测**：`check_gap_ledger.py` 通过（28 条，open 7，overdue 0）；`check_anchors`、`check_state` 等 8 项非钉扎检查器 rc=0；两个 pins 检查器仍为既有欠账 rc=1。
+- **钩子绕过**：本批未改钉扎面对象；既有未复核欠账使 pins 检查器 rc=1，按 3.5.3 第 3 条新建 T-181 后携带 `Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-181` 提交。
+- **未做**：未补题、未改受钉 schema、未改检查器、未宣称 CFG-03/CFG-14 已获敏感性覆盖；模型臂仍 `pending_provider_selection`。
+- **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-181、T-150；`GAP_LEDGER.md` G-027/G-028；本节。
+- **关联 ADR**：无（台账条目与基准文档现状说明，不产生规范层变更）

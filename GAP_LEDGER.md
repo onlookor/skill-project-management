@@ -59,7 +59,7 @@
 
 | check_id | 规则 | 结论 | 复核里程碑 |
 |---|---|---|---|
-| `PROJECT_MINIMAL_EXISTENCE` | G-A1 | `G-002`、`G-007`、`G-008`、`G-009`、`G-014`、`G-016`、`G-017`、`G-019`、`G-020`、`G-021`、`G-023`、`G-024`、`G-025`、`G-026` | M1 |
+| `PROJECT_MINIMAL_EXISTENCE` | G-A1 | `G-002`、`G-007`、`G-008`、`G-009`、`G-014`、`G-016`、`G-017`、`G-019`、`G-020`、`G-021`、`G-023`、`G-024`、`G-025`、`G-026`、`G-027`、`G-028` | M1 |
 | `CONSTRAINT_ANCHOR_REQUIRED` | G-A2 | `G-001`、`G-007`、`G-009`、`G-010` | M1 |
 | `DUAL_DIMENSION_ANNOTATION` | G-B1 | `G-013`、`G-015` | M1 |
 | `DIMENSION_VALUE_CLOSED` | G-B2 | `G-013`、`G-015` | M1 |
@@ -79,7 +79,8 @@
 
 > 矩阵说明：缺口编号替代 `consistent` 表示该 `check_id` 截至 2026-11-14 的复核仍受该缺口影响，不得判为一致。G-008 是表示层合并条目，G-010/G-011/G-012 等为其拆分后的可执行项；G-014、G-016、G-017 为全局项，锚定在首行。
 > G-019 是仓库级“形态判据退役与准入制落地”，不归属单一 `check_id`，锚定首行；2026-11-15 按 r7 复判以 `check-change` 关闭。G-020 是仓库级“子模块、外部生成物与未登记路径的扫描范围”，锚定首行；文件枚举一半已不再保留，形态分类一半并入 G-019，边界见 G-020 说明。G-021 是仓库级内容层残余风险（`representation-defect`/L3，2026-11-15 按 r5 复判以 `accepted` 关闭），锚定首行；G-022 是依赖指纹的信任边界（`representation-defect`/L3，同批以 `accepted` 关闭并指向 ADR-0015 的外部承接），不并入 G-019。
-> G-023/G-024/G-025 是 D6 验收侧在公开案例批次 0104–0105 暴露的运行时契约缺口（状态与挣值工件无币种字段、`due_day` 上限装不下长周期、风险类别闭集），不归属 A 表任一 `check_id`，按 G-014/G-016/G-017 的既有做法锚定首行；三者均 `open`，未改动受钉扎 schema 与检查器。G-026 是 D6 验收侧的模型档位口径缺口（本地权重口径已移出主档位、改走外部 API，本地线独立待定），同属仓库级、锚定首行。
+
+> G-023/G-024/G-025 是 D6 验收侧在公开案例批次 0104–0105 暴露的运行时契约缺口（状态与挣值工件无币种字段、`due_day` 上限装不下长周期、风险类别闭集），不归属 A 表任一 `check_id`，按 G-014/G-016/G-017 的既有做法锚定首行；三者均 `open`，未改动受钉扎 schema 与检查器。G-026 是 D6 验收侧的模型档位口径缺口（本地权重口径已移出主档位、改走外部 API，本地线独立待定），同属仓库级、锚定首行。G-027/G-028 是 D6 验收侧在 S2 变体运行（批次 0109）暴露的**配置可观测性覆盖缺口**，均不归 A 表任一 `check_id`，同样锚定首行。G-027：CFG-03 无任何消费题与契约绑定；G-028：CFG-14 的分档标签无法观测，刻度尺寸现有题取值覆盖不到。
 
 ## 缺口账
 
@@ -111,6 +112,8 @@
 | G-024 | open | representation-defect | L2 | G-024：`runtime/artifacts/dependency-graph.schema.json` 的 `activities[].due_day`（上限 3650 天）；`schedule.critical_path` 的期限判定 | 否 | 架构负责人（受钉扎 schema 变更需裁定） | M1 |  | T-150 | 批次 0105 暴露：`due_day` 上限 3650 天，装不下 2013→2028 的十五年周期；期限一旦超过上限，`schedule.critical_path` 的“按期/超期”就没有合法输入可表达。**待裁定**：是否扩展上限、改日期或相对期限、或在规则中声明“仅支持十年内期限”。本台账不自行改受钉扎 schema，也不为让题目通过而缩放年限；D6-PUB-07 已改为不设里程碑期限，局限写入运行记录与案例台账。**登记里程碑**：M1；到期仍未裁定将阻断发布。 |  |
 | G-025 | open | representation-defect | L3 | G-025：`runtime/artifacts/risk-register.schema.json` 的 `risks[].category` 闭集；`risk.required_fields`、`risk.owner_registered`、`risk.band_consistent` 的类别语义 | 否 | 架构负责人 | M1 |  | T-150 | 批次 0105 暴露：风险类别是闭集（technical/resource/external/organizational/scope），公开案例中的“治理”类问题无对应类别，只能落 `organizational`。**登记即可，不扩枚举**——扩展会改动受钉扎 schema 并影响既有正负例。后续题目按现有五类就近归类，并在案例台账注明改写方式。 |  |
 | G-026 | open | representation-defect | L3 | 全部 32 题的模型臂（S0/S1）、`validation/d6/acceptance.json` 的档位定义、任何“本地可部署”类结论 | 否（不阻断编译主流程与最终发布） | 验收负责人 | M1 |  | T-179 | 批次 0110 按裁定把三档改走外部 API；原本地权重口径（`Qwen2.5-Instruct` 7B/72B、`Q4_K_M` 4-bit、`32768` tokens）移出主档位，打包为独立待定任务 T-179。**受影响下游**：① 全部 32 题的模型臂（S0、S1）从未运行，故无运行记录依赖该口径；② `acceptance.json` 档位定义已改为 `external_api`，本地口径仅作历史字段保留；③ 当前不存在依赖该口径的对比结论。**边界**：本地权重可用时作为独立任务推进，不阻断编译主流程与最终发布，主流程不等待该任务。**拟处置方向**：`doc-only`（仅作历史口径文档化）；关闭须非同源复核或人工签收，不得以本文自证，故关闭前不填处置出口列。 |  |
+| G-027 | open | representation-defect | L2 | CFG-03（偏差分档）的配置敏感性；`deviation.thresholds_configured`、`deviation.dimensions`、`deviation.custom_metric`、`compute_deviation`；S2 变体 V-CFG03 | 否 | 架构负责人（受钉扎 schema 变更需裁定） | M1 |  | T-150 | 批次 0109 暴露：S2 变体 V-CFG03 零题可跑。**性质判定**：① **不是检查缺口**——三项 `deviation.*` 检查与 `compute_deviation` 均已实现（`scripts/pm_caps.py` 的 `_check_deviation_config`/`_check_deviation_dimensions`/`_check_deviation_unsupported` 与 `COMPUTE_REGISTRY["deviation.map"]`）；② **不是“敏感性为 0”**，而是覆盖缺口，且根因有两层：**契约未绑定**——没有任何工件 schema 在 `x-checks` 中声明 `deviation.*`（对 `runtime/artifacts/*.schema.json` 的检索结果为 0），而 `pm_check` 只执行工件 schema 声明的检查，故只加题不加绑定也不会跑到这些检查；**题集缺题**——32 题无一题覆盖偏差分档。**补一题的最小代价（两选一，均需裁定，不得自行改受钉 schema）**：A. 在既有 `runtime/artifacts/cost-budget.schema.json` 的 `x-checks` 增加三项（成本最低：复用现有 cost-budget 输入与工作包字段 `wbs_ref`，仅需 1 条任务卡；但会改变全部既有成本题的检查集合，须整批重跑并复核）；B. 新建 deviation 工件契约（新 schema + 钉扎登记 + 1 份输入 + 1 条任务卡），成本更高但不改既有题。 |  |
+| G-028 | open | representation-defect | L3 | CFG-14（风险刻度与分档）的配置敏感性；`risk.scale_in_range`、`risk.band_consistent`、`compute_risk`；S2 变体 V-CFG14 | 否 | 架构负责人（受钉扎 schema 变更需裁定） | M1 |  | T-150 | 批次 0109 暴露：S2 变体 V-CFG14 下 5 题结论全部不变。**性质判定（分开两层）**：① **分档标签不可观测，属“契约未要求比对标签”，不是检查实现漏写**——`risk-register.schema.json` 的风险条目没有 `band`/`band_order` 字段（必填为 id、category、probability、impact、trigger、response_strategy、owner_role、status、residual_score、objective_refs），`_check_risk_band` 只验证“评分能落入 CFG-14.bands 的某个连续区间”，工件没有声明值可比对，故 3×3→5×5 改标签不会产生差异；② **刻度尺寸并非完全不可观测**——`risk.scale_in_range` 以 CFG-14 的刻度上限判定，若题中出现取值 4–5，3×3 会违规而 5×5 通过；现有 5 题取值均为 1–3，两种刻度都通过，故本轮无差异。**两种修法不同**：契约变更（schema 增 `band` 字段 + `band_consistent` 比对声明值与计算值，动受钉 schema、检查器与既有 5 题工件）；或只补一道取值 4–5 的风险题（只动题集，最小代价约 1 条任务卡 + 1 份输入，可观测刻度尺寸但标签仍不可观测）；或 `doc-only` 声明“档位标签仅用于展示、不参与判定”。最小的是补题，但**不能**据此宣称 CFG-14 已获敏感性覆盖。 |  |
 
 **共同成因**：G-002、G-003、G-004、G-005、G-006 同属 **规则正文严于判定列** 这一大类——判定列只覆盖了规则正文的一部分条件，或把不同严重度的条件压在同一级别。它们不是彼此独立的偶发问题，而是同一口径缺陷的不同表现。对应的独立工作项 T-130、T-131、T-100、T-134、T-135 保留原编号，不合并。
 
