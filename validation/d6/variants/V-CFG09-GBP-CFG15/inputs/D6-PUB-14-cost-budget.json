@@ -1,0 +1,115 @@
+{
+  "artifact_type": "cost-budget",
+  "artifact_version": "1.0.0",
+  "project_id": "D6-PUB-14",
+  "config_ref": {
+    "schema_version": "config.schema/1",
+    "config_digest": "sha256:7baaf0c296a3e310f5412d77c626069385d83c5d1153cb923f9d433cdf75b287",
+    "item_digests": {
+      "CFG-01": "a43268cfab6b05bf9f12a9026013f49b1db587e7e60e527ad043dfe9758cfe4a",
+      "CFG-02": "02244f77b2e46d30d97e5058fae685f9a4cf8cadb123e9ca84e2c3a64499737c",
+      "CFG-03": "d9060adef7299e011a69c0f82685fb37b23921319451dac94d29f517cfa8b02b",
+      "CFG-04": "6534f24738d4ccd6755e22c7e1209deec895a5007e41086bb2cef6a4ece4d98c",
+      "CFG-05": "8dfcd18738d2f8ffdf2a01803e54a4b96e863de26035dbe4d396befb9b7bae0d",
+      "CFG-06": "ee208552d9b0d3a72b62eaa8795c104043c4c82e4772965e6bcab3439bf37a8f",
+      "CFG-08": "8eda1362bd8b232eb452b18d3cfa974f7e68636d758862a5e5f919c4216106db",
+      "CFG-09": "a52650c911dfea5f62e9ff6655f7172b9dca1053891f1c58547bc6f5a5365788",
+      "CFG-10": "88d262f272255cbaabbef3eb4ce3d0333b28380e379acb164fb361587ce38885",
+      "CFG-11": "bd8032c1e74620935cf561da140b664664b34592a2c3d5cf39bc5412e3cdba0a",
+      "CFG-12": "82da498b44fde96a83c2a4695b1545fdcc20b3e734ddf2e2b82feb9e9addbe2e",
+      "CFG-13": "ff85c36abbcd1ad9af70a3987bd1ea3f7a6c07fafbcf34c015d05e8be4960a61",
+      "CFG-14": "323310ff32ff3e64c3343571052daddd56449a309c696b2c3eb85d8f3f5c986c",
+      "CFG-15": "944abc1328a6a3199a3359a0312efd0dcf2ce53a09f805f2407c72c5902238fb"
+    },
+    "defaulted": []
+  },
+  "provenance": {
+    "budget.work_packages": "case:NAO-HS2#/cost-range（取区间上界 102.7bn，口径显式）",
+    "budget.periods": "case:NAO-HS2#/cost-range（分年分布为改造值）"
+  },
+  "data": {
+    "currency": "GBP",
+    "work_packages": [
+      {
+        "id": "PKG-DESN",
+        "wbs_ref": "WBS-DESN",
+        "account_code": "1100",
+        "amount": 30000000000.0,
+        "periods": [
+          {
+            "period": "2020-06",
+            "amount": 15000000000.0
+          },
+          {
+            "period": "2023-06",
+            "amount": 15000000000.0
+          }
+        ]
+      },
+      {
+        "id": "PKG-TUNN",
+        "wbs_ref": "WBS-TUNN",
+        "account_code": "2100",
+        "amount": 25500000000.0,
+        "periods": [
+          {
+            "period": "2024-06",
+            "amount": 12750000000.0
+          },
+          {
+            "period": "2029-06",
+            "amount": 12750000000.0
+          }
+        ]
+      },
+      {
+        "id": "PKG-CIVL",
+        "wbs_ref": "WBS-CIVL",
+        "account_code": "2100",
+        "amount": 20200000000.0,
+        "periods": [
+          {
+            "period": "2025-06",
+            "amount": 10100000000.0
+          },
+          {
+            "period": "2030-06",
+            "amount": 10100000000.0
+          }
+        ]
+      },
+      {
+        "id": "PKG-SYSI",
+        "wbs_ref": "WBS-SYSI",
+        "account_code": "1100",
+        "amount": 17000000000.0,
+        "periods": [
+          {
+            "period": "2028-06",
+            "amount": 8500000000.0
+          },
+          {
+            "period": "2031-06",
+            "amount": 8500000000.0
+          }
+        ]
+      },
+      {
+        "id": "PKG-TEST",
+        "wbs_ref": "WBS-TEST",
+        "account_code": "1100",
+        "amount": 10000000000.0,
+        "periods": [
+          {
+            "period": "2031-12",
+            "amount": 5000000000.0
+          },
+          {
+            "period": "2033-06",
+            "amount": 5000000000.0
+          }
+        ]
+      }
+    ]
+  }
+}

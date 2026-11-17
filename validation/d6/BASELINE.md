@@ -60,15 +60,21 @@
 | S1 技能敏感性（控制臂） | 弱档挂技能 vs 弱档无技能 | 同一任务集、同一配置快照 | 通过率差值（验收要求 ≥20 个百分点） |
 | S2 配置敏感性 | 主配置 vs 单项变体配置 | 同一模型档位、同一任务集 | 结果翻转清单；只允许出现在任务卡 `expected.sensitivity_flip` 中声明的题 |
 
-**S2 变体清单（首轮）**：
+**S2 变体清单（2026-11-17 实际建成并运行）**：
 
-| 变体 | 变更项 | 预期影响面 | 判定 |
-|---|---|---|---|
-| V-CFG03 | CFG-03 偏差分档边界整体位移 | 偏差分档题（`deviation.*`） | 仅在任务卡声明会翻转的题上允许翻转 |
-| V-CFG05 | CFG-05 采样分数由 `[0.5, 1.0]` 改为 `[1.0]` | 状态采样题（`status.sample_grid`） | 采样点数量减少；不得改变已采点的结论 |
-| V-CFG14 | CFG-14 风险刻度由 3×3 改为 5×5 | 风险题（`risk.*`） | 刻度标签与分档随之改变；不得把旧刻度结果混入 |
-| V-CFG15 | CFG-15 科目表增删科目 | 成本题（`budget.accounts_registered`） | 未登记科目应判违规 |
-| V-CFG09 | CFG-09 币种改为 USD | 成本题（`budget.currency_match`） | 币种不一致应判违规 |
+| 变体 | 变更项 | 实际影响面 | 运行结果 | 记录 |
+|---|---|---|---|---|
+| V-CFG03 | CFG-03 偏差分档边界整体位移（档数与标签不变） | 偏差分档题（`deviation.*`） | 全题集无 `deviation.*` 消费者，0 题可跑 | `validation/d6/results/s2-v-cfg03/run.json` |
+| V-CFG05 | CFG-05 采样分数 `[0.5, 1.0]` → `[1.0]` | 状态采样题（`status.sample_grid`） | 3 题 pass→violation | `validation/d6/results/s2-v-cfg05/run.json` |
+| V-CFG14 | CFG-14 风险刻度 3×3 → 5×5（分档连续覆盖 1..25） | 风险题（`risk.*`） | 5 题结论全部不变 | `validation/d6/results/s2-v-cfg14/run.json` |
+| V-CFG15 | CFG-15 科目表移除 2100（采购） | 成本题（`budget.accounts_registered`） | 1 题 pass→violation，1 题失败项扩大 | `validation/d6/results/s2-v-cfg15/run.json` |
+| V-CFG09-GBP | CFG-09 币种 CNY → GBP | 成本题（`budget.currency_match`） | 主运行的基础变体（6 题） | `validation/d6/results/phase2-public-crossrail/run.json` 等 |
+| V-CFG09-GBP-CFG05 | 在 V-CFG09-GBP 上再改采样分数 | GBP 基准的状态题 | 2 题 pass→violation | `validation/d6/results/s2-v-cfg09-gbp-cfg05/run.json` |
+| V-CFG09-GBP-CFG15 | 在 V-CFG09-GBP 上再移除科目 2100 | GBP 基准的成本/状态题 | 4 题 pass→violation，1 题失败项扩大，2 题不变 | `validation/d6/results/s2-v-cfg09-gbp-cfg15/run.json` |
+
+**变体运行的隔离方式**：变体工件是主运行工件的副本，除 `config_ref`（`config_digest` 与 `item_digests`）同步为变体快照外内容完全相同，避免 `config_drift` 混入敏感性观察。所有变体运行独立成 `validation/d6/results/s2-*/run.json`，**不计入主运行通过率**。
+
+**未预先声明翻转的处理**：上表 5 个 pass→violation 翻转（PUB-04、PUB-11、PUB-17、PUB-19、SYN-08 的 `status.sample_grid`）与 5 个（PUB-03、PUB-09、PUB-14、PUB-18、SYN-04 的 `budget.accounts_registered`）均未在任务卡 `expected.sensitivity_flip` 中预先声明。按本节稳定性判据，记为**未声明翻转（不稳定）**，逐题原因已写入对应 `validation/d6/results/s2-*/run.json` 的 `explanation`：采样分数收窄使期中采样点脱离网格；科目表移除使采购工作包无对应科目。**未回溯修改任务卡期望**，也未把变体结果并入主运行。
 
 **稳定性判据**：若某题在主配置下为 `pass`、在变体配置下翻转，而该题未在 `expected.sensitivity_flip` 中声明，记为**不稳定**，必须查因；不得靠调整期望值掩盖。
 

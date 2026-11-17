@@ -1,0 +1,380 @@
+{
+  "summary": {
+    "run_id": "s2-v-cfg09-gbp-cfg15",
+    "kind": "S2-sensitivity-variant",
+    "generated_at": "2026-11-17T20:41:11+08:00",
+    "config_variant": "V-CFG09-GBP-CFG15",
+    "config_digest": "sha256:7baaf0c296a3e310f5412d77c626069385d83c5d1153cb923f9d433cdf75b287",
+    "base_config": "V-CFG09-GBP",
+    "tasks": 7,
+    "counted_in_main_run": false,
+    "models": "not_executed",
+    "deltas": {
+      "unchanged": 2,
+      "pass_to_violation": 4,
+      "pass_to_cannot_evaluate": 0,
+      "violation_to_pass": 0,
+      "cannot_evaluate_to_pass": 0,
+      "changed_other": 1
+    },
+    "observations": [
+      "七题基于 V-CFG09-GBP，变体只再移除科目 2100；五题预算件的采购工作包记在 2100，全部转为 violation。",
+      "两题状态件不受影响（测量科目为 1000/1100）。PUB-15 主运行已是 violation，变体下失败项集合扩大。"
+    ]
+  },
+  "results": [
+    {
+      "task_id": "D6-PUB-03",
+      "title": "Crossrail 成本汇总：£17.6bn 资金包按科目与阶段守恒",
+      "main": {
+        "run": "validation/d6/results/phase2-public-crossrail/run.json",
+        "variant": null,
+        "outcome": "pass",
+        "exit_code": 0,
+        "failed_checks": []
+      },
+      "variant": {
+        "exit_code": 1,
+        "failed_checks": [
+          "budget.accounts_registered"
+        ],
+        "findings": [
+          {
+            "check": "budget.accounts_registered",
+            "detail": "未登记成本科目：['2100']",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "budget.package_unique",
+            "detail": "5 个工作包 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.total_conserved",
+            "detail": "每个科目与总额均守恒，合计 17600000000.0",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.time_phased_sum",
+            "detail": "每个工作包的分时段金额之和等于总额",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.currency_match",
+            "detail": "货币与 CFG-09 一致",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "artifact_digest": "sha256:96ce8df90f849ecbe959b3ae016d9afce52614cb9bd57c81f01e94b8b14047ce"
+      },
+      "delta": "pass_to_violation",
+      "explanation": "科目表移除 2100（采购）后，采购工作包仍记在该科目，budget.accounts_registered 判“未登记成本科目 ['2100']”。"
+    },
+    {
+      "task_id": "D6-PUB-09",
+      "title": "Universal Credit 成本汇总：£2,850m 与 +£912m 变更包",
+      "main": {
+        "run": "validation/d6/results/phase3-public-uc/run.json",
+        "variant": null,
+        "outcome": "pass",
+        "exit_code": 0,
+        "failed_checks": []
+      },
+      "variant": {
+        "exit_code": 1,
+        "failed_checks": [
+          "budget.accounts_registered"
+        ],
+        "findings": [
+          {
+            "check": "budget.accounts_registered",
+            "detail": "未登记成本科目：['2100']",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "budget.package_unique",
+            "detail": "4 个工作包 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.total_conserved",
+            "detail": "每个科目与总额均守恒，合计 2850000000.0",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.time_phased_sum",
+            "detail": "每个工作包的分时段金额之和等于总额",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.currency_match",
+            "detail": "货币与 CFG-09 一致",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "artifact_digest": "sha256:bf78fd58465ef1e42b54d296cd7212b404ee30b646933aafee6c23b099f5bae4"
+      },
+      "delta": "pass_to_violation",
+      "explanation": "科目表移除 2100（采购）后，采购工作包仍记在该科目，budget.accounts_registered 判“未登记成本科目 ['2100']”。"
+    },
+    {
+      "task_id": "D6-PUB-14",
+      "title": "HS2 成本汇总：按 £102.7bn 上界拆包",
+      "main": {
+        "run": "validation/d6/results/phase4-public-hs2/run.json",
+        "variant": null,
+        "outcome": "pass",
+        "exit_code": 0,
+        "failed_checks": []
+      },
+      "variant": {
+        "exit_code": 1,
+        "failed_checks": [
+          "budget.accounts_registered"
+        ],
+        "findings": [
+          {
+            "check": "budget.accounts_registered",
+            "detail": "未登记成本科目：['2100']",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "budget.package_unique",
+            "detail": "5 个工作包 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.total_conserved",
+            "detail": "每个科目与总额均守恒，合计 102700000000.0",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.time_phased_sum",
+            "detail": "每个工作包的分时段金额之和等于总额",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.currency_match",
+            "detail": "货币与 CFG-09 一致",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "artifact_digest": "sha256:4564fab0970f08202460ac84ea081fd3c8abc58088d41cb0284e79ae3408e953"
+      },
+      "delta": "pass_to_violation",
+      "explanation": "科目表移除 2100（采购）后，采购工作包仍记在该科目，budget.accounts_registered 判“未登记成本科目 ['2100']”。"
+    },
+    {
+      "task_id": "D6-PUB-15",
+      "title": "HS2 成本负例：总额写下界 £87.7bn，工作包按上界 £102.7bn",
+      "main": {
+        "run": "validation/d6/results/phase4-public-hs2/run.json",
+        "variant": null,
+        "outcome": "pass",
+        "exit_code": 1,
+        "failed_checks": [
+          "budget.total_conserved",
+          "budget.time_phased_sum"
+        ]
+      },
+      "variant": {
+        "exit_code": 1,
+        "failed_checks": [
+          "budget.accounts_registered",
+          "budget.total_conserved",
+          "budget.time_phased_sum"
+        ],
+        "findings": [
+          {
+            "check": "budget.accounts_registered",
+            "detail": "未登记成本科目：['2100']",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "budget.package_unique",
+            "detail": "5 个工作包 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.total_conserved",
+            "detail": "分时段合计 87700000000.0 与工作包合计 102700000000.0 不等",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "budget.time_phased_sum",
+            "detail": "分时段金额与工作包金额不一致或缺分时段：['PKG-DESN']",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "budget.currency_match",
+            "detail": "货币与 CFG-09 一致",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "artifact_digest": "sha256:d8747dd36e4a15071ce03c33f9972c040e0e3434f47f3fa9117aad8932f13205"
+      },
+      "delta": "changed_other",
+      "explanation": "退出码不变（主运行已是 violation），变体下失败项集合扩大：追加 budget.accounts_registered；原失败项 budget.total_conserved / budget.time_phased_sum 保留。"
+    },
+    {
+      "task_id": "D6-PUB-17",
+      "title": "HS2 状态快照：Euston 暂停期的支出与不可用进度指标",
+      "main": {
+        "run": "validation/d6/results/phase4-public-hs2/run.json",
+        "variant": null,
+        "outcome": "pass",
+        "exit_code": 0,
+        "failed_checks": []
+      },
+      "variant": {
+        "exit_code": 0,
+        "failed_checks": [],
+        "findings": [
+          {
+            "check": "status.dictionary_fields",
+            "detail": "数据字典齐备且测量指标均已登记",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.no_implicit_zero",
+            "detail": "缺数均显式登记了 unavailable_reason",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.sample_grid",
+            "detail": "2 个采样点均与配置口径一致",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.account_registered",
+            "detail": "测量科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "artifact_digest": "sha256:48f8ce87b23b8d5a4531764066540d2737c0e86095871326a1c1289fb9de8de1"
+      },
+      "delta": "unchanged",
+      "explanation": "结论不变。"
+    },
+    {
+      "task_id": "D6-PUB-18",
+      "title": "NPfIT 成本汇总：£11.4bn 按类别拆包",
+      "main": {
+        "run": "validation/d6/results/phase5-public-npfit/run.json",
+        "variant": null,
+        "outcome": "pass",
+        "exit_code": 0,
+        "failed_checks": []
+      },
+      "variant": {
+        "exit_code": 1,
+        "failed_checks": [
+          "budget.accounts_registered"
+        ],
+        "findings": [
+          {
+            "check": "budget.accounts_registered",
+            "detail": "未登记成本科目：['2100']",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "budget.package_unique",
+            "detail": "4 个工作包 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.total_conserved",
+            "detail": "每个科目与总额均守恒，合计 11400000000.0",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.time_phased_sum",
+            "detail": "每个工作包的分时段金额之和等于总额",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.currency_match",
+            "detail": "货币与 CFG-09 一致",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "artifact_digest": "sha256:fed9588eeff5a4ed567113919012996f0d035676bea248180fc5b7b06ca3a171"
+      },
+      "delta": "pass_to_violation",
+      "explanation": "科目表移除 2100（采购）后，采购工作包仍记在该科目，budget.accounts_registered 判“未登记成本科目 ['2100']”。"
+    },
+    {
+      "task_id": "D6-PUB-19",
+      "title": "NPfIT 状态快照：项目关闭后目标类指标显式不可用",
+      "main": {
+        "run": "validation/d6/results/phase5-public-npfit/run.json",
+        "variant": null,
+        "outcome": "pass",
+        "exit_code": 0,
+        "failed_checks": []
+      },
+      "variant": {
+        "exit_code": 0,
+        "failed_checks": [],
+        "findings": [
+          {
+            "check": "status.dictionary_fields",
+            "detail": "数据字典齐备且测量指标均已登记",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.no_implicit_zero",
+            "detail": "缺数均显式登记了 unavailable_reason",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.sample_grid",
+            "detail": "2 个采样点均与配置口径一致",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.account_registered",
+            "detail": "测量科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "artifact_digest": "sha256:154e256518e438d2dd392ff61e74a5d58767b52a86f0e2cc0468fc439107d995"
+      },
+      "delta": "unchanged",
+      "explanation": "结论不变。"
+    }
+  ]
+}

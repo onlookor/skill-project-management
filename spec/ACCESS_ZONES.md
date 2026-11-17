@@ -59,6 +59,13 @@
 | `validation/d6/results/phase3-public-uc/run.json` | C | — | D6 批次 3 机器可读运行记录 |
 | `validation/d6/results/phase4-public-hs2/run.json` | C | — | D6 批次 4 机器可读运行记录 |
 | `validation/d6/results/phase5-public-npfit/run.json` | C | — | D6 批次 5 机器可读运行记录 |
+| `validation/d6/variants/` | C | — | S2 变体工件副本（仅同步 config_ref，不含新素材） |
+| `validation/d6/results/s2-v-cfg03/run.json` | C | — | S2 变体 V-CFG03 运行记录 |
+| `validation/d6/results/s2-v-cfg05/run.json` | C | — | S2 变体 V-CFG05 运行记录 |
+| `validation/d6/results/s2-v-cfg14/run.json` | C | — | S2 变体 V-CFG14 运行记录 |
+| `validation/d6/results/s2-v-cfg15/run.json` | C | — | S2 变体 V-CFG15 运行记录 |
+| `validation/d6/results/s2-v-cfg09-gbp-cfg05/run.json` | C | — | S2 变体 V-CFG09-GBP-CFG05 运行记录 |
+| `validation/d6/results/s2-v-cfg09-gbp-cfg15/run.json` | C | — | S2 变体 V-CFG09-GBP-CFG15 运行记录 |
 | `validation/` | P | P1 | 验证与复核材料 |
 
 ## 2. 数据区准入登记

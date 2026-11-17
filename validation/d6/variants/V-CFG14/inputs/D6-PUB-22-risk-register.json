@@ -1,0 +1,81 @@
+{
+  "artifact_type": "risk-register",
+  "artifact_version": "1.0.0",
+  "project_id": "D6-PUB-22",
+  "config_ref": {
+    "schema_version": "config.schema/1",
+    "config_digest": "sha256:a02cda6228eb9c013690e7828265fc00a0b7c76298d4fa294ed83b28f2f92799",
+    "item_digests": {
+      "CFG-01": "a43268cfab6b05bf9f12a9026013f49b1db587e7e60e527ad043dfe9758cfe4a",
+      "CFG-02": "02244f77b2e46d30d97e5058fae685f9a4cf8cadb123e9ca84e2c3a64499737c",
+      "CFG-03": "d9060adef7299e011a69c0f82685fb37b23921319451dac94d29f517cfa8b02b",
+      "CFG-04": "6534f24738d4ccd6755e22c7e1209deec895a5007e41086bb2cef6a4ece4d98c",
+      "CFG-05": "8dfcd18738d2f8ffdf2a01803e54a4b96e863de26035dbe4d396befb9b7bae0d",
+      "CFG-06": "ee208552d9b0d3a72b62eaa8795c104043c4c82e4772965e6bcab3439bf37a8f",
+      "CFG-08": "8eda1362bd8b232eb452b18d3cfa974f7e68636d758862a5e5f919c4216106db",
+      "CFG-09": "8e06735c89d493d78ff5f12b2e47a5f055f1334b7a540bd6c58345195ee9c153",
+      "CFG-10": "88d262f272255cbaabbef3eb4ce3d0333b28380e379acb164fb361587ce38885",
+      "CFG-11": "bd8032c1e74620935cf561da140b664664b34592a2c3d5cf39bc5412e3cdba0a",
+      "CFG-12": "82da498b44fde96a83c2a4695b1545fdcc20b3e734ddf2e2b82feb9e9addbe2e",
+      "CFG-13": "ff85c36abbcd1ad9af70a3987bd1ea3f7a6c07fafbcf34c015d05e8be4960a61",
+      "CFG-14": "d72d071566de77bba119856faf8e87dcb9e940e0d37ec8228dd4099f6b3e3517",
+      "CFG-15": "c3463e409fa1532f5ac068b1afc87f89ffc0162ada1a38361450a4e5f8ba11ce"
+    },
+    "defaulted": []
+  },
+  "provenance": {
+    "risk.identified": "case:NAO-NPFIT#/nao-findings（范围、供应商、临床采纳）",
+    "risk.assessment": "case:NAO-NPFIT#/nao-findings（概率/影响为改造值）"
+  },
+  "data": {
+    "roles": [
+      "pm",
+      "sponsor",
+      "reviewer"
+    ],
+    "risks": [
+      {
+        "id": "R-NPFIT-01",
+        "category": "scope",
+        "probability": 3,
+        "impact": 3,
+        "trigger": "本地化需求连续两次变更未收敛",
+        "response_strategy": "mitigate",
+        "owner_role": "pm",
+        "status": "responding",
+        "residual_score": 6,
+        "objective_refs": [
+          "范围目标"
+        ]
+      },
+      {
+        "id": "R-NPFIT-02",
+        "category": "external",
+        "probability": 2,
+        "impact": 3,
+        "trigger": "供应商关键交付连续两次延期",
+        "response_strategy": "transfer",
+        "owner_role": "sponsor",
+        "status": "responding",
+        "residual_score": 4,
+        "objective_refs": [
+          "进度目标"
+        ]
+      },
+      {
+        "id": "R-NPFIT-03",
+        "category": "organizational",
+        "probability": 3,
+        "impact": 2,
+        "trigger": "临床用户采纳率连续两季低于基线",
+        "response_strategy": "mitigate",
+        "owner_role": "reviewer",
+        "status": "analyzed",
+        "residual_score": 4,
+        "objective_refs": [
+          "收益目标"
+        ]
+      }
+    ]
+  }
+}

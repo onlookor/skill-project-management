@@ -1,0 +1,100 @@
+{
+  "artifact_type": "status-snapshot",
+  "artifact_version": "1.0.0",
+  "project_id": "D6-SYN-STATUS-POS",
+  "config_ref": {
+    "schema_version": "config.schema/1",
+    "config_digest": "sha256:23e183a81f786b7656db833b6cd19988d3cfdaf76d0182c7c4ce117eb5f160c1",
+    "item_digests": {
+      "CFG-01": "a43268cfab6b05bf9f12a9026013f49b1db587e7e60e527ad043dfe9758cfe4a",
+      "CFG-02": "02244f77b2e46d30d97e5058fae685f9a4cf8cadb123e9ca84e2c3a64499737c",
+      "CFG-03": "d9060adef7299e011a69c0f82685fb37b23921319451dac94d29f517cfa8b02b",
+      "CFG-04": "6534f24738d4ccd6755e22c7e1209deec895a5007e41086bb2cef6a4ece4d98c",
+      "CFG-05": "c2272c0a862f11de35da66ec8be34349001ddebae43b85ab1dafb188f8ad7b30",
+      "CFG-06": "ee208552d9b0d3a72b62eaa8795c104043c4c82e4772965e6bcab3439bf37a8f",
+      "CFG-08": "8eda1362bd8b232eb452b18d3cfa974f7e68636d758862a5e5f919c4216106db",
+      "CFG-09": "8e06735c89d493d78ff5f12b2e47a5f055f1334b7a540bd6c58345195ee9c153",
+      "CFG-10": "88d262f272255cbaabbef3eb4ce3d0333b28380e379acb164fb361587ce38885",
+      "CFG-11": "bd8032c1e74620935cf561da140b664664b34592a2c3d5cf39bc5412e3cdba0a",
+      "CFG-12": "82da498b44fde96a83c2a4695b1545fdcc20b3e734ddf2e2b82feb9e9addbe2e",
+      "CFG-13": "ff85c36abbcd1ad9af70a3987bd1ea3f7a6c07fafbcf34c015d05e8be4960a61",
+      "CFG-14": "323310ff32ff3e64c3343571052daddd56449a309c696b2c3eb85d8f3f5c986c",
+      "CFG-15": "c3463e409fa1532f5ac068b1afc87f89ffc0162ada1a38361450a4e5f8ba11ce"
+    },
+    "defaulted": []
+  },
+  "provenance": {
+    "status.sources": "input:status-input.json#/samples/*/measurements",
+    "status.dictionary": "input:status-input.json#/dictionary"
+  },
+  "data": {
+    "period": {
+      "start": "2026-01-05",
+      "end": "2026-01-09"
+    },
+    "dictionary": [
+      {
+        "metric": "PV",
+        "unit": "currency",
+        "source": "PMO 周报",
+        "collected_at": "2026-01-09T18:00:00+08:00"
+      },
+      {
+        "metric": "EV",
+        "unit": "currency",
+        "source": "PMO 周报",
+        "collected_at": "2026-01-09T18:00:00+08:00"
+      },
+      {
+        "metric": "AC",
+        "unit": "currency",
+        "source": "财务月结底稿",
+        "collected_at": "2026-01-09T18:00:00+08:00"
+      }
+    ],
+    "samples": [
+      {
+        "id": "S-01",
+        "at": "2026-01-07T18:00:00+08:00",
+        "measurements": [
+          {
+            "account_code": "1100",
+            "metric": "PV",
+            "value": 2500
+          },
+          {
+            "account_code": "1100",
+            "metric": "EV",
+            "value": 2500
+          },
+          {
+            "account_code": "1100",
+            "metric": "AC",
+            "value": 2300
+          }
+        ]
+      },
+      {
+        "id": "S-02",
+        "at": "2026-01-09T18:00:00+08:00",
+        "measurements": [
+          {
+            "account_code": "1100",
+            "metric": "PV",
+            "value": 5000
+          },
+          {
+            "account_code": "1100",
+            "metric": "EV",
+            "value": 5000
+          },
+          {
+            "account_code": "1100",
+            "metric": "AC",
+            "value": 4500
+          }
+        ]
+      }
+    ]
+  }
+}

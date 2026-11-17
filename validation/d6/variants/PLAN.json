@@ -1,0 +1,123 @@
+{
+  "V-CFG03": [],
+  "V-CFG05": [
+    {
+      "task_id": "D6-PUB-04",
+      "source": "validation/cases/NAO-CROSSRAIL/inputs/status-snapshot.json",
+      "artifact": "validation/d6/variants/V-CFG05/inputs/D6-PUB-04-status-snapshot.json"
+    },
+    {
+      "task_id": "D6-PUB-11",
+      "source": "validation/cases/NAO-UNIVERSAL-CREDIT/inputs/status-snapshot.json",
+      "artifact": "validation/d6/variants/V-CFG05/inputs/D6-PUB-11-status-snapshot.json"
+    },
+    {
+      "task_id": "D6-SYN-08",
+      "source": "validation/cases/synthetic/SYN-STATUS-POS/inputs/status-snapshot.json",
+      "artifact": "validation/d6/variants/V-CFG05/inputs/D6-SYN-08-status-snapshot.json"
+    }
+  ],
+  "V-CFG09-GBP-CFG05": [
+    {
+      "task_id": "D6-PUB-17",
+      "source": "validation/cases/NAO-HS2/inputs/status-snapshot.json",
+      "artifact": "validation/d6/variants/V-CFG09-GBP-CFG05/inputs/D6-PUB-17-status-snapshot.json"
+    },
+    {
+      "task_id": "D6-PUB-19",
+      "source": "validation/cases/NAO-NPFIT/inputs/status-snapshot.json",
+      "artifact": "validation/d6/variants/V-CFG09-GBP-CFG05/inputs/D6-PUB-19-status-snapshot.json"
+    }
+  ],
+  "V-CFG14": [
+    {
+      "task_id": "D6-PUB-10",
+      "source": "validation/cases/NAO-UNIVERSAL-CREDIT/inputs/risk-register.json",
+      "artifact": "validation/d6/variants/V-CFG14/inputs/D6-PUB-10-risk-register.json"
+    },
+    {
+      "task_id": "D6-PUB-16",
+      "source": "validation/cases/NAO-HS2/inputs/risk-register.json",
+      "artifact": "validation/d6/variants/V-CFG14/inputs/D6-PUB-16-risk-register.json"
+    },
+    {
+      "task_id": "D6-PUB-22",
+      "source": "validation/cases/NAO-NPFIT/inputs/risk-register.json",
+      "artifact": "validation/d6/variants/V-CFG14/inputs/D6-PUB-22-risk-register.json"
+    },
+    {
+      "task_id": "D6-SYN-06",
+      "source": "validation/cases/synthetic/SYN-RISK-POS/inputs/risk-register.json",
+      "artifact": "validation/d6/variants/V-CFG14/inputs/D6-SYN-06-risk-register.json"
+    },
+    {
+      "task_id": "D6-SYN-07",
+      "source": "validation/cases/synthetic/SYN-RISK-RESIDUAL/inputs/risk-register.json",
+      "artifact": "validation/d6/variants/V-CFG14/inputs/D6-SYN-07-risk-register.json"
+    }
+  ],
+  "V-CFG15": [
+    {
+      "task_id": "D6-PUB-04",
+      "source": "validation/cases/NAO-CROSSRAIL/inputs/status-snapshot.json",
+      "artifact": "validation/d6/variants/V-CFG15/inputs/D6-PUB-04-status-snapshot.json"
+    },
+    {
+      "task_id": "D6-PUB-11",
+      "source": "validation/cases/NAO-UNIVERSAL-CREDIT/inputs/status-snapshot.json",
+      "artifact": "validation/d6/variants/V-CFG15/inputs/D6-PUB-11-status-snapshot.json"
+    },
+    {
+      "task_id": "D6-SYN-04",
+      "source": "validation/cases/synthetic/SYN-BUD-POS/inputs/cost-budget.json",
+      "artifact": "validation/d6/variants/V-CFG15/inputs/D6-SYN-04-cost-budget.json"
+    },
+    {
+      "task_id": "D6-SYN-05",
+      "source": "validation/cases/synthetic/SYN-BUD-TIMESUM/inputs/cost-budget.json",
+      "artifact": "validation/d6/variants/V-CFG15/inputs/D6-SYN-05-cost-budget.json"
+    },
+    {
+      "task_id": "D6-SYN-08",
+      "source": "validation/cases/synthetic/SYN-STATUS-POS/inputs/status-snapshot.json",
+      "artifact": "validation/d6/variants/V-CFG15/inputs/D6-SYN-08-status-snapshot.json"
+    }
+  ],
+  "V-CFG09-GBP-CFG15": [
+    {
+      "task_id": "D6-PUB-03",
+      "source": "validation/cases/NAO-CROSSRAIL/inputs/cost-budget.json",
+      "artifact": "validation/d6/variants/V-CFG09-GBP-CFG15/inputs/D6-PUB-03-cost-budget.json"
+    },
+    {
+      "task_id": "D6-PUB-09",
+      "source": "validation/cases/NAO-UNIVERSAL-CREDIT/inputs/cost-budget.json",
+      "artifact": "validation/d6/variants/V-CFG09-GBP-CFG15/inputs/D6-PUB-09-cost-budget.json"
+    },
+    {
+      "task_id": "D6-PUB-14",
+      "source": "validation/cases/NAO-HS2/inputs/cost-budget.json",
+      "artifact": "validation/d6/variants/V-CFG09-GBP-CFG15/inputs/D6-PUB-14-cost-budget.json"
+    },
+    {
+      "task_id": "D6-PUB-15",
+      "source": "validation/cases/NAO-HS2/inputs/cost-budget-range-mismatch.json",
+      "artifact": "validation/d6/variants/V-CFG09-GBP-CFG15/inputs/D6-PUB-15-cost-budget-range-mismatch.json"
+    },
+    {
+      "task_id": "D6-PUB-17",
+      "source": "validation/cases/NAO-HS2/inputs/status-snapshot.json",
+      "artifact": "validation/d6/variants/V-CFG09-GBP-CFG15/inputs/D6-PUB-17-status-snapshot.json"
+    },
+    {
+      "task_id": "D6-PUB-18",
+      "source": "validation/cases/NAO-NPFIT/inputs/cost-budget.json",
+      "artifact": "validation/d6/variants/V-CFG09-GBP-CFG15/inputs/D6-PUB-18-cost-budget.json"
+    },
+    {
+      "task_id": "D6-PUB-19",
+      "source": "validation/cases/NAO-NPFIT/inputs/status-snapshot.json",
+      "artifact": "validation/d6/variants/V-CFG09-GBP-CFG15/inputs/D6-PUB-19-status-snapshot.json"
+    }
+  ]
+}

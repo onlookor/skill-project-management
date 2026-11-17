@@ -1,0 +1,165 @@
+{
+  "summary": {
+    "run_id": "s2-v-cfg05",
+    "kind": "S2-sensitivity-variant",
+    "generated_at": "2026-11-17T20:41:11+08:00",
+    "config_variant": "V-CFG05",
+    "config_digest": "sha256:23e183a81f786b7656db833b6cd19988d3cfdaf76d0182c7c4ce117eb5f160c1",
+    "base_config": "primary",
+    "tasks": 3,
+    "counted_in_main_run": false,
+    "models": "not_executed",
+    "deltas": {
+      "unchanged": 0,
+      "pass_to_violation": 3,
+      "pass_to_cannot_evaluate": 0,
+      "violation_to_pass": 0,
+      "cannot_evaluate_to_pass": 0,
+      "changed_other": 0
+    },
+    "observations": [
+      "三题均为正例，变体下全部变为 violation：采样时刻（周期 50%）不在 [1.0] 网格上。",
+      "该变体说明状态工件对采样分数敏感；若真实部署改用“仅周期末采样”，现有的期中采样件会被判违规。"
+    ]
+  },
+  "results": [
+    {
+      "task_id": "D6-PUB-04",
+      "title": "Crossrail 状态快照：2018 年 7 月的完成度与支出",
+      "main": {
+        "run": "validation/d6/results/phase2-public-crossrail/run.json",
+        "variant": null,
+        "outcome": "pass",
+        "exit_code": 0,
+        "failed_checks": []
+      },
+      "variant": {
+        "exit_code": 1,
+        "failed_checks": [
+          "status.sample_grid"
+        ],
+        "findings": [
+          {
+            "check": "status.dictionary_fields",
+            "detail": "数据字典齐备且测量指标均已登记",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.no_implicit_zero",
+            "detail": "缺数均显式登记了 unavailable_reason",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.sample_grid",
+            "detail": "采样时点不在 CFG-04 计算的网格上：['2018-07-02T00:00:00+08:00']",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "status.account_registered",
+            "detail": "测量科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "artifact_digest": "sha256:abde615aea61ebb23b1dbd0c2cfac36421c1b9a057f70ae3d7ff9677a1763e09"
+      },
+      "delta": "pass_to_violation",
+      "explanation": "CFG-05 由 [0.5, 1.0] 收为 [1.0] 后，工件在周期 50% 时点的采集/采样时刻不再落在网格上，status.sample_grid 判 violation；工件内容除 config_ref 同步为变体快照外未改，不是 config_drift。"
+    },
+    {
+      "task_id": "D6-PUB-11",
+      "title": "Universal Credit 状态快照：无法评估系统价值的指标显式登记不可用",
+      "main": {
+        "run": "validation/d6/results/phase3-public-uc/run.json",
+        "variant": null,
+        "outcome": "pass",
+        "exit_code": 0,
+        "failed_checks": []
+      },
+      "variant": {
+        "exit_code": 1,
+        "failed_checks": [
+          "status.sample_grid"
+        ],
+        "findings": [
+          {
+            "check": "status.dictionary_fields",
+            "detail": "数据字典齐备且测量指标均已登记",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.no_implicit_zero",
+            "detail": "缺数均显式登记了 unavailable_reason",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.sample_grid",
+            "detail": "采样时点不在 CFG-04 计算的网格上：['2013-07-02T00:00:00+08:00']",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "status.account_registered",
+            "detail": "测量科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "artifact_digest": "sha256:ee4350a307a507dd8335f11fd43824495f3e3d86afa4f15eeb6dee7108131af4"
+      },
+      "delta": "pass_to_violation",
+      "explanation": "CFG-05 由 [0.5, 1.0] 收为 [1.0] 后，工件在周期 50% 时点的采集/采样时刻不再落在网格上，status.sample_grid 判 violation；工件内容除 config_ref 同步为变体快照外未改，不是 config_drift。"
+    },
+    {
+      "task_id": "D6-SYN-08",
+      "title": "状态正例：字典齐备、无隐式零、采样点合网格、科目已登记",
+      "main": {
+        "run": "validation/d6/results/phase1-synthetic/run.json",
+        "variant": null,
+        "outcome": "pass",
+        "exit_code": 0,
+        "failed_checks": []
+      },
+      "variant": {
+        "exit_code": 1,
+        "failed_checks": [
+          "status.sample_grid"
+        ],
+        "findings": [
+          {
+            "check": "status.dictionary_fields",
+            "detail": "数据字典齐备且测量指标均已登记",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.no_implicit_zero",
+            "detail": "缺数均显式登记了 unavailable_reason",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.sample_grid",
+            "detail": "采样时点不在 CFG-04 计算的网格上：['2026-01-07T18:00:00+08:00']",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "status.account_registered",
+            "detail": "测量科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "artifact_digest": "sha256:1361b4c8c7cb0dd1ad80230faf4da947ae4426a66fcd3a029c95fa1230c91ed4"
+      },
+      "delta": "pass_to_violation",
+      "explanation": "CFG-05 由 [0.5, 1.0] 收为 [1.0] 后，工件在周期 50% 时点的采集/采样时刻不再落在网格上，status.sample_grid 判 violation；工件内容除 config_ref 同步为变体快照外未改，不是 config_drift。"
+    }
+  ]
+}

@@ -1862,3 +1862,26 @@
 - **未做**：未宣称 D6 达标；模型三档未执行；S2 变体（V-CFG03/05/14/15）未建；`acceptance.json` 的模型档位仍为本地权重口径，待裁定三落地。
 - **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-177、T-150；本节。
 - **关联 ADR**：无（裁定为口径确认，不属于规范层变更）
+
+---
+
+### 批次 0109 — 2026-11-17 — D6 裁定二：S2 配置敏感性变体补齐
+
+- **涉及文件**：
+  - 新增 `validation/d6/configs/`：`V-CFG03`、`V-CFG05`、`V-CFG14`、`V-CFG15`、`V-CFG09-GBP-CFG05`、`V-CFG09-GBP-CFG15` 的配置与锁（各 1 对）。
+  - 新增 `validation/d6/variants/`：24 份变体工件副本（仅把 `config_ref` 同步为变体快照，其余内容与主运行一致）与 `PLAN.json`。
+  - 新增 `validation/d6/results/s2-*`：6 份 `run.json` 与 `SUMMARY.md`。
+  - 修改 `validation/d6/BASELINE.md`（S2 清单改为实际建成并运行，补隔离方式与未声明翻转处理）、`validation/d6/acceptance.json`（`sensitivity.S2_config_variants` 与 `S2_runs` 证据）、`spec/ACCESS_ZONES.md`（7 行 C 区归区）、`scripts/no-review-declarations.json`、`scripts/{spec,checker}-pins.json`、`knowledge/glossary-usage.json`、`TODO.md`、`CHANGELOG.md`。
+- **变更摘要**：
+  - S2 变体独立运行，**不计入主运行**（主运行仍为 32/32，见批次 0108）。
+  - V-CFG03：全题集无 `deviation.*` 消费者，0 题可跑；记为覆盖缺口，不是“敏感性为 0”。
+  - V-CFG05：3 题 pass→violation（`status.sample_grid`：期中采样点不在 `[1.0]` 网格）。V-CFG09-GBP-CFG05：2 题同类翻转。
+  - V-CFG14：5 题结论全部不变（概率/影响取值 1–3 仍在 5×5 内；`risk.band_consistent` 不比对档位标签）。
+  - V-CFG15：SYN-04 pass→violation，SYN-05 失败项扩大（退出码仍 1）。V-CFG09-GBP-CFG15：4 题 pass→violation、1 题失败项扩大、2 题状态件不变（测量科目为 1000/1100）。
+  - 10 个 pass→violation 均未在任务卡 `expected.sensitivity_flip` 中预先声明，按 `BASELINE.md` 稳定性判据记为**未声明翻转（不稳定）**，逐题原因写入对应 `run.json` 的 `explanation`；**未回溯修改任务卡期望**。
+  - 变体工件只同步 `config_ref`，避免 `config_drift` 混入敏感性比较；全部结果与主运行分开统计，不与主运行拼比。
+- **实测**：`python3 /tmp/run_s2.py`（一次性运行器，未入库）逐题调用 `scripts/pm_check.py`；差异统计见各 `run.json` 的 `summary.deltas`。
+- **钩子绕过**：本批改动含受钉扎的 `spec/ACCESS_ZONES.md` 与两份钉扎清单；既有未复核欠账使两个 pins 检查器 rc=1。按 3.5.3 第 3 条新建 T-178 后携带 `Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-178` 提交。
+- **未做**：未宣称 D6 达标；模型三档未执行；本地权重口径待裁定三处理；未把 S2 结果并入主运行通过率。
+- **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-178、T-150；`scripts/no-review-declarations.json` 的 `spec/ACCESS_ZONES.md` 条目；本节。
+- **关联 ADR**：无（S2 口径已在既有 `BASELINE.md` 内，无新增规范层变更）

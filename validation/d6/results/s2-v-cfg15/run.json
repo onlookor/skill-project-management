@@ -1,0 +1,268 @@
+{
+  "summary": {
+    "run_id": "s2-v-cfg15",
+    "kind": "S2-sensitivity-variant",
+    "generated_at": "2026-11-17T20:41:11+08:00",
+    "config_variant": "V-CFG15",
+    "config_digest": "sha256:330f78279880fee03c7feab67d77fcf02bfeb856e08a537767c5ef7971de50c5",
+    "base_config": "primary",
+    "tasks": 5,
+    "counted_in_main_run": false,
+    "models": "not_executed",
+    "deltas": {
+      "unchanged": 3,
+      "pass_to_violation": 1,
+      "pass_to_cannot_evaluate": 0,
+      "violation_to_pass": 0,
+      "cannot_evaluate_to_pass": 0,
+      "changed_other": 1
+    },
+    "observations": [
+      "三题（含两题状态件）不变：状态件测量科目为 1000/1100，移除 2100 不影响；SYN-04 与 SYN-05 的采购工作包记在 2100，故被检出。",
+      "SYN-05 主运行已是 violation，变体下失败项集合扩大（追加 accounts_registered），退出码仍为 1。"
+    ]
+  },
+  "results": [
+    {
+      "task_id": "D6-PUB-04",
+      "title": "Crossrail 状态快照：2018 年 7 月的完成度与支出",
+      "main": {
+        "run": "validation/d6/results/phase2-public-crossrail/run.json",
+        "variant": null,
+        "outcome": "pass",
+        "exit_code": 0,
+        "failed_checks": []
+      },
+      "variant": {
+        "exit_code": 0,
+        "failed_checks": [],
+        "findings": [
+          {
+            "check": "status.dictionary_fields",
+            "detail": "数据字典齐备且测量指标均已登记",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.no_implicit_zero",
+            "detail": "缺数均显式登记了 unavailable_reason",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.sample_grid",
+            "detail": "2 个采样点均与配置口径一致",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.account_registered",
+            "detail": "测量科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "artifact_digest": "sha256:8cd9d57ba48646cb7a43bc08973b52694a1d18742be11566a2442e5ac4a5fe41"
+      },
+      "delta": "unchanged",
+      "explanation": "结论不变：状态件测量科目为 1000/1100，移除 2100 不影响 status.account_registered。"
+    },
+    {
+      "task_id": "D6-PUB-11",
+      "title": "Universal Credit 状态快照：无法评估系统价值的指标显式登记不可用",
+      "main": {
+        "run": "validation/d6/results/phase3-public-uc/run.json",
+        "variant": null,
+        "outcome": "pass",
+        "exit_code": 0,
+        "failed_checks": []
+      },
+      "variant": {
+        "exit_code": 0,
+        "failed_checks": [],
+        "findings": [
+          {
+            "check": "status.dictionary_fields",
+            "detail": "数据字典齐备且测量指标均已登记",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.no_implicit_zero",
+            "detail": "缺数均显式登记了 unavailable_reason",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.sample_grid",
+            "detail": "2 个采样点均与配置口径一致",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.account_registered",
+            "detail": "测量科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "artifact_digest": "sha256:753c353d2ea4d6a3ed1ea58faf68d273b6e5c48b59e28644723494c98697fd1c"
+      },
+      "delta": "unchanged",
+      "explanation": "结论不变：状态件测量科目为 1000/1100，移除 2100 不影响 status.account_registered。"
+    },
+    {
+      "task_id": "D6-SYN-04",
+      "title": "预算正例：科目登记、总额守恒、分时段求和一致、币种一致",
+      "main": {
+        "run": "validation/d6/results/phase1-synthetic/run.json",
+        "variant": null,
+        "outcome": "pass",
+        "exit_code": 0,
+        "failed_checks": []
+      },
+      "variant": {
+        "exit_code": 1,
+        "failed_checks": [
+          "budget.accounts_registered"
+        ],
+        "findings": [
+          {
+            "check": "budget.accounts_registered",
+            "detail": "未登记成本科目：['2100']",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "budget.package_unique",
+            "detail": "3 个工作包 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.total_conserved",
+            "detail": "每个科目与总额均守恒，合计 10000.0",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.time_phased_sum",
+            "detail": "每个工作包的分时段金额之和等于总额",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.currency_match",
+            "detail": "货币与 CFG-09 一致",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "artifact_digest": "sha256:34d6be7f00689bf8bb1259d7d624517273730ca2e5442d8c939b9bfe3812bb4a"
+      },
+      "delta": "pass_to_violation",
+      "explanation": "科目表移除 2100（采购）后，采购工作包仍记在该科目，budget.accounts_registered 判“未登记成本科目 ['2100']”。"
+    },
+    {
+      "task_id": "D6-SYN-05",
+      "title": "预算负例：WP1 分时段合计 4000 ≠ 工作包金额 5000",
+      "main": {
+        "run": "validation/d6/results/phase1-synthetic/run.json",
+        "variant": null,
+        "outcome": "pass",
+        "exit_code": 1,
+        "failed_checks": [
+          "budget.total_conserved",
+          "budget.time_phased_sum"
+        ]
+      },
+      "variant": {
+        "exit_code": 1,
+        "failed_checks": [
+          "budget.accounts_registered",
+          "budget.total_conserved",
+          "budget.time_phased_sum"
+        ],
+        "findings": [
+          {
+            "check": "budget.accounts_registered",
+            "detail": "未登记成本科目：['2100']",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "budget.package_unique",
+            "detail": "3 个工作包 id 唯一",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "budget.total_conserved",
+            "detail": "分时段合计 9000.0 与工作包合计 10000.0 不等",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "budget.time_phased_sum",
+            "detail": "分时段金额与工作包金额不一致或缺分时段：['WP1']",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "budget.currency_match",
+            "detail": "货币与 CFG-09 一致",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "artifact_digest": "sha256:854103e45e46cb76f6b43078f992defb09154602e2e0ab78cf82ee7490b5f107"
+      },
+      "delta": "changed_other",
+      "explanation": "退出码不变（主运行已是 violation），变体下失败项集合扩大：追加 budget.accounts_registered；原失败项 budget.total_conserved / budget.time_phased_sum 保留。"
+    },
+    {
+      "task_id": "D6-SYN-08",
+      "title": "状态正例：字典齐备、无隐式零、采样点合网格、科目已登记",
+      "main": {
+        "run": "validation/d6/results/phase1-synthetic/run.json",
+        "variant": null,
+        "outcome": "pass",
+        "exit_code": 0,
+        "failed_checks": []
+      },
+      "variant": {
+        "exit_code": 0,
+        "failed_checks": [],
+        "findings": [
+          {
+            "check": "status.dictionary_fields",
+            "detail": "数据字典齐备且测量指标均已登记",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.no_implicit_zero",
+            "detail": "缺数均显式登记了 unavailable_reason",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.sample_grid",
+            "detail": "2 个采样点均与配置口径一致",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.account_registered",
+            "detail": "测量科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "artifact_digest": "sha256:77bb93c896c601b7929c53a27d08d0debae942058885eea13dc01331a79bf506"
+      },
+      "delta": "unchanged",
+      "explanation": "结论不变：状态件测量科目为 1000/1100，移除 2100 不影响 status.account_registered。"
+    }
+  ]
+}

@@ -52,8 +52,27 @@
       "V-CFG05",
       "V-CFG14",
       "V-CFG15",
-      "V-CFG09"
+      "V-CFG09-GBP",
+      "V-CFG09-GBP-CFG05",
+      "V-CFG09-GBP-CFG15"
     ],
+    "S2_runs": {
+      "executed": true,
+      "counted_in_main_run": false,
+      "run_records": [
+        "validation/d6/results/s2-v-cfg03/run.json",
+        "validation/d6/results/s2-v-cfg05/run.json",
+        "validation/d6/results/s2-v-cfg14/run.json",
+        "validation/d6/results/s2-v-cfg15/run.json",
+        "validation/d6/results/s2-v-cfg09-gbp-cfg05/run.json",
+        "validation/d6/results/s2-v-cfg09-gbp-cfg15/run.json"
+      ],
+      "pass_to_violation": 10,
+      "pass_to_cannot_evaluate": 0,
+      "changed_other": 2,
+      "undeclared_flips": 10,
+      "note": "变体工件仅同步 config_ref 为变体快照，其余内容与主运行一致；V-CFG03 因题集无 deviation.* 消费者而 0 题可跑。10 个翻转均未在任务卡 expected.sensitivity_flip 中预先声明，按 BASELINE.md 稳定性判据记为未声明翻转，逐题原因见对应 run.json 的 explanation；未回溯修改期望，未并入主运行。"
+    },
     "flip_requires_declaration": true
   },
   "task_set": "validation/d6/tasks/task-set.json",

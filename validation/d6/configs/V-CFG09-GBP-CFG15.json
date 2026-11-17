@@ -1,0 +1,145 @@
+{
+  "schema_version": "config.schema/1",
+  "config": {
+    "CFG-01": [
+      "cost_account",
+      "wbs_node"
+    ],
+    "CFG-02": {
+      "levels": 5,
+      "labels": [
+        "red",
+        "amber",
+        "yellow",
+        "green",
+        "blue"
+      ]
+    },
+    "CFG-03": {
+      "metric": "SPI",
+      "boundaries": [
+        {
+          "label": "red",
+          "order": 1,
+          "lower": -1,
+          "upper": 0.8
+        },
+        {
+          "label": "amber",
+          "order": 2,
+          "lower": 0.8,
+          "upper": 0.95
+        },
+        {
+          "label": "yellow",
+          "order": 3,
+          "lower": 0.95,
+          "upper": 1.0
+        },
+        {
+          "label": "green",
+          "order": 4,
+          "lower": 1.0,
+          "upper": 1.1
+        },
+        {
+          "label": "blue",
+          "order": 5,
+          "lower": 1.1,
+          "upper": 2
+        }
+      ]
+    },
+    "CFG-04": "milestone_fraction",
+    "CFG-05": [
+      0.5,
+      1.0
+    ],
+    "CFG-06": "workday",
+    "CFG-08": {
+      "timezone": "Asia/Shanghai",
+      "workdays": [
+        "Mon",
+        "Tue",
+        "Wed",
+        "Thu",
+        "Fri"
+      ],
+      "holidays": [
+        {
+          "from": "2026-01-01",
+          "to": "2026-01-02"
+        }
+      ]
+    },
+    "CFG-09": "GBP",
+    "CFG-10": {
+      "decimals": 2,
+      "rounding": "half_even",
+      "intermediate": "none"
+    },
+    "CFG-11": {
+      "template": "<type>-<project_id>-v<major>.<minor>"
+    },
+    "CFG-12": {
+      "approver_role_map": {
+        "GATE-SCHEDULE": "pm",
+        "GATE-COST": "pm",
+        "GATE-RISK": "sponsor",
+        "GATE-STATUS": "pm",
+        "GATE-AUDIT": "reviewer"
+      }
+    },
+    "CFG-13": {
+      "rule": "0/100"
+    },
+    "CFG-14": {
+      "scale": "3x3",
+      "probability_labels": [
+        "低",
+        "中",
+        "高"
+      ],
+      "impact_labels": [
+        "轻",
+        "中",
+        "重"
+      ],
+      "score_rule": "product",
+      "bands": [
+        {
+          "label": "green",
+          "order": 1,
+          "lower": 1,
+          "upper": 2
+        },
+        {
+          "label": "yellow",
+          "order": 2,
+          "lower": 3,
+          "upper": 4
+        },
+        {
+          "label": "red",
+          "order": 3,
+          "lower": 5,
+          "upper": 9
+        }
+      ]
+    },
+    "CFG-15": {
+      "source": "validation/d6/acceptance-config.json（验收配置的演示科目表）",
+      "accounts": [
+        {
+          "code": "1000",
+          "name": "项目总预算"
+        },
+        {
+          "code": "1100",
+          "name": "人工",
+          "parent_code": "1000"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "summary": {
+    "run_id": "s2-v-cfg03",
+    "kind": "S2-sensitivity-variant",
+    "generated_at": "2026-11-17T20:41:11+08:00",
+    "config_variant": "V-CFG03",
+    "config_digest": "sha256:b7b6b79988e107cdad9247495b6399cd5e410b0878001cac397aed14e0e27c19",
+    "base_config": "primary",
+    "tasks": 0,
+    "counted_in_main_run": false,
+    "models": "not_executed",
+    "deltas": {
+      "unchanged": 0,
+      "pass_to_violation": 0,
+      "pass_to_cannot_evaluate": 0,
+      "violation_to_pass": 0,
+      "cannot_evaluate_to_pass": 0,
+      "changed_other": 0
+    },
+    "observations": [
+      "本变体只改 CFG-03 的 SPI 分档边界（档数与标签不变）。全题集检查项中没有任何 `deviation.*` 消费者（对 task-set.json 的 checks 枚举为 0 条），因此无题可跑、差异为空。",
+      "这是覆盖缺口，不是敏感性为 0：说明现有 32 题没有一题检验偏差分档口径，改 CFG-03 不会暴露任何结果变化。已写入运行记录，未据此宣称配置安全。"
+    ]
+  },
+  "results": []
+}

@@ -1,0 +1,119 @@
+{
+  "summary": {
+    "run_id": "s2-v-cfg09-gbp-cfg05",
+    "kind": "S2-sensitivity-variant",
+    "generated_at": "2026-11-17T20:41:11+08:00",
+    "config_variant": "V-CFG09-GBP-CFG05",
+    "config_digest": "sha256:00e0ce9002ae21e26bcd2fa3827dadc9b84b34cc557ec13bb3baf1fa30b2d8c7",
+    "base_config": "V-CFG09-GBP",
+    "tasks": 2,
+    "counted_in_main_run": false,
+    "models": "not_executed",
+    "deltas": {
+      "unchanged": 0,
+      "pass_to_violation": 2,
+      "pass_to_cannot_evaluate": 0,
+      "violation_to_pass": 0,
+      "cannot_evaluate_to_pass": 0,
+      "changed_other": 0
+    },
+    "observations": [
+      "两题基于 V-CFG09-GBP（主运行口径），变体只再收采样分数，避免币种差异混入。",
+      "结论与主运行一致地翻转：期中采样不再在网格上。"
+    ]
+  },
+  "results": [
+    {
+      "task_id": "D6-PUB-17",
+      "title": "HS2 状态快照：Euston 暂停期的支出与不可用进度指标",
+      "main": {
+        "run": "validation/d6/results/phase4-public-hs2/run.json",
+        "variant": null,
+        "outcome": "pass",
+        "exit_code": 0,
+        "failed_checks": []
+      },
+      "variant": {
+        "exit_code": 1,
+        "failed_checks": [
+          "status.sample_grid"
+        ],
+        "findings": [
+          {
+            "check": "status.dictionary_fields",
+            "detail": "数据字典齐备且测量指标均已登记",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.no_implicit_zero",
+            "detail": "缺数均显式登记了 unavailable_reason",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.sample_grid",
+            "detail": "采样时点不在 CFG-04 计算的网格上：['2023-06-30T00:00:00+08:00']",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "status.account_registered",
+            "detail": "测量科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "artifact_digest": "sha256:2ea8fa6f11c9c1e7c1ef43aba0d1a039c9b8c804bab8bbb60d4861b24c5d6eb0"
+      },
+      "delta": "pass_to_violation",
+      "explanation": "CFG-05 由 [0.5, 1.0] 收为 [1.0] 后，工件在周期 50% 时点的采集/采样时刻不再落在网格上，status.sample_grid 判 violation；工件内容除 config_ref 同步为变体快照外未改，不是 config_drift。"
+    },
+    {
+      "task_id": "D6-PUB-19",
+      "title": "NPfIT 状态快照：项目关闭后目标类指标显式不可用",
+      "main": {
+        "run": "validation/d6/results/phase5-public-npfit/run.json",
+        "variant": null,
+        "outcome": "pass",
+        "exit_code": 0,
+        "failed_checks": []
+      },
+      "variant": {
+        "exit_code": 1,
+        "failed_checks": [
+          "status.sample_grid"
+        ],
+        "findings": [
+          {
+            "check": "status.dictionary_fields",
+            "detail": "数据字典齐备且测量指标均已登记",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.no_implicit_zero",
+            "detail": "缺数均显式登记了 unavailable_reason",
+            "path": "",
+            "status": "pass"
+          },
+          {
+            "check": "status.sample_grid",
+            "detail": "采样时点不在 CFG-04 计算的网格上：['2010-12-31T00:00:00+08:00']",
+            "path": "",
+            "status": "violation"
+          },
+          {
+            "check": "status.account_registered",
+            "detail": "测量科目均在 CFG-15 内",
+            "path": "",
+            "status": "pass"
+          }
+        ],
+        "artifact_digest": "sha256:054ffc6ae80eb3162771fe9a6a71a6a23821d42d396b31cef303a8dcb82e02de"
+      },
+      "delta": "pass_to_violation",
+      "explanation": "CFG-05 由 [0.5, 1.0] 收为 [1.0] 后，工件在周期 50% 时点的采集/采样时刻不再落在网格上，status.sample_grid 判 violation；工件内容除 config_ref 同步为变体快照外未改，不是 config_drift。"
+    }
+  ]
+}
