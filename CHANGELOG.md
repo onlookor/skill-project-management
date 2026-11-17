@@ -1845,3 +1845,20 @@
 - **未做**：模型弱档/对照档/无技能臂未执行（无权重、或需外部 API，等待确认路线）；S2 变体只建了 `V-CFG09-GBP`，CFG-03/05/14/15 变体未建；D6-SYN-02 保持待裁定，未改检查器与提案。
 - **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-176、T-150 / T-156；`scripts/no-review-declarations.json` 的 `spec/ACCESS_ZONES.md` 条目；本节。
 - **关联 ADR**：ADR-0020
+
+---
+
+### 批次 0108 — 2026-11-17 — D6 裁定一：违规与 cannot_evaluate 同时成立时退出码取 3
+
+- **涉及文件**：`validation/d6/tasks/task-set.json`、`validation/d6/BASELINE.md`、`validation/d6/results/phase1-synthetic/run.json`、`validation/d6/results/phase1-synthetic/SUMMARY.md`、`validation/d6/acceptance.json`、`TODO.md`、`CHANGELOG.md`
+- **变更摘要**：
+  - 按 2026-11-17 裁定，D6-SYN-02 的期望退出码由 1 改为 3：`dep.acyclic` 违规与 `schedule.critical_path` 无法判定同时成立，聚合优先级 `4 > 2 > 3 > 1 > 0` 取 3。任务卡 `expected.outcome` 仍记 `violation`（表示本题判定目的），另加 `expectation_note` 记录裁定依据与“未改提案”的事实。
+  - `BASELINE.md` 五值结果表下新增“多值同时成立时的聚合口径”段，写明 4>2>3>1>0 与本题示例；此前该优先级只存在于检查器实现，验收说明未写。
+  - 重跑合成 10 题：10/10 符合期望，SYN-02 实际 3 = 期望 3，退出码分布 `{0:4, 1:4, 3:2}`；`run.json` 与 `SUMMARY.md` 同步更新，observation 保留原不符事实。
+  - `acceptance.json` 的 `runtime_evidence` 改为 32 题执行、32 题符合、0 不符，并以 `mismatch_history` 记录原 1 题不符及其裁定解决过程。**该字段只记录机械运行一致性，不构成 D6 达标结论**。
+  - 未改 `scripts/pm_check.py`，未改受钉扎的 `spec/D6_REBASELINE_PROPOSAL.md`（§4.5 只定义五值语义，无 1 与 3 的优先级条款）。
+- **实测**：`python3 scripts/pm_check.py --config … --lock … --artifact validation/cases/synthetic/SYN-DEP-CYCLE/inputs/dependency-graph.json` 退出 3，findings 中 `dep.acyclic=violation`、`schedule.critical_path=cannot_evaluate`；重跑 10 题全部符合期望。
+- **钩子绕过**：本批未改钉扎面对象；因既有未复核欠账使两个 pins 检查器 rc≠0，按 3.5.3 第 3 条新建 T-177 后携带 `Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-177` 提交。
+- **未做**：未宣称 D6 达标；模型三档未执行；S2 变体（V-CFG03/05/14/15）未建；`acceptance.json` 的模型档位仍为本地权重口径，待裁定三落地。
+- **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-177、T-150；本节。
+- **关联 ADR**：无（裁定为口径确认，不属于规范层变更）

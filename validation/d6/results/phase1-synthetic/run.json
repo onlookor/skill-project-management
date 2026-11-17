@@ -1,13 +1,13 @@
 {
   "summary": {
     "run_id": "phase1-synthetic",
-    "generated_at": "2026-11-16T22:58:25+08:00",
+    "generated_at": "2026-11-17T20:38:30+08:00",
     "task_set_version": "0.1.0-skeleton",
     "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
     "models": "not_executed",
     "total": 10,
-    "pass": 9,
-    "mismatch": 1,
+    "pass": 10,
+    "mismatch": 0,
     "exit_codes": {
       "0": 4,
       "1": 4,
@@ -17,9 +17,9 @@
     },
     "observations": [
       "依赖图缺少 lag 字段时 schedule.critical_path 判 cannot_evaluate（无法区分“无滞后”与“未声明”）；正例需显式写 lag: 0。",
-      "SYN-DEP-CYCLE 检出 dep.acyclic 违规，但聚合退出码为 3；按规范 4.5“1=存在违规”应记 1。两者同时成立时优先级未定义，本批按 1 期望并记不符，不据此放宽判据。",
+      "D6-SYN-02 于 2026-11-17 按裁定改期望：违规（dep.acyclic）与 cannot_evaluate（schedule.critical_path）同时成立时聚合退出码取 3（优先级 4>2>3>1>0），期望由 1 改为 3 后重跑，实际 3 与期望一致。裁定未改动受钉扎的 spec/D6_REBASELINE_PROPOSAL.md（§4.5 未定义 1 与 3 的优先级）。",
       "SYN-BUD-TIMESUM 同时触发 budget.total_conserved 与 budget.time_phased_sum；两者是不同口径的守恒检查，均保留。",
-      "本批 10 题全部为合成题；公开案例改造题尚未进入运行，模型双臂 not_executed。"
+      "本批 10 题全部为合成题；公开案例改造题在 phase2–phase5 运行，模型双臂 not_executed。"
     ]
   },
   "results": [
@@ -39,7 +39,15 @@
       "expected": {
         "outcome": "pass",
         "exit_code": 0,
-        "must_flag": []
+        "must_flag": [],
+        "must_pass": [
+          "dep.ids_unique",
+          "dep.endpoints_exist",
+          "dep.acyclic",
+          "dep.types_valid",
+          "dep.wbs_mapping",
+          "schedule.critical_path"
+        ]
       },
       "actual": {
         "exit_code": 0,
@@ -103,10 +111,17 @@
       ],
       "expected": {
         "outcome": "violation",
-        "exit_code": 1,
+        "exit_code": 3,
         "must_flag": [
           "dep.acyclic"
-        ]
+        ],
+        "must_pass": [
+          "dep.ids_unique",
+          "dep.endpoints_exist",
+          "dep.types_valid",
+          "dep.wbs_mapping"
+        ],
+        "expectation_note": "2026-11-17 裁定：违规（dep.acyclic）与 cannot_evaluate（schedule.critical_path 因成环无法算关键路径）同时成立时，聚合退出码取 3。聚合优先级为 4>2>3>1>0（`scripts/pm_check.py` 的 PRECEDENCE），故本期望由 1 改为 3；`outcome` 仍记 violation，表示本题的判定目的是检出违规。`spec/D6_REBASELINE_PROPOSAL.md` §4.5 只定义五值各自语义、未定义 1 与 3 的优先级，故未改动该受钉扎提案正文。"
       },
       "actual": {
         "exit_code": 3,
@@ -155,8 +170,8 @@
         "artifact_digest": "sha256:3f948bccd335f9154b9baad6ef9f6020c73c97f5b53740cd09ca5c07df024d60"
       },
       "config_digest": "sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c",
-      "outcome": "mismatch",
-      "mismatch_reason": "exit_code_precedence_undefined"
+      "outcome": "pass",
+      "mismatch_reason": null
     },
     {
       "task_id": "D6-SYN-03",
@@ -176,6 +191,13 @@
         "exit_code": 3,
         "must_flag": [
           "dep.wbs_mapping"
+        ],
+        "must_pass": [
+          "dep.ids_unique",
+          "dep.endpoints_exist",
+          "dep.acyclic",
+          "dep.types_valid",
+          "schedule.critical_path"
         ]
       },
       "actual": {
@@ -242,7 +264,14 @@
       "expected": {
         "outcome": "pass",
         "exit_code": 0,
-        "must_flag": []
+        "must_flag": [],
+        "must_pass": [
+          "budget.accounts_registered",
+          "budget.package_unique",
+          "budget.total_conserved",
+          "budget.time_phased_sum",
+          "budget.currency_match"
+        ]
       },
       "actual": {
         "exit_code": 0,
@@ -302,6 +331,11 @@
         "exit_code": 1,
         "must_flag": [
           "budget.time_phased_sum"
+        ],
+        "must_pass": [
+          "budget.accounts_registered",
+          "budget.package_unique",
+          "budget.currency_match"
         ]
       },
       "actual": {
@@ -339,8 +373,8 @@
           }
         ],
         "failed_checks": [
-          "budget.time_phased_sum",
-          "budget.total_conserved"
+          "budget.total_conserved",
+          "budget.time_phased_sum"
         ],
         "artifact_digest": "sha256:e0fe8731ed8da0aa36a0bd484cbc19f7d7b4a05d18a299b4a9df6af94373a88b"
       },
@@ -363,7 +397,14 @@
       "expected": {
         "outcome": "pass",
         "exit_code": 0,
-        "must_flag": []
+        "must_flag": [],
+        "must_pass": [
+          "risk.required_fields",
+          "risk.scale_in_range",
+          "risk.residual_le_initial",
+          "risk.owner_registered",
+          "risk.band_consistent"
+        ]
       },
       "actual": {
         "exit_code": 0,
@@ -423,6 +464,12 @@
         "exit_code": 1,
         "must_flag": [
           "risk.residual_le_initial"
+        ],
+        "must_pass": [
+          "risk.required_fields",
+          "risk.scale_in_range",
+          "risk.owner_registered",
+          "risk.band_consistent"
         ]
       },
       "actual": {
@@ -482,7 +529,13 @@
       "expected": {
         "outcome": "pass",
         "exit_code": 0,
-        "must_flag": []
+        "must_flag": [],
+        "must_pass": [
+          "status.dictionary_fields",
+          "status.no_implicit_zero",
+          "status.sample_grid",
+          "status.account_registered"
+        ]
       },
       "actual": {
         "exit_code": 0,
@@ -536,6 +589,12 @@
         "exit_code": 1,
         "must_flag": [
           "evm.budget_consistent"
+        ],
+        "must_pass": [
+          "evm.formulas",
+          "evm.ev_measurement",
+          "evm.eac_method",
+          "evm.term_aliases"
         ]
       },
       "actual": {
@@ -598,6 +657,12 @@
         "exit_code": 1,
         "must_flag": [
           "audit.sequence_strict"
+        ],
+        "must_pass": [
+          "audit.required_fields",
+          "audit.chain_digest",
+          "audit.exit_code_valid",
+          "audit.evidence_present"
         ]
       },
       "actual": {

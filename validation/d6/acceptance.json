@@ -67,9 +67,11 @@
       "phase5-public-npfit"
     ],
     "tasks_executed": 32,
-    "tasks_matching_expectation": 31,
-    "tasks_mismatching": 1,
-    "mismatch": "D6-SYN-02：违规与 cannot_evaluate 同时成立时聚合退出码优先级未定义，实际 3、按规范 4.5 期望 1；按上级裁定保留为待裁定项，未改检查器与期望",
+    "tasks_matching_expectation": 32,
+    "tasks_mismatching": 0,
+    "mismatch_history": [
+      "D6-SYN-02：2026-11-17 裁定前，实际聚合退出码 3、规范期望 1，记为不符。裁定“违规与 cannot_evaluate 同时成立时取 3”（优先级 4>2>3>1>0）后，期望改为 3 并重跑，实际 3 与期望一致。受钉扎的 `spec/D6_REBASELINE_PROPOSAL.md` §4.5 只定义五值语义、未定义 1 与 3 的优先级，未改动该提案正文。"
+    ],
     "model_arms": "not_executed（无权重；需外部 API 或本地权重）"
   }
 }

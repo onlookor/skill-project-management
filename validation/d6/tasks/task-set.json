@@ -899,7 +899,7 @@
       ],
       "expected": {
         "outcome": "violation",
-        "exit_code": 1,
+        "exit_code": 3,
         "must_flag": [
           "dep.acyclic"
         ],
@@ -908,7 +908,8 @@
           "dep.endpoints_exist",
           "dep.types_valid",
           "dep.wbs_mapping"
-        ]
+        ],
+        "expectation_note": "2026-11-17 裁定：违规（dep.acyclic）与 cannot_evaluate（schedule.critical_path 因成环无法算关键路径）同时成立时，聚合退出码取 3。聚合优先级为 4>2>3>1>0（`scripts/pm_check.py` 的 PRECEDENCE），故本期望由 1 改为 3；`outcome` 仍记 violation，表示本题的判定目的是检出违规。`spec/D6_REBASELINE_PROPOSAL.md` §4.5 只定义五值各自语义、未定义 1 与 3 的优先级，故未改动该受钉扎提案正文。"
       },
       "input": "validation/cases/synthetic/SYN-DEP-CYCLE/inputs/dependency-graph.json",
       "input_status": "ready",

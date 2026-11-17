@@ -41,6 +41,8 @@
 | `gap` | 对应能力尚无工件契约或检查项，无法运行 | 否，记入实现缺口 |
 | `not_run` | 本轮未执行（模型臂、待核验素材） | 否，不计入分母 |
 
+**多值同时成立时的聚合口径**：一件工件内多个检查可同时给出不同结论，聚合退出码按 `scripts/pm_check.py` 的 `PRECEDENCE` 取最高优先级，顺序为 `4 > 2 > 3 > 1 > 0`。因此**违规与 `cannot_evaluate` 同时成立时判 3**（如 D6-SYN-02：`dep.acyclic` 违规、`schedule.critical_path` 因成环无法判定）。该口径为 2026-11-17 裁定；`expected.outcome` 仍按任务的判定目的标注（上述题目记 `violation`），退出码按聚合结果记录。裁定前 D6-SYN-02 的期望为 1，属期望值与实现不一致，已改为 3 并重跑。
+
 ## 3. 配置随题的方式
 
 1. **主运行锁同一快照**：任务集主运行的全部题目引用 `acceptance-config.json` 与 `acceptance-config.lock.json`，结果表逐题记录 `config_digest = sha256:228bcbd6c6bd4f95869de18650e5dc0acd3de204ffc49ad2846ddb3af10abe8c`。
