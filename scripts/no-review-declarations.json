@@ -61,11 +61,11 @@
   },
   "spec": {
     "spec/ACCESS_ZONES.md": {
-      "reason": "批次 0095 为新增的 `runtime/` 顶层目录登记归区（C 区 22 个 JSON、P/P2 10 个 Markdown），区段指纹已重冻；新增归区内容无复核产物。批次 0098 又为 `spec/clause-registry.json` 增加 D 区登记与生成器登记（第 1/2 节），同属未复核改动。批次 0103 为 D6 验收件登记 `validation/cases/`（C 区 JSON）与 `validation/d6/` 的 P/C 混合归区，仍无复核产物；批次 0104 增 `validation/d6/configs/` 与批次 2 运行记录两行 C 区归区，欠账见 T-173；批次 0105 增批次 3 运行记录一行，欠账见 T-174；批次 0106 增批次 4 运行记录一行，欠账见 T-175；批次 0107 增批次 5 运行记录一行，欠账见 T-176；批次 0109 增 `validation/d6/variants/` 与 6 条 S2 运行记录归区，欠账见 T-178；批次 0112 增 `runtime/artifacts/CONTRACTS.md` 的 P2 归区与批次 6 运行记录归区，欠账见 T-182",
-      "missing_review": "对 `runtime/` 归区、P2 分级与 0098 新增 D 区/生成器登记是否符合 `ACCESS_ZONES` 第 2/3/4 节的非同源复核；批次 0103 另需复核 D6 验收件把案例输入归 C 区、说明文档归 P 区是否成立，以及 `validation/d6/results/` 的 P2 口径；批次 0104 需复核变体配置目录与运行记录归 C 区是否成立；批次 0105 需复核逐批登记运行记录是否成立；批次 0106 需复核 G-023/G-024/G-025 的台账写法（含锚定首行与待裁定表述）；批次 0107 需复核批次 5 运行记录归区与 `acceptance.json` 的 `runtime_evidence` 字段表述；批次 0109 需复核 S2 变体工件副本（仅同步 config_ref）归 C 区、以及变体结果单列不进主运行的口径；批次 0112 需复核 `runtime/artifacts/CONTRACTS.md` 归 P2、以及 doc-only 声明是否越出契约说明的边界",
+      "reason": "批次 0095 为新增的 `runtime/` 顶层目录登记归区（C 区 22 个 JSON、P/P2 10 个 Markdown），区段指纹已重冻；新增归区内容无复核产物。批次 0098 又为 `spec/clause-registry.json` 增加 D 区登记与生成器登记（第 1/2 节），同属未复核改动。批次 0103 为 D6 验收件登记 `validation/cases/`（C 区 JSON）与 `validation/d6/` 的 P/C 混合归区，仍无复核产物；批次 0104 增 `validation/d6/configs/` 与批次 2 运行记录两行 C 区归区，欠账见 T-173；批次 0105 增批次 3 运行记录一行，欠账见 T-174；批次 0106 增批次 4 运行记录一行，欠账见 T-175；批次 0107 增批次 5 运行记录一行，欠账见 T-176；批次 0109 增 `validation/d6/variants/` 与 6 条 S2 运行记录归区，欠账见 T-178；批次 0112 增 `runtime/artifacts/CONTRACTS.md` 的 P2 归区与批次 6 运行记录归区，欠账见 T-182；批次 0113 补登记 `validation/d6/results/phase6-contract-gaps/run.json` 归 C 区（修复 D4 的 RM-ZONE 回归），欠账见 T-183",
+      "missing_review": "对 `runtime/` 归区、P2 分级与 0098 新增 D 区/生成器登记是否符合 `ACCESS_ZONES` 第 2/3/4 节的非同源复核；批次 0103 另需复核 D6 验收件把案例输入归 C 区、说明文档归 P 区是否成立，以及 `validation/d6/results/` 的 P2 口径；批次 0104 需复核变体配置目录与运行记录归 C 区是否成立；批次 0105 需复核逐批登记运行记录是否成立；批次 0106 需复核 G-023/G-024/G-025 的台账写法（含锚定首行与待裁定表述）；批次 0107 需复核批次 5 运行记录归区与 `acceptance.json` 的 `runtime_evidence` 字段表述；批次 0109 需复核 S2 变体工件副本（仅同步 config_ref）归 C 区、以及变体结果单列不进主运行的口径；批次 0112 需复核 `runtime/artifacts/CONTRACTS.md` 归 P2、以及 doc-only 声明是否越出契约说明的边界；批次 0113 需复核“逐个 `run.json` 登记为 C 区”是否比目录级 P2 更合适，以及漏登记如何被检查器发现",
       "due": "M1 出口前",
       "owner": "父会话 6af45947fead009e7bdd1e76（待指派）",
-      "todo": "T-182"
+      "todo": "T-183"
     },
     "runtime/artifacts/deviation-report.schema.json": {
       "reason": "批次 0112 按 G-027 方案 B 新增 deviation-report 契约，并登记为规格区段；同一批新增 `deviation.band_consistent` 检查以消费 CFG-03.boundaries 与 CFG-02.labels。新增契约与检查均无复核产物",

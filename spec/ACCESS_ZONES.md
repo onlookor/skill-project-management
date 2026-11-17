@@ -60,6 +60,7 @@
 | `validation/d6/results/phase3-public-uc/run.json` | C | — | D6 批次 3 机器可读运行记录 |
 | `validation/d6/results/phase4-public-hs2/run.json` | C | — | D6 批次 4 机器可读运行记录 |
 | `validation/d6/results/phase5-public-npfit/run.json` | C | — | D6 批次 5 机器可读运行记录 |
+| `validation/d6/results/phase6-contract-gaps/run.json` | C | — | D6 批次 6 机器可读运行记录 |
 | `validation/d6/variants/` | C | — | S2 变体工件副本（仅同步 config_ref，不含新素材） |
 | `validation/d6/results/s2-v-cfg03/run.json` | C | — | S2 变体 V-CFG03 运行记录 |
 | `validation/d6/results/s2-v-cfg05/run.json` | C | — | S2 变体 V-CFG05 运行记录 |

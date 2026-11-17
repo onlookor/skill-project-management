@@ -1940,3 +1940,16 @@
 - **未做**：未宣称 D6 达标；未改 `risk-register.schema.json`；未宣称 CFG-14 标签已覆盖；模型三档仍未执行。
 - **“这批改动尚未经外复核”的登记位置**：`TODO.md` T-182、T-150；`scripts/no-review-declarations.json` 的 `spec/ACCESS_ZONES.md`、`runtime/artifacts/deviation-report.schema.json`、`scripts/pm_caps.py`、`scripts/check_spec_pins.py`、`scripts/no-review-declarations.json` 五条；`GAP_LEDGER.md` G-027/G-028；本节。
 - **关联 ADR**：无（新增运行期契约按 T-151 的既有契约层口径落地；未改规范正文）
+
+---
+
+### 批次 0113 — 2026-11-17 — 修复 D4 回归：补登记 phase6 运行记录归区
+
+- **涉及文件**：`spec/ACCESS_ZONES.md`、`scripts/spec-pins.json`、`scripts/checker-pins.json`、`scripts/no-review-declarations.json`、`TODO.md`、`knowledge/glossary-usage.json`、`CHANGELOG.md`
+- **变更摘要**：
+  - `check_no_raw_material` 因 `validation/d6/results/phase6-contract-gaps/run.json` 未被逐条登记、落到 `validation/d6/results/` 的 P2 默认区而报 `RM-ZONE`（批次 0112 提交后才纳入跟踪文件扫描）。按既有格式在 `spec/ACCESS_ZONES.md`（第 63 行）增一行 C 区登记，与 phase1–5 一致。
+  - 核查 `validation/d6/results/` 下全部 12 个子目录：仅 `phase6-contract-gaps` 未登记，其余 11 个 `run.json` 均已登记；本批一次补齐，无其他漏项。
+  - `ACCESS_ZONES.md` 为受钉区段：按 3.5.3 以 `无复核声明（不构成认可，不放行）` 重冻 `spec-pins.json`，同步 `checker-pins.json`，改写 `no-review-declarations.json` 的 `spec/ACCESS_ZONES.md` 条目并新建到期项 T-183。
+- **实测**：`check_no_raw_material.py` rc=0（306 文件，D 25 / O 30 / P 109 / C 142 / 未归类 0，0 错误）；`check_state.py`、`check_anchors.py`、`check_gap_ledger.py`、`check_three_table.py`、`check_ledger_landings.py`、`check_clause_basis.py`、`check_coverage_gate.py`、`check_glossary_usage.py` 均 rc=0。两个 pins 检查器仍因既有未复核声明 rc=1。
+- **钩子绕过**：受钉区段改动且无复核产物，按 3.5.3 第 3 条新建 T-183 后携带 `Hook-Bypass: pin-review-debt`、`Hook-Bypass-Items: T-183` 提交。
+- **未做**：未改任何运行记录或任务工件，未改检查器逻辑；漏登记的结构性原因由 T-183 复核项承接。
